@@ -1,0 +1,66 @@
+﻿@using SESM.DAL
+@using SESM.DTO
+@using SESM.Tools
+
+@{
+    ViewBag.Title = "Servers List";
+    
+}
+
+<h2>Server List</h2>
+
+@if ((bool)ViewData["IsAdmin"])
+{
+    <div class="btn-group btn-group-justified col-md-6">
+        <a class="btn btn-default" href="@(Url.Action("Create", "Server"))">Add Server</a>
+        <a class="btn btn-success" href="@(Url.Action("StartAll", "Server"))">Start All</a>
+        <a class="btn btn-warning" href="@(Url.Action("RestartAll", "Server"))">Restart All</a>
+        <a class="btn btn-danger" href="@(Url.Action("StopAll", "Server"))">Stop All</a>
+    </div>
+}
+
+@{ List<EntityServer> ServerList = ViewData["ServerList"] as List<EntityServer>;}
+@{ Dictionary<int, ServiceState> StateList = ViewData["StateList"] as Dictionary<int, ServiceState>;}
+<table class="table table-hover">
+    <tr>
+        <th>
+            Name
+        </th>
+        <th>
+            State
+        </th>
+
+    </tr>
+
+    @foreach (EntityServer item in ServerList)
+    {
+        <tr onclick="location.href = '@(Url.Action("Status", "Server", new { id = item.Id }))'" class="hoverTable">
+            <td>
+                @item.Name
+            </td>
+            <td>
+                @if (StateList[item.Id] == ServiceState.Running)
+                {
+                    <span class="glyphicon glyphicon-ok-sign green"></span>
+                }
+                else if (StateList[item.Id] == ServiceState.Starting)
+                {
+                    <span class="glyphicon glyphicon-chevron-up blue"></span>
+                }
+                else if (StateList[item.Id] == ServiceState.Stopping)
+                {
+                    <span class="glyphicon glyphicon-chevron-down blue"></span>
+                }
+                else if (StateList[item.Id] == ServiceState.Stopped)
+                {
+                    <span class="glyphicon glyphicon-remove-sign red"></span>
+                }
+                else if (StateList[item.Id] == ServiceState.Unknow)
+                {
+                    <span class="glyphicon glyphicon-warning-sign red"></span>
+                }
+            </td>
+        </tr>
+    }
+
+</table>

@@ -1,0 +1,44 @@
+﻿@model SESM.Models.NewMapViewModel
+
+@{
+    ViewBag.Title = "New Map";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        <section id="loginForm">
+            @using (Html.BeginForm("NewMap", "Server", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                <h4>New Map Parametters.</h4>
+                <hr />
+                @Html.ValidationSummary(true)
+                <div class="form-group">
+                    @Html.LabelFor(m => m.MapType, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.EnumDropDownListFor(m => m.MapType, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.MapType)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.AsteroidAmount, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.AsteroidAmount, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.AsteroidAmount)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Create" class="btn btn-default" />
+                    </div>
+                </div>
+                <p>
+                    If tou don't have an Account, you can @Html.ActionLink("Register", "Register") one.
+                </p>
+            }
+        </section>
+    </div>
+
+</div>

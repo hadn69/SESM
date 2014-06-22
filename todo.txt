@@ -1,0 +1,9 @@
+- Server Creation form
+- User Managment (promote SAdmin / change Login/Password / delete user)
+- Global Properties Managment
+- Server Delete
+- Server All Stop/Start
+- Version Update Upload
+- Map Upload
+- Cleanup
+	- Admin/SuperAdminOnly actionFilter

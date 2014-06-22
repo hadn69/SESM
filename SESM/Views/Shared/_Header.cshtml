@@ -1,0 +1,19 @@
+﻿@using SESM.DTO
+<ul class="nav navbar-nav">
+    @if (Session["User"] != null)
+    {
+        EntityUser user = Session["User"] as EntityUser;
+        <li>
+            @Html.ActionLink("Servers", "Index", "Server")
+        </li>
+        if (user.IsAdmin)
+        {
+            <li>
+                @Html.ActionLink("Users", "Index", "Users")
+            </li>
+            <li>
+                @Html.ActionLink("Settings", "Index", "Settings")
+            </li>
+        }
+    }
+</ul>

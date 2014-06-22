@@ -1,0 +1,307 @@
+﻿@using SESM.DAL
+@model SESM.Models.NewServerViewModel
+
+@{
+    ViewBag.Title = "New Server";
+    object labelClass = new { @class = "col-md-5 control-label" };
+
+    string valueColumn = "col-md-6";
+    object ValueClass = new { @class = "form-control" };
+}
+
+<h2>New Server</h2>
+@using (Html.BeginForm("Create", "Server", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    <div class="row">
+        <div class="col-md-6">
+            <section>
+
+                <hr />
+                <h3>Server Settings</h3>
+                <hr />
+                @Html.ValidationSummary()
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Name, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.Name, ValueClass)
+                        @Html.ValidationMessageFor(m => m.Name)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.IsPublic, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.IsPublic, ValueClass)
+                        @Html.ValidationMessageFor(m => m.IsPublic)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ServerName, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.ServerName, ValueClass)
+                        @Html.ValidationMessageFor(m => m.ServerName)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.IP, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.IP, ValueClass)
+                        @Html.ValidationMessageFor(m => m.IP)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ServerPort, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.ServerPort, ValueClass)
+                        @Html.ValidationMessageFor(m => m.ServerPort)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.SteamPort, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.SteamPort, ValueClass)
+                        @Html.ValidationMessageFor(m => m.SteamPort)
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        <div class="col-md-6">
+            <section>
+                <hr />
+                <h3>Game Settings</h3>
+                <hr />
+                <div class="form-group">
+                    @Html.LabelFor(m => m.GameMode, labelClass)
+                    <div class="@valueColumn">
+                        @Html.EnumDropDownListFor(m => m.GameMode, null, ValueClass)
+                        @Html.ValidationMessageFor(m => m.GameMode)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.EnvironmentHostility, labelClass)
+                    <div class="@valueColumn">
+                        @Html.EnumDropDownListFor(m => m.EnvironmentHostility, null, ValueClass)
+                        @Html.ValidationMessageFor(m => m.EnvironmentHostility)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.OnlineMode, labelClass)
+                    <div class="@valueColumn">
+                        @Html.EnumDropDownListFor(m => m.OnlineMode, null, ValueClass)
+                        @Html.ValidationMessageFor(m => m.OnlineMode)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.MaxPlayers, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.MaxPlayers, ValueClass)
+                        @Html.ValidationMessageFor(m => m.MaxPlayers)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.MaxFloatingObjects, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.MaxFloatingObjects, ValueClass)
+                        @Html.ValidationMessageFor(m => m.MaxFloatingObjects)
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <section>
+                <hr />
+                <h3>Multiplier Settings</h3>
+                <hr />
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.InventorySizeMultiplier, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.InventorySizeMultiplier, null, ValueClass)
+                        @Html.ValidationMessageFor(m => m.InventorySizeMultiplier)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.AssemblerSpeedMultiplier, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.AssemblerSpeedMultiplier, null, ValueClass)
+                        @Html.ValidationMessageFor(m => m.AssemblerSpeedMultiplier)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.AssemblerEfficiencyMultiplier, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.AssemblerEfficiencyMultiplier, null, ValueClass)
+                        @Html.ValidationMessageFor(m => m.AssemblerEfficiencyMultiplier)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.RefinerySpeedMultiplier, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.RefinerySpeedMultiplier, null, ValueClass)
+                        @Html.ValidationMessageFor(m => m.RefinerySpeedMultiplier)
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="col-md-6">
+            <section>
+                <hr />
+                <h3>Gameplay Settings</h3>
+                <hr />
+                <div class="form-group">
+                    @Html.LabelFor(m => m.AutoHealing, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.AutoHealing, ValueClass)
+                        @Html.ValidationMessageFor(m => m.AutoHealing)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.WeaponsEnabled, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.WeaponsEnabled, ValueClass)
+                        @Html.ValidationMessageFor(m => m.WeaponsEnabled)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ShowPlayerNamesOnHud, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.ShowPlayerNamesOnHud, ValueClass)
+                        @Html.ValidationMessageFor(m => m.ShowPlayerNamesOnHud)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ThrusterDamage, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.ThrusterDamage, ValueClass)
+                        @Html.ValidationMessageFor(m => m.ThrusterDamage)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.CargoShipsEnabled, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.CargoShipsEnabled, ValueClass)
+                        @Html.ValidationMessageFor(m => m.CargoShipsEnabled)
+                    </div>
+                </div>
+
+
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <section>
+                <hr />
+                <h3>Map Settings</h3>
+                <hr />
+                <div class="form-group">
+                    @Html.LabelFor(m => m.WorldSizeKm, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.WorldSizeKm, null, ValueClass)
+                        @Html.ValidationMessageFor(m => m.WorldSizeKm)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.AutoSave, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.AutoSave, ValueClass)
+                        @Html.ValidationMessageFor(m => m.AutoSave)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.RemoveTrash, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.RemoveTrash, ValueClass)
+                        @Html.ValidationMessageFor(m => m.RemoveTrash)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.RespawnShipDelete, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.RespawnShipDelete, ValueClass)
+                        @Html.ValidationMessageFor(m => m.RespawnShipDelete)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.EnableCopyPaste, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.EnableCopyPaste, ValueClass)
+                        @Html.ValidationMessageFor(m => m.EnableCopyPaste)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.EnableSpectator, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.EnableSpectator, ValueClass)
+                        @Html.ValidationMessageFor(m => m.EnableSpectator)
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        <div class="col-md-6">
+            <section>
+                <hr />
+                <h3>In-Game Managment Settings</h3>
+                <hr />
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Administrators, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextAreaFor(m => m.Administrators, ValueClass)
+                        @Html.ValidationMessageFor(m => m.Administrators)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Banned, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextAreaFor(m => m.Banned, ValueClass)
+                        @Html.ValidationMessageFor(m => m.Banned)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.GroupID, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.GroupID, null, ValueClass)
+                        @Html.ValidationMessageFor(m => m.GroupID)
+                    </div>
+                </div>
+            </section>
+            <section>
+                <hr />
+                <h3>Web Managment Settings</h3>
+                <hr />
+                <div class="form-group">
+                    @Html.LabelFor(m => m.WebAdministrators, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextAreaFor(m => m.WebAdministrators, ValueClass)
+                        @Html.ValidationMessageFor(m => m.WebAdministrators)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.WebManagers, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextAreaFor(m => m.WebManagers, ValueClass)
+                        @Html.ValidationMessageFor(m => m.WebManagers)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.WebUsers, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextAreaFor(m => m.WebUsers, ValueClass)
+                        @Html.ValidationMessageFor(m => m.WebUsers)
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="col-md-offset-2 col-md-10">
+        <input type="submit" value="Save" class="btn btn-default" />
+    </div>
+}
+
+<p>
+    @Html.ActionLink("< Back to List", "Index")
+</p>

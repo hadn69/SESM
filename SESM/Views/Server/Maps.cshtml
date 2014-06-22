@@ -1,0 +1,41 @@
+﻿@{
+    ViewBag.Title = "title";
+    List<SelectListItem> listDir = (List<SelectListItem>) ViewData["listDir"];
+    int id = (int)ViewData["ID"];
+}
+@model SESM.Models.MapViewModel
+<h2>@ViewBag.Title</h2>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <section id="loginForm">
+            @using (Html.BeginForm("Maps", "Server", null, FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
+            {
+
+                <h4>Select A Map.</h4>
+                <hr />
+                @Html.ValidationSummary(true)
+                <div class="form-group">
+                    @Html.LabelFor(m => m.MapName, new {@class = "col-md-2 control-label"})
+                    <div class="col-md-10">
+
+                        @Html.DropDownListFor(m => m.MapName, listDir, new {@class = "form-control", size = "5"})
+                        @Html.ValidationMessageFor(m => m.MapName)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save And (Re)Start" name="action:SaveMap" class="btn btn-default" />
+                        <input type="submit" value="Delete" name="action:DelMap" class="btn btn-default" />
+                        <input type="submit" value="Download" name="action:DownMap" class="btn btn-default" /><br />
+                        <a class="btn btn-default" href="@(Url.Action("NewMap", "Server", new { id = id }))">Create Map</a>
+                    </div>
+                </div>
+
+            }
+        </section>
+    </div>
+
+</div>
