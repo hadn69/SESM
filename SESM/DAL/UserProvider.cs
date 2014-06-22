@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using SESM.DTO;
@@ -18,6 +19,17 @@ namespace SESM.DAL
             try
             {
                 return _context.Users.Find(id);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public List<EntityUser> GetUsers()
+        {
+            try
+            {
+                return _context.Users.ToList();
             }
             catch
             {
