@@ -78,12 +78,24 @@ namespace SESM.DAL
                 throw;
             }
         }
+
         public void AddUser(EntityUser user)
         {
             try
             {
                 _context.Users.Add(user);
-                _context.Entry<EntityUser>(user).State = EntityState.Added;
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public void RemoveUser(EntityUser user)
+        {
+            try
+            {
+                _context.Users.Remove(user);
                 _context.SaveChanges();
             }
             catch

@@ -2,7 +2,7 @@
 @model SESM.Models.ServerViewModel
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "Server Details";
     object labelClass = new {@class = "col-md-5 control-label"};
     
     string valueColumn = "col-md-6";
@@ -22,7 +22,7 @@
     }
 }
 
-<h2>Server Details</h2>
+<h2>@ViewBag.Title</h2>
 @using (Html.BeginForm("Details", "Server", new {ReturnUrl = ViewBag.ReturnUrl}, FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
 {
     <div class="row">   

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
-  <setParameter name="IIS Web Application Name" value="Default Web Site/SESM_deploy" />
-  <setParameter name="DataContext-Web.config Connection String" value="Data Source=(LocalDB)\v11.0;AttachDbFilename='|DataDirectory|DB.mdf';Integrated Security=True" />
+  <setParameter name="IIS Web Application Name" value="SESM" />
+  <setParameter name="DataContext-Web.config Connection String" value="Server=.\SQLEXPRESS;Database=SESM;User Id=sa;Password=MyPassword;MultipleActiveResultSets=true;" />
 </parameters>

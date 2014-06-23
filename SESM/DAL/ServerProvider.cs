@@ -190,6 +190,43 @@ namespace SESM.DAL
             }
         }
 
+        public AccessLevel GetHighestAccessLevel(List<EntityServer> servers, EntityUser user)
+        {
+           AccessLevel accessLevel = AccessLevel.Guest;
+            if(user.IsAdmin)
+                return AccessLevel.SuperAdmin;
+           foreach (AccessLevel itemAccessLevel in servers.Select(item => GetAccessLevel(user.Id, item.Id)))
+            {
+                if (accessLevel == AccessLevel.Guest 
+                    && itemAccessLevel != AccessLevel.Guest)
+                {
+                    accessLevel = itemAccessLevel;
+                }
+                else if (accessLevel == AccessLevel.User
+                    && itemAccessLevel != AccessLevel.Guest
+                    && itemAccessLevel != AccessLevel.User)
+                {
+                    accessLevel = itemAccessLevel;
+                }
+                else if (accessLevel == AccessLevel.Manager
+                    && itemAccessLevel != AccessLevel.Guest
+                    && itemAccessLevel != AccessLevel.User
+                    && itemAccessLevel != AccessLevel.Manager)
+                {
+                    accessLevel = itemAccessLevel;
+                }
+                else if (accessLevel == AccessLevel.Admin
+                    && itemAccessLevel != AccessLevel.Guest
+                    && itemAccessLevel != AccessLevel.User
+                    && itemAccessLevel != AccessLevel.Manager
+                    && itemAccessLevel != AccessLevel.Admin)
+                {
+                    accessLevel = itemAccessLevel;
+                }
+            }
+            return accessLevel;
+        }
+
         public List<EntityServer> GetServers(EntityUser user)
         {
             try
@@ -216,6 +253,18 @@ namespace SESM.DAL
             catch (Exception)
             {
                 return null;
+            }
+        }
+        public void RemoveServer(EntityServer server)
+        {
+            try
+            {
+                _context.Servers.Remove(server);
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw;
             }
         }
     }

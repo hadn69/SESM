@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "title";
+    ViewBag.Title = "Map List";
     List<SelectListItem> listDir = (List<SelectListItem>) ViewData["listDir"];
     int id = (int)ViewData["ID"];
 }
@@ -13,7 +13,7 @@
             @using (Html.BeginForm("Maps", "Server", null, FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
             {
 
-                <h4>Select A Map.</h4>
+                <h4>Select A Map : </h4>
                 <hr />
                 @Html.ValidationSummary(true)
                 <div class="form-group">

@@ -26,7 +26,7 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(context);
             List<EntityServer> serverList = srvPrv.GetServers(user);
 
-            ViewData["IsAdmin"] = user.IsAdmin;
+            ViewData["AccessLevel"] = srvPrv.GetHighestAccessLevel(serverList, user);
 
             ViewData["ServerList"] = serverList;
             ViewData["StateList"] = srvPrv.GetState(serverList);
@@ -58,6 +58,29 @@ namespace SESM.Controllers
             ViewData["ID"] = id;
             Response.AddHeader("Refresh", "10");
             return View(serverView);
+        }
+
+        // GET: Server/Delete/5
+        [HttpGet]
+        [CheckAuth]
+        [SuperAdmin]
+        public ActionResult Delete(int? id)
+        {
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(context);
+            int serverId = id ?? 0;
+
+            EntityServer serv = srvPrv.GetServer(serverId);
+            if (serv != null)
+            {
+                ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(serv));
+                if (Directory.Exists(PathHelper.GetInstancePath(serv)))
+                    Directory.Delete(PathHelper.GetInstancePath(serv), true);
+                srvPrv.RemoveServer(serv);
+            }
+
+            return RedirectToAction("Index");
         }
 
         // GET: Server/Start/5
@@ -206,6 +229,7 @@ namespace SESM.Controllers
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(context);
             int serverId = id ?? 0;
+            ViewData["ID"] = serverId;
             EntityServer serv = srvPrv.GetServer(serverId);
 
             AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, serv.Id);

@@ -220,7 +220,7 @@ namespace SESM.Tools
             sb.AppendLine("    <TypeId>ScenarioDefinition</TypeId>");
             sb.AppendLine("    <SubtypeId>" + ScenarioType.ToString() + "</SubtypeId>");
             sb.AppendLine("  </Scenario>");
-            if (SaveName == string.Empty)
+            if (string.IsNullOrEmpty(SaveName))
                 sb.AppendLine("  <LoadWorld />");
             else
                 sb.AppendLine("  <LoadWorld>" + PathHelper.GetSavePath(serv, SaveName) + "</LoadWorld>");
