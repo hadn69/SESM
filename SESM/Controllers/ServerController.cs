@@ -25,7 +25,6 @@ namespace SESM.Controllers
         {
             EntityUser user = Session["User"] as EntityUser;
 
-
             ServerProvider srvPrv = new ServerProvider(context);
 
             List<EntityServer> serverList = srvPrv.GetServers(user);
@@ -38,9 +37,9 @@ namespace SESM.Controllers
             return View();
         }
 
+        //
         // GET: Server/Status/5
         [HttpGet]
-        [LoggedOnly]
         [CheckAuth]
         public ActionResult Status(int? id)
         {
@@ -104,7 +103,9 @@ namespace SESM.Controllers
             return RedirectToAction("Status", new { id = id });
         }
 
+
         [HttpGet]
+        [LoggedOnly]
         public ActionResult StartAll()
         {
             EntityUser user = Session["User"] as EntityUser;

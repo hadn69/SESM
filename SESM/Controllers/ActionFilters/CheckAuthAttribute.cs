@@ -17,8 +17,8 @@ namespace SESM.Controllers.ActionFilters
 
                 ServerProvider srvPrv = new ServerProvider(context);
                 EntityUser user = HttpContext.Current.Session["User"] as EntityUser;
-
-                if (!srvPrv.CheckAccess(user.Id, int.Parse(filterContext.ActionParameters["id"].ToString())))
+                int idServer = int.Parse(filterContext.ActionParameters["id"].ToString());
+                if ((user == null && !srvPrv.GetServer(idServer).IsPublic) || (user != null && !srvPrv.CheckAccess(user.Id, idServer)))
                 {
                     filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary
                     {
