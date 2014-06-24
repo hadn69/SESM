@@ -12,22 +12,25 @@ using SESM.Tools;
 
 namespace SESM.Controllers
 {
-    [LoggedOnly]
+    
     public class ServerController : Controller
     {
         readonly DataContext context = new DataContext();
 
+        //
         // GET: Server
+        // This page show the list of all the servers the current user is authorised to see
         [HttpGet]
         public ActionResult Index()
         {
             EntityUser user = Session["User"] as EntityUser;
 
+
             ServerProvider srvPrv = new ServerProvider(context);
+
             List<EntityServer> serverList = srvPrv.GetServers(user);
 
             ViewData["AccessLevel"] = srvPrv.GetHighestAccessLevel(serverList, user);
-
             ViewData["ServerList"] = serverList;
             ViewData["StateList"] = srvPrv.GetState(serverList);
             
@@ -37,6 +40,7 @@ namespace SESM.Controllers
 
         // GET: Server/Status/5
         [HttpGet]
+        [LoggedOnly]
         [CheckAuth]
         public ActionResult Status(int? id)
         {
@@ -62,6 +66,7 @@ namespace SESM.Controllers
 
         // GET: Server/Delete/5
         [HttpGet]
+        [LoggedOnly]
         [CheckAuth]
         [SuperAdmin]
         public ActionResult Delete(int? id)
@@ -85,6 +90,7 @@ namespace SESM.Controllers
 
         // GET: Server/Start/5
         [HttpGet]
+        [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
         public ActionResult Start(int? id)
@@ -115,8 +121,10 @@ namespace SESM.Controllers
             return RedirectToAction("Index");
         }
 
+        //
         // GET: Server/Stop/5
         [HttpGet]
+        [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
         public ActionResult Stop(int? id)
@@ -131,6 +139,7 @@ namespace SESM.Controllers
         }
 
         [HttpGet]
+        [LoggedOnly]
         public ActionResult StopAll()
         {
             EntityUser user = Session["User"] as EntityUser;
@@ -149,6 +158,7 @@ namespace SESM.Controllers
 
         // GET: Server/Restart/5
         [HttpGet]
+        [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
         public ActionResult Restart(int? id)
@@ -163,6 +173,7 @@ namespace SESM.Controllers
         }
 
         [HttpGet]
+        [LoggedOnly]
         public ActionResult RestartAll()
         {
             EntityUser user = Session["User"] as EntityUser;
@@ -195,6 +206,7 @@ namespace SESM.Controllers
 
         // GET: Server/Details/5
         [HttpGet]
+        [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
         public ActionResult Details(int? id)
@@ -222,6 +234,7 @@ namespace SESM.Controllers
         }
 
         [HttpPost]
+        [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
         public ActionResult Details(int? id, ServerViewModel model)
@@ -337,15 +350,14 @@ namespace SESM.Controllers
 
         // GET: Server
         [HttpGet]
+        [LoggedOnly]
         [CheckAuth]
         [AdminAndAbove]
-        public ActionResult Maps(int? id)
+        public ActionResult Maps(int id)
         {
-            EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(context);
-            int serverId = id ?? 0;
-            ViewData["ID"] = serverId;
-            EntityServer serv = srvPrv.GetServer(serverId);
+            ViewData["ID"] = id;
+            EntityServer serv = srvPrv.GetServer(id);
 
             string[] listDir = Directory.GetDirectories(PathHelper.GetSavesPath(serv));
 
@@ -373,6 +385,7 @@ namespace SESM.Controllers
 
         // GET: Server
         [HttpPost]
+        [LoggedOnly]
         [CheckAuth]
         [AdminAndAbove]
         [MultipleButton(Name = "action", Argument = "SaveMap")]
@@ -400,6 +413,7 @@ namespace SESM.Controllers
 
         // GET: Server
         [HttpPost]
+        [LoggedOnly]
         [CheckAuth]
         [AdminAndAbove]
         [MultipleButton(Name = "action", Argument = "DelMap")]
@@ -420,6 +434,7 @@ namespace SESM.Controllers
 
         // GET: Server
         [HttpPost]
+        [LoggedOnly]
         [CheckAuth]
         [AdminAndAbove]
         [MultipleButton(Name = "action", Argument = "DownMap")]
@@ -455,6 +470,7 @@ namespace SESM.Controllers
 
 
         [HttpGet]
+        [LoggedOnly]
         [CheckAuth]
         [AdminAndAbove]
         public ActionResult NewMap(int id)
@@ -463,6 +479,7 @@ namespace SESM.Controllers
         }
 
         [HttpPost]
+        [LoggedOnly]
         [CheckAuth]
         [AdminAndAbove]
         public ActionResult NewMap(int? id, NewMapViewModel model)
@@ -489,6 +506,7 @@ namespace SESM.Controllers
         }
 
         [HttpGet]
+        [LoggedOnly]
         [SuperAdmin]
         public ActionResult Create()
         {
@@ -497,6 +515,7 @@ namespace SESM.Controllers
         }
 
         [HttpPost]
+        [LoggedOnly]
         [SuperAdmin]
         public ActionResult Create(NewServerViewModel model)
         {

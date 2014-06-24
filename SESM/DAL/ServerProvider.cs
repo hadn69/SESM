@@ -192,9 +192,12 @@ namespace SESM.DAL
 
         public AccessLevel GetHighestAccessLevel(List<EntityServer> servers, EntityUser user)
         {
-           AccessLevel accessLevel = AccessLevel.Guest;
+           
+            if (user == null)
+                return AccessLevel.Guest;
             if(user.IsAdmin)
                 return AccessLevel.SuperAdmin;
+            AccessLevel accessLevel = AccessLevel.Guest;
            foreach (AccessLevel itemAccessLevel in servers.Select(item => GetAccessLevel(user.Id, item.Id)))
             {
                 if (accessLevel == AccessLevel.Guest 
@@ -229,6 +232,10 @@ namespace SESM.DAL
 
         public List<EntityServer> GetServers(EntityUser user)
         {
+            if (user == null)
+            {
+                return _context.Servers.ToList().Where(item => item.IsPublic).ToList();
+            }
             try
             {
                 UserProvider usrPrv = new UserProvider(_context);
