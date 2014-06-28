@@ -41,7 +41,15 @@
             
         </h3>
         <h5>Game Mode : @Model.GameMode</h5>
-        <h5>Current Map : @Model.SaveName</h5>
+        @if (Model.SaveName == null)
+        {
+            <h5>Current Map : New map at each start</h5>
+        }
+        else
+        {
+            <h5>Current Map : @Model.SaveName</h5>
+        }
+        
         @if (accessLevel == AccessLevel.SuperAdmin || accessLevel == AccessLevel.Admin || accessLevel == AccessLevel.Manager)
         {
             <div class="btn-group btn-group-justified">

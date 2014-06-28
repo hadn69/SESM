@@ -210,7 +210,7 @@
                 <hr />
                 <h3>Map Settings @if (accessLevel == AccessLevel.Admin || accessLevel == AccessLevel.SuperAdmin)
                                  {
-                                     <a class="btn btn-default" href="@(Url.Action("Maps", "Server", new {id = id}))">Manage Maps ...</a>
+                                     <a class="btn btn-default" href="@(Url.Action("Maps", "Server", new {id = id}))">Manage Maps</a>
                                  }</h3>
                 <hr />
                 <div class="form-group">
@@ -335,7 +335,8 @@
 </div>
     </div>
     <div class="col-md-offset-2 col-md-10">
-    <input type="submit" value="Save and (Re)Start" class="btn btn-default" />
+        <input type="submit" value="Save" name="action:SaveDetails" class="btn btn-default" />
+        <input type="submit" value="Save and (Re)Start" name="action:SaveRestartDetails" class="btn btn-default" />
     </div>
 }
 

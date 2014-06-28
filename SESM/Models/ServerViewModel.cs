@@ -7,7 +7,7 @@ namespace SESM.Models
     {
         [Required]
         [DisplayName("Web Name")]
-        [RegularExpression(@"^[a-zA-Z0-9_.-]+$", ErrorMessage = "The Name must be only composed of letters, numbers, dot, dash and underscore")]
+        [RegularExpression(@"^[a-zA-Z0-9_.-]+$", ErrorMessage = "The Name must be only composed of letters, numbers, dots, dashs and underscores")]
         public string Name { get; set; }
 
         [Required]

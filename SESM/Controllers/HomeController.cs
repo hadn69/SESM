@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Web.Mvc;
-using SESM.DAL;
+﻿using System.Web.Mvc;
 
 namespace SESM.Controllers
 {
