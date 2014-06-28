@@ -795,6 +795,24 @@ namespace SESM.Controllers
             return RedirectToAction("Maps", new {id = id});
         }
 
+        //
+        // GET: Server/Logs/5
+        [HttpGet]
+        [LoggedOnly]
+        [CheckAuth]
+        [ManagerAndAbove]
+        public ActionResult Logs(int id)
+        {
+            ServerProvider srvPrv = new ServerProvider(context);
+            EntityServer serv = srvPrv.GetServer(id);
+            string path = PathHelper.GetInstancePath(serv) + "SpaceEngineers-Dedicated.log";
+            if (System.IO.File.Exists(path))
+                ViewData["logEntries"] = System.IO.File.ReadAllLines(path);
+            else
+                ViewData["logEntries"] = new string[0];
+            return View();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -804,5 +822,6 @@ namespace SESM.Controllers
             base.Dispose(disposing);
         }
 
+        
     }
 }

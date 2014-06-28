@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "Logs";
+
+    string[] logEntries = (string[])ViewData["logEntries"];
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="panel panel-default">
+    <div class="panel-heading">Server's Logs</div>
+    <div class="panel-body">
+        <div style="overflow:auto">
+            <ul class="list-group">
+                @foreach (string item in logEntries)
+                {
+                    <li class="list-group-item">@item</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

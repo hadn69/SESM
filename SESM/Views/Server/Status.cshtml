@@ -9,7 +9,8 @@
 }
 <h2>@Model.Name Status @if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
                        {
-                           <a class="btn btn-default" href="@(Url.Action("Details", "Server", new {id = id}))">Edit</a>
+                            <a class="btn btn-default" href="@(Url.Action("Details", "Server", new {id = id}))">Edit</a>
+                            <a class="btn btn-default" href="@(Url.Action("Logs", "Server", new {id = id}))">Logs</a>
                        }
                        @if (accessLevel == AccessLevel.SuperAdmin )
                         {

@@ -146,6 +146,7 @@
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Server\UploadMap.cshtml" />
+    <Content Include="Views\Server\Logs.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -200,6 +201,7 @@
     <Compile Include="Tools\PathHelper.cs" />
     <Compile Include="Tools\ServiceHelper.cs" />
     <Compile Include="Tools\ServerConfigHelper.cs" />
+    <Compile Include="Tools\SESMConfigHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config">
