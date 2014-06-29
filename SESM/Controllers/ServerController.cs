@@ -770,6 +770,11 @@ namespace SESM.Controllers
         [AdminAndAbove]
         public ActionResult UploadMap(int id, UploadMapViewModel model)
         {
+            if (!ZipFile.IsZipFile(model.SaveZip.InputStream, false))
+            {
+                ModelState.AddModelError("ZipError", "Your File is not a valid zip file");
+                return View(model);
+            }
             ServerProvider srvPrv = new ServerProvider(context);
             EntityServer serv = srvPrv.GetServer(id);
 
@@ -806,8 +811,26 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(context);
             EntityServer serv = srvPrv.GetServer(id);
             string path = PathHelper.GetInstancePath(serv) + "SpaceEngineers-Dedicated.log";
+            if (SESMConfigHelper.GetAddDateToLog())
+            {
+                DirectoryInfo info = new DirectoryInfo(PathHelper.GetInstancePath(serv));
+                FileInfo file = info.GetFiles().Where(f => f.Name.EndsWith(".log")).OrderBy(p => p.CreationTime).First();
+                path = PathHelper.GetInstancePath(serv) + file.Name;
+            }
             if (System.IO.File.Exists(path))
-                ViewData["logEntries"] = System.IO.File.ReadAllLines(path);
+            {
+                FileStream logFileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                StreamReader logFileReader = new StreamReader(logFileStream);
+                List<string> logList = new List<string>();
+                while (!logFileReader.EndOfStream)
+                {
+                    logList.Add(logFileReader.ReadLine());
+                }
+
+                logFileReader.Close();
+                logFileStream.Close();
+                ViewData["logEntries"] = logList.ToArray();
+            }
             else
                 ViewData["logEntries"] = new string[0];
             return View();

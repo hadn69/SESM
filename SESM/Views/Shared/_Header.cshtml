@@ -8,13 +8,12 @@
         EntityUser user = (EntityUser)Session["User"];
         if (user.IsAdmin)
          {
-             <li>
-                 @Html.ActionLink("Users", "Index", "User")
-             </li>
-             <!-- On Next Version
-                 <li>
-                     @Html.ActionLink("Settings", "Index", "Settings")
-                 </li>-->
+            <li>
+                @Html.ActionLink("Users", "Index", "User")
+            </li>
+            <li>
+                @Html.ActionLink("Settings", "Index", "Settings")
+            </li>
          }
     }
 </ul>

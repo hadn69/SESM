@@ -1,6 +1,3 @@
 - User Managment (promote SAdmin / change Login/Password / delete user)
-- Global Properties Managment
-- Version Update Upload
-- Map Upload
 - Kill and Kill Force
 - Cleanup

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Configuration;
 using System.Linq;
 using System.ServiceProcess;
-using System.Web.Configuration;
 using SESM.DTO;
+using SESM.Models;
 
 namespace SESM.Tools
 {
@@ -12,8 +11,12 @@ namespace SESM.Tools
         
         public static string GetServiceName(EntityServer server)
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
             return PathHelper.GetPrefix() + "_" + server.Id + "_" + server.Name;
+        }
+
+        public static string GetServiceName(string prefix, EntityServer server)
+        {
+            return prefix + "_" + server.Id + "_" + server.Name;
         }
 
         public static void StopService(string serviceName)
@@ -21,15 +24,10 @@ namespace SESM.Tools
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
-                if (svcController != null)
-                {
-                    if (svcController.Status != ServiceControllerStatus.Stopped &&
-                        svcController.Status != ServiceControllerStatus.StopPending)
-                        svcController.Stop();
-  
-                }
+                if (svcController.Status == ServiceControllerStatus.Running)
+                    svcController.Stop();
             }
-            catch (Exception Ex)
+            catch (Exception ex)
             {
                 return;
             }
@@ -40,17 +38,14 @@ namespace SESM.Tools
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
-                if (svcController != null)
+
+                if (svcController.Status == ServiceControllerStatus.Running)
                 {
-                    if (svcController.Status != ServiceControllerStatus.Stopped &&
-                        svcController.Status != ServiceControllerStatus.StopPending)
-                    {
-                        svcController.Stop();
-                        svcController.WaitForStatus(ServiceControllerStatus.Stopped);
-                    }
+                    svcController.Stop();
+                    svcController.WaitForStatus(ServiceControllerStatus.Stopped);
                 }
             }
-            catch (Exception Ex)
+            catch (Exception ex)
             {
                 return;
             }
@@ -61,30 +56,24 @@ namespace SESM.Tools
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
-                if (svcController != null)
-                {
-                    svcController.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 10));
-                }
+                svcController.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 10));
             }
-            catch (Exception Ex)
+            catch (Exception ex)
             {
                 return;
             }
         }
+
         public static void StartService(string serviceName)
         {
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
-                if (svcController != null)
-                {
-                    if (svcController.Status != ServiceControllerStatus.Running &&
-                        svcController.Status != ServiceControllerStatus.StartPending)
-                        svcController.Start();
 
-                }
+                if (svcController.Status == ServiceControllerStatus.Stopped)
+                    svcController.Start();
             }
-            catch (Exception Ex)
+            catch (Exception ex)
             {
                 return;
             }
@@ -95,20 +84,14 @@ namespace SESM.Tools
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
-                if (svcController != null)
+                if (svcController.Status == ServiceControllerStatus.Running)
                 {
-                    if (svcController.Status != ServiceControllerStatus.Stopped 
-                        && svcController.Status != ServiceControllerStatus.StartPending 
-                        && svcController.Status != ServiceControllerStatus.StopPending)
-                    {
-                        svcController.Stop();
-                        svcController.WaitForStatus(ServiceControllerStatus.Stopped);
-                        svcController.Start();
-                    }
-
+                    svcController.Stop();
+                    svcController.WaitForStatus(ServiceControllerStatus.Stopped);
+                    svcController.Start();
                 }
             }
-            catch (Exception Ex)
+            catch (Exception ex)
             {
                 return;
             }
@@ -116,28 +99,27 @@ namespace SESM.Tools
 
         public static void RegisterService(string serviceName)
         {
-            if (!DoesServiceExist(serviceName))
-            {
-                Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-                string dataPath = conf.AppSettings.Settings["SEDataPath"].Value;
-                if (conf.AppSettings.Settings["Arch"].Value == "x86")
-                    dataPath += @"DedicatedServer\SpaceEngineersDedicated.exe";
-                if (conf.AppSettings.Settings["Arch"].Value == "x64")
-                    dataPath += @"DedicatedServer64\SpaceEngineersDedicated.exe";
+            if (DoesServiceExist(serviceName)) 
+                return;
 
-                System.Diagnostics.Process si = new System.Diagnostics.Process();
-                si.StartInfo.WorkingDirectory = @"c:\";
-                si.StartInfo.UseShellExecute = false;
-                si.StartInfo.FileName = "cmd.exe";
-                si.StartInfo.Arguments = "/c \"sc create " + serviceName + " start= auto binPath= \\\"" + dataPath + "\\\"\"";
-                si.StartInfo.CreateNoWindow = true;
-                si.StartInfo.RedirectStandardInput = true;
-                si.StartInfo.RedirectStandardOutput = true;
-                si.StartInfo.RedirectStandardError = true;
-                si.Start();
-                string output = si.StandardOutput.ReadToEnd();
-                si.Close();
-            }
+            string dataPath = SESMConfigHelper.GetSEDataPath();
+            if (SESMConfigHelper.GetArch() == ArchType.x86)
+                dataPath += @"DedicatedServer\SpaceEngineersDedicated.exe";
+            if (SESMConfigHelper.GetArch() == ArchType.x64)
+                dataPath += @"DedicatedServer64\SpaceEngineersDedicated.exe";
+
+            System.Diagnostics.Process si = new System.Diagnostics.Process();
+            si.StartInfo.WorkingDirectory = @"c:\";
+            si.StartInfo.UseShellExecute = false;
+            si.StartInfo.FileName = "cmd.exe";
+            si.StartInfo.Arguments = "/c \"sc create " + serviceName + " start= auto binPath= \\\"" + dataPath + "\\\"\"";
+            si.StartInfo.CreateNoWindow = true;
+            si.StartInfo.RedirectStandardInput = true;
+            si.StartInfo.RedirectStandardOutput = true;
+            si.StartInfo.RedirectStandardError = true;
+            si.Start();
+            string output = si.StandardOutput.ReadToEnd();
+            si.Close();
         }
 
         public static void UnRegisterService(string serviceName)

@@ -1,0 +1,67 @@
+﻿@model SESM.Models.SettingsViewModel
+@{
+    ViewBag.Title = "Configuration";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        <section id="loginForm">
+            @using (Html.BeginForm("Index", "Settings", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                <hr />
+                @Html.ValidationSummary()
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Prefix, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Prefix, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Prefix)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.SESavePath, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.SESavePath, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.SESavePath)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.SEDataPath, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.SEDataPath, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.SEDataPath)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Arch, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.EnumDropDownListFor(m => m.Arch, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Arch)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.AddDateToLog, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.CheckBoxFor(m => m.AddDateToLog, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.AddDateToLog)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.SendLogToKeen, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.CheckBoxFor(m => m.SendLogToKeen, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.SendLogToKeen)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" onclick="return confirm('This will restart all started server, Are you sure you want to save ?');" class="btn btn-default" />
+                        <a class="btn btn-default" href="@(Url.Action("UploadBin", "Settings"))">Upload Binaries</a>
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+
+</div>

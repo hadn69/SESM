@@ -230,11 +230,16 @@ namespace SESM.DAL
             return accessLevel;
         }
 
+        public List<EntityServer> GetAllServers()
+        {
+            return _context.Servers.ToList();
+        }
+
         public List<EntityServer> GetServers(EntityUser user)
         {
             if (user == null)
             {
-                return _context.Servers.ToList().Where(item => item.IsPublic).ToList();
+                return _context.Servers.Where(item => item.IsPublic).ToList();
             }
             try
             {
