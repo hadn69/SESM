@@ -21,6 +21,7 @@
         <a class="btn btn-success" href="@(Url.Action("StartAll", "Server"))">Start All</a>
         <a class="btn btn-warning" href="@(Url.Action("RestartAll", "Server"))">Restart All</a>
         <a class="btn btn-danger" href="@(Url.Action("StopAll", "Server"))">Stop All</a>
+        <a class="btn btn-danger" onclick="return confirm('This will kill all started server, this may cause save corruption ! Are you sure you want to do this ?');" href="@(Url.Action("KillAll", "Server"))">Kill All</a>
     </div>
 }
 

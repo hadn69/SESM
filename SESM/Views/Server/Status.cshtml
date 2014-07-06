@@ -54,30 +54,22 @@
         @if (accessLevel == AccessLevel.SuperAdmin || accessLevel == AccessLevel.Admin || accessLevel == AccessLevel.Manager)
         {
             <div class="btn-group btn-group-justified">
-                @if (status == ServiceState.Running)
-                {
-                    <a class="btn btn-warning" href="@(Url.Action("Restart", "Server", new { id = id }))">Restart</a>
-                    <a class="btn btn-danger" href="@(Url.Action("Stop", "Server", new { id = id }))">Stop</a>
-                }
-                else if (status == ServiceState.Starting)
-                {
-                    <a class="btn btn-danger" href="@(Url.Action("Stop", "Server", new { id = id }))">Stop</a>
-                }
-                else if (status == ServiceState.Stopping)
-                {
-                    <a class="btn btn-danger" href="@(Url.Action("Stop", "Server", new { id = id }))">Stop</a>
-                }
-                else if (status == ServiceState.Stopped)
+                @if (status == ServiceState.Stopped || status == ServiceState.Unknow)
                 {
                     <a class="btn btn-success" href="@(Url.Action("Start", "Server", new { id = id }))">Start</a>
                 }
-                else if (status == ServiceState.Unknow)
+                @if (status == ServiceState.Running || status == ServiceState.Unknow)
                 {
-                    <a class="btn btn-success" href="@(Url.Action("Start", "Server", new { id = id }))">Start</a>
                     <a class="btn btn-warning" href="@(Url.Action("Restart", "Server", new { id = id }))">Restart</a>
+                }
+                @if (status == ServiceState.Running || status == ServiceState.Unknow)
+                {
                     <a class="btn btn-danger" href="@(Url.Action("Stop", "Server", new { id = id }))">Stop</a>
                 }
-               
+                @if (status != ServiceState.Stopped)
+                {
+                    <a class="btn btn-danger" onclick="return confirm('This will kill this server, this may cause save corruption ! Are you sure you want to do this ?');" href="@(Url.Action("Kill", "Server", new { id = id }))">Kill</a>
+                }
             </div>
         }
         <hr/>

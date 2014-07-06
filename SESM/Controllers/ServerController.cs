@@ -167,13 +167,12 @@ namespace SESM.Controllers
         [LoggedOnly]
         [CheckAuth]
         [SuperAdmin]
-        public ActionResult Delete(int? id)
+        public ActionResult Delete(int id)
         {
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(context);
-            int serverId = id ?? 0;
 
-            EntityServer serv = srvPrv.GetServer(serverId);
+            EntityServer serv = srvPrv.GetServer(id);
             if (serv != null)
             {
                 ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
@@ -186,7 +185,7 @@ namespace SESM.Controllers
             return RedirectToAction("Index");
         }
 
-        #region Start Stop Restart Kill KillForce
+        #region Start Stop Restart Kill
 
         #region Start
         //
@@ -195,11 +194,10 @@ namespace SESM.Controllers
         [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
-        public ActionResult Start(int? id)
+        public ActionResult Start(int id)
         {
             ServerProvider srvPrv = new ServerProvider(context);
-            int serverId = id ?? 0;
-            EntityServer serv = srvPrv.GetServer(serverId);
+            EntityServer serv = srvPrv.GetServer(id);
 
             ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
 
@@ -235,11 +233,10 @@ namespace SESM.Controllers
         [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
-        public ActionResult Stop(int? id)
+        public ActionResult Stop(int id)
         {
             ServerProvider srvPrv = new ServerProvider(context);
-            int serverId = id ?? 0;
-            EntityServer serv = srvPrv.GetServer(serverId);
+            EntityServer serv = srvPrv.GetServer(id);
 
             ServiceHelper.StopService(ServiceHelper.GetServiceName(serv));
 
@@ -274,11 +271,10 @@ namespace SESM.Controllers
         [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
-        public ActionResult Restart(int? id)
+        public ActionResult Restart(int id)
         {
             ServerProvider srvPrv = new ServerProvider(context);
-            int serverId = id ?? 0;
-            EntityServer serv = srvPrv.GetServer(serverId);
+            EntityServer serv = srvPrv.GetServer(id);
 
             ServiceHelper.RestartService(ServiceHelper.GetServiceName(serv));
 
@@ -320,8 +316,45 @@ namespace SESM.Controllers
         }
         #endregion
 
+        #region Kill
+        //
+        // GET: Server/Kill/5
+        [HttpGet]
+        [LoggedOnly]
+        [CheckAuth]
+        [ManagerAndAbove]
+        public ActionResult Kill(int id)
+        {
+            ServerProvider srvPrv = new ServerProvider(context);
+            EntityServer serv = srvPrv.GetServer(id);
+            ServiceHelper.KillService(ServiceHelper.GetServiceName(serv));
+
+            return RedirectToAction("Status", new { id = id });
+        }
+
+        //
+        // GET: Server/KillAll
+        [HttpGet]
+        [LoggedOnly]
+        public ActionResult KillAll()
+        {
+            EntityUser user = Session["User"] as EntityUser;
+
+            ServerProvider srvPrv = new ServerProvider(context);
+            List<EntityServer> serverList = srvPrv.GetServers(user);
+            foreach (EntityServer item in serverList)
+            {
+                AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
+                if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+                    ServiceHelper.KillService(ServiceHelper.GetServiceName(item));
+            }
+
+            return RedirectToAction("Index");
+        }
+
         #endregion
 
+        #endregion
         //
         // GET: Server/Details/5
         [HttpGet]

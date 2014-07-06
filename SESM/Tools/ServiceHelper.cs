@@ -1,8 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using SESM.DTO;
 using SESM.Models;
+using System.Management;
 
 namespace SESM.Tools
 {
@@ -138,6 +141,46 @@ namespace SESM.Tools
                 si.Start();
                 string output = si.StandardOutput.ReadToEnd();
                 si.Close();
+            }
+        }
+        // Source : http://stackoverflow.com/a/566089
+        public static void KillService(string serviceName)
+        {
+            if (DoesServiceExist(serviceName))
+            {
+                string query = string.Format("SELECT ProcessId FROM Win32_Service WHERE Name='{0}'", serviceName);
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    uint processId = (uint) obj["ProcessId"];
+                    Process process = null;
+                    try
+                    {
+                        process = Process.GetProcessById((int) processId);
+                    }
+                    catch (ArgumentException)
+                    {
+                        // Thrown if the process specified by processId
+                        // is no longer running.
+                    }
+                    try
+                    {
+                        if (process != null)
+                        {
+                            process.Kill();
+                        }
+                    }
+                    catch (Win32Exception)
+                    {
+                        // Thrown if process is already terminating,
+                        // the process is a Win16 exe or the process
+                        // could not be terminated.
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // Thrown if the process has already terminated.
+                    }
+                }
             }
         }
 
