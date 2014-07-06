@@ -6,19 +6,16 @@
 
 <h2>User List</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Login)
+            Login
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Email)
+            Email
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.IsAdmin)
+            Super Admin
         </th>
         <th></th>
     </tr>
@@ -36,6 +33,7 @@
             @Html.DisplayFor(modelItem => item.IsAdmin)
         </td>
         <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id })
             @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { onclick = "return confirm('Are you sure you want to delete this user ?');" })
         </td>
     </tr>

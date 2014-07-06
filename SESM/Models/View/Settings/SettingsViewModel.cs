@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SESM.Models
+namespace SESM.Models.View.Settings
 {
     public class SettingsViewModel
     {

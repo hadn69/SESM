@@ -1,7 +1,10 @@
-﻿using System.Web.Mvc;
+﻿using System.ComponentModel;
+using System.Web.Mvc;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
+using SESM.Models.View.User;
+using SESM.Tools;
 
 namespace SESM.Controllers
 {
@@ -32,5 +35,44 @@ namespace SESM.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
+        public ActionResult Edit(int id)
+        {
+            UserProvider usrPrv = new UserProvider(context);
+
+            EntityUser user = usrPrv.GetUser(id);
+            UserViewModel model = new UserViewModel();
+            if (user == null)
+                return RedirectToAction("Index");
+            model.Email = user.Email;
+            model.Login = user.Login;
+            model.Password = "";
+            model.IsAdmin = user.IsAdmin;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(int id, UserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                UserProvider usrPrv = new UserProvider(context);
+
+                EntityUser user = usrPrv.GetUser(id);
+                user.Email = model.Email;
+                user.Login = model.Login;
+                user.IsAdmin = model.IsAdmin;
+                if (!(model.Password == null || model.Password == string.Empty))
+                {
+                    user.Password = HashHelper.MD5Hash(model.Password);
+                }
+                usrPrv.UpdateUser(user);
+
+                return RedirectToAction("Index");    
+            }
+
+            return View(model);
+        }
     }
 }

@@ -2,7 +2,7 @@
 using System.Configuration;
 using System.Web.Configuration;
 using Microsoft.Win32;
-using SESM.Models;
+using SESM.Models.View.Settings;
 
 namespace SESM.Tools
 {

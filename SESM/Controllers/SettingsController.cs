@@ -6,7 +6,7 @@ using Ionic.Zip;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
-using SESM.Models;
+using SESM.Models.View.Settings;
 using SESM.Tools;
 
 namespace SESM.Controllers

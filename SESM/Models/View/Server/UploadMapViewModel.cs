@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Web;
 
-namespace SESM.Models
+namespace SESM.Models.View.Server
 {
     public class UploadMapViewModel
     {

@@ -1,17 +1,16 @@
-﻿
+﻿@model SESM.Models.View.User.UserViewModel
+
 @{
-    ViewBag.Title = "Login";
+    ViewBag.Title = "Edit User";
 }
-@model SESM.Models.View.Account.LoginViewModel
 
 <h2>@ViewBag.Title</h2>
 
 <div class="row">
     <div class="col-md-12">
         <section id="loginForm">
-            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            @using (Html.BeginForm("Edit", "User", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
-                <h4>Please identify yourself.</h4>
                 <hr />
                 @Html.ValidationSummary()
                 <div class="form-group">
@@ -28,15 +27,25 @@
                         @Html.ValidationMessageFor(m => m.Password)
                     </div>
                 </div>
-                
                 <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Connect" class="btn btn-default" />
+                    @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Email)
                     </div>
                 </div>
-                <p>
-                    If you don't have an Account, you can @Html.ActionLink("Register", "Register") one.
-                </p>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.IsAdmin, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.CheckBoxFor(m => m.IsAdmin, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.IsAdmin)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn btn-default" />
+                    </div>
+                </div>
             }
         </section>
     </div>

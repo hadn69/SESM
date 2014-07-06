@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using SESM.DTO;
-using SESM.Models;
 using System.Management;
+using SESM.Models.View.Settings;
 
 namespace SESM.Tools
 {

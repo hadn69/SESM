@@ -2,7 +2,7 @@
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
-using SESM.Models;
+using SESM.Models.View.Account;
 using SESM.Tools;
 
 namespace SESM.Controllers
@@ -75,6 +75,8 @@ namespace SESM.Controllers
                         user.Email = model.Email;
 
                         usrPrv.AddUser(user);
+
+                        Session["User"] = user;
                         return RedirectToAction("Index", "Server");
                     }
                     else

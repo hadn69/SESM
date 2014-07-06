@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace SESM.Models
+namespace SESM.Models.View.Server
 {
-    public class NewServerViewModel
+    public class ServerViewModel
     {
         [Required]
         [DisplayName("Web Name")]
-        [RegularExpression(@"^[a-zA-Z0-9_.-]+$", ErrorMessage = "The Name must be only composed of letters, numbers, dot, dash and underscore")]
+        [RegularExpression(@"^[a-zA-Z0-9_.-]+$", ErrorMessage = "The Name must be only composed of letters, numbers, dots, dashs and underscores")]
         public string Name { get; set; }
 
         [Required]
@@ -94,6 +94,12 @@ namespace SESM.Models
         [DisplayName("Enable Respawn Ship Auto Delete")]
         public bool RespawnShipDelete { get; set; }
 
+        [DisplayName("Current Scenario")]
+        public SubTypeId ScenarioType { get; set; }
+
+        [DisplayName("Current Save")]
+        public string SaveName { get; set; }
+
         [Required]
         [DisplayName("Listening IP")]
         [RegularExpression(@"^((\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])$", ErrorMessage = "The IP must be a vaild one")]
@@ -108,6 +114,9 @@ namespace SESM.Models
         [DisplayName("Server Connexion Port")]
         [RegularExpression(@"^([1-9]|[1-9]\d|[1-9]\d{0,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$", ErrorMessage = "The steam port must be a vaild number")]
         public int ServerPort { get; set; }
+
+        [DisplayName("Asteroid Amount")]
+        public int AsteroidAmount { get; set; }
 
         [DisplayName("In-Game Administrators List")]
         public string Administrators { get; set; }
@@ -132,7 +141,7 @@ namespace SESM.Models
         public string WebUsers { get; set; }
 
 
-        public NewServerViewModel()
+        public ServerViewModel()
         {
             GameMode = GameMode.Survival;
             InventorySizeMultiplier = 1;
@@ -154,9 +163,12 @@ namespace SESM.Models
             RemoveTrash = false;
             WorldSizeKm = 0;
             RespawnShipDelete = true;
+            ScenarioType = SubTypeId.EasyStart1;
+            SaveName = string.Empty;
             IP = "0.0.0.0";
             SteamPort = 8766;
             ServerPort = 27016;
+            AsteroidAmount = 4;
             Administrators = string.Empty;
             Banned = string.Empty;
             GroupID = 0;

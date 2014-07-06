@@ -1,22 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SESM.Models
+namespace SESM.Models.View.User
 {
-    public class RegisterViewModel
+    public class UserViewModel
     {
         [Required(ErrorMessage = "Login is required")]
         [Display(Name = "Login")]
         public string Login { get; set; }
 
-        [Required(ErrorMessage = "Password is required")]
         [Display(Name = "Password")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "Retyping your password is required")]
-        [Display(Name = "Retype Password")]
-        [DataType(DataType.Password)]
-        public string RetypedPassword { get; set; }
+        [Required(ErrorMessage = "Super Admin is required")]
+        [Display(Name = "Super Admin")]
+        public bool IsAdmin { get; set; }
 
         [Required(ErrorMessage = "Email is required")]
         [Display(Name = "Email")]
