@@ -297,6 +297,8 @@
     </div>
 }
 
-<p>
-    @Html.ActionLink("< Back to List", "Index")
-</p>
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-default" href="@(Url.Action("Index", "User", new {id = ViewData["ID"]}))">Back to Server Status</a>
+    </div>
+</div>

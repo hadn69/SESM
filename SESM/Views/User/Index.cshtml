@@ -1,11 +1,7 @@
 ﻿@model IEnumerable<SESM.DTO.EntityUser>
-
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "User List";
 }
-
-<h2>User List</h2>
-
 <table class="table">
     <tr>
         <th>
@@ -30,7 +26,14 @@
             @Html.DisplayFor(modelItem => item.Email)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.IsAdmin)
+            @if (item.IsAdmin)
+            {
+                <span class="glyphicon glyphicon-ok-sign green"></span>
+            }
+            else
+            {
+                <span class="glyphicon glyphicon-remove-sign red"></span>
+            }
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id = item.Id })

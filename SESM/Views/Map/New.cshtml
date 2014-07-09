@@ -3,16 +3,11 @@
 @{
     ViewBag.Title = "New Map";
 }
-
-<h2>@ViewBag.Title</h2>
-
 <div class="row">
     <div class="col-md-12">
         <section id="Form">
             @using (Html.BeginForm("New", "Map", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
-                <h4>New Map Parametters.</h4>
-                <hr />
                 @Html.ValidationSummary(true)
                 <div class="form-group">
                     @Html.LabelFor(m => m.MapType, new { @class = "col-md-2 control-label" })
@@ -38,5 +33,10 @@
             }
         </section>
     </div>
-
+</div>
+<br/>
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-default" href="@(Url.Action("Index", "Map", new {id = ViewData["ID"]}))">Back to Map List</a>
+    </div>
 </div>

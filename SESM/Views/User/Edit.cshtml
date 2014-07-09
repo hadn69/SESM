@@ -3,15 +3,11 @@
 @{
     ViewBag.Title = "Edit User";
 }
-
-<h2>@ViewBag.Title</h2>
-
 <div class="row">
     <div class="col-md-12">
         <section id="Form">
             @using (Html.BeginForm("Edit", "User", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
-                <hr />
                 @Html.ValidationSummary()
                 <div class="form-group">
                     @Html.LabelFor(m => m.Login, new { @class = "col-md-2 control-label" })
@@ -50,4 +46,9 @@
         </section>
     </div>
 
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-default" href="@(Url.Action("Index", "User"))">Back to User List</a>
+    </div>
 </div>

@@ -1,13 +1,12 @@
 ﻿@using SESM.DAL
 @using SESM.DTO
 @using SESM.Tools
-
 @{
     ViewBag.Title = "Server List";
     AccessLevel accessLevel = (AccessLevel) ViewData["AccessLevel"];
+    List<EntityServer> serverList = ViewData["ServerList"] as List<EntityServer>;
+    Dictionary<int, ServiceState> stateList = ViewData["StateList"] as Dictionary<int, ServiceState>;
 }
-
-<h2>@ViewBag.Title</h2>
 
 @if (accessLevel == AccessLevel.Manager
     || accessLevel == AccessLevel.Admin
@@ -16,18 +15,16 @@
     <div class="btn-group btn-group-justified col-md-6">
         @if(accessLevel == AccessLevel.SuperAdmin)
         {
-        <a class="btn btn-default" href="@(Url.Action("Create", "Server"))">Add Server</a>
+            <a class="btn btn-default" href="@(Url.Action("Create", "Server"))">Add Server</a>
         }
         <a class="btn btn-success" href="@(Url.Action("StartAll", "Server"))">Start All</a>
         <a class="btn btn-warning" href="@(Url.Action("RestartAll", "Server"))">Restart All</a>
         <a class="btn btn-danger" href="@(Url.Action("StopAll", "Server"))">Stop All</a>
         <a class="btn btn-danger" onclick="return confirm('This will kill all running servers and may cause save corruption! Are you sure you want to do this?');" href="@(Url.Action("KillAll", "Server"))">Kill All</a>
     </div>
-}
-
-@{
-    List<EntityServer> ServerList = ViewData["ServerList"] as List<EntityServer>;
-    Dictionary<int, ServiceState> StateList = ViewData["StateList"] as Dictionary<int, ServiceState>;
+    <br/>
+    <br/>
+    <br/>
 }
 <table class="table table-hover">
     <tr>
@@ -40,14 +37,14 @@
 
     </tr>
 
-    @foreach (EntityServer item in ServerList)
+    @foreach (EntityServer item in serverList)
     {
         <tr onclick="location.href = '@(Url.Action("Status", "Server", new { id = item.Id }))'" class="hoverTable">
             <td>
                 @item.Name
             </td>
             <td>
-                @switch (StateList[item.Id])
+                @switch (stateList[item.Id])
                 {
                     case ServiceState.Running:
                         <span class="glyphicon glyphicon-ok-sign green"></span>
@@ -70,7 +67,7 @@
     }
 
 </table>
-@if(ServerList.Count == 0)
+@if(serverList.Count == 0)
 {
     <p>You don't have access to any servers.</p>
 }

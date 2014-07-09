@@ -195,5 +195,13 @@ namespace SESM.Controllers
             }
             return View(model);
         }
+
+        //
+        // GET: Settings/Diagnosis
+        [HttpGet]
+        public ActionResult Diagnosis()
+        {
+            return View();
+        }
     }
 }

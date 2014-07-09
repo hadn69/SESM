@@ -7,38 +7,26 @@
     AccessLevel accessLevel = (AccessLevel)ViewData["AccessLevel"];
     int id = (int) ViewData["ID"];
 }
-<h2>@Model.Name Status @if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-                       {
-                            <a class="btn btn-default" href="@(Url.Action("Details", "Server", new {id = id}))">Edit</a>
-                            <a class="btn btn-default" href="@(Url.Action("Logs", "Server", new {id = id}))">Logs</a>
-                       }
-                       @if (accessLevel == AccessLevel.SuperAdmin )
-                        {
-                            <a class="btn btn-default" onclick="return confirm('Are you sure you want to delete this server?');" href="@(Url.Action("Delete", "Server", new {id = id}))">Delete</a>
-                        }</h2> 
 <div class="row">
-    <div class="col-md-6">
-        <hr />
-        <h3>Server Status : @if (status == ServiceState.Running)
-                            {
-                                <span class="glyphicon glyphicon-ok-sign green"></span> @:Running
-                            }
-                            else if (status == ServiceState.Starting)
-                            {
-                                <span class="glyphicon glyphicon-chevron-up blue"></span> @:Starting
-                            }
-                            else if (status == ServiceState.Stopping)
-                            {
-                                <span class="glyphicon glyphicon-chevron-down blue"></span> @:Stopping
-                            }
-                            else if (status == ServiceState.Stopped)
-                            {
-                                <span class="glyphicon glyphicon-remove-sign red"></span> @:Stopped
-                            }
-                            else if (status == ServiceState.Unknow)
-                            {
-                                <span class="glyphicon glyphicon-warning-sign red"></span> @:Unknow
-                            }
+    <div class="col-md-4">
+        <h3>@Model.Name's Status : @switch (status)
+                                   {
+                                       case ServiceState.Running:
+                                           <span class="glyphicon glyphicon-ok-sign green"></span> @:Running
+                                           break;
+                                       case ServiceState.Starting:
+                                           <span class="glyphicon glyphicon-chevron-up blue"></span> @:Starting
+                                           break;
+                                       case ServiceState.Stopping:
+                                           <span class="glyphicon glyphicon-chevron-down blue"></span> @:Stopping
+                                           break;
+                                       case ServiceState.Stopped:
+                                           <span class="glyphicon glyphicon-remove-sign red"></span> @:Stopped
+                                           break;
+                                       case ServiceState.Unknow:
+                                           <span class="glyphicon glyphicon-warning-sign red"></span> @:Unknow
+                                           break;
+                                   }
             
         </h3>
         <h5>Game Mode : @Model.GameMode</h5>
@@ -72,7 +60,26 @@
                 }
             </div>
         }
-        <hr/>
+        
+    </div>
+    <div class="col-md-8">
+        <div class="btn-group-vertical">
+            @if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+            {
+                <a class="btn btn-default" href="@(Url.Action("Details", "Server", new {id = id}))">Edit</a>
+                <a class="btn btn-default" href="@(Url.Action("Logs", "Server", new {id = id}))">Logs</a>
+                <a class="btn btn-default" href="@(Url.Action("Index", "Map", new {id = id}))">Maps</a>
+            }
+            @if (accessLevel == AccessLevel.SuperAdmin)
+            {
+                <a class="btn btn-default" onclick="return confirm('Are you sure you want to delete this server?');" href="@(Url.Action("Delete", "Server", new {id = id}))">Delete</a>
+            }
+        </div>
+    </div>
+</div>
+<br/>
+<div class="row">
+    <div class="col-md-12">
         <a class="btn btn-default" href="@(Url.Action("Index", "Server"))">Back to List</a>
     </div>
 </div>

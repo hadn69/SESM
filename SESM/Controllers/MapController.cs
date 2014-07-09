@@ -72,7 +72,7 @@ namespace SESM.Controllers
                 serverConfig.SaveName = model.MapName;
                 serverConfig.Save(serv);
                 ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
-                return RedirectToAction("Details", "Server", new { id = id });
+                return RedirectToAction("Status", "Server", new { id = id });
             }
 
             return RedirectToAction("Index", new { id = id });
@@ -101,13 +101,12 @@ namespace SESM.Controllers
         // POST: Server/SaveMap/5
         [HttpPost]
         [MultipleButton(Name = "action", Argument = "DownMap")]
-        public ActionResult DownMap(int? id, MapViewModel model)
+        public ActionResult DownMap(int id, MapViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
-            int serverId = id ?? 0;
-            ViewData["ID"] = serverId;
-            EntityServer serv = srvPrv.GetServer(serverId);
+            ViewData["ID"] = id;
+            EntityServer serv = srvPrv.GetServer(id);
 
             if (ModelState.IsValid)
             {
@@ -136,6 +135,7 @@ namespace SESM.Controllers
         [HttpGet]
         public ActionResult New(int id)
         {
+            ViewData["ID"] = id;
             return View(new NewMapViewModel());
         }
 
@@ -146,6 +146,7 @@ namespace SESM.Controllers
         {
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
+            ViewData["ID"] = id;
             EntityServer serv = srvPrv.GetServer(id);
 
             if (ModelState.IsValid)
@@ -169,6 +170,7 @@ namespace SESM.Controllers
         [HttpGet]
         public ActionResult Upload(int id)
         {
+            ViewData["ID"] = id;
             return View();
         }
 

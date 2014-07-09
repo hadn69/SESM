@@ -8,30 +8,35 @@
     <section id="Form">
         @using (Html.BeginForm("Index", "Map", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
         {
-        <div class="col-md-3">
-            @Html.ValidationSummary(true)
-            <div class="form-group">
-                <div class="col-md-12">
-                    @Html.DropDownListFor(m => m.MapName, listDir, new {@class = "form-control", size = "15"})
-                    @Html.ValidationMessageFor(m => m.MapName)
-                </div>
-            </div> 
-        </div>
-        <div class="col-md-9" >
-            <div class="form-group">
-                <div class="col-md-12">
-                    <br/>
-                    <br/>
-                    <div class="btn-group-vertical">
-                        <input type="submit" onclick="return confirm('This will restart this server. Are you sure you want to do this ?');" value="Select And (Re)Start" name="action:SaveMap" class="btn btn-default" />
-                        <input type="submit" onclick="return confirm('This will delete this map. Are you sure you want to do this ?');" value="Delete Map" name="action:DelMap" class="btn btn-default" />
-                        <input type="submit" value="Download Map" name="action:DownMap" class="btn btn-default" />
-                        <a class="btn btn-default" href="@(Url.Action("New", "Map", new {id = id}))">Create Map</a>
-                        <a class="btn btn-default" href="@(Url.Action("Upload", "Map", new { id = id }))">Upload Map</a>
+            <div class="col-md-3">
+                @Html.ValidationSummary(true)
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.DropDownListFor(m => m.MapName, listDir, new {@class = "form-control", size = "15"})
+                        @Html.ValidationMessageFor(m => m.MapName)
+                    </div>
+                </div> 
+            </div>
+            <div class="col-md-9" >
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <br/>
+                        <br/>
+                        <div class="btn-group-vertical">
+                            <input type="submit" onclick="return confirm('This will restart this server. Are you sure you want to do this ?');" value="Select And (Re)Start" name="action:SaveMap" class="btn btn-default" />
+                            <input type="submit" onclick="return confirm('This will delete this map. Are you sure you want to do this ?');" value="Delete Map" name="action:DelMap" class="btn btn-default" />
+                            <input type="submit" value="Download Map" name="action:DownMap" class="btn btn-default" />
+                            <a class="btn btn-default" href="@(Url.Action("New", "Map", new {id = id}))">Create Map</a>
+                            <a class="btn btn-default" href="@(Url.Action("Upload", "Map", new { id = id }))">Upload Map</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         }
     </section>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-default" href="@(Url.Action("Status", "Server", new {id = ViewData["ID"]}))">Back to Server Status</a>
+    </div>
 </div>
