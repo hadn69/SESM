@@ -1,34 +1,30 @@
 ﻿@using SESM.DAL
 @model SESM.Models.View.Server.ServerViewModel
-
 @{
     ViewBag.Title = "Server Details";
     object labelClass = new {@class = "col-md-5 control-label"};
-    
-    string valueColumn = "col-md-6";
+
+    const string valueColumn = "col-md-6";
     int id = (int) ViewData["ID"];
     
-    object SuperAdminAccessClass = new { @class = "form-control", disabled = "true" };
-    object AdminAccessClass = new { @class = "form-control", disabled = "true" };
-    object ManagerAccessClass = new { @class = "form-control"};
+    object superAdminAccessClass = new { @class = "form-control", disabled = "true" };
+    object adminAccessClass = new { @class = "form-control", disabled = "true" };
+    object managerAccessClass = new { @class = "form-control"};
     AccessLevel accessLevel = (AccessLevel)ViewData["AccessLevel"];
     if (accessLevel == AccessLevel.SuperAdmin)
     {
-        SuperAdminAccessClass = new {@class = "form-control"};
+        superAdminAccessClass = new {@class = "form-control"};
     }
     if (accessLevel == AccessLevel.SuperAdmin || accessLevel == AccessLevel.Admin)
     {
-        AdminAccessClass = new {@class = "form-control"};
+        adminAccessClass = new {@class = "form-control"};
     }
 }
-
-<h2>@ViewBag.Title</h2>
 @using (Html.BeginForm("Details", "Server", new {ReturnUrl = ViewBag.ReturnUrl}, FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
 {
     <div class="row">   
         <div class="col-md-6">
             <section>
-
                 <hr />
                 <h3>Server Settings</h3>
                 <hr />
@@ -36,42 +32,42 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.Name, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.Name, AdminAccessClass)
+                        @Html.TextBoxFor(m => m.Name, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.Name)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.IsPublic, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.IsPublic, AdminAccessClass)
+                        @Html.CheckBoxFor(m => m.IsPublic, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.IsPublic)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.ServerName, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.ServerName, AdminAccessClass)
+                        @Html.TextBoxFor(m => m.ServerName, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.ServerName)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.IP, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.IP, AdminAccessClass)
+                        @Html.TextBoxFor(m => m.IP, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.IP)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.ServerPort, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.ServerPort, AdminAccessClass)
+                        @Html.TextBoxFor(m => m.ServerPort, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.ServerPort)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.SteamPort, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.SteamPort, AdminAccessClass)
+                        @Html.TextBoxFor(m => m.SteamPort, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.SteamPort)
                     </div>
                 </div>
@@ -86,35 +82,35 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.GameMode, labelClass)
                     <div class="@valueColumn">
-                        @Html.EnumDropDownListFor(m => m.GameMode, null, ManagerAccessClass)
+                        @Html.EnumDropDownListFor(m => m.GameMode, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.GameMode)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.EnvironmentHostility, labelClass)
                     <div class="@valueColumn">
-                        @Html.EnumDropDownListFor(m => m.EnvironmentHostility, null, ManagerAccessClass)
+                        @Html.EnumDropDownListFor(m => m.EnvironmentHostility, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.EnvironmentHostility)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.OnlineMode, labelClass)
                     <div class="@valueColumn">
-                        @Html.EnumDropDownListFor(m => m.OnlineMode, null, ManagerAccessClass)
+                        @Html.EnumDropDownListFor(m => m.OnlineMode, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.OnlineMode)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.MaxPlayers, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.MaxPlayers, ManagerAccessClass)
+                        @Html.TextBoxFor(m => m.MaxPlayers, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.MaxPlayers)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.MaxFloatingObjects, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.MaxFloatingObjects, ManagerAccessClass)
+                        @Html.TextBoxFor(m => m.MaxFloatingObjects, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.MaxFloatingObjects)
                     </div>
                 </div>
@@ -131,28 +127,28 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.InventorySizeMultiplier, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.InventorySizeMultiplier, null, ManagerAccessClass)
+                        @Html.TextBoxFor(m => m.InventorySizeMultiplier, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.InventorySizeMultiplier)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.AssemblerSpeedMultiplier, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.AssemblerSpeedMultiplier, null, ManagerAccessClass)
+                        @Html.TextBoxFor(m => m.AssemblerSpeedMultiplier, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.AssemblerSpeedMultiplier)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.AssemblerEfficiencyMultiplier, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.AssemblerEfficiencyMultiplier, null, ManagerAccessClass)
+                        @Html.TextBoxFor(m => m.AssemblerEfficiencyMultiplier, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.AssemblerEfficiencyMultiplier)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.RefinerySpeedMultiplier, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.RefinerySpeedMultiplier, null, ManagerAccessClass)
+                        @Html.TextBoxFor(m => m.RefinerySpeedMultiplier, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.RefinerySpeedMultiplier)
                     </div>
                 </div>
@@ -166,7 +162,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.AutoHealing, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.AutoHealing, ManagerAccessClass)
+                        @Html.CheckBoxFor(m => m.AutoHealing, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.AutoHealing)
                     </div>
                 </div>
@@ -174,28 +170,28 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.WeaponsEnabled, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.WeaponsEnabled, ManagerAccessClass)
+                        @Html.CheckBoxFor(m => m.WeaponsEnabled, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.WeaponsEnabled)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.ShowPlayerNamesOnHud, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.ShowPlayerNamesOnHud, ManagerAccessClass)
+                        @Html.CheckBoxFor(m => m.ShowPlayerNamesOnHud, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.ShowPlayerNamesOnHud)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.ThrusterDamage, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.ThrusterDamage, ManagerAccessClass)
+                        @Html.CheckBoxFor(m => m.ThrusterDamage, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.ThrusterDamage)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.CargoShipsEnabled, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.CargoShipsEnabled, ManagerAccessClass)
+                        @Html.CheckBoxFor(m => m.CargoShipsEnabled, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.CargoShipsEnabled)
                     </div>
                 </div>
@@ -237,42 +233,42 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.WorldSizeKm, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.WorldSizeKm, null, ManagerAccessClass)
+                        @Html.TextBoxFor(m => m.WorldSizeKm, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.WorldSizeKm)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.AutoSave, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.AutoSave, ManagerAccessClass)
+                        @Html.CheckBoxFor(m => m.AutoSave, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.AutoSave)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.RemoveTrash, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.RemoveTrash, ManagerAccessClass)
+                        @Html.CheckBoxFor(m => m.RemoveTrash, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.RemoveTrash)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.RespawnShipDelete, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.RespawnShipDelete, ManagerAccessClass)
+                        @Html.CheckBoxFor(m => m.RespawnShipDelete, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.RespawnShipDelete)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.EnableCopyPaste, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.EnableCopyPaste, ManagerAccessClass)
+                        @Html.CheckBoxFor(m => m.EnableCopyPaste, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.EnableCopyPaste)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.EnableSpectator, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.EnableSpectator, ManagerAccessClass)
+                        @Html.CheckBoxFor(m => m.EnableSpectator, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.EnableSpectator)
                     </div>
                 </div>
@@ -287,21 +283,21 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.Administrators, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextAreaFor(m => m.Administrators, AdminAccessClass)
+                        @Html.TextAreaFor(m => m.Administrators, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.Administrators)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.Banned, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextAreaFor(m => m.Banned, ManagerAccessClass)
+                        @Html.TextAreaFor(m => m.Banned, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.Banned)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.GroupID, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.GroupID, null, AdminAccessClass)
+                        @Html.TextBoxFor(m => m.GroupID, null, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.GroupID)
                     </div>
                 </div>
@@ -313,21 +309,21 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.WebAdministrators, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextAreaFor(m => m.WebAdministrators, SuperAdminAccessClass)
+                        @Html.TextAreaFor(m => m.WebAdministrators, superAdminAccessClass)
                         @Html.ValidationMessageFor(m => m.WebAdministrators)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.WebManagers, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextAreaFor(m => m.WebManagers, AdminAccessClass)
+                        @Html.TextAreaFor(m => m.WebManagers, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.WebManagers)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.WebUsers, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextAreaFor(m => m.WebUsers, ManagerAccessClass)
+                        @Html.TextAreaFor(m => m.WebUsers, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.WebUsers)
                     </div>
                 </div>
