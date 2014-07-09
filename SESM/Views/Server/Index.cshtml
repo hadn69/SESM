@@ -3,7 +3,7 @@
 @using SESM.Tools
 
 @{
-    ViewBag.Title = "Servers List";
+    ViewBag.Title = "Server List";
     AccessLevel accessLevel = (AccessLevel) ViewData["AccessLevel"];
 }
 
@@ -21,7 +21,7 @@
         <a class="btn btn-success" href="@(Url.Action("StartAll", "Server"))">Start All</a>
         <a class="btn btn-warning" href="@(Url.Action("RestartAll", "Server"))">Restart All</a>
         <a class="btn btn-danger" href="@(Url.Action("StopAll", "Server"))">Stop All</a>
-        <a class="btn btn-danger" onclick="return confirm('This will kill all started server, this may cause save corruption ! Are you sure you want to do this ?');" href="@(Url.Action("KillAll", "Server"))">Kill All</a>
+        <a class="btn btn-danger" onclick="return confirm('This will kill all running servers and may cause save corruption! Are you sure you want to do this?');" href="@(Url.Action("KillAll", "Server"))">Kill All</a>
     </div>
 }
 
@@ -72,6 +72,6 @@
 </table>
 @if(ServerList.Count == 0)
 {
-    <p>You don't have access to any servers</p>
+    <p>You don't have access to any servers.</p>
 }
 
