@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Home";
+}
+<div class="jumbotron">
+<<<<<<< HEAD
+    <h1>SESM - Space Engineers Server Manager</h1>
+    <p class="lead">Welcome to Space Engineers Server Manager !</p>
+=======
+    <h1>SESM - Space Engineer Server Manager</h1>
+    <p class="lead">Welcome in Space Engineer Server Manager !</p>
+>>>>>>> origin/master
+    <p><a href="https://sesm.codeplex.com/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
+</div>

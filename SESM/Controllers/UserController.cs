@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
@@ -12,12 +11,12 @@ namespace SESM.Controllers
     [SuperAdmin]
     public class UserController : Controller
     {
-        private DataContext context = new DataContext();
+        private readonly DataContext _context = new DataContext();
 
         [HttpGet]
         public ActionResult Index()
         {
-            UserProvider usrPrv = new UserProvider(context);
+            UserProvider usrPrv = new UserProvider(_context);
             return View(usrPrv.GetUsers());
         }
         
@@ -27,7 +26,7 @@ namespace SESM.Controllers
             EntityUser user = Session["User"] as EntityUser;
             if (user.Id != id)
             {
-                UserProvider usrPrv = new UserProvider(context);
+                UserProvider usrPrv = new UserProvider(_context);
                 EntityUser usr = usrPrv.GetUser(id);
                 if (usr != null)
                     usrPrv.RemoveUser(usr);
@@ -38,7 +37,7 @@ namespace SESM.Controllers
         [HttpGet]
         public ActionResult Edit(int id)
         {
-            UserProvider usrPrv = new UserProvider(context);
+            UserProvider usrPrv = new UserProvider(_context);
 
             EntityUser user = usrPrv.GetUser(id);
             UserViewModel model = new UserViewModel();
@@ -57,7 +56,7 @@ namespace SESM.Controllers
         {
             if (ModelState.IsValid)
             {
-                UserProvider usrPrv = new UserProvider(context);
+                UserProvider usrPrv = new UserProvider(_context);
 
                 EntityUser user = usrPrv.GetUser(id);
                 user.Email = model.Email;

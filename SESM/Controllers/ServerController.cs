@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
-using Ionic.Zip;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
@@ -15,7 +13,7 @@ namespace SESM.Controllers
     
     public class ServerController : Controller
     {
-        readonly DataContext context = new DataContext();
+        readonly DataContext _context = new DataContext();
 
         #region Index
 
@@ -27,7 +25,7 @@ namespace SESM.Controllers
         {
             EntityUser user = Session["User"] as EntityUser;
 
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
 
             List<EntityServer> serverList = srvPrv.GetServers(user);
 
@@ -61,7 +59,7 @@ namespace SESM.Controllers
         public ActionResult Create(NewServerViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
 
             if (ModelState.IsValid)
             {
@@ -77,7 +75,7 @@ namespace SESM.Controllers
                 string[] webAdminsSplitted = model.WebAdministrators != null ? model.WebAdministrators.Split(';') : new string[0];
                 string[] webManagerSplitted = model.WebManagers != null ? model.WebManagers.Split(';') : new string[0];
                 string[] webUsersSplitted = model.WebUsers != null ? model.WebUsers.Split(';') : new string[0];
-                UserProvider usrPrv = new UserProvider(context);
+                UserProvider usrPrv = new UserProvider(_context);
                 bool errorFlag = false;
                 foreach (string item in webAdminsSplitted.Where(item => !usrPrv.UserExist(item)))
                 {
@@ -120,7 +118,7 @@ namespace SESM.Controllers
                 configHelper.Save(serv);
                 ServiceHelper.RegisterService(ServiceHelper.GetServiceName(serv));
 
-                return RedirectToAction("NewMap", new { id = serv.Id });
+                return RedirectToAction("Index","Map", new { id = serv.Id });
             }
             return View(model);
         }
@@ -136,7 +134,7 @@ namespace SESM.Controllers
         public ActionResult Status(int? id)
         {
             EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             int serverId = id ?? 0;
 
             EntityServer serv = srvPrv.GetServer(serverId);
@@ -170,7 +168,7 @@ namespace SESM.Controllers
         public ActionResult Delete(int id)
         {
             EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
 
             EntityServer serv = srvPrv.GetServer(id);
             if (serv != null)
@@ -196,7 +194,7 @@ namespace SESM.Controllers
         [ManagerAndAbove]
         public ActionResult Start(int id)
         {
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 
             ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
@@ -212,7 +210,7 @@ namespace SESM.Controllers
         {
             EntityUser user = Session["User"] as EntityUser;
 
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             List<EntityServer> serverList = srvPrv.GetServers(user);
             foreach (EntityServer item in serverList)
             {
@@ -235,7 +233,7 @@ namespace SESM.Controllers
         [ManagerAndAbove]
         public ActionResult Stop(int id)
         {
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 
             ServiceHelper.StopService(ServiceHelper.GetServiceName(serv));
@@ -251,7 +249,7 @@ namespace SESM.Controllers
         {
             EntityUser user = Session["User"] as EntityUser;
 
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             List<EntityServer> serverList = srvPrv.GetServers(user);
             foreach (EntityServer item in serverList)
             {
@@ -273,7 +271,7 @@ namespace SESM.Controllers
         [ManagerAndAbove]
         public ActionResult Restart(int id)
         {
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 
             ServiceHelper.RestartService(ServiceHelper.GetServiceName(serv));
@@ -289,7 +287,7 @@ namespace SESM.Controllers
         {
             EntityUser user = Session["User"] as EntityUser;
 
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             List<EntityServer> serverList = srvPrv.GetServers(user);
             foreach (EntityServer item in serverList)
             {
@@ -325,7 +323,7 @@ namespace SESM.Controllers
         [ManagerAndAbove]
         public ActionResult Kill(int id)
         {
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
             ServiceHelper.KillService(ServiceHelper.GetServiceName(serv));
 
@@ -340,7 +338,7 @@ namespace SESM.Controllers
         {
             EntityUser user = Session["User"] as EntityUser;
 
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             List<EntityServer> serverList = srvPrv.GetServers(user);
             foreach (EntityServer item in serverList)
             {
@@ -364,7 +362,7 @@ namespace SESM.Controllers
         public ActionResult Details(int? id)
         {
             EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             int serverId = id ?? 0;
             ViewData["ID"] = serverId;
             EntityServer serv = srvPrv.GetServer(serverId);
@@ -396,7 +394,7 @@ namespace SESM.Controllers
         public ActionResult DetailsSaveRestart(int? id, ServerViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             int serverId = id ?? 0;
             ViewData["ID"] = serverId;
             EntityServer serv = srvPrv.GetServer(serverId);
@@ -446,7 +444,7 @@ namespace SESM.Controllers
                 string[] webAdminsSplitted = model.WebAdministrators != null? model.WebAdministrators.Split(';'): new string[0];
                 string[] webManagerSplitted = model.WebManagers != null ? model.WebManagers.Split(';') : new string[0];
                 string[] webUsersSplitted = model.WebUsers != null ? model.WebUsers.Split(';') : new string[0];
-                UserProvider usrPrv = new UserProvider(context);
+                UserProvider usrPrv = new UserProvider(_context);
                 bool errorFlag = false;
                 foreach (string item in webAdminsSplitted.Where(item => !usrPrv.UserExist(item)))
                 {
@@ -515,7 +513,7 @@ namespace SESM.Controllers
         public ActionResult DetailsSave(int? id, ServerViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             int serverId = id ?? 0;
             ViewData["ID"] = serverId;
             EntityServer serv = srvPrv.GetServer(serverId);
@@ -565,7 +563,7 @@ namespace SESM.Controllers
                 string[] webAdminsSplitted = model.WebAdministrators != null ? model.WebAdministrators.Split(';') : new string[0];
                 string[] webManagerSplitted = model.WebManagers != null ? model.WebManagers.Split(';') : new string[0];
                 string[] webUsersSplitted = model.WebUsers != null ? model.WebUsers.Split(';') : new string[0];
-                UserProvider usrPrv = new UserProvider(context);
+                UserProvider usrPrv = new UserProvider(_context);
                 bool errorFlag = false;
                 foreach (string item in webAdminsSplitted.Where(item => !usrPrv.UserExist(item)))
                 {
@@ -620,218 +618,7 @@ namespace SESM.Controllers
             return View("Details", model);
         }
 
-        //
-        // GET: Server/Maps/5
-        [HttpGet]
-        [LoggedOnly]
-        [CheckAuth]
-        [AdminAndAbove]
-        public ActionResult Maps(int id)
-        {
-            ServerProvider srvPrv = new ServerProvider(context);
-            
-            ViewData["ID"] = id;
-            EntityServer serv = srvPrv.GetServer(id);
-
-            string[] listDir = Directory.GetDirectories(PathHelper.GetSavesPath(serv));
-
-            List<SelectListItem> listSLI = new List<SelectListItem>();
-
-            foreach (string item in listDir)
-            {
-                SelectListItem sli = new SelectListItem();
-                sli.Text = PathHelper.GetLastDirName(item);
-                sli.Value = PathHelper.GetLastDirName(item);
-                listSLI.Add(sli);
-            }
-
-            ViewData["listDir"] = listSLI;
-
-            MapViewModel model = new MapViewModel();
-
-            ServerConfigHelper serverConfig = new ServerConfigHelper();
-            serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
-            model.MapName = serverConfig.SaveName;
-
-            return View(model);
-        }
-
-        //
-        // POST: Server/SaveMap/5
-        [HttpPost]
-        [LoggedOnly]
-        [CheckAuth]
-        [AdminAndAbove]
-        [MultipleButton(Name = "action", Argument = "SaveMap")]
-        public ActionResult SaveMap(int? id, MapViewModel model)
-        {
-            EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(context);
-            int serverId = id ?? 0;
-            EntityServer serv = srvPrv.GetServer(serverId);
-
-
-            if (ModelState.IsValid)
-            {
-                ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
-                ServerConfigHelper serverConfig = new ServerConfigHelper();
-                serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
-                serverConfig.SaveName = model.MapName;
-                serverConfig.Save(serv);
-                ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
-                return RedirectToAction("Details", new {id = id});
-            }
-
-            return RedirectToAction("Maps", new { id = id });
-        }
-
-        //
-        // POST: Server/SaveMap/5
-        [HttpPost]
-        [LoggedOnly]
-        [CheckAuth]
-        [AdminAndAbove]
-        [MultipleButton(Name = "action", Argument = "DelMap")]
-        public ActionResult DelMap(int? id, MapViewModel model)
-        {
-            EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(context);
-            int serverId = id ?? 0;
-            EntityServer serv = srvPrv.GetServer(serverId);
-
-            if (ModelState.IsValid && Directory.Exists(PathHelper.GetSavePath(serv, model.MapName) + @"\"))
-            {
-                Directory.Delete(PathHelper.GetSavePath(serv, model.MapName) + @"\", true);
-            }
-
-            return RedirectToAction("Maps", new { id = id });
-        }
-
-        //
-        // POST: Server/SaveMap/5
-        [HttpPost]
-        [LoggedOnly]
-        [CheckAuth]
-        [AdminAndAbove]
-        [MultipleButton(Name = "action", Argument = "DownMap")]
-        public ActionResult DownMap(int? id, MapViewModel model)
-        {
-            EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(context);
-            int serverId = id ?? 0;
-            ViewData["ID"] = serverId;
-            EntityServer serv = srvPrv.GetServer(serverId);
-
-            if (ModelState.IsValid)
-            {
-                string sourceFolderPath = PathHelper.GetSavePath(serv, model.MapName) + @"\";
-                if (Directory.Exists(sourceFolderPath))
-                {
-
-                    Response.Clear();
-                    Response.ContentType = "application/zip";
-                    Response.AddHeader("Content-Disposition",
-                        String.Format("attachment; filename={0}", model.MapName + ".zip"));
-
-                    using (ZipFile zip = new ZipFile())
-                    {
-                        zip.AddSelectedFiles("*", sourceFolderPath, string.Empty, true);
-                        zip.Save(Response.OutputStream);
-                    }
-                    Response.End();
-                }
-            }
-            return RedirectToAction("Maps", new {id = id});
-        }
-
-        //
-        // GET: Server/NewMap/5
-        [HttpGet]
-        [LoggedOnly]
-        [CheckAuth]
-        [AdminAndAbove]
-        public ActionResult NewMap(int id)
-        {
-            return View(new NewMapViewModel());
-        }
-
-        //
-        // POST: Server/NewMap/5
-        [HttpPost]
-        [LoggedOnly]
-        [CheckAuth]
-        [AdminAndAbove]
-        public ActionResult NewMap(int? id, NewMapViewModel model)
-        {
-            EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(context);
-            int serverId = id ?? 0;
-            EntityServer serv = srvPrv.GetServer(serverId);
-
-            if (ModelState.IsValid)
-            {
-                ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
-                ServerConfigHelper serverConfig = new ServerConfigHelper();
-                serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
-                serverConfig.ScenarioType = model.MapType;
-                serverConfig.AsteroidAmount = model.AsteroidAmount;
-                serverConfig.SaveName = string.Empty;
-                serverConfig.Save(serv);
-                ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
-                return RedirectToAction("Status", new {id = id});
-            }
-
-            return View(model);
-        }
-
-        //
-        // GET: Server/UploadMap/5
-        [HttpGet]
-        [LoggedOnly]
-        [CheckAuth]
-        [AdminAndAbove]
-        public ActionResult UploadMap(int id)
-        {
-            return View();
-        }
-
-        //
-        // POST: Server/UploadMap/5
-        [HttpPost]
-        [LoggedOnly]
-        [CheckAuth]
-        [AdminAndAbove]
-        public ActionResult UploadMap(int id, UploadMapViewModel model)
-        {
-            if (!ZipFile.IsZipFile(model.SaveZip.InputStream, false))
-            {
-                ModelState.AddModelError("ZipError", "Your File is not a valid zip file");
-                return View(model);
-            }
-            ServerProvider srvPrv = new ServerProvider(context);
-            EntityServer serv = srvPrv.GetServer(id);
-
-            string[] listDir = Directory.GetDirectories(PathHelper.GetSavesPath(serv));
-
-            if (listDir.Any(item => item == model.SaveName))
-            {
-                ModelState.AddModelError("nameAlreadExist", "A save with this name already exist");
-                return View(model);
-            }
-            string path = PathHelper.GetSavesPath(serv) + model.SaveName + @"\";
-            
-            using (ZipFile zip = ZipFile.Read(model.SaveZip.InputStream))
-            {
-                if (!zip.ContainsEntry("SANDBOX_0_0_0_.sbs"))
-                {
-                    ModelState.AddModelError("InvalidSave", "Your save zip is invalid");
-                    return View(model);
-                }
-                Directory.CreateDirectory(path);
-                zip.ExtractAll(path);
-            }
-            return RedirectToAction("Maps", new {id = id});
-        }
+        
 
         //
         // GET: Server/Logs/5
@@ -841,7 +628,7 @@ namespace SESM.Controllers
         [ManagerAndAbove]
         public ActionResult Logs(int id)
         {
-            ServerProvider srvPrv = new ServerProvider(context);
+            ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
             string path = PathHelper.GetInstancePath(serv) + "SpaceEngineers-Dedicated.log";
             if (SESMConfigHelper.GetAddDateToLog())
@@ -873,7 +660,7 @@ namespace SESM.Controllers
         {
             if (disposing)
             {
-                context.Dispose();
+                _context.Dispose();
             }
             base.Dispose(disposing);
         }
