@@ -1,47 +1,37 @@
-﻿@{
+﻿@model SESM.Models.View.Server.MapViewModel
+@{
     ViewBag.Title = "Map List";
     List<SelectListItem> listDir = (List<SelectListItem>) ViewData["listDir"];
     int id = (int)ViewData["ID"];
 }
-@model SESM.Models.View.Server.MapViewModel
-<h2>@ViewBag.Title</h2>
-
-
 <div class="row">
-    <div class="col-md-12">
-        <section id="loginForm">
-            @using (Html.BeginForm("Maps", "Server", null, FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
-            {
-
-                <h4>Select A Map : </h4>
-                <hr />
-                @Html.ValidationSummary(true)
-                <div class="form-group">
-                    <div class="col-md-12">
-
-                        @Html.DropDownListFor(m => m.MapName, listDir, new {@class = "form-control", size = "5"})
-                        @Html.ValidationMessageFor(m => m.MapName)
+    <section id="Form">
+        @using (Html.BeginForm("Maps", "Server", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+        <div class="col-md-3">
+            @Html.ValidationSummary(true)
+            <div class="form-group">
+                <div class="col-md-12">
+                    @Html.DropDownListFor(m => m.MapName, listDir, new {@class = "form-control", size = "15"})
+                    @Html.ValidationMessageFor(m => m.MapName)
+                </div>
+            </div> 
+        </div>
+        <div class="col-md-9" >
+            <div class="form-group">
+                <div class="col-md-12">
+                    <br/>
+                    <br/>
+                    <div class="btn-group-vertical">
+                        <input type="submit" onclick="return confirm('This will restart this server. Are you sure you want to do this ?');" value="Select And (Re)Start" name="action:SaveMap" class="btn btn-default" />
+                        <input type="submit" onclick="return confirm('This will delete this map. Are you sure you want to do this ?');" value="Delete Map" name="action:DelMap" class="btn btn-default" />
+                        <input type="submit" value="Download Map" name="action:DownMap" class="btn btn-default" />
+                        <a class="btn btn-default" href="@(Url.Action("NewMap", "Server", new {id = id}))">Create Map</a>
+                        <a class="btn btn-default" href="@(Url.Action("UploadMap", "Server", new {id = id}))">Upload Map</a>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <div class="col-md-12">
-                        <div class="btn-group">
-                            <input type="submit" value="Select And (Re)Start" name="action:SaveMap" class="btn btn-default" />
-                            <input type="submit" value="Delete Map" name="action:DelMap" class="btn btn-default" />
-                            <input type="submit" value="Download Map" name="action:DownMap" class="btn btn-default" />
-                        </div>
-                        <br />
-                        <br />
-                        <div class="btn-group">
-                            <a class="btn btn-default" href="@(Url.Action("NewMap", "Server", new { id = id }))">Create Map</a>
-                            <a class="btn btn-default" href="@(Url.Action("UploadMap", "Server", new { id = id }))">Upload Map</a>
-                        </div>
-                    </div>
-                </div>
-
-            }
-        </section>
-    </div>
-
+            </div>
+        </div>
+        }
+    </section>
 </div>

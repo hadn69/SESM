@@ -4,9 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - SESM</title>
-    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    
     <link href="~/Content/bootstrap.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
     <script src="~/Scripts/modernizr.js"></script>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
 </head>
 <body>
     <div class="navbar navbar-default navbar-fixed-top">
@@ -27,15 +33,16 @@
     </div>
 
     <div class="container body-content">
+        <h2>@ViewBag.Title</h2>
+        <hr />
         @RenderBody()
         <hr />
         <footer>
             <p><a href="http://www.spaceengineersgame.com/">Space Engineers &reg;</a> is a game of <a href="http://www.keenswh.com/"> KEEN SWH LTD</a>.</p>
-            <p>SESM is neither affiliated nor supported by KEEN SWH LTD, use it at your own risk. Current Version : 1.4</p>
+            <p>SESM is neither affiliated nor supported by KEEN SWH LTD, use it at your own risk. Current Version : 1.5</p>
         </footer>
     </div>
 
-    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
-    <script src="~/Scripts/bootstrap.js"></script>
+    
 </body>
 </html>
