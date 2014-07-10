@@ -94,6 +94,26 @@ namespace SESM.Models.View.Server
         [DisplayName("Enable Respawn Ship Auto Delete")]
         public bool RespawnShipDelete { get; set; }
 
+        [Required]
+        [DisplayName("Reset Block Ownership")]
+        public bool ResetOwnership { get; set; }
+
+        [Required]
+        [DisplayName("Welder Speed")]
+        public double WelderSpeedMultiplier { get; set; }
+
+        [Required]
+        [DisplayName("Grinder Speed")]
+        public double GrinderSpeedMultiplier { get; set; }
+
+        [Required]
+        [DisplayName("Enable Realistic Sound")]
+        public bool RealisticSound { get; set; }
+
+        [Required]
+        [DisplayName("Hack Speed")]
+        public double HackSpeedMultiplier { get; set; }
+
         [DisplayName("Current Scenario")]
         public SubTypeId ScenarioType { get; set; }
 
@@ -163,6 +183,12 @@ namespace SESM.Models.View.Server
             RemoveTrash = false;
             WorldSizeKm = 0;
             RespawnShipDelete = true;
+            ResetOwnership = false;
+            WelderSpeedMultiplier = 1;
+            GrinderSpeedMultiplier = 1;
+            RealisticSound = false;
+            HackSpeedMultiplier = 0.33;
+
             ScenarioType = SubTypeId.EasyStart1;
             SaveName = string.Empty;
             IP = "0.0.0.0";

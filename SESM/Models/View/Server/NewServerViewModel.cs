@@ -95,6 +95,26 @@ namespace SESM.Models.View.Server
         public bool RespawnShipDelete { get; set; }
 
         [Required]
+        [DisplayName("Reset Block Ownership")]
+        public bool ResetOwnership { get; set; }
+
+        [Required]
+        [DisplayName("Welder Speed")]
+        public double WelderSpeedMultiplier { get; set; }
+
+        [Required]
+        [DisplayName("Grinder Speed")]
+        public double GrinderSpeedMultiplier { get; set; }
+
+        [Required]
+        [DisplayName("Enable Realistic Sound")]
+        public bool RealisticSound { get; set; }
+
+        [Required]
+        [DisplayName("Hack Speed")]
+        public double HackSpeedMultiplier { get; set; }
+
+        [Required]
         [DisplayName("Listening IP")]
         [RegularExpression(@"^((\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])$", ErrorMessage = "The IP must be a vaild one")]
         public string IP { get; set; }
@@ -154,6 +174,12 @@ namespace SESM.Models.View.Server
             RemoveTrash = false;
             WorldSizeKm = 0;
             RespawnShipDelete = true;
+            ResetOwnership = false;
+            WelderSpeedMultiplier = 1;
+            GrinderSpeedMultiplier = 1;
+            RealisticSound = false;
+            HackSpeedMultiplier = 0.33;
+
             IP = "0.0.0.0";
             SteamPort = 8766;
             ServerPort = 27016;
