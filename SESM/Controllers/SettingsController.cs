@@ -178,7 +178,8 @@ namespace SESM.Controllers
                     ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
                 }
 
-                
+                model.ServerZip.InputStream.Seek(0, SeekOrigin.Begin);
+
                 using (ZipFile zip = ZipFile.Read(model.ServerZip.InputStream))
                 {
                     Directory.Delete(SESMConfigHelper.GetSEDataPath(), true);
