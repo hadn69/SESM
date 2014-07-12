@@ -14,7 +14,6 @@ namespace SESM.Controllers
 {
     [LoggedOnly]
     [CheckAuth]
-    [AdminAndAbove]
     public class MapController : Controller
     {
         readonly DataContext _context = new DataContext();
@@ -22,12 +21,20 @@ namespace SESM.Controllers
         //
         // GET: Server/Maps/5
         [HttpGet]
+        [ManagerAndAbove]
         public ActionResult Index(int id)
         {
+            EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
+            EntityServer serv = srvPrv.GetServer(id);
+            if (serv == null)
+            {
+                return RedirectToAction("Index", "Server");
+            }
 
             ViewData["ID"] = id;
-            EntityServer serv = srvPrv.GetServer(id);
+            ViewData["AccessLevel"] = srvPrv.GetAccessLevel(user.Id, serv.Id);
+            
 
             string[] listDir = Directory.GetDirectories(PathHelper.GetSavesPath(serv));
 
@@ -55,6 +62,7 @@ namespace SESM.Controllers
         //
         // POST: Server/SaveMap/5
         [HttpPost]
+        [ManagerAndAbove]
         [MultipleButton(Name = "action", Argument = "SaveMap")]
         public ActionResult SaveMap(int? id, MapViewModel model)
         {
@@ -81,6 +89,7 @@ namespace SESM.Controllers
         //
         // POST: Server/SaveMap/5
         [HttpPost]
+        [ManagerAndAbove]
         [MultipleButton(Name = "action", Argument = "DelMap")]
         public ActionResult DelMap(int? id, MapViewModel model)
         {
@@ -100,6 +109,7 @@ namespace SESM.Controllers
         //
         // POST: Server/SaveMap/5
         [HttpPost]
+        [ManagerAndAbove]
         [MultipleButton(Name = "action", Argument = "DownMap")]
         public ActionResult DownMap(int id, MapViewModel model)
         {
@@ -133,6 +143,7 @@ namespace SESM.Controllers
         //
         // GET: Server/NewMap/5
         [HttpGet]
+        [ManagerAndAbove]
         public ActionResult New(int id)
         {
             ViewData["ID"] = id;
@@ -142,6 +153,7 @@ namespace SESM.Controllers
         //
         // POST: Server/NewMap/5
         [HttpPost]
+        [ManagerAndAbove]
         public ActionResult New(int id, NewMapViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;
@@ -168,6 +180,7 @@ namespace SESM.Controllers
         //
         // GET: Server/UploadMap/5
         [HttpGet]
+        [AdminAndAbove]
         public ActionResult Upload(int id)
         {
             ViewData["ID"] = id;
@@ -177,6 +190,7 @@ namespace SESM.Controllers
         //
         // POST: Server/UploadMap/5
         [HttpPost]
+        [AdminAndAbove]
         public ActionResult Upload(int id, UploadMapViewModel model)
         {
             if (!ZipFile.IsZipFile(model.SaveZip.InputStream, false))
@@ -184,6 +198,7 @@ namespace SESM.Controllers
                 ModelState.AddModelError("ZipError", "Your File is not a valid zip file");
                 return View(model);
             }
+            model.SaveZip.InputStream.Seek(0, SeekOrigin.Begin);
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 

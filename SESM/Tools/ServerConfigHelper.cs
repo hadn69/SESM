@@ -206,8 +206,8 @@ namespace SESM.Tools
             model.SteamPort = SteamPort;
             model.ServerPort = ServerPort;
             model.AsteroidAmount = AsteroidAmount;
-            model.Administrators = String.Join("\n", Administrators);
-            model.Banned = String.Join("\n", Banned);
+            model.Administrators = String.Join(";", Administrators);
+            model.Banned = String.Join(";", Banned);
             model.GroupID = GroupID;
             model.ServerName = ServerName;
             return model;

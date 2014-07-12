@@ -82,14 +82,14 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.GameMode, labelClass)
                     <div class="@valueColumn">
-                        @Html.EnumDropDownListFor(m => m.GameMode, null, managerAccessClass)
+                        @Html.EnumDropDownListFor(m => m.GameMode, null, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.GameMode)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.EnvironmentHostility, labelClass)
                     <div class="@valueColumn">
-                        @Html.EnumDropDownListFor(m => m.EnvironmentHostility, null, managerAccessClass)
+                        @Html.EnumDropDownListFor(m => m.EnvironmentHostility, null, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.EnvironmentHostility)
                     </div>
                 </div>
@@ -103,14 +103,14 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.MaxPlayers, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.MaxPlayers, managerAccessClass)
+                        @Html.TextBoxFor(m => m.MaxPlayers, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.MaxPlayers)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.MaxFloatingObjects, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.MaxFloatingObjects, managerAccessClass)
+                        @Html.TextBoxFor(m => m.MaxFloatingObjects, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.MaxFloatingObjects)
                     </div>
                 </div>
@@ -211,7 +211,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.CargoShipsEnabled, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.CargoShipsEnabled, managerAccessClass)
+                        @Html.CheckBoxFor(m => m.CargoShipsEnabled, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.CargoShipsEnabled)
                     </div>
                 </div>

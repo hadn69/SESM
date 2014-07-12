@@ -1,8 +1,10 @@
-﻿@model SESM.Models.View.Server.MapViewModel
+﻿@using SESM.DAL
+@model SESM.Models.View.Server.MapViewModel
 @{
     ViewBag.Title = "Map List";
     List<SelectListItem> listDir = (List<SelectListItem>) ViewData["listDir"];
     int id = (int)ViewData["ID"];
+    AccessLevel accessLevel = (AccessLevel)ViewData["AccessLevel"];
 }
 <div class="row">
     <section id="Form">
@@ -27,7 +29,10 @@
                             <input type="submit" onclick="return confirm('This will delete this map. Are you sure you want to do this ?');" value="Delete Map" name="action:DelMap" class="btn btn-default" />
                             <input type="submit" value="Download Map" name="action:DownMap" class="btn btn-default" />
                             <a class="btn btn-default" href="@(Url.Action("New", "Map", new {id = id}))">Create Map</a>
-                            <a class="btn btn-default" href="@(Url.Action("Upload", "Map", new { id = id }))">Upload Map</a>
+                            @if (accessLevel == AccessLevel.Admin || accessLevel == AccessLevel.SuperAdmin)
+                            {
+                                <a class="btn btn-default" href="@(Url.Action("Upload", "Map", new {id = id}))">Upload Map</a>
+                            }
                         </div>
                     </div>
                 </div>

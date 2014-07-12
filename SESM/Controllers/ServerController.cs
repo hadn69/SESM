@@ -359,13 +359,12 @@ namespace SESM.Controllers
         [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
-        public ActionResult Details(int? id)
+        public ActionResult Details(int id)
         {
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
-            int serverId = id ?? 0;
-            ViewData["ID"] = serverId;
-            EntityServer serv = srvPrv.GetServer(serverId);
+            ViewData["ID"] = id;
+            EntityServer serv = srvPrv.GetServer(id);
             AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, serv.Id);
             
             ViewData["AccessLevel"] = accessLevel;
@@ -427,7 +426,25 @@ namespace SESM.Controllers
                     || model.SteamPort != serverConfig.SteamPort
                     || model.Administrators != string.Join(";", serverConfig.Administrators)
                     || model.GroupID != serverConfig.GroupID
-                    || model.WebManagers != string.Join(";", WebManagersList)))
+                    || model.WebManagers != string.Join(";", WebManagersList)
+                    || model.GameMode != serverConfig.GameMode
+                    || model.EnvironmentHostility != serverConfig.EnvironmentHostility
+                    || model.MaxPlayers != serverConfig.MaxPlayers
+                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
+                    || model.CargoShipsEnabled != serverConfig.CargoShipsEnabled
+                    || model.WelderSpeedMultiplier != serverConfig.WelderSpeedMultiplier
+                    || model.GrinderSpeedMultiplier != serverConfig.GrinderSpeedMultiplier
+                    || model.HackSpeedMultiplier != serverConfig.HackSpeedMultiplier
+                    || model.InventorySizeMultiplier != serverConfig.InventorySizeMultiplier
+                    || model.AssemblerEfficiencyMultiplier != serverConfig.AssemblerEfficiencyMultiplier
+                    || model.AssemblerSpeedMultiplier != serverConfig.AssemblerSpeedMultiplier
+                    || model.RefinerySpeedMultiplier != serverConfig.RefinerySpeedMultiplier
+                    || model.WorldSizeKm != serverConfig.WorldSizeKm
+                    || model.AutoSave != serverConfig.AutoSave
+                    || model.RemoveTrash != serverConfig.RemoveTrash
+                    || model.RespawnShipDelete != serverConfig.RespawnShipDelete
+                    || model.EnableCopyPaste != serverConfig.EnableCopyPaste
+                    || model.EnableSpectator != serverConfig.EnableSpectator))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
                     return View("Details", model);
@@ -546,7 +563,25 @@ namespace SESM.Controllers
                     || model.SteamPort != serverConfig.SteamPort
                     || model.Administrators != string.Join(";", serverConfig.Administrators)
                     || model.GroupID != serverConfig.GroupID
-                    || model.WebManagers != string.Join(";", WebManagersList)))
+                    || model.WebManagers != string.Join(";", WebManagersList)
+                    || model.GameMode != serverConfig.GameMode
+                    || model.EnvironmentHostility != serverConfig.EnvironmentHostility
+                    || model.MaxPlayers != serverConfig.MaxPlayers
+                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
+                    || model.CargoShipsEnabled != serverConfig.CargoShipsEnabled
+                    || model.WelderSpeedMultiplier != serverConfig.WelderSpeedMultiplier
+                    || model.GrinderSpeedMultiplier != serverConfig.GrinderSpeedMultiplier
+                    || model.HackSpeedMultiplier != serverConfig.HackSpeedMultiplier
+                    || model.InventorySizeMultiplier != serverConfig.InventorySizeMultiplier
+                    || model.AssemblerEfficiencyMultiplier != serverConfig.AssemblerEfficiencyMultiplier
+                    || model.AssemblerSpeedMultiplier != serverConfig.AssemblerSpeedMultiplier
+                    || model.RefinerySpeedMultiplier != serverConfig.RefinerySpeedMultiplier
+                    || model.WorldSizeKm != serverConfig.WorldSizeKm
+                    || model.AutoSave != serverConfig.AutoSave
+                    || model.RemoveTrash != serverConfig.RemoveTrash
+                    || model.RespawnShipDelete != serverConfig.RespawnShipDelete
+                    || model.EnableCopyPaste != serverConfig.EnableCopyPaste
+                    || model.EnableSpectator != serverConfig.EnableSpectator))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
                     return View("Details", model);
@@ -557,8 +592,6 @@ namespace SESM.Controllers
                     ModelState.AddModelError("PortUnavailable", "The server port is already in use (on " + srvPrv.GetServerByPort(model.ServerPort).Name + ")");
                     return View("Details", model);
                 }
-
-
 
                 string[] webAdminsSplitted = model.WebAdministrators != null ? model.WebAdministrators.Split(';') : new string[0];
                 string[] webManagerSplitted = model.WebManagers != null ? model.WebManagers.Split(';') : new string[0];
