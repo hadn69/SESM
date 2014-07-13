@@ -67,8 +67,7 @@ namespace SESM.Controllers
                     || model.SendLogToKeen != SESMConfigHelper.GetSendLogToKeen())
                 {
                     // Getting started server list
-                    List<EntityServer> listStartedServ =
-                        srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
+                    List<EntityServer> listStartedServ = srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
 
                     foreach (EntityServer item in srvPrv.GetAllServers())
                     {
@@ -202,7 +201,13 @@ namespace SESM.Controllers
         [HttpGet]
         public ActionResult Diagnosis()
         {
-            return View();
+            DiagnosisViewModel model = new DiagnosisViewModel();
+            if (_context.Database.Exists())
+                model.DatabaseConnexion = true;
+
+            //if(System.IO.File.Exists(SESMConfigHelper.GetSEDataPath() + ))
+
+            return View(model);
         }
     }
 }

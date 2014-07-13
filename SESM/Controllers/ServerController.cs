@@ -424,8 +424,6 @@ namespace SESM.Controllers
                     || model.IP != serverConfig.IP
                     || model.ServerPort != serverConfig.ServerPort
                     || model.SteamPort != serverConfig.SteamPort
-                    || model.Administrators != string.Join(";", serverConfig.Administrators)
-                    || model.GroupID != serverConfig.GroupID
                     || model.WebManagers != string.Join(";", WebManagersList)
                     || model.GameMode != serverConfig.GameMode
                     || model.EnvironmentHostility != serverConfig.EnvironmentHostility
@@ -561,8 +559,6 @@ namespace SESM.Controllers
                     || model.IP != serverConfig.IP
                     || model.ServerPort != serverConfig.ServerPort
                     || model.SteamPort != serverConfig.SteamPort
-                    || model.Administrators != string.Join(";", serverConfig.Administrators)
-                    || model.GroupID != serverConfig.GroupID
                     || model.WebManagers != string.Join(";", WebManagersList)
                     || model.GameMode != serverConfig.GameMode
                     || model.EnvironmentHostility != serverConfig.EnvironmentHostility

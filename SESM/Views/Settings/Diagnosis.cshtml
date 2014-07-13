@@ -1,13 +1,27 @@
-﻿@{
+﻿@model SESM.Models.View.Settings.DiagnosisViewModel
+@{
     ViewBag.Title = "Diagnosis";
 }
 
 <div class="row">
+    @if (Model.DatabaseConnexion)
+    {
+        <div class="alert alert-success">
+            <span class="glyphicon glyphicon-ok"></span> Database Connexion
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <span class="glyphicon glyphicon-remove"></span> Database Connexion
+        </div>
+    }
+
     Database Connexion : <br/>
-    Database Integrity :<br /> 
     Service Creation :<br />
     Service Deletion :<br />
-    FileSystem Access :<br />
+    File Creation :<br />
+    File Deletion :<br />
     Super Administrator presence :<br />
     
 </div>

@@ -201,6 +201,7 @@
     <Compile Include="Models\View\Account\RegisterViewModel.cs" />
     <Compile Include="Models\View\Server\ServerEnums.cs" />
     <Compile Include="Models\View\Server\ServerViewModel.cs" />
+    <Compile Include="Models\View\Settings\DiagnosisViewModel.cs" />
     <Compile Include="Models\View\Settings\SettingsViewModel.cs" />
     <Compile Include="Models\View\Settings\UploadBinViewModel.cs" />
     <Compile Include="Models\View\Server\UploadMapViewModel.cs" />
