@@ -326,11 +326,11 @@ namespace SESM.Tools
             if (sessionSettings.Element("AutoHealing") != null)
                 bool.TryParse(sessionSettings.Element("AutoHealing").Value, out AutoHealing);
             if (sessionSettings.Element("EnableCopyPaste") != null)
-                bool.TryParse(sessionSettings.Element("EnableCopyPaste").Value, out AutoHealing);
+                bool.TryParse(sessionSettings.Element("EnableCopyPaste").Value, out EnableCopyPaste);
             if (sessionSettings.Element("AutoSave") != null)
-                bool.TryParse(sessionSettings.Element("AutoSave").Value, out AutoHealing);
+                bool.TryParse(sessionSettings.Element("AutoSave").Value, out AutoSave);
             if (sessionSettings.Element("WeaponsEnabled") != null)
-                bool.TryParse(sessionSettings.Element("WeaponsEnabled").Value, out AutoHealing);
+                bool.TryParse(sessionSettings.Element("WeaponsEnabled").Value, out WeaponsEnabled);
             if (sessionSettings.Element("ShowPlayerNamesOnHud") != null)
                 bool.TryParse(sessionSettings.Element("ShowPlayerNamesOnHud").Value, out ShowPlayerNamesOnHud);
             if (sessionSettings.Element("ThrusterDamage") != null)
