@@ -17,11 +17,98 @@
         </div>
     }
 
-    Database Connexion : <br/>
-    Service Creation :<br />
-    Service Deletion :<br />
-    File Creation :<br />
-    File Deletion :<br />
-    Super Administrator presence :<br />
+    @if (Model.ArchMatch)
+    {
+        <div class="alert alert-success">
+            <span class="glyphicon glyphicon-ok"></span> Architecture
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <span class="glyphicon glyphicon-remove"></span> Architecture
+        </div>
+    }
     
+    @if (Model.Binariesx86)
+    {
+        <div class="alert alert-success">
+            <span class="glyphicon glyphicon-ok"></span> Binaries x86
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <span class="glyphicon glyphicon-remove"></span> Binaries x86
+        </div>
+    }
+    
+    @if (Model.Binariesx64)
+    {
+        <div class="alert alert-success">
+            <span class="glyphicon glyphicon-ok"></span> Binaries x64
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <span class="glyphicon glyphicon-remove"></span> Binaries x64
+        </div>
+    }
+    
+    @if (Model.ServiceCreation)
+    {
+        <div class="alert alert-success">
+            <span class="glyphicon glyphicon-ok"></span> Service Creation
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <span class="glyphicon glyphicon-remove"></span> Service Creation
+        </div>
+    }
+    
+    @if (Model.ServiceDeletion)
+    {
+        <div class="alert alert-success">
+            <span class="glyphicon glyphicon-ok"></span> Service Deletion
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <span class="glyphicon glyphicon-remove"></span> Service Deletion
+        </div>
+    }
+    
+    @if (Model.FileCreation)
+    {
+        <div class="alert alert-success">
+            <span class="glyphicon glyphicon-ok"></span> File Creation
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <span class="glyphicon glyphicon-remove"></span> File Creation
+        </div>
+    }
+
+    @if (Model.FileDeletion)
+    {
+        <div class="alert alert-success">
+            <span class="glyphicon glyphicon-ok"></span> File Deletion
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <span class="glyphicon glyphicon-remove"></span> File Deletion
+        </div>
+    }
+    
+    
+    
+
 </div>

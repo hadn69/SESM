@@ -6,9 +6,9 @@
 
     const string valueColumn = "col-md-6";
     int id = (int) ViewData["ID"];
-    
-    object superAdminAccessClass = new { @class = "form-control", disabled = "true" };
-    object adminAccessClass = new { @class = "form-control", disabled = "true" };
+
+    object superAdminAccessClass = new { @class = "form-control", @readonly = "readonly", onclick = "return false" };
+    object adminAccessClass = new { @class = "form-control", @readonly = "readonly" , onclick = "return false" };
     object managerAccessClass = new { @class = "form-control"};
     AccessLevel accessLevel = (AccessLevel)ViewData["AccessLevel"];
     if (accessLevel == AccessLevel.SuperAdmin)

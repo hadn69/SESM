@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using Ionic.Zip;
 using SESM.Controllers.ActionFilters;
@@ -201,11 +204,70 @@ namespace SESM.Controllers
         [HttpGet]
         public ActionResult Diagnosis()
         {
+            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
+
+            if (conf.AppSettings.Settings["Diagnosis"].Value.ToLower() != "true")
+            {
+                return RedirectToAction("Index", "Home");
+            }
             DiagnosisViewModel model = new DiagnosisViewModel();
+
             if (_context.Database.Exists())
                 model.DatabaseConnexion = true;
 
-            //if(System.IO.File.Exists(SESMConfigHelper.GetSEDataPath() + ))
+            switch (SESMConfigHelper.GetArch())
+            {
+                case ArchType.x64:
+                    if (System.Environment.Is64BitOperatingSystem)
+                        model.ArchMatch = true;
+                    break;
+                case ArchType.x86:
+                    model.ArchMatch = true;
+                    break;
+            }
+
+            if (System.IO.File.Exists(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer\SpaceEngineersDedicated.exe"))
+                model.Binariesx86 = true;
+
+            if (System.IO.File.Exists(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer64\SpaceEngineersDedicated.exe"))
+                model.Binariesx64 = true;
+
+            ServiceHelper.RegisterService("SESMDiagTest");
+            if (ServiceHelper.DoesServiceExist("SESMDiagTest"))
+                model.ServiceCreation = true;
+
+            ServiceHelper.UnRegisterService("SESMDiagTest");
+            if (!ServiceHelper.DoesServiceExist("SESMDiagTest"))
+                model.ServiceDeletion = true;
+
+            try
+            {
+                FileStream stream = System.IO.File.Create(conf.AppSettings.Settings["SEDataPath"].Value + @"\testDiag.bin");
+                stream.Close();
+                stream.Dispose();
+                model.FileCreation = true;
+            }
+            catch (Exception)
+            {
+            }
+
+            try
+            {
+                System.IO.File.Delete(conf.AppSettings.Settings["SEDataPath"].Value + @"\testDiag.bin");
+                model.FileDeletion = true;
+            }
+            catch (Exception)
+            {
+            }
+            UserProvider usrPrv = new UserProvider(_context);
+            foreach (EntityUser item in usrPrv.GetUsers())
+            {
+                if (item.IsAdmin)
+                {
+                    model.SuperAdmin = true;
+                    break;
+                }
+            }
 
             return View(model);
         }

@@ -525,13 +525,12 @@ namespace SESM.Controllers
         [CheckAuth]
         [ManagerAndAbove]
         [MultipleButton(Name = "action", Argument = "SaveDetails")]
-        public ActionResult DetailsSave(int? id, ServerViewModel model)
+        public ActionResult DetailsSave(int id, ServerViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
-            int serverId = id ?? 0;
-            ViewData["ID"] = serverId;
-            EntityServer serv = srvPrv.GetServer(serverId);
+            ViewData["ID"] = id;
+            EntityServer serv = srvPrv.GetServer(id);
 
             AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, serv.Id);
             ViewData["AccessLevel"] = accessLevel;
@@ -547,11 +546,18 @@ namespace SESM.Controllers
                 List<string> WebManagersList = serv.Managers.Select(item => item.Login).ToList();
                 List<string> WebUsersList = serv.Users.Select(item => item.Login).ToList();
 
+
+
+
                 if ((accessLevel == AccessLevel.Manager || accessLevel == AccessLevel.Admin)
                     && model.WebAdministrators != string.Join(";", WebAdminsList))
                 {
-                    ModelState.AddModelError("AdminModified", "You can't modify the Web Administrator list");
-                    return View("Details", model);
+                    if (!(string.IsNullOrEmpty(model.WebAdministrators) &&
+                          string.IsNullOrEmpty(string.Join(";", WebAdminsList))))
+                    {
+                        ModelState.AddModelError("AdminModified", "You can't modify the Web Administrator list");
+                        return View("Details", model);
+                    }
                 }
                 if (accessLevel == AccessLevel.Manager
                     && (model.Name != serv.Name
