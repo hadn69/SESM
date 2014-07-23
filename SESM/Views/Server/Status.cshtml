@@ -1,6 +1,6 @@
 ﻿@using SESM.DAL
-@using SESM.Tools
-@model SESM.Models.View.Server.ServerViewModel
+@using SESM.Tools.Helpers
+@model SESM.Models.Views.Server.ServerViewModel
 @{
     ViewBag.Title = "Server Status";
     ServiceState status = (ServiceState) ViewData["State"];
@@ -67,8 +67,9 @@
             @if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
             {
                 <a class="btn btn-default" href="@(Url.Action("Details", "Server", new {id = id}))">Edit</a>
-                <a class="btn btn-default" href="@(Url.Action("Logs", "Server", new {id = id}))">Logs</a>
+                <a class="btn btn-default" href="@(Url.Action("Index", "Log", new {id = id}))">Logs</a>
                 <a class="btn btn-default" href="@(Url.Action("Index", "Map", new {id = id}))">Maps</a>
+                <a class="btn btn-default" href="@(Url.Action("StatsHourly", "Server", new {id = id}))">Stats</a>
             }
             @if (accessLevel == AccessLevel.SuperAdmin)
             {

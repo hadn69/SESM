@@ -1,0 +1,19 @@
+﻿<div class="row">
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div style="overflow:auto;height:350px">
+            <ul class="list-group">
+                @foreach (string item in (string[])ViewData["logEntries"])
+                {
+                    <li class="list-group-item">@item</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-default" href="@(Url.Action("Index", "Log", new {id = ViewData["ID"]}))">Back to Log List</a>
+    </div>
+</div>

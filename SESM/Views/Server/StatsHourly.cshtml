@@ -1,0 +1,74 @@
+﻿@using SESM.DTO
+@{
+    ViewBag.Title = "Hourly Stats";
+    List<EntityPerfEntry> perfEntries = (List<EntityPerfEntry>)ViewData["perfEntries"];
+}
+
+<div class="row">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <canvas id="ChartCnv" width="1140" height="400"></canvas>
+            <div id="legend"></div>
+            <script type="text/javascript">
+                // Src : https://github.com/bebraw/Chart.js.legend
+                function legend(parent, data) {
+                    parent.className = 'legend';
+                    var datas = data.hasOwnProperty('datasets') ? data.datasets : data;
+
+                    // remove possible children of the parent
+                    while (parent.hasChildNodes()) {
+                        parent.removeChild(parent.lastChild);
+                    }
+
+                    datas.forEach(function (d) {
+                        var title = document.createElement('span');
+                        title.className = 'title';
+                        title.style.borderColor = d.hasOwnProperty('strokeColor') ? d.strokeColor : d.color;
+                        title.style.borderStyle = 'solid';
+                        parent.appendChild(title);
+
+                        var text = document.createTextNode(d.title);
+                        title.appendChild(text);
+                    });
+                }
+                var data = {
+                    labels: ["@Html.Raw(string.Join("\", \"",perfEntries.ConvertAll(x => x.Timestamp.ToString("HH:mm")).ToArray()))"],
+                    datasets: [
+                    {
+                        label: "CPU Usage",
+                        title: "CPU Usage (in %)",
+                        fillColor: "rgba(220,220,220,0.2)",
+                        strokeColor: "rgba(220,220,220,1)",
+                        pointColor: "rgba(220,220,220,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(220,220,220,1)",
+                        data: [@Html.Raw(string.Join(", ",perfEntries.ConvertAll(x => x.CPUUsage).ToArray()))]
+                    },
+                    {
+                        label: "RAM Usage",
+                        title: "RAM Usage (in MB)",
+                        fillColor: "rgba(151,187,205,0.2)",
+                        strokeColor: "rgba(151,187,205,1)",
+                        pointColor: "rgba(151,187,205,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(151,187,205,1)",
+                        data: [@Html.Raw(string.Join(", ",perfEntries.ConvertAll(x => x.RamUsage / 1024).ToArray()))]
+                    }]
+                };
+                var options = {
+                    scaleGridLineWidth: 2,
+                    bezierCurveTension: 0.4,
+                    pointDotRadius: 5,
+
+                    legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].lineColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+
+                };
+                var ctx = document.getElementById("ChartCnv").getContext("2d");
+                var myNewChart = new Chart(ctx).Line(data);
+                legend(document.getElementById("legend"), data);
+            </script>
+        </div>
+    </div>
+</div>

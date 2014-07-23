@@ -1,0 +1,40 @@
+﻿@model SESM.Models.Views.Log.LogViewModel
+@{
+    ViewBag.Title = "Log List";
+    List<SelectListItem> listLog = (List<SelectListItem>)ViewData["listLog"];
+    int id = (int)ViewData["ID"];
+}
+<div class="row">
+    <section id="Form">
+        @using (Html.BeginForm("Index", "Log", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            <div class="col-md-6">
+                @Html.ValidationSummary()
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.DropDownListFor(m => m.LogName, listLog, new { @class = "form-control", size = "15", style = "max-width:none;width:500px" })
+                        @Html.ValidationMessageFor(m => m.LogName)
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" >
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <br/>
+                        <br/>
+                        <div class="btn-group-vertical">
+                            <input type="submit" value="View Log" name="action:ViewLog" class="btn btn-default" />
+                            <input type="submit" onclick="return confirm('This will delete this log. Are you sure you want to do this ?');" value="Delete Log" name="action:DeleteLog" class="btn btn-default" />
+                            <input type="submit" value="Download Log" name="action:DownloadLog" class="btn btn-default" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </section>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-default" href="@(Url.Action("Status", "Server", new {id = ViewData["ID"]}))">Back to Server Status</a>
+    </div>
+</div>

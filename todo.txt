@@ -1,3 +1,9 @@
-- User Managment (promote SAdmin / change Login/Password / delete user)
-- Kill and Kill Force
+- Add new check options
+- Check bug surv/crea
+- Perf monitor
+	- Get RAM (which one ?)
+- Mod manager (c/p du manager de map)
+- Log Manager
+- faction manager ?
+- refonte system de perm
 - Cleanup

@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
 using SESM.DTO;
+using SESM.Migrations;
 
 namespace SESM.DAL
 {
@@ -7,10 +8,12 @@ namespace SESM.DAL
     {
         public DbSet<EntityUser> Users { get; set; }
         public DbSet<EntityServer> Servers { get; set; }
+        public DbSet<EntityPerfEntry> PerfEntries { get; set; }
 
         public DataContext()
         {
-            Database.SetInitializer<DataContext>(new DataContextInitializer());
+            //Database.SetInitializer<DataContext>(new DataContextInitializer());
+            Database.SetInitializer<DataContext>(new MigrateDatabaseToLatestVersion<DataContext, Configuration>());
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -24,6 +27,8 @@ namespace SESM.DAL
             modelBuilder.Entity<EntityUser>()
                 .HasMany<EntityServer>(x => x.UserOf)
                 .WithMany(x => x.Users);
+            modelBuilder.Entity<EntityServer>()
+                .HasMany<EntityPerfEntry>(x => x.PerfEntries);
         }
     }
 }

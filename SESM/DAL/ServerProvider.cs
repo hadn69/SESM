@@ -4,7 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.ServiceProcess;
 using SESM.DTO;
-using SESM.Tools;
+using SESM.Tools.Helpers;
 
 namespace SESM.DAL
 {

@@ -30,7 +30,14 @@ namespace SESM.DTO
             get { return _users ?? (_users = new HashSet<EntityUser>()); }
             set { _users = value; }
         }
-
+        
+        private ICollection<EntityPerfEntry> _perfEntries;
+        public virtual ICollection<EntityPerfEntry> PerfEntries
+        {
+            get { return _perfEntries ?? (_perfEntries = new HashSet<EntityPerfEntry>()); }
+            set { _perfEntries = value; }
+        }
+        
         public EntityServer()
         {
             IsPublic = false;

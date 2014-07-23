@@ -2,14 +2,14 @@
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
-using SESM.Models.View.Account;
-using SESM.Tools;
+using SESM.Models.Views.Account;
+using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {
     public class AccountController : Controller
     {
-        readonly DataContext context = new DataContext();
+        readonly DataContext _context = new DataContext();
 
         //
         // GET: /Account/Login
@@ -29,7 +29,7 @@ namespace SESM.Controllers
         {
             if (ModelState.IsValid)
             {
-                UserProvider usrPrv = new UserProvider(context);
+                UserProvider usrPrv = new UserProvider(_context);
                 EntityUser usr = usrPrv.GetUser(model.Login);
                 if (usr != null && usr.Password == HashHelper.MD5Hash(model.Password))
                 {
@@ -65,7 +65,7 @@ namespace SESM.Controllers
                 if (model.Password == model.RetypedPassword)
                 {
                     
-                    UserProvider usrPrv = new UserProvider(context);
+                    UserProvider usrPrv = new UserProvider(_context);
                     EntityUser usrTest = usrPrv.GetUser(model.Login);
                     if (usrTest == null)
                     {
@@ -110,7 +110,7 @@ namespace SESM.Controllers
         public ActionResult Manage()
         {
             EntityUser sUser = Session["User"] as EntityUser;
-            UserProvider usrPrv = new UserProvider(context);
+            UserProvider usrPrv = new UserProvider(_context);
             EntityUser user = usrPrv.GetUser(sUser.Id);
 
             ManageViewModel model = new ManageViewModel();
@@ -128,7 +128,7 @@ namespace SESM.Controllers
             {
 
                 EntityUser sUser = Session["User"] as EntityUser;
-                UserProvider usrPrv = new UserProvider(context);
+                UserProvider usrPrv = new UserProvider(_context);
                 EntityUser user = usrPrv.GetUser(sUser.Id);
 
                 if (model.OldPassword != null)

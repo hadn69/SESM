@@ -7,8 +7,8 @@ using Ionic.Zip;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
-using SESM.Models.View.Server;
-using SESM.Tools;
+using SESM.Models.Views.Map;
+using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {
@@ -19,7 +19,7 @@ namespace SESM.Controllers
         readonly DataContext _context = new DataContext();
 
         //
-        // GET: Server/Maps/5
+        // GET: Map/5
         [HttpGet]
         [ManagerAndAbove]
         public ActionResult Index(int id)
@@ -60,11 +60,11 @@ namespace SESM.Controllers
         }
 
         //
-        // POST: Server/SaveMap/5
+        // POST: Map/Save/5
         [HttpPost]
         [ManagerAndAbove]
         [MultipleButton(Name = "action", Argument = "SaveMap")]
-        public ActionResult SaveMap(int? id, MapViewModel model)
+        public ActionResult Save(int? id, MapViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -87,11 +87,11 @@ namespace SESM.Controllers
         }
 
         //
-        // POST: Server/SaveMap/5
+        // POST: Map/Save/5
         [HttpPost]
         [ManagerAndAbove]
-        [MultipleButton(Name = "action", Argument = "DelMap")]
-        public ActionResult DelMap(int? id, MapViewModel model)
+        [MultipleButton(Name = "action", Argument = "DeleteMap")]
+        public ActionResult Delete(int? id, MapViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -107,11 +107,11 @@ namespace SESM.Controllers
         }
 
         //
-        // POST: Server/SaveMap/5
+        // POST: Map/Save/5
         [HttpPost]
         [ManagerAndAbove]
-        [MultipleButton(Name = "action", Argument = "DownMap")]
-        public ActionResult DownMap(int id, MapViewModel model)
+        [MultipleButton(Name = "action", Argument = "DownloadMap")]
+        public ActionResult Download(int id, MapViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -141,7 +141,7 @@ namespace SESM.Controllers
         }
 
         //
-        // GET: Server/NewMap/5
+        // GET: Map/New/5
         [HttpGet]
         [ManagerAndAbove]
         public ActionResult New(int id)
@@ -151,7 +151,7 @@ namespace SESM.Controllers
         }
 
         //
-        // POST: Server/NewMap/5
+        // POST: Map/New/5
         [HttpPost]
         [ManagerAndAbove]
         public ActionResult New(int id, NewMapViewModel model)
@@ -178,7 +178,7 @@ namespace SESM.Controllers
         }
 
         //
-        // GET: Server/UploadMap/5
+        // GET: Map/Upload/5
         [HttpGet]
         [AdminAndAbove]
         public ActionResult Upload(int id)
@@ -188,7 +188,7 @@ namespace SESM.Controllers
         }
 
         //
-        // POST: Server/UploadMap/5
+        // POST: Map/Upload/5
         [HttpPost]
         [AdminAndAbove]
         public ActionResult Upload(int id, UploadMapViewModel model)

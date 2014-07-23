@@ -38,14 +38,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.dll</HintPath>
+    <Reference Include="Common.Logging">
+      <HintPath>..\packages\Common.Logging.2.1.2\lib\net40\Common.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.SqlServerCompact">
-      <HintPath>..\packages\EntityFramework.SqlServerCompact.6.1.0\lib\net45\EntityFramework.SqlServerCompact.dll</HintPath>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServerCompact, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.SqlServerCompact.6.1.1\lib\net45\EntityFramework.SqlServerCompact.dll</HintPath>
     </Reference>
     <Reference Include="Ionic.Zip">
       <HintPath>.\Ionic.Zip.dll</HintPath>
@@ -54,6 +60,9 @@
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Quartz">
+      <HintPath>..\packages\Quartz.2.2.3\lib\net40\Quartz.dll</HintPath>
     </Reference>
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
@@ -73,27 +82,27 @@
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.Helpers.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.0\lib\net45\System.Web.Helpers.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Mvc, Version=5.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.Web.Mvc, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.1.2\lib\net45\System.Web.Mvc.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.0\lib\net45\System.Web.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.Razor.3.1.2\lib\net45\System.Web.Razor.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.0\lib\net45\System.Web.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.WebPages.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.0\lib\net45\System.Web.WebPages.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.0\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.0\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
@@ -112,7 +121,15 @@
     <Content Include="Content\glyphicons-halflings-regular.svg" />
     <Content Include="Content\site.css" />
     <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\Chart.js" />
+    <Content Include="Scripts\jquery-2.1.1.js" />
+    <Content Include="Scripts\jquery-2.1.1.min.js" />
+    <Content Include="Scripts\jquery-2.1.1.min.map" />
+    <None Include="job_scheduling_data_2_0.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <None Include="Scripts\jquery-2.1.1-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -125,12 +142,9 @@
     <None Include="Properties\PublishProfiles\Dev.pubxml" />
     <None Include="Properties\PublishProfiles\Package.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="Scripts\jquery-1.10.2.js" />
-    <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
@@ -147,11 +161,13 @@
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Map\Upload.cshtml" />
-    <Content Include="Views\Server\Logs.cshtml" />
+    <Content Include="Views\Log\View.cshtml" />
     <Content Include="Views\Settings\Index.cshtml" />
     <Content Include="Views\Settings\UploadBin.cshtml" />
     <Content Include="Views\User\Edit.cshtml" />
     <Content Include="Views\Settings\Diagnosis.cshtml" />
+    <Content Include="Views\Log\Index.cshtml" />
+    <Content Include="Views\Server\StatsHourly.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -178,6 +194,7 @@
     <Compile Include="Controllers\ActionFilters\GuestOnlyAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\ManagerAndAboveAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\SuperAdminAttribute.cs" />
+    <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Controllers\MapController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -187,32 +204,52 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="DAL\DataContext.cs" />
     <Compile Include="DAL\DataContextInitializer.cs" />
+    <Compile Include="DAL\PerfProvider.cs" />
     <Compile Include="DAL\ServerProvider.cs" />
     <Compile Include="DAL\UserProvider.cs" />
+    <Compile Include="DTO\EntityInstanceRole.cs" />
+    <Compile Include="DTO\EntityPerfEntry.cs" />
     <Compile Include="DTO\EntityServer.cs" />
+    <Compile Include="DTO\EntityServerWideRole.cs" />
     <Compile Include="DTO\EntityUser.cs" />
+    <Compile Include="DTO\EnumInstancePerm.cs" />
+    <Compile Include="DTO\EnumPermAccess.cs" />
+    <Compile Include="DTO\EnumServerWidePerm.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\View\Account\LoginViewModel.cs" />
-    <Compile Include="Models\View\Account\ManageViewModel.cs" />
-    <Compile Include="Models\View\Server\MapViewModel.cs" />
-    <Compile Include="Models\View\Server\NewServerViewModel.cs" />
-    <Compile Include="Models\View\Account\RegisterViewModel.cs" />
-    <Compile Include="Models\View\Server\ServerEnums.cs" />
-    <Compile Include="Models\View\Server\ServerViewModel.cs" />
-    <Compile Include="Models\View\Settings\DiagnosisViewModel.cs" />
-    <Compile Include="Models\View\Settings\SettingsViewModel.cs" />
-    <Compile Include="Models\View\Settings\UploadBinViewModel.cs" />
-    <Compile Include="Models\View\Server\UploadMapViewModel.cs" />
-    <Compile Include="Models\View\User\UserViewModel.cs" />
+    <Compile Include="Migrations\201407201131287_InitialCreate.cs" />
+    <Compile Include="Migrations\201407201131287_InitialCreate.Designer.cs">
+      <DependentUpon>201407201131287_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201407201218541_PerfMonitor.cs" />
+    <Compile Include="Migrations\201407201218541_PerfMonitor.Designer.cs">
+      <DependentUpon>201407201218541_PerfMonitor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\Views\Account\LoginViewModel.cs" />
+    <Compile Include="Models\Views\Account\ManageViewModel.cs" />
+    <Compile Include="Models\Views\Log\LogViewModel.cs" />
+    <Compile Include="Models\Views\Map\MapViewModel.cs" />
+    <Compile Include="Models\Views\Map\NewMapViewModel.cs" />
+    <Compile Include="Models\Views\Server\NewServerViewModel.cs" />
+    <Compile Include="Models\Views\Account\RegisterViewModel.cs" />
+    <Compile Include="Models\Views\Server\ServerEnums.cs" />
+    <Compile Include="Models\Views\Server\ServerViewModel.cs" />
+    <Compile Include="Models\Views\Settings\DiagnosisViewModel.cs" />
+    <Compile Include="Models\Views\Settings\SettingsViewModel.cs" />
+    <Compile Include="Models\Views\Settings\UploadBinViewModel.cs" />
+    <Compile Include="Models\Views\Map\UploadMapViewModel.cs" />
+    <Compile Include="Models\Views\User\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
-    <Compile Include="Tools\HashHelper.cs" />
-    <Compile Include="Tools\PathHelper.cs" />
-    <Compile Include="Tools\ServiceHelper.cs" />
-    <Compile Include="Tools\ServerConfigHelper.cs" />
-    <Compile Include="Tools\SESMConfigHelper.cs" />
+    <Compile Include="Tools\Helpers\HashHelper.cs" />
+    <Compile Include="Tools\Helpers\PathHelper.cs" />
+    <Compile Include="Tools\Monitor\Collector.cs" />
+    <Compile Include="Tools\Helpers\ServiceHelper.cs" />
+    <Compile Include="Tools\Helpers\ServerConfigHelper.cs" />
+    <Compile Include="Tools\Helpers\SESMConfigHelper.cs" />
+    <Compile Include="Tools\Monitor\HourlyCrusher.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config">
@@ -226,6 +263,14 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201407201131287_InitialCreate.resx">
+      <DependentUpon>201407201131287_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407201218541_PerfMonitor.resx">
+      <DependentUpon>201407201218541_PerfMonitor.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>

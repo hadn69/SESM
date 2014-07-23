@@ -1,6 +1,6 @@
 ﻿using System.Data.Entity;
 using SESM.DTO;
-using SESM.Tools;
+using SESM.Tools.Helpers;
 
 namespace SESM.DAL
 {

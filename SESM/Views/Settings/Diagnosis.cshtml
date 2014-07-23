@@ -1,4 +1,4 @@
-﻿@model SESM.Models.View.Settings.DiagnosisViewModel
+﻿@model SESM.Models.Views.Settings.DiagnosisViewModel
 @{
     ViewBag.Title = "Diagnosis";
 }
@@ -108,7 +108,18 @@
         </div>
     }
     
-    
+    @if (Model.SuperAdmin)
+    {
+        <div class="alert alert-success">
+            <span class="glyphicon glyphicon-ok"></span> At Least 1 Super Admin
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <span class="glyphicon glyphicon-remove"></span> At Least 1 Super Admin
+        </div>
+    }
     
 
 </div>

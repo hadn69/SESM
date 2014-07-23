@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
-using SESM.Models.View.Server;
-using SESM.Tools;
+using SESM.Models.Views.Server;
+using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {
@@ -653,41 +654,19 @@ namespace SESM.Controllers
             return View("Details", model);
         }
 
-        
-
         //
-        // GET: Server/Logs/5
+        // GET: Server/StatsHourly/5
         [HttpGet]
         [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
-        public ActionResult Logs(int id)
+        public ActionResult StatsHourly(int id)
         {
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
-            string path = PathHelper.GetInstancePath(serv) + "SpaceEngineers-Dedicated.log";
-            if (SESMConfigHelper.GetAddDateToLog())
-            {
-                DirectoryInfo info = new DirectoryInfo(PathHelper.GetInstancePath(serv));
-                FileInfo file = info.GetFiles().Where(f => f.Name.EndsWith(".log")).OrderBy(p => p.CreationTime).First();
-                path = PathHelper.GetInstancePath(serv) + file.Name;
-            }
-            if (System.IO.File.Exists(path))
-            {
-                FileStream logFileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                StreamReader logFileReader = new StreamReader(logFileStream);
-                List<string> logList = new List<string>();
-                while (!logFileReader.EndOfStream)
-                {
-                    logList.Add(logFileReader.ReadLine());
-                }
 
-                logFileReader.Close();
-                logFileStream.Close();
-                ViewData["logEntries"] = logList.ToArray();
-            }
-            else
-                ViewData["logEntries"] = new string[0];
+            List<EntityPerfEntry> perfEntries = serv.PerfEntries.Where(x => x.Timestamp >= DateTime.Now.AddHours(-2)).OrderBy(x => x.Timestamp).ToList();
+            ViewData["perfEntries"] = perfEntries;
             return View();
         }
 
@@ -699,7 +678,5 @@ namespace SESM.Controllers
             }
             base.Dispose(disposing);
         }
-
-        
     }
 }

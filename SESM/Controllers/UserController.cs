@@ -2,8 +2,8 @@
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
-using SESM.Models.View.User;
-using SESM.Tools;
+using SESM.Models.Views.User;
+using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {
