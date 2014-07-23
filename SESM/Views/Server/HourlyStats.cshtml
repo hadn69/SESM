@@ -1,0 +1,108 @@
+﻿@using SESM.DTO
+@{
+    ViewBag.Title = "Stats";
+    List<EntityPerfEntry> perfEntries = (List<EntityPerfEntry>)ViewData["perfEntries"];
+}
+<script type="text/javascript" src="~/Scripts/amcharts/amcharts.js"></script>
+<script type="text/javascript" src="~/Scripts/amcharts/serial.js"></script>
+<script type="text/javascript" src="~/Scripts/amcharts/themes/dark.js"></script>
+<div class="row">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div id="chartdiv"></div>
+            <script type="text/javascript">
+                var chartData = [
+                    @{
+                        foreach (EntityPerfEntry item in perfEntries)
+                        {
+                            string outStr = String.Empty;
+                            outStr += "{";
+                            outStr += "date:new Date(" + item.Timestamp.Year + ", " 
+                                                        + item.Timestamp.Month + ","
+                                                        + item.Timestamp.Day + ", "
+                                                        + item.Timestamp.Hour + ", "
+                                                        + item.Timestamp.Minute + ", "
+                                                        + item.Timestamp.Second + "),";
+                            outStr += "CPU:" + item.CPUUsage + ",";
+                            outStr += "RAM:" + item.RamUsage;
+                            outStr += "},\n";
+                            @Html.Raw(outStr);
+
+                        }
+                    }
+                ];
+                var chart = AmCharts.makeChart("chartdiv", {
+                    "type": "serial",
+                    "theme": "dark",
+                    "pathToImages": "@Request.Url.GetLeftPart(UriPartial.Authority)/Scripts/amcharts/images/",
+                    "legend": {
+                        "useGraphSettings": true
+                    },
+                    "dataProvider": chartData,
+                    "valueAxes": [{
+                        "id": "cpuAxis",
+                        "axisThickness": 2,
+                        "axisColor": "#ffb9f7",
+                        "gridAlpha": 0,
+                        "axisAlpha": 1,
+                        "position": "left",
+                        "title": "CPU Usage (in %)"
+                    }, {
+                        "id": "ramAxis",
+                        "axisThickness": 2,
+                        "axisColor": "#00b9f7",
+                        "gridAlpha": 0,
+                        "axisAlpha": 1,
+                        "position": "right",
+                        "title": "RAM Usage (in MB)"
+                    }],
+                    "graphs": [{
+                        "valueAxis": "cpuAxis",
+                        "connect": false,
+                        "lineColor": "#ffb9f7",
+                        "fillColor": "#ffb9f7",
+                        "fillAlphas": 0.4,
+                        "lineThickness": 2,
+                        "bullet": "none",
+                        "title": "CPU Usage",
+                        "valueField": "CPU"
+                    }, {
+                        "valueAxis": "ramAxis",
+                        "connect": false,
+                        "lineColor": "#00b9f7",
+                        "fillColor": "#00b9f7",
+                        "fillAlphas": 0.4,
+                        "lineThickness": 2,
+                        "bullet": "none",
+                        "title": "RAM Usage",
+                        "valueField": "RAM"
+                    }],
+                    "chartScrollbar": {},
+                    "chartCursor": {
+                        "categoryBalloonDateFormat": "JJ:NN, DD/MM",
+                        "cursorPosition": "mouse"
+                    },
+                    "categoryField": "date",
+                    "categoryAxis": {
+                        "minPeriod": "mm",
+                        "parseDates": true,
+                        "axisColor": "#DADADA",
+                        "minorGridEnabled": true
+                    }
+                });
+                chart.addListener("dataUpdated", zoomChart);
+                zoomChart();
+
+                function zoomChart() {
+                    chart.zoomToIndexes(chart.dataProvider.length - 20, chart.dataProvider.length - 1);
+                }
+            </script>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-default" href="@(Url.Action("GlobalStats", "Server", new {id = ViewData["ID"]}))">More Stats</a>
+        <a class="btn btn-default" href="@(Url.Action("Status", "Server", new {id = ViewData["ID"]}))">Back to Server Status</a>
+    </div>
+</div>

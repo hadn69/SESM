@@ -111,8 +111,16 @@ namespace SESM.Models.Views.Server
         public bool RealisticSound { get; set; }
 
         [Required]
+        [DisplayName("Enable Client-Side Saving")]
+        public bool ClientCanSave { get; set; }
+
+        [Required]
         [DisplayName("Hack Speed")]
         public double HackSpeedMultiplier { get; set; }
+
+        [Required]
+        [DisplayName("Enable Permanent Death")]
+        public bool PermanentDeath { get; set; }
 
         [DisplayName("Current Scenario")]
         public SubTypeId ScenarioType { get; set; }
@@ -187,7 +195,9 @@ namespace SESM.Models.Views.Server
             WelderSpeedMultiplier = 1;
             GrinderSpeedMultiplier = 1;
             RealisticSound = false;
+            ClientCanSave = false;
             HackSpeedMultiplier = 0.33;
+            PermanentDeath = false;
 
             ScenarioType = SubTypeId.EasyStart1;
             SaveName = string.Empty;

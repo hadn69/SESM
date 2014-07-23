@@ -34,7 +34,9 @@ namespace SESM.Tools.Helpers
         public double WelderSpeedMultiplier = 1;
         public double GrinderSpeedMultiplier = 1;
         public bool RealisticSound = false;
+        public bool ClientCanSave = false;
         public double HackSpeedMultiplier = 0.33;
+        public bool PermanentDeath = false;
 
         public SubTypeId ScenarioType = SubTypeId.EasyStart1;
         public string SaveName = string.Empty;
@@ -76,7 +78,9 @@ namespace SESM.Tools.Helpers
             WelderSpeedMultiplier = model.WelderSpeedMultiplier;
             GrinderSpeedMultiplier = model.GrinderSpeedMultiplier;
             RealisticSound = model.RealisticSound;
+            ClientCanSave = model.ClientCanSave;
             HackSpeedMultiplier = model.HackSpeedMultiplier;
+            PermanentDeath = model.PermanentDeath;
 
             ScenarioType = model.ScenarioType;
             SaveName = model.SaveName;
@@ -137,7 +141,9 @@ namespace SESM.Tools.Helpers
             WelderSpeedMultiplier = model.WelderSpeedMultiplier;
             GrinderSpeedMultiplier = model.GrinderSpeedMultiplier;
             RealisticSound = model.RealisticSound;
+            ClientCanSave = model.ClientCanSave;
             HackSpeedMultiplier = model.HackSpeedMultiplier;
+            PermanentDeath = model.PermanentDeath;
 
             IP = model.IP;
             SteamPort = model.SteamPort;
@@ -198,7 +204,9 @@ namespace SESM.Tools.Helpers
             model.WelderSpeedMultiplier = WelderSpeedMultiplier;
             model.GrinderSpeedMultiplier = GrinderSpeedMultiplier;
             model.RealisticSound = RealisticSound;
+            model.ClientCanSave = ClientCanSave;
             model.HackSpeedMultiplier = HackSpeedMultiplier;
+            model.PermanentDeath = PermanentDeath;
 
             model.ScenarioType = ScenarioType;
             model.SaveName = SaveName;
@@ -244,7 +252,9 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <WelderSpeedMultiplier>" + WelderSpeedMultiplier + "</WelderSpeedMultiplier>");
             sb.AppendLine("    <GrinderSpeedMultiplier>" + GrinderSpeedMultiplier + "</GrinderSpeedMultiplier>");
             sb.AppendLine("    <RealisticSound>" + RealisticSound.ToString().ToLower() + "</RealisticSound>");
+            sb.AppendLine("    <ClientCanSave>" + ClientCanSave.ToString().ToLower() + "</ClientCanSave>");
             sb.AppendLine("    <HackSpeedMultiplier>" + HackSpeedMultiplier + "</HackSpeedMultiplier>");
+            sb.AppendLine("    <PermanentDeath>" + PermanentDeath.ToString().ToLower() + "</PermanentDeath>");
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
             sb.AppendLine("    <TypeId>ScenarioDefinition</TypeId>");
@@ -353,8 +363,12 @@ namespace SESM.Tools.Helpers
                 double.TryParse(sessionSettings.Element("GrinderSpeedMultiplier").Value, out GrinderSpeedMultiplier);
             if (sessionSettings.Element("RealisticSound") != null)
                 bool.TryParse(sessionSettings.Element("RealisticSound").Value, out RealisticSound);
+            if (sessionSettings.Element("ClientCanSave") != null)
+                bool.TryParse(sessionSettings.Element("ClientCanSave").Value, out ClientCanSave);
             if (sessionSettings.Element("HackSpeedMultiplier") != null)
                 double.TryParse(sessionSettings.Element("HackSpeedMultiplier").Value, out HackSpeedMultiplier);
+            if (sessionSettings.Element("PermanentDeath") != null)
+                bool.TryParse(sessionSettings.Element("PermanentDeath").Value, out PermanentDeath);
             if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                 Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
             if (root.Element("LoadWorld") != null)

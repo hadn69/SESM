@@ -1,0 +1,34 @@
+﻿@using SESM.Tools
+@model SESM.Models.Views.Mod.UploadModViewModel
+@{
+    ViewBag.Title = "Mod Upload";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <section id="Form">
+            @using (Html.BeginForm("Upload", "Mod", null, FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" }))
+            {
+                @Html.ValidationSummary()
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ModZip, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.FileFor(m => m.ModZip, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.ModZip)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Upload" class="btn btn-default" />
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-default" href="@(Url.Action("Index", "Mod", new {id = ViewData["ID"]}))">Back to Mod List</a>
+    </div>
+</div>

@@ -55,3 +55,8 @@ input[type="checkbox"].input-validation-error {
 hr {
     border-top: 1px solid black;
 }
+
+#chartdiv {background: #3f3f4f;color:#ffffff;	
+	width	: 100%;
+	height	: 500px;
+}	

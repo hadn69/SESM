@@ -30,9 +30,17 @@ namespace SESM.Tools.Helpers
         {
             return GetInstancePath(server) + @"Saves\";
         }
+        public static string GetModsPath(EntityServer server)
+        {
+            return GetInstancePath(server) + @"Mods\";
+        }
         public static string GetSavePath(EntityServer server, string saveName)
         {
             return GetSavesPath(server) + saveName;
+        }
+        public static string GetModsPath(EntityServer server, string modName)
+        {
+            return GetModsPath(server) + modName;
         }
         public static string GetConfigurationFilePath(EntityServer server)
         {

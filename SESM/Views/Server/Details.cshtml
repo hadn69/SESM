@@ -89,7 +89,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.EnvironmentHostility, labelClass)
                     <div class="@valueColumn">
-                        @Html.EnumDropDownListFor(m => m.EnvironmentHostility, null, adminAccessClass)
+                        @Html.EnumDropDownListFor(m => m.EnvironmentHostility, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.EnvironmentHostility)
                     </div>
                 </div>
@@ -126,49 +126,49 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.WelderSpeedMultiplier, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.WelderSpeedMultiplier, null, adminAccessClass)
+                        @Html.TextBoxFor(m => m.WelderSpeedMultiplier, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.WelderSpeedMultiplier)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.GrinderSpeedMultiplier, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.GrinderSpeedMultiplier, null, adminAccessClass)
+                        @Html.TextBoxFor(m => m.GrinderSpeedMultiplier, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.GrinderSpeedMultiplier)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.HackSpeedMultiplier, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.HackSpeedMultiplier, null, adminAccessClass)
+                        @Html.TextBoxFor(m => m.HackSpeedMultiplier, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.HackSpeedMultiplier)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.InventorySizeMultiplier, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.InventorySizeMultiplier, null, adminAccessClass)
+                        @Html.TextBoxFor(m => m.InventorySizeMultiplier, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.InventorySizeMultiplier)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.AssemblerSpeedMultiplier, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.AssemblerSpeedMultiplier, null, adminAccessClass)
+                        @Html.TextBoxFor(m => m.AssemblerSpeedMultiplier, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.AssemblerSpeedMultiplier)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.AssemblerEfficiencyMultiplier, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.AssemblerEfficiencyMultiplier, null, adminAccessClass)
+                        @Html.TextBoxFor(m => m.AssemblerEfficiencyMultiplier, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.AssemblerEfficiencyMultiplier)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.RefinerySpeedMultiplier, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.RefinerySpeedMultiplier, null, adminAccessClass)
+                        @Html.TextBoxFor(m => m.RefinerySpeedMultiplier, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.RefinerySpeedMultiplier)
                     </div>
                 </div>
@@ -211,7 +211,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.CargoShipsEnabled, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.CargoShipsEnabled, adminAccessClass)
+                        @Html.CheckBoxFor(m => m.CargoShipsEnabled, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.CargoShipsEnabled)
                     </div>
                 </div>
@@ -259,46 +259,59 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.WorldSizeKm, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.WorldSizeKm, adminAccessClass)
+                        @Html.TextBoxFor(m => m.WorldSizeKm, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.WorldSizeKm)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.AutoSave, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.AutoSave, adminAccessClass)
+                        @Html.CheckBoxFor(m => m.AutoSave, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.AutoSave)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.RemoveTrash, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.RemoveTrash, adminAccessClass)
+                        @Html.CheckBoxFor(m => m.RemoveTrash, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.RemoveTrash)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.RespawnShipDelete, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.RespawnShipDelete, adminAccessClass)
+                        @Html.CheckBoxFor(m => m.RespawnShipDelete, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.RespawnShipDelete)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.EnableCopyPaste, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.EnableCopyPaste, adminAccessClass)
+                        @Html.CheckBoxFor(m => m.EnableCopyPaste, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.EnableCopyPaste)
                     </div>
                 </div>
                 <div class="form-group">
                     @Html.LabelFor(m => m.EnableSpectator, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.EnableSpectator, adminAccessClass)
+                        @Html.CheckBoxFor(m => m.EnableSpectator, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.EnableSpectator)
                     </div>
                 </div>
-
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ClientCanSave, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.ClientCanSave, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.ClientCanSave)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PermanentDeath, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.PermanentDeath, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.PermanentDeath)
+                    </div>
+                </div>
             </section>
         </div>
         <div class="col-md-6">
@@ -349,7 +362,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.WebManagers, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextAreaFor(m => m.WebManagers, adminAccessClass)
+                        @Html.TextAreaFor(m => m.WebManagers, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.WebManagers)
                     </div>
                 </div>

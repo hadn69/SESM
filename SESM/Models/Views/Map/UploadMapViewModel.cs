@@ -3,7 +3,7 @@ using System.Web;
 
 namespace SESM.Models.Views.Map
 {
-    public class UploadMapViewModel
+    public partial class UploadMapViewModel
     {
         [Required(ErrorMessage = "Save name is required")]
         [Display(Name = "Save Name")]

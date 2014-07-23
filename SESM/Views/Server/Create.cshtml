@@ -208,6 +208,7 @@
                         @Html.ValidationMessageFor(m => m.RealisticSound)
                     </div>
                 </div>
+                
 
             </section>
         </div>
@@ -260,7 +261,20 @@
                         @Html.ValidationMessageFor(m => m.EnableSpectator)
                     </div>
                 </div>
-
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ClientCanSave, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.ClientCanSave, valueClass)
+                        @Html.ValidationMessageFor(m => m.ClientCanSave)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PermanentDeath, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.PermanentDeath, valueClass)
+                        @Html.ValidationMessageFor(m => m.PermanentDeath)
+                    </div>
+                </div>
             </section>
         </div>
         <div class="col-md-6">

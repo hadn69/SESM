@@ -14,6 +14,7 @@ namespace SESM.Controllers
 {
     [LoggedOnly]
     [CheckAuth]
+    [ManagerAndAbove]
     public class MapController : Controller
     {
         readonly DataContext _context = new DataContext();
@@ -21,7 +22,6 @@ namespace SESM.Controllers
         //
         // GET: Map/5
         [HttpGet]
-        [ManagerAndAbove]
         public ActionResult Index(int id)
         {
             EntityUser user = Session["User"] as EntityUser;
@@ -62,14 +62,12 @@ namespace SESM.Controllers
         //
         // POST: Map/Save/5
         [HttpPost]
-        [ManagerAndAbove]
         [MultipleButton(Name = "action", Argument = "SaveMap")]
-        public ActionResult Save(int? id, MapViewModel model)
+        public ActionResult Save(int id, MapViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
-            int serverId = id ?? 0;
-            EntityServer serv = srvPrv.GetServer(serverId);
+            EntityServer serv = srvPrv.GetServer(id);
 
 
             if (ModelState.IsValid)
@@ -89,14 +87,12 @@ namespace SESM.Controllers
         //
         // POST: Map/Save/5
         [HttpPost]
-        [ManagerAndAbove]
         [MultipleButton(Name = "action", Argument = "DeleteMap")]
-        public ActionResult Delete(int? id, MapViewModel model)
+        public ActionResult Delete(int id, MapViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
-            int serverId = id ?? 0;
-            EntityServer serv = srvPrv.GetServer(serverId);
+            EntityServer serv = srvPrv.GetServer(id);
 
             if (ModelState.IsValid && Directory.Exists(PathHelper.GetSavePath(serv, model.MapName) + @"\"))
             {
@@ -109,7 +105,6 @@ namespace SESM.Controllers
         //
         // POST: Map/Save/5
         [HttpPost]
-        [ManagerAndAbove]
         [MultipleButton(Name = "action", Argument = "DownloadMap")]
         public ActionResult Download(int id, MapViewModel model)
         {
@@ -143,7 +138,6 @@ namespace SESM.Controllers
         //
         // GET: Map/New/5
         [HttpGet]
-        [ManagerAndAbove]
         public ActionResult New(int id)
         {
             ViewData["ID"] = id;
@@ -153,7 +147,6 @@ namespace SESM.Controllers
         //
         // POST: Map/New/5
         [HttpPost]
-        [ManagerAndAbove]
         public ActionResult New(int id, NewMapViewModel model)
         {
             EntityUser user = Session["User"] as EntityUser;

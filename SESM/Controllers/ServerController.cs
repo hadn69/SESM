@@ -425,25 +425,9 @@ namespace SESM.Controllers
                     || model.IP != serverConfig.IP
                     || model.ServerPort != serverConfig.ServerPort
                     || model.SteamPort != serverConfig.SteamPort
-                    || model.WebManagers != string.Join(";", WebManagersList)
                     || model.GameMode != serverConfig.GameMode
-                    || model.EnvironmentHostility != serverConfig.EnvironmentHostility
                     || model.MaxPlayers != serverConfig.MaxPlayers
-                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
-                    || model.CargoShipsEnabled != serverConfig.CargoShipsEnabled
-                    || model.WelderSpeedMultiplier != serverConfig.WelderSpeedMultiplier
-                    || model.GrinderSpeedMultiplier != serverConfig.GrinderSpeedMultiplier
-                    || model.HackSpeedMultiplier != serverConfig.HackSpeedMultiplier
-                    || model.InventorySizeMultiplier != serverConfig.InventorySizeMultiplier
-                    || model.AssemblerEfficiencyMultiplier != serverConfig.AssemblerEfficiencyMultiplier
-                    || model.AssemblerSpeedMultiplier != serverConfig.AssemblerSpeedMultiplier
-                    || model.RefinerySpeedMultiplier != serverConfig.RefinerySpeedMultiplier
-                    || model.WorldSizeKm != serverConfig.WorldSizeKm
-                    || model.AutoSave != serverConfig.AutoSave
-                    || model.RemoveTrash != serverConfig.RemoveTrash
-                    || model.RespawnShipDelete != serverConfig.RespawnShipDelete
-                    || model.EnableCopyPaste != serverConfig.EnableCopyPaste
-                    || model.EnableSpectator != serverConfig.EnableSpectator))
+                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
                     return View("Details", model);
@@ -566,25 +550,9 @@ namespace SESM.Controllers
                     || model.IP != serverConfig.IP
                     || model.ServerPort != serverConfig.ServerPort
                     || model.SteamPort != serverConfig.SteamPort
-                    || model.WebManagers != string.Join(";", WebManagersList)
                     || model.GameMode != serverConfig.GameMode
-                    || model.EnvironmentHostility != serverConfig.EnvironmentHostility
                     || model.MaxPlayers != serverConfig.MaxPlayers
-                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
-                    || model.CargoShipsEnabled != serverConfig.CargoShipsEnabled
-                    || model.WelderSpeedMultiplier != serverConfig.WelderSpeedMultiplier
-                    || model.GrinderSpeedMultiplier != serverConfig.GrinderSpeedMultiplier
-                    || model.HackSpeedMultiplier != serverConfig.HackSpeedMultiplier
-                    || model.InventorySizeMultiplier != serverConfig.InventorySizeMultiplier
-                    || model.AssemblerEfficiencyMultiplier != serverConfig.AssemblerEfficiencyMultiplier
-                    || model.AssemblerSpeedMultiplier != serverConfig.AssemblerSpeedMultiplier
-                    || model.RefinerySpeedMultiplier != serverConfig.RefinerySpeedMultiplier
-                    || model.WorldSizeKm != serverConfig.WorldSizeKm
-                    || model.AutoSave != serverConfig.AutoSave
-                    || model.RemoveTrash != serverConfig.RemoveTrash
-                    || model.RespawnShipDelete != serverConfig.RespawnShipDelete
-                    || model.EnableCopyPaste != serverConfig.EnableCopyPaste
-                    || model.EnableSpectator != serverConfig.EnableSpectator))
+                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
                     return View("Details", model);
@@ -660,12 +628,26 @@ namespace SESM.Controllers
         [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
-        public ActionResult StatsHourly(int id)
+        public ActionResult HourlyStats(int id)
+        {
+            ServerProvider srvPrv = new ServerProvider(_context);
+            EntityServer serv = srvPrv.GetServer(id);
+            ViewData["ID"] = id;
+            List<EntityPerfEntry> perfEntries = serv.PerfEntries.Where(x => x.Timestamp >= DateTime.Now.AddHours(-2)).OrderBy(x => x.Timestamp).ToList();
+            ViewData["perfEntries"] = perfEntries;
+            return View();
+        }
+
+        [HttpGet]
+        [LoggedOnly]
+        [CheckAuth]
+        [ManagerAndAbove]
+        public ActionResult GlobalStats(int id)
         {
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 
-            List<EntityPerfEntry> perfEntries = serv.PerfEntries.Where(x => x.Timestamp >= DateTime.Now.AddHours(-2)).OrderBy(x => x.Timestamp).ToList();
+            List<EntityPerfEntry> perfEntries = serv.PerfEntries.Where(x => x.CPUUsagePeak != null).OrderBy(x => x.Timestamp).ToList();
             ViewData["perfEntries"] = perfEntries;
             return View();
         }
@@ -678,5 +660,7 @@ namespace SESM.Controllers
             }
             base.Dispose(disposing);
         }
+
+        
     }
 }

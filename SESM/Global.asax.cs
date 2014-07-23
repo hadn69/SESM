@@ -28,7 +28,7 @@ namespace SESM
 
             scheduler.ScheduleJob(collectorJob, collectorTrigger);
 
-            IJobDetail hourlyCrusherJob = JobBuilder.Create<Collector>()
+            IJobDetail hourlyCrusherJob = JobBuilder.Create<HourlyCrusher>()
                 .WithIdentity("HourlyCrusherJob", "Monitor")
                 .Build();
 
