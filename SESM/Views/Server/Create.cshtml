@@ -275,6 +275,13 @@
                         @Html.ValidationMessageFor(m => m.PermanentDeath)
                     </div>
                 </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.PauseGameWhenEmpty, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.PauseGameWhenEmpty, valueClass)
+                        @Html.ValidationMessageFor(m => m.PauseGameWhenEmpty)
+                    </div>
+                </div>
             </section>
         </div>
         <div class="col-md-6">

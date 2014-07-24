@@ -48,6 +48,7 @@ namespace SESM.Tools.Helpers
         public List<ulong> Banned = new List<ulong>();
         public ulong GroupID = 0;
         public string ServerName = "SESM";
+        public bool PauseGameWhenEmpty = false;
 
         /// <summary>
         /// Parse the View Model into the object
@@ -112,7 +113,7 @@ namespace SESM.Tools.Helpers
             }
             GroupID = model.GroupID;
             ServerName = model.ServerName;
-            return;
+            PauseGameWhenEmpty = model.PauseGameWhenEmpty;
         }
 
         public void ParseIn(NewServerViewModel model)
@@ -172,7 +173,7 @@ namespace SESM.Tools.Helpers
             }
             GroupID = model.GroupID;
             ServerName = model.ServerName;
-            return;
+            PauseGameWhenEmpty = model.PauseGameWhenEmpty;
         }
 
         /// <summary>
@@ -218,6 +219,7 @@ namespace SESM.Tools.Helpers
             model.Banned = String.Join(";", Banned);
             model.GroupID = GroupID;
             model.ServerName = ServerName;
+            model.PauseGameWhenEmpty = PauseGameWhenEmpty;
             return model;
         }
 
@@ -255,6 +257,7 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <ClientCanSave>" + ClientCanSave.ToString().ToLower() + "</ClientCanSave>");
             sb.AppendLine("    <HackSpeedMultiplier>" + HackSpeedMultiplier + "</HackSpeedMultiplier>");
             sb.AppendLine("    <PermanentDeath>" + PermanentDeath.ToString().ToLower() + "</PermanentDeath>");
+            sb.AppendLine("    <Mods />");
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
             sb.AppendLine("    <TypeId>ScenarioDefinition</TypeId>");
@@ -295,6 +298,7 @@ namespace SESM.Tools.Helpers
                 sb.AppendLine("  <ServerName />");
             else
                 sb.AppendLine("  <ServerName>" + ServerName + "</ServerName>");
+            sb.AppendLine("  <PauseGameWhenEmpty>" + PauseGameWhenEmpty.ToString().ToLower() + "</PauseGameWhenEmpty>");
             sb.AppendLine("</MyConfigDedicated>");
             File.WriteAllText(PathHelper.GetConfigurationFilePath(serv), sb.ToString());
         }
@@ -401,7 +405,8 @@ namespace SESM.Tools.Helpers
                 ulong.TryParse(root.Element("GroupID").Value, out GroupID);
             if (root.Element("ServerName") != null)
                 ServerName = root.Element("ServerName").Value;
-
+            if (root.Element("PauseGameWhenEmpty") != null)
+                bool.TryParse(root.Element("PauseGameWhenEmpty").Value, out PauseGameWhenEmpty);
             return true;
         }
     }

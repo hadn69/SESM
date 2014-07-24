@@ -150,6 +150,10 @@ namespace SESM.Models.Views.Server
         [DisplayName("Server Display Name")]
         public string ServerName { get; set; }
 
+        [Required]
+        [DisplayName("Pause Game When No Player")]
+        public bool PauseGameWhenEmpty { get; set; }
+
         [DisplayName("Web Administrators List")]
         public string WebAdministrators { get; set; }
 
