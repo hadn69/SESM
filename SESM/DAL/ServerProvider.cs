@@ -133,7 +133,6 @@ namespace SESM.DAL
             try
             {
                 _context.Servers.Add(server);
-                //_context.Entry<EntityServer>(server).State = EntityState.Added;
                 _context.SaveChanges();
             }
             catch
@@ -255,10 +254,7 @@ namespace SESM.DAL
                     listServ.AddRange(usr.AdministratorOf);
                     listServ.AddRange(usr.ManagerOf);
                     listServ.AddRange(usr.UserOf);
-                    foreach (EntityServer item in _context.Servers.ToList().Where(item => item.IsPublic && !listServ.Contains(item)))
-                    {
-                        listServ.Add(item);
-                    }
+                    listServ.AddRange(_context.Servers.Where(item => item.IsPublic && !listServ.Contains(item)).ToList());
                     return listServ;
                 }
             }
@@ -271,6 +267,7 @@ namespace SESM.DAL
         {
             try
             {
+                _context.PerfEntries.RemoveRange(server.PerfEntries);
                 _context.Servers.Remove(server);
                 _context.SaveChanges();
             }
