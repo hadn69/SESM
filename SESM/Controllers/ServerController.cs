@@ -416,9 +416,14 @@ namespace SESM.Controllers
                 if ((accessLevel == AccessLevel.Manager || accessLevel == AccessLevel.Admin)
                     && model.WebAdministrators != string.Join(";", WebAdminsList))
                 {
-                    ModelState.AddModelError("AdminModified", "You can't modify the Web Administrator list");
-                    return View("Details", model);
+                    if (!(string.IsNullOrEmpty(model.WebAdministrators) &&
+                          string.IsNullOrEmpty(string.Join(";", WebAdminsList))))
+                    {
+                        ModelState.AddModelError("AdminModified", "You can't modify the Web Administrator list");
+                        return View("Details", model);
+                    }
                 }
+
                 if (accessLevel == AccessLevel.Manager
                     && (model.Name != serv.Name
                     || model.ServerName != serverConfig.ServerName

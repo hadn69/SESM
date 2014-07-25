@@ -257,10 +257,10 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <ClientCanSave>" + ClientCanSave.ToString().ToLower() + "</ClientCanSave>");
             sb.AppendLine("    <HackSpeedMultiplier>" + HackSpeedMultiplier + "</HackSpeedMultiplier>");
             sb.AppendLine("    <PermanentDeath>" + PermanentDeath.ToString().ToLower() + "</PermanentDeath>");
-            sb.AppendLine("    <Mods />");
+            //sb.AppendLine("    <Mods />");
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
-            sb.AppendLine("    <TypeId>ScenarioDefinition</TypeId>");
+            sb.AppendLine("    <TypeId>MyObjectBuilder_ScenarioDefinition</TypeId>");
             sb.AppendLine("    <SubtypeId>" + ScenarioType.ToString() + "</SubtypeId>");
             sb.AppendLine("  </Scenario>");
             if (string.IsNullOrEmpty(SaveName))
