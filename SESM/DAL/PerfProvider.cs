@@ -30,11 +30,8 @@ namespace SESM.DAL
         {
             try
             {
-                foreach (EntityPerfEntry item in perfEntries)
-                {
-                    _context.PerfEntries.Remove(item);
-                }
-                
+
+                _context.PerfEntries.RemoveRange(perfEntries);
                 _context.SaveChanges();
             }
             catch

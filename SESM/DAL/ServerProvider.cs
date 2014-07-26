@@ -254,7 +254,10 @@ namespace SESM.DAL
                     listServ.AddRange(usr.AdministratorOf);
                     listServ.AddRange(usr.ManagerOf);
                     listServ.AddRange(usr.UserOf);
-                    listServ.AddRange(_context.Servers.Where(item => item.IsPublic && !listServ.Contains(item)).ToList());
+                    foreach (EntityServer item in _context.Servers.ToList().Where(item => item.IsPublic && !listServ.Contains(item)))
+                    {
+                        listServ.Add(item);
+                    }
                     return listServ;
                 }
             }

@@ -21,7 +21,8 @@ namespace SESM.Tools.Monitor
             {
                 List<EntityPerfEntry> perfEntries =
                     item.PerfEntries.Where(x => x.Timestamp <= timestamp && x.CPUUsagePeak != null)
-                        .OrderBy(x => x.Timestamp).ToList();
+                        .OrderBy(x => x.Timestamp)
+                        .ToList();
                 
                 EntityPerfEntry perfEntry = new EntityPerfEntry();
                 perfEntry.Timestamp = perfEntries[0].Timestamp;
