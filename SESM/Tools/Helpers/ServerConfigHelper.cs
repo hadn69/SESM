@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using SESM.DTO;
 using SESM.Models.Views.Server;
@@ -38,7 +39,7 @@ namespace SESM.Tools.Helpers
         public double HackSpeedMultiplier = 0.33;
         public bool PermanentDeath = false;
 
-        public SubTypeId ScenarioType = SubTypeId.EasyStart1;
+        public SubTypeId ScenarioType = SubTypeId.LoneSurvivor;
         public string SaveName = string.Empty;
         public string IP = "0.0.0.0";
         public int SteamPort = 8766;
@@ -301,6 +302,199 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("  <PauseGameWhenEmpty>" + PauseGameWhenEmpty.ToString().ToLower() + "</PauseGameWhenEmpty>");
             sb.AppendLine("</MyConfigDedicated>");
             File.WriteAllText(PathHelper.GetConfigurationFilePath(serv), sb.ToString());
+
+            // Saving the parameters also to the save file
+            if (SaveName != null)
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.Load(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc");
+                XmlNode root = doc.DocumentElement;
+                XmlNode settingsNode = root.SelectSingleNode("descendant::Settings");
+                XmlNode valueNode = null;
+
+                valueNode = settingsNode.SelectSingleNode("descendant::GameMode");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "GameMode", null));
+                settingsNode.SelectSingleNode("descendant::GameMode").InnerText = GameMode.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::InventorySizeMultiplier");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "InventorySizeMultiplier", null));
+                settingsNode.SelectSingleNode("descendant::InventorySizeMultiplier").InnerText =
+                    InventorySizeMultiplier.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::AssemblerEfficiencyMultiplier");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "AssemblerEfficiencyMultiplier", null));
+                settingsNode.SelectSingleNode("descendant::AssemblerEfficiencyMultiplier").InnerText =
+                    AssemblerEfficiencyMultiplier.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::AssemblerSpeedMultiplier");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "AssemblerSpeedMultiplier", null));
+                settingsNode.SelectSingleNode("descendant::AssemblerSpeedMultiplier").InnerText =
+                    AssemblerSpeedMultiplier.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::RefinerySpeedMultiplier");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "RefinerySpeedMultiplier", null));
+                settingsNode.SelectSingleNode("descendant::RefinerySpeedMultiplier").InnerText =
+                    RefinerySpeedMultiplier.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::OnlineMode");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "OnlineMode", null));
+                settingsNode.SelectSingleNode("descendant::OnlineMode").InnerText = OnlineMode.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::MaxPlayers");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "MaxPlayers", null));
+                settingsNode.SelectSingleNode("descendant::MaxPlayers").InnerText = MaxPlayers.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::MaxFloatingObjects");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "MaxFloatingObjects", null));
+                settingsNode.SelectSingleNode("descendant::MaxFloatingObjects").InnerText =
+                    MaxFloatingObjects.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnvironmentHostility");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnvironmentHostility", null));
+                settingsNode.SelectSingleNode("descendant::EnvironmentHostility").InnerText =
+                    EnvironmentHostility.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::AutoHealing");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "AutoHealing", null));
+                settingsNode.SelectSingleNode("descendant::AutoHealing").InnerText = AutoHealing.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableCopyPaste");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableCopyPaste", null));
+                settingsNode.SelectSingleNode("descendant::EnableCopyPaste").InnerText =
+                    EnableCopyPaste.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::AutoSave");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "AutoSave", null));
+                settingsNode.SelectSingleNode("descendant::AutoSave").InnerText = AutoSave.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::WeaponsEnabled");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "WeaponsEnabled", null));
+                settingsNode.SelectSingleNode("descendant::WeaponsEnabled").InnerText =
+                    WeaponsEnabled.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::ShowPlayerNamesOnHud");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ShowPlayerNamesOnHud", null));
+                settingsNode.SelectSingleNode("descendant::ShowPlayerNamesOnHud").InnerText =
+                    ShowPlayerNamesOnHud.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::ThrusterDamage");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ThrusterDamage", null));
+                settingsNode.SelectSingleNode("descendant::ThrusterDamage").InnerText =
+                    ThrusterDamage.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::CargoShipsEnabled");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "CargoShipsEnabled", null));
+                settingsNode.SelectSingleNode("descendant::CargoShipsEnabled").InnerText =
+                    CargoShipsEnabled.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableSpectator");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableSpectator", null));
+                settingsNode.SelectSingleNode("descendant::EnableSpectator").InnerText =
+                    EnableSpectator.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::RemoveTrash");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "RemoveTrash", null));
+                settingsNode.SelectSingleNode("descendant::RemoveTrash").InnerText = RemoveTrash.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::WorldSizeKm");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "WorldSizeKm", null));
+                settingsNode.SelectSingleNode("descendant::WorldSizeKm").InnerText = WorldSizeKm.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::RespawnShipDelete");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "RespawnShipDelete", null));
+                settingsNode.SelectSingleNode("descendant::RespawnShipDelete").InnerText =
+                    RespawnShipDelete.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::ResetOwnership");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ResetOwnership", null));
+                settingsNode.SelectSingleNode("descendant::ResetOwnership").InnerText =
+                    ResetOwnership.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::WelderSpeedMultiplier");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "WelderSpeedMultiplier", null));
+                settingsNode.SelectSingleNode("descendant::WelderSpeedMultiplier").InnerText =
+                    WelderSpeedMultiplier.ToString().Replace(',', '.');
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::GrinderSpeedMultiplier");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "GrinderSpeedMultiplier", null));
+                settingsNode.SelectSingleNode("descendant::GrinderSpeedMultiplier").InnerText =
+                    GrinderSpeedMultiplier.ToString().Replace(',', '.');
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::RealisticSound");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "RealisticSound", null));
+                settingsNode.SelectSingleNode("descendant::RealisticSound").InnerText =
+                    RealisticSound.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::ClientCanSave");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ClientCanSave", null));
+                settingsNode.SelectSingleNode("descendant::ClientCanSave").InnerText =
+                    ClientCanSave.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::HackSpeedMultiplier");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "HackSpeedMultiplier", null));
+                settingsNode.SelectSingleNode("descendant::HackSpeedMultiplier").InnerText =
+                    HackSpeedMultiplier.ToString().Replace(',', '.');
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::PermanentDeath");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "PermanentDeath", null));
+                settingsNode.SelectSingleNode("descendant::PermanentDeath").InnerText =
+                    PermanentDeath.ToString().ToLower();
+
+                doc.Save(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc");
+            }
         }
 
         /// <summary>

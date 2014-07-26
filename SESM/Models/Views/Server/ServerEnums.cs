@@ -25,9 +25,9 @@
 
     public enum SubTypeId
     {
+        LoneSurvivor,
         EasyStart1,
         EasyStart2,
-        Survival,
         CrashedRedShip,
         TwoPlateforms,
         Asteroids,
