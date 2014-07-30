@@ -18,7 +18,7 @@ namespace SESM.Models.Views.Settings
 
         [Required]
         [Display(Name = "System")]
-        public ArchType Arch { get; set; }
+        public EnumArchType EnumArch { get; set; }
 
         [Required]
         [Display(Name = "Add Date To Logs")]
@@ -27,11 +27,5 @@ namespace SESM.Models.Views.Settings
         [Required]
         [Display(Name = "Send Log To KSH")]
         public bool SendLogToKeen { get; set; }
-    }
-
-    public enum ArchType
-    {
-        x86,
-        x64
     }
 }

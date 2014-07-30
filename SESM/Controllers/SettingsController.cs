@@ -30,7 +30,7 @@ namespace SESM.Controllers
             model.Prefix = SESMConfigHelper.GetPrefix();
             model.SESavePath = SESMConfigHelper.GetSESavePath();
             model.SEDataPath = SESMConfigHelper.GetSEDataPath();
-            model.Arch = SESMConfigHelper.GetArch();
+            model.EnumArch = SESMConfigHelper.GetArch();
             model.AddDateToLog = SESMConfigHelper.GetAddDateToLog();
             model.SendLogToKeen = SESMConfigHelper.GetSendLogToKeen();
 
@@ -65,7 +65,7 @@ namespace SESM.Controllers
                 if (model.Prefix != SESMConfigHelper.GetPrefix()
                     || model.SEDataPath != SESMConfigHelper.GetSEDataPath()
                     || model.SESavePath != SESMConfigHelper.GetSESavePath()
-                    || model.Arch != SESMConfigHelper.GetArch()
+                    || model.EnumArch != SESMConfigHelper.GetArch()
                     || model.AddDateToLog != SESMConfigHelper.GetAddDateToLog()
                     || model.SendLogToKeen != SESMConfigHelper.GetSendLogToKeen())
                 {
@@ -120,7 +120,7 @@ namespace SESM.Controllers
                         Directory.Move(SESMConfigHelper.GetSESavePath(), model.SESavePath);
                         SESMConfigHelper.SetSEDataPath(model.SESavePath);
                     }
-                    SESMConfigHelper.SetArch(model.Arch);
+                    SESMConfigHelper.SetArch(model.EnumArch);
                     SESMConfigHelper.SetAddDateToLog(model.AddDateToLog);
                     SESMConfigHelper.SetSendLogToKeen(model.SendLogToKeen);
 
@@ -217,11 +217,11 @@ namespace SESM.Controllers
 
             switch (SESMConfigHelper.GetArch())
             {
-                case ArchType.x64:
+                case EnumArchType.X64:
                     if (System.Environment.Is64BitOperatingSystem)
                         model.ArchMatch = true;
                     break;
-                case ArchType.x86:
+                case EnumArchType.X86:
                     model.ArchMatch = true;
                     break;
             }

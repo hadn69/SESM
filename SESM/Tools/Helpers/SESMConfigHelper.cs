@@ -113,30 +113,30 @@ namespace SESM.Tools.Helpers
             conf.AppSettings.Settings["SEDataPath"].Value = sEDataPath;
         }
 
-        public static ArchType GetArch()
+        public static EnumArchType GetArch()
         {
             Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
             switch (conf.AppSettings.Settings["Arch"].Value)
             {
                 case "x86":
-                    return ArchType.x86;
+                    return EnumArchType.X86;
                     break;
                 case "x64":
-                    return ArchType.x64;
+                    return EnumArchType.X64;
                     break;
             }
             throw new SystemException("ArchError");
         }
 
-        public static void SetArch(ArchType arch)
+        public static void SetArch(EnumArchType enumArch)
         {
             Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            switch (arch)
+            switch (enumArch)
             {
-                case ArchType.x86:
+                case EnumArchType.X86:
                     conf.AppSettings.Settings["Arch"].Value = "x86";
                     break;
-                case ArchType.x64:
+                case EnumArchType.X64:
                     conf.AppSettings.Settings["Arch"].Value = "x64";
                     break;
             }

@@ -9,6 +9,7 @@ namespace SESM.DAL
         public DbSet<EntityUser> Users { get; set; }
         public DbSet<EntityServer> Servers { get; set; }
         public DbSet<EntityPerfEntry> PerfEntries { get; set; }
+        public DbSet<EntityHost> Hosts { get; set; }
 
         public DataContext()
         {
@@ -29,6 +30,9 @@ namespace SESM.DAL
                 .WithMany(x => x.Users);
             modelBuilder.Entity<EntityServer>()
                 .HasMany<EntityPerfEntry>(x => x.PerfEntries);
+            modelBuilder.Entity<EntityHost>()
+                .HasMany<EntityServer>(x => x.Servers)
+                .WithRequired(x => x.Host);
         }
     }
 }

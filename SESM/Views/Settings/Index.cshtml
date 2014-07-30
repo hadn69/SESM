@@ -30,10 +30,10 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Arch, new { @class = "col-md-2 control-label" })
+                    @Html.LabelFor(m => m.EnumArch, new { @class = "col-md-2 control-label" })
                     <div class="col-md-10">
-                        @Html.EnumDropDownListFor(m => m.Arch, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.Arch)
+                        @Html.EnumDropDownListFor(m => m.EnumArch, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.EnumArch)
                     </div>
                 </div>
                 <div class="form-group">

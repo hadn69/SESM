@@ -37,6 +37,8 @@ namespace SESM.DTO
             get { return _perfEntries ?? (_perfEntries = new HashSet<EntityPerfEntry>()); }
             set { _perfEntries = value; }
         }
+
+        public virtual EntityHost Host { get; set; }
         
         public EntityServer()
         {

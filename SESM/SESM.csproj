@@ -314,6 +314,7 @@
     <Compile Include="DAL\PerfProvider.cs" />
     <Compile Include="DAL\ServerProvider.cs" />
     <Compile Include="DAL\UserProvider.cs" />
+    <Compile Include="DTO\EntityHost.cs" />
     <Compile Include="DTO\EntityInstanceRole.cs" />
     <Compile Include="DTO\EntityPerfEntry.cs" />
     <Compile Include="DTO\EntityServer.cs" />
@@ -333,6 +334,10 @@
     <Compile Include="Migrations\201407201218541_PerfMonitor.Designer.cs">
       <DependentUpon>201407201218541_PerfMonitor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201407291114424_Multi-Hosts.cs" />
+    <Compile Include="Migrations\201407291114424_Multi-Hosts.Designer.cs">
+      <DependentUpon>201407291114424_Multi-Hosts.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Views\Account\LoginViewModel.cs" />
     <Compile Include="Models\Views\Account\ManageViewModel.cs" />
@@ -345,6 +350,7 @@
     <Compile Include="Models\Views\Account\RegisterViewModel.cs" />
     <Compile Include="Models\Views\Server\ServerEnums.cs" />
     <Compile Include="Models\Views\Server\ServerViewModel.cs" />
+    <Compile Include="Models\Views\Settings\EnumArchType.cs" />
     <Compile Include="Models\Views\Settings\DiagnosisViewModel.cs" />
     <Compile Include="Models\Views\Settings\SettingsViewModel.cs" />
     <Compile Include="Models\Views\Settings\UploadBinViewModel.cs" />
@@ -379,6 +385,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201407201218541_PerfMonitor.resx">
       <DependentUpon>201407201218541_PerfMonitor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201407291114424_Multi-Hosts.resx">
+      <DependentUpon>201407291114424_Multi-Hosts.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
