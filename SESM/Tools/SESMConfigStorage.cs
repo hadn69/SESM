@@ -19,7 +19,7 @@ namespace SESM.Tools
 
         public SESMConfigStorage()
         {
-            DBConnString = @"Provider=System.Data.SqlClient;Provider Connection String= 'Server=.\SQLEXPRESS;Database=SESM;User Id=sa;Password=MyPassword;MultipleActiveResultSets=true;'";
+            DBConnString = @"Server=.\SQLEXPRESS;Database=SESM;User Id=sa;Password=MyPassword;MultipleActiveResultSets=true;";
             Prefix = "SESM";
             SESavePath = @"C:\ProgramData\SpaceEngineersDedicated\";
             SEDataPath = @"C:\SpaceEngineer\";
