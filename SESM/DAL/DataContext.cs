@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity;
 using SESM.DTO;
 using SESM.Migrations;
+using SESM.Tools.Helpers;
 
 namespace SESM.DAL
 {
@@ -10,7 +11,7 @@ namespace SESM.DAL
         public DbSet<EntityServer> Servers { get; set; }
         public DbSet<EntityPerfEntry> PerfEntries { get; set; }
 
-        public DataContext()
+        public DataContext() : base(SESMConfigHelper.GetDBConnString())
         {
             //Database.SetInitializer<DataContext>(new DataContextInitializer());
             Database.SetInitializer<DataContext>(new MigrateDatabaseToLatestVersion<DataContext, Configuration>());

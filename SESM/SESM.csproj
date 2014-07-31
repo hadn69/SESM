@@ -111,12 +111,11 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
+    <Reference Include="Westwind.Utilities.Configuration">
+      <HintPath>..\packages\Westwind.Utilities.Configuration.2.20.01\lib\net40\Westwind.Utilities.Configuration.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\DB.mdf" />
-    <Content Include="App_Data\DB_log.ldf">
-      <DependentUpon>DB.mdf</DependentUpon>
-    </Content>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\glyphicons-halflings-regular.svg" />
     <Content Include="Content\site.css" />
@@ -274,6 +273,7 @@
     <Content Include="Views\Mod\Upload.cshtml" />
     <Content Include="Views\Server\HourlyStats.cshtml" />
     <Content Include="Views\Server\GlobalStats.cshtml" />
+    <Content Include="Views\Settings\AutoUpdate.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -345,12 +345,14 @@
     <Compile Include="Models\Views\Account\RegisterViewModel.cs" />
     <Compile Include="Models\Views\Server\ServerEnums.cs" />
     <Compile Include="Models\Views\Server\ServerViewModel.cs" />
+    <Compile Include="Models\Views\Settings\AutoUpdateViewModel.cs" />
     <Compile Include="Models\Views\Settings\DiagnosisViewModel.cs" />
     <Compile Include="Models\Views\Settings\SettingsViewModel.cs" />
     <Compile Include="Models\Views\Settings\UploadBinViewModel.cs" />
     <Compile Include="Models\Views\Map\UploadMapViewModel.cs" />
     <Compile Include="Models\Views\User\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\AutoUpdate.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
     <Compile Include="Tools\Helpers\HashHelper.cs" />
     <Compile Include="Tools\Helpers\PathHelper.cs" />
@@ -359,6 +361,7 @@
     <Compile Include="Tools\Helpers\ServerConfigHelper.cs" />
     <Compile Include="Tools\Helpers\SESMConfigHelper.cs" />
     <Compile Include="Tools\Monitor\HourlyCrusher.cs" />
+    <Compile Include="Tools\SESMConfigStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config">
@@ -381,7 +384,9 @@
       <DependentUpon>201407201218541_PerfMonitor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

@@ -33,7 +33,7 @@ namespace SESM.Controllers
             model.Arch = SESMConfigHelper.GetArch();
             model.AddDateToLog = SESMConfigHelper.GetAddDateToLog();
             model.SendLogToKeen = SESMConfigHelper.GetSendLogToKeen();
-
+            
             return View(model);
         }
 
@@ -82,12 +82,14 @@ namespace SESM.Controllers
                         ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
                     }
 
+                    // Killing some ghost processes that might still exists
+                    ServiceHelper.KillAllService();
+
                     foreach (EntityServer item in srvPrv.GetAllServers())
                     {
                         ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(item));
                     }
 
-                   
                     if (model.SEDataPath != SESMConfigHelper.GetSEDataPath())
                     {
                         if (!Directory.Exists(model.SEDataPath))
@@ -109,8 +111,8 @@ namespace SESM.Controllers
                     {
                         foreach (EntityServer item in srvPrv.GetAllServers())
                         {
-                            Directory.Move(model.SEDataPath + ServiceHelper.GetServiceName(SESMConfigHelper.GetPrefix(), item),
-                                model.SEDataPath + ServiceHelper.GetServiceName(model.Prefix, item));
+                            Directory.Move(SESMConfigHelper.GetSEDataPath() + ServiceHelper.GetServiceName(SESMConfigHelper.GetPrefix(), item),
+                                            SESMConfigHelper.GetSEDataPath() + ServiceHelper.GetServiceName(model.Prefix, item));
                         }
                         SESMConfigHelper.SetPrefix(model.Prefix);
                     }
@@ -118,7 +120,7 @@ namespace SESM.Controllers
                     if (model.SESavePath != SESMConfigHelper.GetSESavePath())
                     {
                         Directory.Move(SESMConfigHelper.GetSESavePath(), model.SESavePath);
-                        SESMConfigHelper.SetSEDataPath(model.SESavePath);
+                        SESMConfigHelper.SetSESavePath(model.SESavePath);
                     }
                     SESMConfigHelper.SetArch(model.Arch);
                     SESMConfigHelper.SetAddDateToLog(model.AddDateToLog);
@@ -180,12 +182,23 @@ namespace SESM.Controllers
                     ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
                 }
 
+                // Killing some ghost processes that might still exists
+                ServiceHelper.KillAllService();
+
                 model.ServerZip.InputStream.Seek(0, SeekOrigin.Begin);
 
                 using (ZipFile zip = ZipFile.Read(model.ServerZip.InputStream))
                 {
-                    Directory.Delete(SESMConfigHelper.GetSEDataPath(), true);
-                    Directory.CreateDirectory(SESMConfigHelper.GetSEDataPath());
+                    if (!Directory.Exists(SESMConfigHelper.GetSEDataPath()))
+                        Directory.CreateDirectory(SESMConfigHelper.GetSEDataPath());
+                    if (Directory.Exists(SESMConfigHelper.GetSEDataPath() + @"Content\"))
+                        Directory.Delete(SESMConfigHelper.GetSEDataPath() + @"Content\", true);
+                    if (Directory.Exists(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer\"))
+                        Directory.Delete(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer\", true);
+                    if (Directory.Exists(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer64\"))
+                        Directory.Delete(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer64\", true);
+                    //Directory.Delete(SESMConfigHelper.GetSEDataPath(), true);
+                    //Directory.CreateDirectory(SESMConfigHelper.GetSEDataPath());
                     zip.ExtractAll(SESMConfigHelper.GetSEDataPath());
                 }
 
@@ -204,9 +217,7 @@ namespace SESM.Controllers
         [HttpGet]
         public ActionResult Diagnosis()
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-
-            if (conf.AppSettings.Settings["Diagnosis"].Value.ToLower() != "true")
+            if (!SESMConfigHelper.GetDiagnosis())
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -242,7 +253,7 @@ namespace SESM.Controllers
 
             try
             {
-                FileStream stream = System.IO.File.Create(conf.AppSettings.Settings["SEDataPath"].Value + @"\testDiag.bin");
+                FileStream stream = System.IO.File.Create(SESMConfigHelper.GetSEDataPath() + @"\testDiag.bin");
                 stream.Close();
                 stream.Dispose();
                 model.FileCreation = true;
@@ -253,7 +264,7 @@ namespace SESM.Controllers
 
             try
             {
-                System.IO.File.Delete(conf.AppSettings.Settings["SEDataPath"].Value + @"\testDiag.bin");
+                System.IO.File.Delete(SESMConfigHelper.GetSEDataPath() + @"\testDiag.bin");
                 model.FileDeletion = true;
             }
             catch (Exception)
@@ -270,6 +281,37 @@ namespace SESM.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpGet]
+        [LoggedOnly]
+        [SuperAdmin]
+        public ActionResult AutoUpdate()
+        {
+            AutoUpdateViewModel model = new AutoUpdateViewModel();
+            model.AutoUpdate = SESMConfigHelper.GetAutoUpdate();
+            model.UserName = SESMConfigHelper.GetAUUsername();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [LoggedOnly]
+        [SuperAdmin]
+        public ActionResult AutoUpdate(AutoUpdateViewModel model)
+        {
+            if(!ModelState.IsValid)
+                return View(model);
+
+            SESMConfigHelper.SetAUUsername(model.UserName);
+            SESMConfigHelper.SetAutoUpdate(model.AutoUpdate);
+
+            if (!string.IsNullOrEmpty(model.Password))
+            {
+                SESMConfigHelper.SetAUPassword(model.Password);
+            }
+            model.Password = "";
+            return RedirectToAction("Index", "Server");
         }
     }
 }

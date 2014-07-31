@@ -2,6 +2,7 @@
 using System.Web.Routing;
 using Quartz;
 using Quartz.Impl;
+using SESM.Tools;
 using SESM.Tools.Monitor;
 
 namespace SESM
@@ -12,10 +13,10 @@ namespace SESM
         {
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-
+            
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.Start();
-
+            
             IJobDetail collectorJob = JobBuilder.Create<Collector>()
                 .WithIdentity("CollectorJob", "Monitor")
                 .Build();
@@ -37,8 +38,20 @@ namespace SESM
                 .WithCronSchedule("0 0 * * * ?")
                 .StartNow()
                 .Build();
-
+            
             scheduler.ScheduleJob(hourlyCrusherJob, hourlyCrusherTrigger);
+            
+            IJobDetail autoUpdateJob = JobBuilder.Create<AutoUpdate>()
+                .WithIdentity("AutoUpdateJob", "AutoUpdate")
+                .Build();
+
+            ITrigger autoUpdateTrigger = TriggerBuilder.Create()
+                .WithIdentity("AutoUpdateTrigger", "AutoUpdate")
+                .WithCronSchedule("0 0/2 * * * ?")
+                .StartNow()
+                .Build();
+
+            scheduler.ScheduleJob(autoUpdateJob, autoUpdateTrigger);
         }
     }
 }

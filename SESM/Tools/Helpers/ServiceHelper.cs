@@ -112,7 +112,7 @@ namespace SESM.Tools.Helpers
             if (SESMConfigHelper.GetArch() == ArchType.x64)
                 dataPath += @"DedicatedServer64\SpaceEngineersDedicated.exe";
 
-            System.Diagnostics.Process si = new System.Diagnostics.Process();
+            Process si = new Process();
             si.StartInfo.WorkingDirectory = @"c:\";
             si.StartInfo.UseShellExecute = false;
             si.StartInfo.FileName = "cmd.exe";
@@ -171,6 +171,22 @@ namespace SESM.Tools.Helpers
                     // Thrown if the process has already terminated.
                 }
 
+            }
+        }
+
+        public static void KillAllService()
+        {
+            foreach (Process proc in Process.GetProcessesByName("SpaceEngineersDedicated"))
+            {
+                try
+                {
+                    proc.Kill();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                
             }
         }
 

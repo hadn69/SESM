@@ -1,13 +1,26 @@
 ﻿using System;
 using System.Configuration;
+using System.Text;
 using System.Web.Configuration;
+using System.Web.Security;
 using Microsoft.Win32;
 using SESM.Models.Views.Settings;
+using Westwind.Utilities.Configuration;
 
 namespace SESM.Tools.Helpers
 {
     public class SESMConfigHelper
     {
+        // TODO : refactor getter/setter as properties
+
+        public static SESMConfigStorage ConfigStorage;
+
+        static SESMConfigHelper()
+        {
+            ConfigStorage = new SESMConfigStorage();
+            ConfigStorage.Initialize();
+        }
+
         private static void InitializeRegistry()
         {
             RegistryKey wow6432Node = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node", true);
@@ -77,46 +90,119 @@ namespace SESM.Tools.Helpers
             regKey.SetValue("SendLogToKeen", value ? "True" : "False", RegistryValueKind.String);
         }
 
+        public static string GetDBConnString()
+        {
+            ConfigStorage.Read();
+            return ConfigStorage.DBConnString;
+        }
+
+        public static void SetDBConnString(string DBConnString)
+        {
+            ConfigStorage.DBConnString = DBConnString;
+            ConfigStorage.Write();
+        }
+
         public static string GetPrefix()
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            return conf.AppSettings.Settings["Prefix"].Value;
+            ConfigStorage.Read();
+            return ConfigStorage.Prefix;
         }
 
         public static void SetPrefix(string prefix)
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            conf.AppSettings.Settings["Prefix"].Value = prefix;
+            ConfigStorage.Prefix = prefix;
+            ConfigStorage.Write();
         }
 
         public static string GetSESavePath()
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            return conf.AppSettings.Settings["SESavePath"].Value;
+            ConfigStorage.Read();
+            return ConfigStorage.SESavePath;
         }
 
         public static void SetSESavePath(string SESavePath)
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            conf.AppSettings.Settings["SESavePath"].Value = SESavePath;
+            ConfigStorage.SESavePath = SESavePath;
+            ConfigStorage.Write();
         }
 
         public static string GetSEDataPath()
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            return conf.AppSettings.Settings["SEDataPath"].Value;
+            ConfigStorage.Read();
+            return ConfigStorage.SEDataPath;
         }
 
-        public static void SetSEDataPath(string sEDataPath)
+        public static void SetSEDataPath(string SEDataPath)
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            conf.AppSettings.Settings["SEDataPath"].Value = sEDataPath;
+            ConfigStorage.SEDataPath = SEDataPath;
+            ConfigStorage.Write();
+        }
+
+        public static bool GetDiagnosis()
+        {
+            ConfigStorage.Read();
+            return ConfigStorage.Diagnosis;
+        }
+
+        public static void SetDiagnosis(bool diagnosis)
+        {
+            ConfigStorage.Diagnosis = diagnosis;
+            ConfigStorage.Write();
+        }
+
+        public static bool GetAutoUpdate()
+        {
+            ConfigStorage.Read();
+            return ConfigStorage.AutoUpdate;
+        }
+
+        public static void SetAutoUpdate(bool autoUpdate)
+        {
+            ConfigStorage.AutoUpdate = autoUpdate;
+            ConfigStorage.Write();
+        }
+
+        public static string GetAUUsername()
+        {
+            ConfigStorage.Read();
+            return ConfigStorage.AUUsername;
+        }
+
+        public static void SetAUUsername(string aUUsername)
+        {
+            ConfigStorage.AUUsername = aUUsername;
+            ConfigStorage.Write();
+        }
+
+        public static string GetAUPassword()
+        {
+            ConfigStorage.Read();
+            string value = ConfigStorage.AUPassword;
+            return Encoding.UTF8.GetString(MachineKey.Unprotect(Convert.FromBase64String(value), "SteamPassword"));
+        }
+
+        public static void SetAUPassword(string aUPassword)
+        {
+            string value = Convert.ToBase64String(MachineKey.Protect(Encoding.UTF8.GetBytes(aUPassword), "SteamPassword"));
+            ConfigStorage.AUPassword = value;
+            ConfigStorage.Write();
+        }
+
+        public static string GetLastAU()
+        {
+            ConfigStorage.Read();
+            return ConfigStorage.LastAU;
+        }
+
+        public static void SetLastAU(string lastAU)
+        {
+            ConfigStorage.LastAU = lastAU;
+            ConfigStorage.Write();
         }
 
         public static ArchType GetArch()
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            switch (conf.AppSettings.Settings["Arch"].Value)
+            switch (ConfigStorage.Arch)
             {
                 case "x86":
                     return ArchType.x86;
@@ -130,16 +216,18 @@ namespace SESM.Tools.Helpers
 
         public static void SetArch(ArchType arch)
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
             switch (arch)
             {
                 case ArchType.x86:
-                    conf.AppSettings.Settings["Arch"].Value = "x86";
+                    ConfigStorage.Arch = "x86";
                     break;
                 case ArchType.x64:
-                    conf.AppSettings.Settings["Arch"].Value = "x64";
+                    ConfigStorage.Arch = "x64";
                     break;
             }
         }
+    
+    
+    
     }
 }
