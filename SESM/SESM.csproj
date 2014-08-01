@@ -346,6 +346,7 @@
     <Compile Include="Models\Views\Server\ServerEnums.cs" />
     <Compile Include="Models\Views\Server\ServerViewModel.cs" />
     <Compile Include="Models\Views\Settings\AutoUpdateViewModel.cs" />
+    <Compile Include="Models\Views\Settings\DiagnosisElement.cs" />
     <Compile Include="Models\Views\Settings\DiagnosisViewModel.cs" />
     <Compile Include="Models\Views\Settings\SettingsViewModel.cs" />
     <Compile Include="Models\Views\Settings\UploadBinViewModel.cs" />

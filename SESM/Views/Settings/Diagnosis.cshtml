@@ -1,125 +1,32 @@
-﻿@model SESM.Models.Views.Settings.DiagnosisViewModel
+﻿@using SESM.Models.Views.Settings
+@model SESM.Models.Views.Settings.DiagnosisViewModel
 @{
     ViewBag.Title = "Diagnosis";
 }
 
 <div class="row">
-    @if (Model.DatabaseConnexion)
+    @foreach (DiagnosisElement item in Model.ElementList)
     {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Database Connexion
-        </div>
+        if(item.State == true)
+        {
+            <div class="alert alert-success">
+                <h4><span class="glyphicon glyphicon-ok"></span> @item.Name</h4>
+                <p>@Html.Raw(item.Message)</p>
+            </div>
+        }
+        if (item.State == false)
+        {
+            <div class="alert alert-danger">
+                <h4><span class="glyphicon glyphicon-remove"></span> @item.Name</h4>
+                <p>@Html.Raw(item.Message)</p>
+            </div>
+        }
+        if (item.State == null)
+        {
+            <div class="alert alert-info">
+                <h4><span class="glyphicon glyphicon-arrow-up"></span> @item.Name</h4>
+                <p>@Html.Raw(item.Message)</p>
+            </div>
+        }
     }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Database Connexion
-        </div>
-    }
-
-    @if (Model.ArchMatch)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Architecture
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Architecture
-        </div>
-    }
-    
-    @if (Model.Binariesx86)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Binaries x86
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Binaries x86
-        </div>
-    }
-    
-    @if (Model.Binariesx64)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Binaries x64
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Binaries x64
-        </div>
-    }
-    
-    @if (Model.ServiceCreation)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Service Creation
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Service Creation
-        </div>
-    }
-    
-    @if (Model.ServiceDeletion)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Service Deletion
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Service Deletion
-        </div>
-    }
-    
-    @if (Model.FileCreation)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> File Creation
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> File Creation
-        </div>
-    }
-
-    @if (Model.FileDeletion)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> File Deletion
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> File Deletion
-        </div>
-    }
-    
-    @if (Model.SuperAdmin)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> At Least 1 Super Admin
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> At Least 1 Super Admin
-        </div>
-    }
-    
-
 </div>

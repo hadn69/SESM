@@ -33,7 +33,7 @@ namespace SESM.Controllers
             model.Arch = SESMConfigHelper.GetArch();
             model.AddDateToLog = SESMConfigHelper.GetAddDateToLog();
             model.SendLogToKeen = SESMConfigHelper.GetSendLogToKeen();
-            
+
             return View(model);
         }
 
@@ -207,7 +207,7 @@ namespace SESM.Controllers
                     ServiceHelper.StartService(ServiceHelper.GetServiceName(item));
                 }
 
-                return RedirectToAction("Index","Server");
+                return RedirectToAction("Index", "Server");
             }
             return View(model);
         }
@@ -223,63 +223,150 @@ namespace SESM.Controllers
             }
             DiagnosisViewModel model = new DiagnosisViewModel();
 
+            
             if (_context.Database.Exists())
-                model.DatabaseConnexion = true;
-
+            {
+                model.DatabaseConnexion.State = true;
+                model.DatabaseConnexion.Message = "Connection to database successful";
+            }
+            else
+            {
+                model.DatabaseConnexion.State = false;
+                model.DatabaseConnexion.Message = "Connection to database failed. <br/> Check your connexion string in SESM.config";
+            }
+            
             switch (SESMConfigHelper.GetArch())
             {
                 case ArchType.x64:
                     if (System.Environment.Is64BitOperatingSystem)
-                        model.ArchMatch = true;
+                    {
+                        model.ArchMatch.State = true;
+                        model.ArchMatch.Message = "You are on a 64 Bits computer and you want to run 64 Bits servers. It will work !";
+                    }
+                    else
+                    {
+                        model.ArchMatch.State = false;
+                        model.ArchMatch.Message = "You are on a 32 Bits computer and you want to run 64 Bits servers. It won't work ! <br/>Please consider changing your Architecture variable to x86";
+                    }
                     break;
                 case ArchType.x86:
-                    model.ArchMatch = true;
+                    if (System.Environment.Is64BitOperatingSystem)
+                    {
+                        model.ArchMatch.State = true;
+                        model.ArchMatch.Message = "You are on a 64 Bits computer and you want to run 32 Bits servers. It will work ! <br/>(but you should consider switching your arch variable to x64 for better performances)";
+                    }
+                    else
+                    {
+                        model.ArchMatch.State = true;
+                        model.ArchMatch.Message = "You are on a 32 Bits computer and you want to run 32 Bits servers. It will work !";
+                    }
                     break;
             }
 
+
             if (System.IO.File.Exists(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer\SpaceEngineersDedicated.exe"))
-                model.Binariesx86 = true;
+            {
+                model.Binariesx86.State = true;
+                model.Binariesx86.Message = "32 Bits Space Engineers bianries found at " + SESMConfigHelper.GetSEDataPath() + @"DedicatedServer\SpaceEngineersDedicated.exe";
+            }
+            else
+            {
+                model.Binariesx86.State = false;
+                model.Binariesx86.Message = "32 Bits Space Engineers bianries not found at " + SESMConfigHelper.GetSEDataPath() + @"DedicatedServer\SpaceEngineersDedicated.exe<br/>You should try to reupload your game files or activate the auto update";
+            }
+
 
             if (System.IO.File.Exists(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer64\SpaceEngineersDedicated.exe"))
-                model.Binariesx64 = true;
+            {
+                model.Binariesx64.State = true;
+                model.Binariesx64.Message = "64 Bits Space Engineers bianries found at " + SESMConfigHelper.GetSEDataPath() + @"DedicatedServer64\SpaceEngineersDedicated.exe";
+            }
+            else
+            {
+                model.Binariesx64.State = false;
+                model.Binariesx64.Message = "64 Bits Space Engineers bianries not found at " + SESMConfigHelper.GetSEDataPath() + @"DedicatedServer64\SpaceEngineersDedicated.exe<br/>You should try to reupload your game files or activate the auto update";
+            }
+
 
             ServiceHelper.RegisterService("SESMDiagTest");
             if (ServiceHelper.DoesServiceExist("SESMDiagTest"))
-                model.ServiceCreation = true;
+            {
+                model.ServiceCreation.State = true;
+                model.ServiceCreation.Message = "Creation of the service \"SESMDiagTest\" successful";
 
-            ServiceHelper.UnRegisterService("SESMDiagTest");
-            if (!ServiceHelper.DoesServiceExist("SESMDiagTest"))
-                model.ServiceDeletion = true;
-
-            try
-            {
-                FileStream stream = System.IO.File.Create(SESMConfigHelper.GetSEDataPath() + @"\testDiag.bin");
-                stream.Close();
-                stream.Dispose();
-                model.FileCreation = true;
-            }
-            catch (Exception)
-            {
-            }
-
-            try
-            {
-                System.IO.File.Delete(SESMConfigHelper.GetSEDataPath() + @"\testDiag.bin");
-                model.FileDeletion = true;
-            }
-            catch (Exception)
-            {
-            }
-            UserProvider usrPrv = new UserProvider(_context);
-            foreach (EntityUser item in usrPrv.GetUsers())
-            {
-                if (item.IsAdmin)
+                ServiceHelper.UnRegisterService("SESMDiagTest");
+                if (!ServiceHelper.DoesServiceExist("SESMDiagTest"))
                 {
-                    model.SuperAdmin = true;
-                    break;
+                    model.ServiceDeletion.State = true;
+                    model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" successful";
+                }
+                else
+                {
+                    model.ServiceDeletion.State = false;
+                    model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" failed<br/>Check if the application pool have admin rights";
                 }
             }
+            else
+            {
+                model.ServiceCreation.State = false;
+                model.ServiceCreation.Message = "Creation of the service \"SESMDiagTest\" failed<br/>Check if the application pool have admin rights";
+                
+                model.ServiceDeletion.State = null;
+                model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" irrelevant";
+            }
 
+            try
+            {
+                FileStream stream = System.IO.File.Create(@"C:\SESMDiagTest.bin");
+                stream.Close();
+                stream.Dispose();
+                model.FileCreation.State = true;
+                model.FileCreation.Message = @"Creation of the file C:\SESMDiagTest.bin successful";
+
+                try
+                {
+                    System.IO.File.Delete(@"\testDiag.bin");
+                    model.FileDeletion.State = true;
+                    model.FileDeletion.Message = @"Deletion of the file C:\SESMDiagTest.bin successful";
+                }
+                catch (Exception)
+                {
+                    model.FileDeletion.State = false;
+                    model.FileDeletion.Message = @"Deletion of the file C:\SESMDiagTest.bin failed <br/>Check if the application pool have admin rights";
+                }
+
+
+            }
+            catch (Exception)
+            {
+                model.FileCreation.State = false;
+                model.FileCreation.Message = @"Creation of the file C:\SESMDiagTest.bin failed <br/>Check if the application pool have admin rights";
+
+                model.FileDeletion.State = null;
+                model.FileDeletion.Message = @"Deletion of the file C:\SESMDiagTest.bin irrelevant";
+            }
+
+            UserProvider usrPrv = new UserProvider(_context);
+
+            if (model.DatabaseConnexion.State == true)
+            {
+                model.SuperAdmin.State = false;
+                model.SuperAdmin.Message = @"No super administrator found";
+
+                foreach (EntityUser item in usrPrv.GetUsers())
+                {
+                    if (item.IsAdmin)
+                    {
+                        model.SuperAdmin.State = true;
+                        model.SuperAdmin.Message = @"At least 1 super administrator found";
+                    }
+                }
+            }
+            else
+            {
+                model.SuperAdmin.State = null;
+                model.SuperAdmin.Message = @"Super administrator search irrelevant";
+            }
             return View(model);
         }
 
@@ -300,7 +387,7 @@ namespace SESM.Controllers
         [SuperAdmin]
         public ActionResult AutoUpdate(AutoUpdateViewModel model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return View(model);
 
             SESMConfigHelper.SetAUUsername(model.UserName);
