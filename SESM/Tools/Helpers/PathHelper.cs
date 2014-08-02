@@ -18,11 +18,11 @@ namespace SESM.Tools.Helpers
         }
         public static string GetPrefix()
         {
-            return SESMConfigHelper.GetPrefix();
+            return SESMConfigHelper.Prefix;
         }
         public static string GetInstancePath(EntityServer server)
         {
-            return SESMConfigHelper.GetSESavePath() + GetPrefix() + "_" + server.Id + "_" + server.Name + @"\";
+            return SESMConfigHelper.SESavePath + GetPrefix() + "_" + server.Id + "_" + server.Name + @"\";
         }
         public static string GetSavesPath(EntityServer server)
         {

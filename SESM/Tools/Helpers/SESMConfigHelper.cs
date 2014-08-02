@@ -40,194 +40,216 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public static bool GetAddDateToLog()
+        public static bool AddDateToLog
         {
-            InitializeRegistry();
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer");
-
-            string addDateToLog = (string)regKey.GetValue("AddDateToLog");
-
-            if (addDateToLog == "False")
-                return false;
-            if (addDateToLog == "True")
-                return true;
-
-            throw new SystemException("RegKeyError");
-        }
-
-        public static void SetAddDateToLog(bool value)
-        {
-            InitializeRegistry();
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
-
-            regKey.SetValue("AddDateToLog", value ? "True" : "False", RegistryValueKind.String);
-        }
-
-        public static bool GetSendLogToKeen()
-        {
-            InitializeRegistry();
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer");
-
-            string addDateToLog = (string)regKey.GetValue("SendLogToKeen");
-
-            if (addDateToLog == "False")
-                return false;
-            if (addDateToLog == "True")
-                return true;
-
-            throw new SystemException("RegKeyError");
-        }
-
-        public static void SetSendLogToKeen(bool value)
-        {
-            InitializeRegistry();
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
-
-            regKey.SetValue("SendLogToKeen", value ? "True" : "False", RegistryValueKind.String);
-        }
-
-        public static string GetDBConnString()
-        {
-            ConfigStorage.Read();
-            return ConfigStorage.DBConnString;
-        }
-
-        public static void SetDBConnString(string DBConnString)
-        {
-            ConfigStorage.DBConnString = DBConnString;
-            ConfigStorage.Write();
-        }
-
-        public static string GetPrefix()
-        {
-            ConfigStorage.Read();
-            return ConfigStorage.Prefix;
-        }
-
-        public static void SetPrefix(string prefix)
-        {
-            ConfigStorage.Prefix = prefix;
-            ConfigStorage.Write();
-        }
-
-        public static string GetSESavePath()
-        {
-            ConfigStorage.Read();
-            return ConfigStorage.SESavePath;
-        }
-
-        public static void SetSESavePath(string SESavePath)
-        {
-            ConfigStorage.SESavePath = SESavePath;
-            ConfigStorage.Write();
-        }
-
-        public static string GetSEDataPath()
-        {
-            ConfigStorage.Read();
-            return ConfigStorage.SEDataPath;
-        }
-
-        public static void SetSEDataPath(string SEDataPath)
-        {
-            ConfigStorage.SEDataPath = SEDataPath;
-            ConfigStorage.Write();
-        }
-
-        public static bool GetDiagnosis()
-        {
-            ConfigStorage.Read();
-            return ConfigStorage.Diagnosis;
-        }
-
-        public static void SetDiagnosis(bool diagnosis)
-        {
-            ConfigStorage.Diagnosis = diagnosis;
-            ConfigStorage.Write();
-        }
-
-        public static bool GetAutoUpdate()
-        {
-            ConfigStorage.Read();
-            return ConfigStorage.AutoUpdate;
-        }
-
-        public static void SetAutoUpdate(bool autoUpdate)
-        {
-            ConfigStorage.AutoUpdate = autoUpdate;
-            ConfigStorage.Write();
-        }
-
-        public static string GetAUUsername()
-        {
-            ConfigStorage.Read();
-            return ConfigStorage.AUUsername;
-        }
-
-        public static void SetAUUsername(string aUUsername)
-        {
-            ConfigStorage.AUUsername = aUUsername;
-            ConfigStorage.Write();
-        }
-
-        public static string GetAUPassword()
-        {
-            ConfigStorage.Read();
-            string value = ConfigStorage.AUPassword;
-            return Encoding.UTF8.GetString(MachineKey.Unprotect(Convert.FromBase64String(value), "SteamPassword"));
-        }
-
-        public static void SetAUPassword(string aUPassword)
-        {
-            string value = Convert.ToBase64String(MachineKey.Protect(Encoding.UTF8.GetBytes(aUPassword), "SteamPassword"));
-            ConfigStorage.AUPassword = value;
-            ConfigStorage.Write();
-        }
-
-        public static string GetLastAU()
-        {
-            ConfigStorage.Read();
-            return ConfigStorage.LastAU;
-        }
-
-        public static void SetLastAU(string lastAU)
-        {
-            ConfigStorage.LastAU = lastAU;
-            ConfigStorage.Write();
-        }
-
-        public static ArchType GetArch()
-        {
-            switch (ConfigStorage.Arch)
+            get
             {
-                case "x86":
-                    return ArchType.x86;
-                    break;
-                case "x64":
-                    return ArchType.x64;
-                    break;
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer");
+
+                string addDateToLog = (string)regKey.GetValue("AddDateToLog");
+
+                if (addDateToLog == "False")
+                    return false;
+                if (addDateToLog == "True")
+                    return true;
+
+                throw new SystemException("RegKeyError");
             }
-            throw new SystemException("ArchError");
-        }
-
-        public static void SetArch(ArchType arch)
-        {
-            switch (arch)
+            set
             {
-                case ArchType.x86:
-                    ConfigStorage.Arch = "x86";
-                    break;
-                case ArchType.x64:
-                    ConfigStorage.Arch = "x64";
-                    break;
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
+
+                regKey.SetValue("AddDateToLog", value ? "True" : "False", RegistryValueKind.String);
             }
         }
-    
-    
-    
+
+        public static bool SendLogToKeen
+        {
+            get
+            {
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer");
+
+                string addDateToLog = (string)regKey.GetValue("SendLogToKeen");
+
+                if (addDateToLog == "False")
+                    return false;
+                if (addDateToLog == "True")
+                    return true;
+
+                throw new SystemException("RegKeyError");                
+            }
+            set
+            {
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
+
+                regKey.SetValue("SendLogToKeen", value ? "True" : "False", RegistryValueKind.String);
+            }
+        }
+
+        public static string DBConnString
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.DBConnString;
+            }
+            set
+            {
+                ConfigStorage.DBConnString = value;
+                ConfigStorage.Write();        
+            }
+
+        }
+
+        public static string Prefix
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.Prefix;        
+            }
+            set
+            {
+                ConfigStorage.Prefix = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string SESavePath
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.SESavePath;                
+            }
+            set
+            {
+                ConfigStorage.SESavePath = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string SEDataPath
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.SEDataPath;                
+            }
+            set
+            {
+                ConfigStorage.SEDataPath = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool Diagnosis
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.Diagnosis;
+            }
+            set
+            {
+                ConfigStorage.Diagnosis = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool AutoUpdate
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoUpdate;
+            }
+            set
+            {
+                ConfigStorage.AutoUpdate = value;
+                ConfigStorage.Write();        
+            }
+        }
+
+        public static string AUUsername
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AUUsername;                
+            }
+            set
+            {
+                ConfigStorage.AUUsername = value;
+                ConfigStorage.Write();        
+            }
+        }
+
+        public static string AUPassword
+        {
+            get
+            {
+                ConfigStorage.Read();
+                string value = ConfigStorage.AUPassword;
+                return Encoding.UTF8.GetString(MachineKey.Unprotect(Convert.FromBase64String(value), "SteamPassword"));                
+            }
+            set
+            {
+                string val = Convert.ToBase64String(MachineKey.Protect(Encoding.UTF8.GetBytes(value), "SteamPassword"));
+                ConfigStorage.AUPassword = val;
+                ConfigStorage.Write();            
+            }
+        }
+
+        public static string LastAU
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.LastAU;
+            }
+            set
+            {
+                ConfigStorage.LastAU = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static ArchType Arch
+        {
+            get
+            {
+                switch (ConfigStorage.Arch)
+                {
+                    case "x86":
+                        return ArchType.x86;
+                        break;
+                    case "x64":
+                        return ArchType.x64;
+                        break;
+                }
+                throw new SystemException("ArchError");                
+            }
+            set
+            {
+                switch (value)
+                {
+                    case ArchType.x86:
+                        ConfigStorage.Arch = "x86";
+                        break;
+                    case ArchType.x64:
+                        ConfigStorage.Arch = "x64";
+                        break;
+                }   
+            }
+        }
     }
 }

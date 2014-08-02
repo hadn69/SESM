@@ -274,6 +274,7 @@
     <Content Include="Views\Server\HourlyStats.cshtml" />
     <Content Include="Views\Server\GlobalStats.cshtml" />
     <Content Include="Views\Settings\AutoUpdate.cshtml" />
+    <Content Include="Views\Map\Rename.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -339,6 +340,7 @@
     <Compile Include="Models\Views\Log\LogViewModel.cs" />
     <Compile Include="Models\Views\Map\MapViewModel.cs" />
     <Compile Include="Models\Views\Map\NewMapViewModel.cs" />
+    <Compile Include="Models\Views\Map\RenameMapViewModel.cs" />
     <Compile Include="Models\Views\Mod\ModViewModel.cs" />
     <Compile Include="Models\Views\Mod\UploadModViewModel.cs" />
     <Compile Include="Models\Views\Server\NewServerViewModel.cs" />

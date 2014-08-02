@@ -18,16 +18,16 @@ namespace SESM.Tools
         public void Execute(IJobExecutionContext jobContext)
         {
             // Checking auto update is enable
-            if (!SESMConfigHelper.GetAutoUpdate())
+            if (!SESMConfigHelper.AutoUpdate)
                 return;
 
             Process si = new Process();
-            si.StartInfo.WorkingDirectory = SESMConfigHelper.GetSEDataPath() + @"\SteamCMD\";
+            si.StartInfo.WorkingDirectory = SESMConfigHelper.SEDataPath + @"\SteamCMD\";
             si.StartInfo.UseShellExecute = false;
             si.StartInfo.FileName = "cmd.exe";
-            si.StartInfo.Arguments = "/c \"" + SESMConfigHelper.GetSEDataPath() + @"\SteamCMD\steamcmd.exe +login " + SESMConfigHelper.GetAUUsername() 
-                + " " + SESMConfigHelper.GetAUPassword() + " +force_install_dir " 
-                + SESMConfigHelper.GetSEDataPath() + "\\AutoUpdateData\\ +app_update 244850 validate +quit \"";
+            si.StartInfo.Arguments = "/c \"" + SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe +login " + SESMConfigHelper.AUUsername 
+                + " " + SESMConfigHelper.AUPassword + " +force_install_dir " 
+                + SESMConfigHelper.SEDataPath + "\\AutoUpdateData\\ +app_update 244850 validate +quit \"";
             si.StartInfo.CreateNoWindow = true;
             si.StartInfo.RedirectStandardInput = true;
             si.StartInfo.RedirectStandardOutput = true;
@@ -50,14 +50,14 @@ namespace SESM.Tools
             si.Close();
 
             // Checking DedicatedServer.zip exist 
-            if (!File.Exists(SESMConfigHelper.GetSEDataPath() + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
+            if (!File.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
                 return;
 
             // Checking if the file has been modified since last check
-            FileInfo fi = new FileInfo(SESMConfigHelper.GetSEDataPath() + @"\AutoUpdateData\Tools\DedicatedServer.zip");
-            if(fi.LastWriteTime.ToString("g") == SESMConfigHelper.GetLastAU())
+            FileInfo fi = new FileInfo(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip");
+            if(fi.LastWriteTime.ToString("g") == SESMConfigHelper.LastAU)
                 return;
-            SESMConfigHelper.SetLastAU(fi.LastWriteTime.ToString("g"));
+            SESMConfigHelper.LastAU = fi.LastWriteTime.ToString("g");
 
             DataContext context = new DataContext();
             ServerProvider srvPrv = new ServerProvider(context);
@@ -79,19 +79,19 @@ namespace SESM.Tools
             // Killing some ghost processes that might still exists
             ServiceHelper.KillAllService();
 
-            using (ZipFile zip = ZipFile.Read(SESMConfigHelper.GetSEDataPath() + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
+            using (ZipFile zip = ZipFile.Read(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
             {
-                if (!Directory.Exists(SESMConfigHelper.GetSEDataPath()))
-                    Directory.CreateDirectory(SESMConfigHelper.GetSEDataPath());
-                if (Directory.Exists(SESMConfigHelper.GetSEDataPath() + @"Content\"))
-                    Directory.Delete(SESMConfigHelper.GetSEDataPath() + @"Content\", true);
-                if (Directory.Exists(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer\"))
-                    Directory.Delete(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer\", true);
-                if (Directory.Exists(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer64\"))
-                    Directory.Delete(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer64\", true);
+                if (!Directory.Exists(SESMConfigHelper.SEDataPath))
+                    Directory.CreateDirectory(SESMConfigHelper.SEDataPath);
+                if (Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
+                    Directory.Delete(SESMConfigHelper.SEDataPath + @"Content\", true);
+                if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
+                    Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
+                if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
+                    Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
                 //Directory.Delete(SESMConfigHelper.GetSEDataPath(), true);
                 //Directory.CreateDirectory(SESMConfigHelper.GetSEDataPath());
-                zip.ExtractAll(SESMConfigHelper.GetSEDataPath());
+                zip.ExtractAll(SESMConfigHelper.SEDataPath);
             }
 
             foreach (EntityServer item in listStartedServ)

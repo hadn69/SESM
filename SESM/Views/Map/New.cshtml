@@ -8,7 +8,7 @@
         <section id="Form">
             @using (Html.BeginForm("New", "Map", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
-                @Html.ValidationSummary(true)
+                @Html.ValidationSummary()
                 <div class="form-group">
                     @Html.LabelFor(m => m.MapType, new { @class = "col-md-2 control-label" })
                     <div class="col-md-10">
@@ -26,7 +26,7 @@
 
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Create" class="btn btn-default" />
+                        <input type="submit" value="Create" onclick="return confirm('This will (re)start this server. Are you sure you want to do this ?');" class="btn btn-default" />
                     </div>
                 </div>
 

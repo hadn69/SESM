@@ -106,10 +106,10 @@ namespace SESM.Tools.Helpers
             if (DoesServiceExist(serviceName)) 
                 return;
 
-            string dataPath = SESMConfigHelper.GetSEDataPath();
-            if (SESMConfigHelper.GetArch() == ArchType.x86)
+            string dataPath = SESMConfigHelper.SEDataPath;
+            if (SESMConfigHelper.Arch == ArchType.x86)
                 dataPath += @"DedicatedServer\SpaceEngineersDedicated.exe";
-            if (SESMConfigHelper.GetArch() == ArchType.x64)
+            if (SESMConfigHelper.Arch == ArchType.x64)
                 dataPath += @"DedicatedServer64\SpaceEngineersDedicated.exe";
 
             Process si = new Process();
@@ -130,7 +130,7 @@ namespace SESM.Tools.Helpers
         {
             if (DoesServiceExist(serviceName))
             {
-                System.Diagnostics.Process si = new System.Diagnostics.Process();
+                Process si = new Process();
                 si.StartInfo.WorkingDirectory = @"c:\";
                 si.StartInfo.UseShellExecute = false;
                 si.StartInfo.FileName = "cmd.exe";
@@ -195,7 +195,7 @@ namespace SESM.Tools.Helpers
             if (!DoesServiceExist(serviceName))
                 return null;
 
-            System.Diagnostics.Process si = new System.Diagnostics.Process();
+            Process si = new Process();
             si.StartInfo.WorkingDirectory = @"c:\";
             si.StartInfo.UseShellExecute = false;
             si.StartInfo.FileName = "cmd.exe";
@@ -232,8 +232,7 @@ namespace SESM.Tools.Helpers
                 return ressources;
             }
                 
-
-            SelectQuery query = new SelectQuery("select PercentProcessorTime, WorkingSetPrivate " +
+            SelectQuery query = new SelectQuery("select PercentProcessorTime, WorkingSet " +
                                               "from Win32_PerfFormattedData_PerfProc_Process " +
                                               "where IDProcess = " + pid);
 
@@ -243,8 +242,8 @@ namespace SESM.Tools.Helpers
             IEnumerator enumerator = collection.GetEnumerator();
             enumerator.MoveNext();
             ManagementObject managementObject = (ManagementObject)enumerator.Current;
-            ressources.CPU = int.Parse(managementObject["PercentProcessorTime"].ToString());
-            ressources.Memory = (int)Math.Floor(long.Parse(managementObject["WorkingSetPrivate"].ToString()) / (1024.0 * 2));
+            ressources.CPU = int.Parse(managementObject["PercentProcessorTime"].ToString()) / Environment.ProcessorCount;
+            ressources.Memory = (int)Math.Floor(long.Parse(managementObject["WorkingSet"].ToString()) / (1024.0 * 2));
             return ressources;
         }
 

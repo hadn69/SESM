@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
+using System.Xml;
 using Ionic.Zip;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
@@ -34,7 +35,7 @@ namespace SESM.Controllers
 
             ViewData["ID"] = id;
             ViewData["AccessLevel"] = srvPrv.GetAccessLevel(user.Id, serv.Id);
-            
+            ViewData["ServerState"] = srvPrv.GetState(serv);
 
             string[] listDir = Directory.GetDirectories(PathHelper.GetSavesPath(serv));
 
@@ -72,6 +73,32 @@ namespace SESM.Controllers
 
             if (ModelState.IsValid)
             {
+                if(srvPrv.GetState(serv) != ServiceState.Stopped)
+                    return RedirectToAction("Index", new { id = id });
+
+                ServerConfigHelper serverConfig = new ServerConfigHelper();
+                serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
+                serverConfig.SaveName = model.MapName;
+                serverConfig.Save(serv);
+                return RedirectToAction("Status", "Server", new { id = id });
+            }
+
+            return RedirectToAction("Index", new { id = id });
+        }
+
+        //
+        // POST: Map/Save/5
+        [HttpPost]
+        [MultipleButton(Name = "action", Argument = "SaveRestartMap")]
+        public ActionResult SaveRestart(int id, MapViewModel model)
+        {
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(_context);
+            EntityServer serv = srvPrv.GetServer(id);
+
+
+            if (ModelState.IsValid)
+            {
                 ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
@@ -79,6 +106,72 @@ namespace SESM.Controllers
                 serverConfig.Save(serv);
                 ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
                 return RedirectToAction("Status", "Server", new { id = id });
+            }
+
+            return RedirectToAction("Index", new { id = id });
+        }
+
+        [HttpPost]
+        [MultipleButton(Name = "action", Argument = "RenameMap")]
+        public ActionResult Rename(int id, MapViewModel model)
+        {
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(_context);
+            EntityServer serv = srvPrv.GetServer(id);
+
+            if (ModelState.IsValid)
+            {
+                ViewData["ID"] = id;
+                RenameMapViewModel renameModel = new RenameMapViewModel();
+                if (!Directory.Exists(PathHelper.GetSavePath(serv, model.MapName)))
+                    return RedirectToAction("Index", new {id = id});
+                renameModel.CurrentMapName = model.MapName;
+                renameModel.NewMapName = model.MapName;
+                return View("Rename",renameModel);
+            }
+
+            return RedirectToAction("Index", new { id = id });
+        }
+
+        
+        [HttpPost]
+        public ActionResult Rename(int id, RenameMapViewModel model)
+        {
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(_context);
+            EntityServer serv = srvPrv.GetServer(id);
+
+            if (ModelState.IsValid)
+            {
+                if (!Directory.Exists(PathHelper.GetSavePath(serv, model.CurrentMapName)))
+                    return RedirectToAction("Index", new { id = id });
+                if(model.CurrentMapName == model.NewMapName) // Nothing to do
+                    return RedirectToAction("Index", new { id = id });
+
+                ServerConfigHelper serverConfig = new ServerConfigHelper();
+                serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
+                bool toRestart = false;
+                if (model.CurrentMapName == serverConfig.SaveName && srvPrv.GetState(serv) == ServiceState.Running)
+                {
+                    ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                    toRestart = true;
+                }
+
+                XmlDocument doc = new XmlDocument();
+                doc.Load(PathHelper.GetSavePath(serv, model.CurrentMapName) + @"\Sandbox.sbc");
+                XmlNode root = doc.DocumentElement;
+                XmlNode nameNode = root.SelectSingleNode("descendant::SessionName");
+                nameNode.InnerText = model.NewMapName;
+                doc.Save(PathHelper.GetSavePath(serv, model.CurrentMapName) + @"\Sandbox.sbc");
+
+                Directory.Move(PathHelper.GetSavePath(serv, model.CurrentMapName), PathHelper.GetSavePath(serv, model.NewMapName));
+
+                if (toRestart)
+                {
+                    serverConfig.SaveName = model.NewMapName;
+                    serverConfig.Save(serv);
+                    ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
+                }
             }
 
             return RedirectToAction("Index", new { id = id });

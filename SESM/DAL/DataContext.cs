@@ -11,7 +11,7 @@ namespace SESM.DAL
         public DbSet<EntityServer> Servers { get; set; }
         public DbSet<EntityPerfEntry> PerfEntries { get; set; }
 
-        public DataContext() : base(SESMConfigHelper.GetDBConnString())
+        public DataContext() : base(SESMConfigHelper.DBConnString)
         {
             //Database.SetInitializer<DataContext>(new DataContextInitializer());
             Database.SetInitializer<DataContext>(new MigrateDatabaseToLatestVersion<DataContext, Configuration>());
