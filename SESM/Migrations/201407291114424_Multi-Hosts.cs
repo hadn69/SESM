@@ -29,7 +29,7 @@ namespace SESM.Migrations
                         EndingPort = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id);
-
+            
             AddColumn("dbo.EntityServers", "Host_Id", c => c.Int(nullable: false));
             CreateIndex("dbo.EntityServers", "Host_Id");
             AddForeignKey("dbo.EntityServers", "Host_Id", "dbo.EntityHosts", "Id", cascadeDelete: true);

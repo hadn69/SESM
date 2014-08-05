@@ -30,7 +30,7 @@ namespace SESM.Controllers
             model.Prefix = SESMConfigHelper.Prefix;
             model.SESavePath = SESMConfigHelper.SESavePath;
             model.SEDataPath = SESMConfigHelper.SEDataPath;
-            model.Arch = SESMConfigHelper.Arch;
+            model.EnumArch = SESMConfigHelper.Arch;
             model.AddDateToLog = SESMConfigHelper.AddDateToLog;
             model.SendLogToKeen = SESMConfigHelper.SendLogToKeen;
 
@@ -65,7 +65,7 @@ namespace SESM.Controllers
                 if (model.Prefix != SESMConfigHelper.Prefix
                     || model.SEDataPath != SESMConfigHelper.SEDataPath
                     || model.SESavePath != SESMConfigHelper.SESavePath
-                    || model.Arch != SESMConfigHelper.Arch
+                    || model.EnumArch != SESMConfigHelper.Arch
                     || model.AddDateToLog != SESMConfigHelper.AddDateToLog
                     || model.SendLogToKeen != SESMConfigHelper.SendLogToKeen)
                 {
@@ -136,7 +136,7 @@ namespace SESM.Controllers
                         Directory.Move(SESMConfigHelper.SESavePath, model.SESavePath);
                         SESMConfigHelper.SESavePath = model.SESavePath;
                     }
-                    SESMConfigHelper.Arch = model.Arch;
+                    SESMConfigHelper.Arch = model.EnumArch;
                     SESMConfigHelper.AddDateToLog = model.AddDateToLog;
                     SESMConfigHelper.SendLogToKeen = model.SendLogToKeen;
 

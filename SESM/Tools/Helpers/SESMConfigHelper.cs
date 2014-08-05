@@ -223,7 +223,7 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public static ArchType Arch
+        public static EnumArchType Arch
         {
             get
             {
@@ -240,8 +240,7 @@ namespace SESM.Tools.Helpers
             }
             set
             {
- 
-            switch (enumArch)
+                switch (value)
                 {
                 case EnumArchType.X86:
                         ConfigStorage.Arch = "x86";

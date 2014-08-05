@@ -107,9 +107,9 @@ namespace SESM.Tools.Helpers
                 return;
 
             string dataPath = SESMConfigHelper.SEDataPath;
-            if (SESMConfigHelper.Arch == ArchType.x86)
+            if (SESMConfigHelper.Arch == EnumArchType.X86)
                 dataPath += @"DedicatedServer\SpaceEngineersDedicated.exe";
-            if (SESMConfigHelper.Arch == ArchType.x64)
+            if (SESMConfigHelper.Arch == EnumArchType.X64)
                 dataPath += @"DedicatedServer64\SpaceEngineersDedicated.exe";
 
             Process si = new Process();
