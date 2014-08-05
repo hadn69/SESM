@@ -27,12 +27,12 @@ namespace SESM.Controllers
         {
             SettingsViewModel model = new SettingsViewModel();
 
-            model.Prefix = SESMConfigHelper.GetPrefix();
-            model.SESavePath = SESMConfigHelper.GetSESavePath();
-            model.SEDataPath = SESMConfigHelper.GetSEDataPath();
-            model.EnumArch = SESMConfigHelper.GetArch();
-            model.AddDateToLog = SESMConfigHelper.GetAddDateToLog();
-            model.SendLogToKeen = SESMConfigHelper.GetSendLogToKeen();
+            model.Prefix = SESMConfigHelper.Prefix;
+            model.SESavePath = SESMConfigHelper.SESavePath;
+            model.SEDataPath = SESMConfigHelper.SEDataPath;
+            model.Arch = SESMConfigHelper.Arch;
+            model.AddDateToLog = SESMConfigHelper.AddDateToLog;
+            model.SendLogToKeen = SESMConfigHelper.SendLogToKeen;
 
             return View(model);
         }
@@ -62,12 +62,12 @@ namespace SESM.Controllers
                 if (flag)
                     return View(model);
 
-                if (model.Prefix != SESMConfigHelper.GetPrefix()
-                    || model.SEDataPath != SESMConfigHelper.GetSEDataPath()
-                    || model.SESavePath != SESMConfigHelper.GetSESavePath()
-                    || model.EnumArch != SESMConfigHelper.GetArch()
-                    || model.AddDateToLog != SESMConfigHelper.GetAddDateToLog()
-                    || model.SendLogToKeen != SESMConfigHelper.GetSendLogToKeen())
+                if (model.Prefix != SESMConfigHelper.Prefix
+                    || model.SEDataPath != SESMConfigHelper.SEDataPath
+                    || model.SESavePath != SESMConfigHelper.SESavePath
+                    || model.Arch != SESMConfigHelper.Arch
+                    || model.AddDateToLog != SESMConfigHelper.AddDateToLog
+                    || model.SendLogToKeen != SESMConfigHelper.SendLogToKeen)
                 {
                     // Getting started server list
                     List<EntityServer> listStartedServ = srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
@@ -82,13 +82,15 @@ namespace SESM.Controllers
                         ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
                     }
 
+                    // Killing some ghost processes that might still exists
+                    ServiceHelper.KillAllService();
+
                     foreach (EntityServer item in srvPrv.GetAllServers())
                     {
                         ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(item));
                     }
 
-                   
-                    if (model.SEDataPath != SESMConfigHelper.GetSEDataPath())
+                    if (model.SEDataPath != SESMConfigHelper.SEDataPath)
                     {
                         if (!Directory.Exists(model.SEDataPath))
                             Directory.CreateDirectory(model.SEDataPath);
@@ -98,31 +100,45 @@ namespace SESM.Controllers
                             Directory.Delete(model.SEDataPath + @"DedicatedServer\", true);
                         if (Directory.Exists(model.SEDataPath + @"DedicatedServer64\"))
                             Directory.Delete(model.SEDataPath + @"DedicatedServer64\", true);
+                        if (Directory.Exists(model.SEDataPath + @"SteamCMD\"))
+                            Directory.Delete(model.SEDataPath + @"SteamCMD\", true);
+                        if (Directory.Exists(model.SEDataPath + @"autoupdatedata\"))
+                            Directory.Delete(model.SEDataPath + @"autoupdatedata\", true);
 
-                        Directory.Move(SESMConfigHelper.GetSEDataPath() + @"Content\", model.SEDataPath + @"Content\");
-                        Directory.Move(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer\", model.SEDataPath + @"DedicatedServer\");
-                        Directory.Move(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer64\", model.SEDataPath + @"DedicatedServer64\");
-                        SESMConfigHelper.SetSEDataPath(model.SEDataPath);
+
+
+                        if (Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
+                            Directory.Move(SESMConfigHelper.SEDataPath + @"Content\", model.SEDataPath + @"Content\");
+                        if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
+                            Directory.Move(SESMConfigHelper.SEDataPath + @"DedicatedServer\", model.SEDataPath + @"DedicatedServer\");
+                        if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
+                            Directory.Move(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", model.SEDataPath + @"DedicatedServer64\");
+                        if (Directory.Exists(SESMConfigHelper.SEDataPath + @"SteamCMD\"))
+                            Directory.Move(SESMConfigHelper.SEDataPath + @"SteamCMD\", model.SEDataPath + @"SteamCMD\");
+                        if (Directory.Exists(SESMConfigHelper.SEDataPath + @"autoupdatedata\"))
+                            Directory.Move(SESMConfigHelper.SEDataPath + @"autoupdatedata\", model.SEDataPath + @"autoupdatedata\");
+                        
+                        SESMConfigHelper.SEDataPath = model.SEDataPath;
                     }
 
-                    if (model.Prefix != SESMConfigHelper.GetPrefix())
+                    if (model.Prefix != SESMConfigHelper.Prefix)
                     {
                         foreach (EntityServer item in srvPrv.GetAllServers())
                         {
-                            Directory.Move(model.SEDataPath + ServiceHelper.GetServiceName(SESMConfigHelper.GetPrefix(), item),
-                                model.SEDataPath + ServiceHelper.GetServiceName(model.Prefix, item));
+                            Directory.Move(SESMConfigHelper.SEDataPath + ServiceHelper.GetServiceName(SESMConfigHelper.Prefix, item),
+                                            SESMConfigHelper.SEDataPath + ServiceHelper.GetServiceName(model.Prefix, item));
                         }
-                        SESMConfigHelper.SetPrefix(model.Prefix);
+                        SESMConfigHelper.Prefix = model.Prefix;
                     }
 
-                    if (model.SESavePath != SESMConfigHelper.GetSESavePath())
+                    if (model.SESavePath != SESMConfigHelper.SESavePath)
                     {
-                        Directory.Move(SESMConfigHelper.GetSESavePath(), model.SESavePath);
-                        SESMConfigHelper.SetSEDataPath(model.SESavePath);
+                        Directory.Move(SESMConfigHelper.SESavePath, model.SESavePath);
+                        SESMConfigHelper.SESavePath = model.SESavePath;
                     }
-                    SESMConfigHelper.SetArch(model.EnumArch);
-                    SESMConfigHelper.SetAddDateToLog(model.AddDateToLog);
-                    SESMConfigHelper.SetSendLogToKeen(model.SendLogToKeen);
+                    SESMConfigHelper.Arch = model.Arch;
+                    SESMConfigHelper.AddDateToLog = model.AddDateToLog;
+                    SESMConfigHelper.SendLogToKeen = model.SendLogToKeen;
 
                     foreach (EntityServer item in srvPrv.GetAllServers())
                     {
@@ -180,13 +196,24 @@ namespace SESM.Controllers
                     ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
                 }
 
+                // Killing some ghost processes that might still exists
+                ServiceHelper.KillAllService();
+
                 model.ServerZip.InputStream.Seek(0, SeekOrigin.Begin);
 
                 using (ZipFile zip = ZipFile.Read(model.ServerZip.InputStream))
                 {
-                    Directory.Delete(SESMConfigHelper.GetSEDataPath(), true);
-                    Directory.CreateDirectory(SESMConfigHelper.GetSEDataPath());
-                    zip.ExtractAll(SESMConfigHelper.GetSEDataPath());
+                    if (!Directory.Exists(SESMConfigHelper.SEDataPath))
+                        Directory.CreateDirectory(SESMConfigHelper.SEDataPath);
+                    if (Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
+                        Directory.Delete(SESMConfigHelper.SEDataPath + @"Content\", true);
+                    if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
+                        Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
+                    if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
+                        Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
+                    //Directory.Delete(SESMConfigHelper.GetSEDataPath(), true);
+                    //Directory.CreateDirectory(SESMConfigHelper.GetSEDataPath());
+                    zip.ExtractAll(SESMConfigHelper.SEDataPath);
                 }
 
                 foreach (EntityServer item in listStartedServ)
@@ -194,7 +221,7 @@ namespace SESM.Controllers
                     ServiceHelper.StartService(ServiceHelper.GetServiceName(item));
                 }
 
-                return RedirectToAction("Index","Server");
+                return RedirectToAction("Index", "Server");
             }
             return View(model);
         }
@@ -204,72 +231,188 @@ namespace SESM.Controllers
         [HttpGet]
         public ActionResult Diagnosis()
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-
-            if (conf.AppSettings.Settings["Diagnosis"].Value.ToLower() != "true")
+            if (!SESMConfigHelper.Diagnosis)
             {
                 return RedirectToAction("Index", "Home");
             }
             DiagnosisViewModel model = new DiagnosisViewModel();
 
+            
             if (_context.Database.Exists())
-                model.DatabaseConnexion = true;
-
-            switch (SESMConfigHelper.GetArch())
+            {
+                model.DatabaseConnexion.State = true;
+                model.DatabaseConnexion.Message = "Connection to database successful";
+            }
+            else
+            {
+                model.DatabaseConnexion.State = false;
+                model.DatabaseConnexion.Message = "Connection to database failed. <br/> Check your connexion string in SESM.config";
+            }
+            
+            switch (SESMConfigHelper.Arch)
             {
                 case EnumArchType.X64:
                     if (System.Environment.Is64BitOperatingSystem)
-                        model.ArchMatch = true;
+                    {
+                        model.ArchMatch.State = true;
+                        model.ArchMatch.Message = "You are on a 64 Bits computer and you want to run 64 Bits servers. It will work !";
+                    }
+                    else
+                    {
+                        model.ArchMatch.State = false;
+                        model.ArchMatch.Message = "You are on a 32 Bits computer and you want to run 64 Bits servers. It won't work ! <br/>Please consider changing your Architecture variable to x86";
+                    }
                     break;
                 case EnumArchType.X86:
-                    model.ArchMatch = true;
+                    if (System.Environment.Is64BitOperatingSystem)
+                    {
+                        model.ArchMatch.State = true;
+                        model.ArchMatch.Message = "You are on a 64 Bits computer and you want to run 32 Bits servers. It will work ! <br/>(but you should consider switching your arch variable to x64 for better performances)";
+                    }
+                    else
+                    {
+                        model.ArchMatch.State = true;
+                        model.ArchMatch.Message = "You are on a 32 Bits computer and you want to run 32 Bits servers. It will work !";
+                    }
                     break;
             }
 
-            if (System.IO.File.Exists(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer\SpaceEngineersDedicated.exe"))
-                model.Binariesx86 = true;
 
-            if (System.IO.File.Exists(SESMConfigHelper.GetSEDataPath() + @"DedicatedServer64\SpaceEngineersDedicated.exe"))
-                model.Binariesx64 = true;
+            if (System.IO.File.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\SpaceEngineersDedicated.exe"))
+            {
+                model.Binariesx86.State = true;
+                model.Binariesx86.Message = "32 Bits Space Engineers bianries found at " + SESMConfigHelper.SEDataPath + @"DedicatedServer\SpaceEngineersDedicated.exe";
+            }
+            else
+            {
+                model.Binariesx86.State = false;
+                model.Binariesx86.Message = "32 Bits Space Engineers bianries not found at " + SESMConfigHelper.SEDataPath + @"DedicatedServer\SpaceEngineersDedicated.exe<br/>You should try to reupload your game files or activate the auto update";
+            }
+
+
+            if (System.IO.File.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\SpaceEngineersDedicated.exe"))
+            {
+                model.Binariesx64.State = true;
+                model.Binariesx64.Message = "64 Bits Space Engineers bianries found at " + SESMConfigHelper.SEDataPath + @"DedicatedServer64\SpaceEngineersDedicated.exe";
+            }
+            else
+            {
+                model.Binariesx64.State = false;
+                model.Binariesx64.Message = "64 Bits Space Engineers bianries not found at " + SESMConfigHelper.SEDataPath + @"DedicatedServer64\SpaceEngineersDedicated.exe<br/>You should try to reupload your game files or activate the auto update";
+            }
+
 
             ServiceHelper.RegisterService("SESMDiagTest");
             if (ServiceHelper.DoesServiceExist("SESMDiagTest"))
-                model.ServiceCreation = true;
+            {
+                model.ServiceCreation.State = true;
+                model.ServiceCreation.Message = "Creation of the service \"SESMDiagTest\" successful";
 
-            ServiceHelper.UnRegisterService("SESMDiagTest");
-            if (!ServiceHelper.DoesServiceExist("SESMDiagTest"))
-                model.ServiceDeletion = true;
-
-            try
-            {
-                FileStream stream = System.IO.File.Create(conf.AppSettings.Settings["SEDataPath"].Value + @"\testDiag.bin");
-                stream.Close();
-                stream.Dispose();
-                model.FileCreation = true;
-            }
-            catch (Exception)
-            {
-            }
-
-            try
-            {
-                System.IO.File.Delete(conf.AppSettings.Settings["SEDataPath"].Value + @"\testDiag.bin");
-                model.FileDeletion = true;
-            }
-            catch (Exception)
-            {
-            }
-            UserProvider usrPrv = new UserProvider(_context);
-            foreach (EntityUser item in usrPrv.GetUsers())
-            {
-                if (item.IsAdmin)
+                ServiceHelper.UnRegisterService("SESMDiagTest");
+                if (!ServiceHelper.DoesServiceExist("SESMDiagTest"))
                 {
-                    model.SuperAdmin = true;
-                    break;
+                    model.ServiceDeletion.State = true;
+                    model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" successful";
+                }
+                else
+                {
+                    model.ServiceDeletion.State = false;
+                    model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" failed<br/>Check if the application pool have admin rights";
                 }
             }
+            else
+            {
+                model.ServiceCreation.State = false;
+                model.ServiceCreation.Message = "Creation of the service \"SESMDiagTest\" failed<br/>Check if the application pool have admin rights";
+                
+                model.ServiceDeletion.State = null;
+                model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" irrelevant";
+            }
+
+            try
+            {
+                FileStream stream = System.IO.File.Create(@"C:\SESMDiagTest.bin");
+                stream.Close();
+                stream.Dispose();
+                model.FileCreation.State = true;
+                model.FileCreation.Message = @"Creation of the file C:\SESMDiagTest.bin successful";
+
+                try
+                {
+                    System.IO.File.Delete(@"\testDiag.bin");
+                    model.FileDeletion.State = true;
+                    model.FileDeletion.Message = @"Deletion of the file C:\SESMDiagTest.bin successful";
+                }
+                catch (Exception)
+                {
+                    model.FileDeletion.State = false;
+                    model.FileDeletion.Message = @"Deletion of the file C:\SESMDiagTest.bin failed <br/>Check if the application pool have admin rights";
+                }
+
+
+            }
+            catch (Exception)
+            {
+                model.FileCreation.State = false;
+                model.FileCreation.Message = @"Creation of the file C:\SESMDiagTest.bin failed <br/>Check if the application pool have admin rights";
+
+                model.FileDeletion.State = null;
+                model.FileDeletion.Message = @"Deletion of the file C:\SESMDiagTest.bin irrelevant";
+            }
+
+            UserProvider usrPrv = new UserProvider(_context);
+
+            if (model.DatabaseConnexion.State == true)
+            {
+                model.SuperAdmin.State = false;
+                model.SuperAdmin.Message = @"No super administrator found";
+
+                foreach (EntityUser item in usrPrv.GetUsers())
+                {
+                    if (item.IsAdmin)
+                    {
+                        model.SuperAdmin.State = true;
+                        model.SuperAdmin.Message = @"At least 1 super administrator found";
+                    }
+                }
+            }
+            else
+            {
+                model.SuperAdmin.State = null;
+                model.SuperAdmin.Message = @"Super administrator search irrelevant";
+            }
+            return View(model);
+        }
+
+        [HttpGet]
+        [LoggedOnly]
+        [SuperAdmin]
+        public ActionResult AutoUpdate()
+        {
+            AutoUpdateViewModel model = new AutoUpdateViewModel();
+            model.AutoUpdate = SESMConfigHelper.AutoUpdate;
+            model.UserName = SESMConfigHelper.AUUsername;
 
             return View(model);
+        }
+
+        [HttpPost]
+        [LoggedOnly]
+        [SuperAdmin]
+        public ActionResult AutoUpdate(AutoUpdateViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            SESMConfigHelper.AUUsername = model.UserName;
+            SESMConfigHelper.AutoUpdate = model.AutoUpdate;
+
+            if (!string.IsNullOrEmpty(model.Password))
+            {
+                SESMConfigHelper.AUPassword = model.Password;
+            }
+            model.Password = "";
+            return RedirectToAction("Index", "Server");
         }
     }
 }

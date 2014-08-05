@@ -381,6 +381,9 @@ namespace SESM.Controllers
             serverView.WebAdministrators = string.Join(";", serv.Administrators.Select(item => item.Login).ToList());
             serverView.WebManagers = string.Join(";", serv.Managers.Select(item => item.Login).ToList());
             serverView.WebUsers = string.Join(";", serv.Users.Select(item => item.Login).ToList());
+            if (!string.IsNullOrEmpty(serverView.SaveName))
+                serverView.AsteroidAmount = Directory.GetFiles(PathHelper.GetSavePath(serv, serverView.SaveName), "asteroid??.vox").Length;
+ 
             return View(serverView);
         }
 

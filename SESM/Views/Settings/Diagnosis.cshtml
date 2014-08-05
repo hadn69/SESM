@@ -1,125 +1,73 @@
-﻿@model SESM.Models.Views.Settings.DiagnosisViewModel
+﻿@using SESM.Models.Views.Settings
+@model SESM.Models.Views.Settings.DiagnosisViewModel
 @{
     ViewBag.Title = "Diagnosis";
 }
 
 <div class="row">
-    @if (Model.DatabaseConnexion)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Database Connexion
+    <div class="jumbotron">
+        @if (Model.ElementList.Count(x => x.State != true) == 0)
+        {
+            <br/>
+            <br/>
+            <h1 class="text-center"><span style ="transform: scale(3.0, 3.0);" class="glyphicon glyphicon glyphicon-ok-circle green"></span></h1>
+            <br />
+            <br />
+            <br/>
+            <h1 class="text-center">Congratulation, All seams in order!</h1>
+            <p class="text-center">If you want to know more, expand the panel below</p>
+            <p class="text-center"><span class="glyphicon glyphicon-arrow-down"></span></p>
+        }
+        else
+        {
+            <br />
+            <br />
+            <h1 class="text-center"><span style="transform: scale(3.0, 3.0);" class="glyphicon glyphicon glyphicon-remove-circle red"></span></h1>
+            <br />
+            <br />
+            <br />
+            <h1 class="text-center">Argh, There is a problem captain!</h1>
+            <p class="text-center">To know more, expand the panel below</p>
+            <p class="text-center"><span class="glyphicon glyphicon-arrow-down"></span></p>
+        }
+    </div>
+    <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                        Detailed Diagnosis
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseOne" class="panel-collapse collapse">
+                <div class="panel-body">
+                    @foreach (DiagnosisElement item in Model.ElementList)
+                    {
+                        if (item.State == true)
+                        {
+                            <div class="alert alert-success">
+                                <h4><span class="glyphicon glyphicon-ok"></span> @item.Name</h4>
+                                <p>@Html.Raw(item.Message)</p>
+                            </div>
+                        }
+                        if (item.State == null)
+                        {
+                            <div class="alert alert-info">
+                                <h4><span class="glyphicon glyphicon-minus"></span> @item.Name</h4>
+                                <p>@Html.Raw(item.Message)</p>
+                            </div>
+                        }
+                        if (item.State == false)
+                        {
+                            <div class="alert alert-danger">
+                                <h4><span class="glyphicon glyphicon-remove"></span> @item.Name</h4>
+                                <p>@Html.Raw(item.Message)</p>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
         </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Database Connexion
-        </div>
-    }
-
-    @if (Model.ArchMatch)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Architecture
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Architecture
-        </div>
-    }
-    
-    @if (Model.Binariesx86)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Binaries x86
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Binaries x86
-        </div>
-    }
-    
-    @if (Model.Binariesx64)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Binaries x64
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Binaries x64
-        </div>
-    }
-    
-    @if (Model.ServiceCreation)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Service Creation
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Service Creation
-        </div>
-    }
-    
-    @if (Model.ServiceDeletion)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> Service Deletion
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> Service Deletion
-        </div>
-    }
-    
-    @if (Model.FileCreation)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> File Creation
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> File Creation
-        </div>
-    }
-
-    @if (Model.FileDeletion)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> File Deletion
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> File Deletion
-        </div>
-    }
-    
-    @if (Model.SuperAdmin)
-    {
-        <div class="alert alert-success">
-            <span class="glyphicon glyphicon-ok"></span> At Least 1 Super Admin
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger">
-            <span class="glyphicon glyphicon-remove"></span> At Least 1 Super Admin
-        </div>
-    }
-    
-
+    </div>
 </div>

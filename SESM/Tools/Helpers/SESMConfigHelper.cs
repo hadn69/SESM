@@ -1,13 +1,26 @@
 ﻿using System;
 using System.Configuration;
+using System.Text;
 using System.Web.Configuration;
+using System.Web.Security;
 using Microsoft.Win32;
 using SESM.Models.Views.Settings;
+using Westwind.Utilities.Configuration;
 
 namespace SESM.Tools.Helpers
 {
     public class SESMConfigHelper
     {
+        // TODO : refactor getter/setter as properties
+
+        public static SESMConfigStorage ConfigStorage;
+
+        static SESMConfigHelper()
+        {
+            ConfigStorage = new SESMConfigStorage();
+            ConfigStorage.Initialize();
+        }
+
         private static void InitializeRegistry()
         {
             RegistryKey wow6432Node = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node", true);
@@ -27,118 +40,216 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public static bool GetAddDateToLog()
+        public static bool AddDateToLog
         {
-            InitializeRegistry();
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer");
-
-            string addDateToLog = (string)regKey.GetValue("AddDateToLog");
-
-            if (addDateToLog == "False")
-                return false;
-            if (addDateToLog == "True")
-                return true;
-
-            throw new SystemException("RegKeyError");
-        }
-
-        public static void SetAddDateToLog(bool value)
-        {
-            InitializeRegistry();
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
-
-            regKey.SetValue("AddDateToLog", value ? "True" : "False", RegistryValueKind.String);
-        }
-
-        public static bool GetSendLogToKeen()
-        {
-            InitializeRegistry();
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer");
-
-            string addDateToLog = (string)regKey.GetValue("SendLogToKeen");
-
-            if (addDateToLog == "False")
-                return false;
-            if (addDateToLog == "True")
-                return true;
-
-            throw new SystemException("RegKeyError");
-        }
-
-        public static void SetSendLogToKeen(bool value)
-        {
-            InitializeRegistry();
-            RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
-
-            regKey.SetValue("SendLogToKeen", value ? "True" : "False", RegistryValueKind.String);
-        }
-
-        public static string GetPrefix()
-        {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            return conf.AppSettings.Settings["Prefix"].Value;
-        }
-
-        public static void SetPrefix(string prefix)
-        {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            conf.AppSettings.Settings["Prefix"].Value = prefix;
-        }
-
-        public static string GetSESavePath()
-        {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            return conf.AppSettings.Settings["SESavePath"].Value;
-        }
-
-        public static void SetSESavePath(string SESavePath)
-        {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            conf.AppSettings.Settings["SESavePath"].Value = SESavePath;
-        }
-
-        public static string GetSEDataPath()
-        {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            return conf.AppSettings.Settings["SEDataPath"].Value;
-        }
-
-        public static void SetSEDataPath(string sEDataPath)
-        {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            conf.AppSettings.Settings["SEDataPath"].Value = sEDataPath;
-        }
-
-        public static EnumArchType GetArch()
-        {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            switch (conf.AppSettings.Settings["Arch"].Value)
+            get
             {
-                case "x86":
-                    return EnumArchType.X86;
-                    break;
-                case "x64":
-                    return EnumArchType.X64;
-                    break;
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer");
+
+                string addDateToLog = (string)regKey.GetValue("AddDateToLog");
+
+                if (addDateToLog == "False")
+                    return false;
+                if (addDateToLog == "True")
+                    return true;
+
+                throw new SystemException("RegKeyError");
             }
-            throw new SystemException("ArchError");
+            set
+            {
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
+
+                regKey.SetValue("AddDateToLog", value ? "True" : "False", RegistryValueKind.String);
+            }
         }
 
-        public static void SetArch(EnumArchType enumArch)
+        public static bool SendLogToKeen
         {
-            Configuration conf = WebConfigurationManager.OpenWebConfiguration("/web");
-            switch (enumArch)
+            get
             {
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer");
+
+                string addDateToLog = (string)regKey.GetValue("SendLogToKeen");
+
+                if (addDateToLog == "False")
+                    return false;
+                if (addDateToLog == "True")
+                    return true;
+
+                throw new SystemException("RegKeyError");                
+            }
+            set
+            {
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
+
+                regKey.SetValue("SendLogToKeen", value ? "True" : "False", RegistryValueKind.String);
+            }
+        }
+
+        public static string DBConnString
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.DBConnString;
+            }
+            set
+            {
+                ConfigStorage.DBConnString = value;
+                ConfigStorage.Write();        
+            }
+
+        }
+
+        public static string Prefix
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.Prefix;        
+            }
+            set
+            {
+                ConfigStorage.Prefix = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string SESavePath
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.SESavePath;                
+            }
+            set
+            {
+                ConfigStorage.SESavePath = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string SEDataPath
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.SEDataPath;                
+            }
+            set
+            {
+                ConfigStorage.SEDataPath = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool Diagnosis
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.Diagnosis;
+            }
+            set
+            {
+                ConfigStorage.Diagnosis = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool AutoUpdate
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoUpdate;
+            }
+            set
+            {
+                ConfigStorage.AutoUpdate = value;
+                ConfigStorage.Write();        
+            }
+        }
+
+        public static string AUUsername
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AUUsername;                
+            }
+            set
+            {
+                ConfigStorage.AUUsername = value;
+                ConfigStorage.Write();        
+            }
+        }
+
+        public static string AUPassword
+        {
+            get
+            {
+                ConfigStorage.Read();
+                string value = ConfigStorage.AUPassword;
+                return Encoding.UTF8.GetString(MachineKey.Unprotect(Convert.FromBase64String(value), "SteamPassword"));                
+            }
+            set
+            {
+                string val = Convert.ToBase64String(MachineKey.Protect(Encoding.UTF8.GetBytes(value), "SteamPassword"));
+                ConfigStorage.AUPassword = val;
+                ConfigStorage.Write();            
+            }
+        }
+
+        public static string LastAU
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.LastAU;
+            }
+            set
+            {
+                ConfigStorage.LastAU = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static ArchType Arch
+        {
+            get
+            {
+                switch (ConfigStorage.Arch)
+                {
+                    case "x86":
+                    return EnumArchType.X86;
+                        break;
+                    case "x64":
+                    return EnumArchType.X64;
+                        break;
+                }
+                throw new SystemException("ArchError");                
+            }
+            set
+            {
+ 
+            switch (enumArch)
+                {
                 case EnumArchType.X86:
-                    conf.AppSettings.Settings["Arch"].Value = "x86";
-                    break;
+                        ConfigStorage.Arch = "x86";
+                        break;
                 case EnumArchType.X64:
-                    conf.AppSettings.Settings["Arch"].Value = "x64";
-                    break;
+                        ConfigStorage.Arch = "x64";
+                        break;
+                }   
             }
         }
     }
