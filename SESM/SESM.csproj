@@ -275,6 +275,8 @@
     <Content Include="Views\Server\GlobalStats.cshtml" />
     <Content Include="Views\Settings\AutoUpdate.cshtml" />
     <Content Include="Views\Map\Rename.cshtml" />
+    <Content Include="Views\Settings\Backups.cshtml" />
+    <Content Include="Views\Backup\Index.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -301,6 +303,7 @@
     <Compile Include="Controllers\ActionFilters\GuestOnlyAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\ManagerAndAboveAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\SuperAdminAttribute.cs" />
+    <Compile Include="Controllers\BackupController.cs" />
     <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Controllers\MapController.cs" />
     <Compile Include="Controllers\ModController.cs" />
@@ -334,9 +337,14 @@
     <Compile Include="Migrations\201407201218541_PerfMonitor.Designer.cs">
       <DependentUpon>201407201218541_PerfMonitor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201408051859541_backups.cs" />
+    <Compile Include="Migrations\201408051859541_backups.Designer.cs">
+      <DependentUpon>201408051859541_backups.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Views\Account\LoginViewModel.cs" />
     <Compile Include="Models\Views\Account\ManageViewModel.cs" />
+    <Compile Include="Models\Views\Backup\BackupViewModel.cs" />
     <Compile Include="Models\Views\Log\LogViewModel.cs" />
     <Compile Include="Models\Views\Map\MapViewModel.cs" />
     <Compile Include="Models\Views\Map\NewMapViewModel.cs" />
@@ -348,6 +356,7 @@
     <Compile Include="Models\Views\Server\ServerEnums.cs" />
     <Compile Include="Models\Views\Server\ServerViewModel.cs" />
     <Compile Include="Models\Views\Settings\AutoUpdateViewModel.cs" />
+    <Compile Include="Models\Views\Settings\BackupsViewModel.cs" />
     <Compile Include="Models\Views\Settings\DiagnosisElement.cs" />
     <Compile Include="Models\Views\Settings\DiagnosisViewModel.cs" />
     <Compile Include="Models\Views\Settings\SettingsViewModel.cs" />
@@ -356,6 +365,7 @@
     <Compile Include="Models\Views\User\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\AutoUpdate.cs" />
+    <Compile Include="Tools\BackupJob.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
     <Compile Include="Tools\Helpers\HashHelper.cs" />
     <Compile Include="Tools\Helpers\PathHelper.cs" />
@@ -385,6 +395,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201407201218541_PerfMonitor.resx">
       <DependentUpon>201407201218541_PerfMonitor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201408051859541_backups.resx">
+      <DependentUpon>201408051859541_backups.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,10 @@ namespace SESM.Models.Views.Settings
     public class AutoUpdateViewModel
     {
         [Required]
+        [Display(Name = "Activate Auto Update")]
+        public bool AutoUpdate { get; set; }
+
+        [Required]
         [Display(Name = "Steam Username")]
         public string UserName { get; set; }
 
@@ -12,8 +16,7 @@ namespace SESM.Models.Views.Settings
         public string Password { get; set; }
 
         [Required]
-        [Display(Name = "Auto update every 10mn")]
-        public bool AutoUpdate { get; set; }
-
+        [Display(Name = "Cron Interval")]
+        public string CronInterval { get; set; }
     }
 }

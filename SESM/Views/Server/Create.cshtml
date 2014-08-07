@@ -282,6 +282,27 @@
                         @Html.ValidationMessageFor(m => m.PauseGameWhenEmpty)
                     </div>
                 </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.IsLvl1BackupEnabled, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.IsLvl1BackupEnabled, valueClass)
+                        @Html.ValidationMessageFor(m => m.IsLvl1BackupEnabled)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.IsLvl2BackupEnabled, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.IsLvl2BackupEnabled, valueClass)
+                        @Html.ValidationMessageFor(m => m.IsLvl2BackupEnabled)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.IsLvl3BackupEnabled, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.IsLvl3BackupEnabled, valueClass)
+                        @Html.ValidationMessageFor(m => m.IsLvl3BackupEnabled)
+                    </div>
+                </div>
             </section>
         </div>
         <div class="col-md-6">
@@ -308,6 +329,13 @@
                     <div class="@valueColumn">
                         @Html.TextAreaFor(m => m.Banned, valueClass)
                         @Html.ValidationMessageFor(m => m.Banned)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Mods, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextAreaFor(m => m.Mods, valueClass)
+                        @Html.ValidationMessageFor(m => m.Mods)
                     </div>
                 </div>
                 <div class="form-group">

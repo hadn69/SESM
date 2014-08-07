@@ -377,6 +377,9 @@ namespace SESM.Controllers
             serverView = serverConfig.ParseOut(serverView);
             serverView.Name = serv.Name;
             serverView.IsPublic = serv.IsPublic;
+            serverView.IsLvl1BackupEnabled = serv.IsLvl1BackupEnabled;
+            serverView.IsLvl2BackupEnabled = serv.IsLvl2BackupEnabled;
+            serverView.IsLvl3BackupEnabled = serv.IsLvl3BackupEnabled;
 
             serverView.WebAdministrators = string.Join(";", serv.Administrators.Select(item => item.Login).ToList());
             serverView.WebManagers = string.Join(";", serv.Managers.Select(item => item.Login).ToList());
@@ -476,6 +479,10 @@ namespace SESM.Controllers
                 serv.Ip = model.IP;
                 serv.Port = model.ServerPort;
                 serv.IsPublic = model.IsPublic;
+
+                serv.IsLvl1BackupEnabled = model.IsLvl1BackupEnabled;
+                serv.IsLvl2BackupEnabled = model.IsLvl2BackupEnabled;
+                serv.IsLvl3BackupEnabled = model.IsLvl3BackupEnabled;
 
                 srvPrv.AddAdministrator(webAdminsSplitted, serv);
                 srvPrv.AddManagers(webManagerSplitted, serv);
@@ -599,6 +606,10 @@ namespace SESM.Controllers
                 serv.Ip = model.IP;
                 serv.Port = model.ServerPort;
                 serv.IsPublic = model.IsPublic;
+
+                serv.IsLvl1BackupEnabled = model.IsLvl1BackupEnabled;
+                serv.IsLvl2BackupEnabled = model.IsLvl2BackupEnabled;
+                serv.IsLvl3BackupEnabled = model.IsLvl3BackupEnabled;
 
                 srvPrv.AddAdministrator(webAdminsSplitted, serv);
                 srvPrv.AddManagers(webManagerSplitted, serv);

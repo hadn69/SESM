@@ -47,6 +47,7 @@ namespace SESM.Tools.Helpers
         public int AsteroidAmount = 4;
         public List<ulong> Administrators = new List<ulong>();
         public List<ulong> Banned = new List<ulong>();
+        public List<ulong> Mods = new List<ulong>();
         public ulong GroupID = 0;
         public string ServerName = "SESM";
         public bool PauseGameWhenEmpty = false;
@@ -112,6 +113,17 @@ namespace SESM.Tools.Helpers
                     Banned.Add(ulong.Parse(item));
                 }
             }
+
+            Mods = new List<ulong>();
+            if (model.Mods != null)
+            {
+                string[] splittedMod = model.Mods.Split(';');
+
+                foreach (string item in splittedMod)
+                {
+                    Mods.Add(ulong.Parse(item));
+                }
+            }
             GroupID = model.GroupID;
             ServerName = model.ServerName;
             PauseGameWhenEmpty = model.PauseGameWhenEmpty;
@@ -172,6 +184,17 @@ namespace SESM.Tools.Helpers
                     Banned.Add(ulong.Parse(item));
                 }
             }
+
+            Mods = new List<ulong>();
+            if (model.Mods != null)
+            {
+                string[] splittedMod = model.Mods.Split(';');
+
+                foreach (string item in splittedMod)
+                {
+                    Mods.Add(ulong.Parse(item));
+                }
+            }
             GroupID = model.GroupID;
             ServerName = model.ServerName;
             PauseGameWhenEmpty = model.PauseGameWhenEmpty;
@@ -218,6 +241,7 @@ namespace SESM.Tools.Helpers
             model.AsteroidAmount = AsteroidAmount;
             model.Administrators = String.Join(";", Administrators);
             model.Banned = String.Join(";", Banned);
+            model.Mods = String.Join(";", Mods);
             model.GroupID = GroupID;
             model.ServerName = ServerName;
             model.PauseGameWhenEmpty = PauseGameWhenEmpty;
@@ -258,7 +282,6 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <ClientCanSave>" + ClientCanSave.ToString().ToLower() + "</ClientCanSave>");
             sb.AppendLine("    <HackSpeedMultiplier>" + HackSpeedMultiplier + "</HackSpeedMultiplier>");
             sb.AppendLine("    <PermanentDeath>" + PermanentDeath.ToString().ToLower() + "</PermanentDeath>");
-            //sb.AppendLine("    <Mods />");
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
             sb.AppendLine("    <TypeId>MyObjectBuilder_ScenarioDefinition</TypeId>");
@@ -293,6 +316,18 @@ namespace SESM.Tools.Helpers
                     sb.AppendLine("    <unsignedLong>" + item + "</unsignedLong>");
                 }
                 sb.AppendLine("  </Banned>");
+            }
+
+            if (Mods.Count == 0)
+                sb.AppendLine("  <Mods />");
+            else
+            {
+                sb.AppendLine("  <Mods>");
+                foreach (ulong item in Banned)
+                {
+                    sb.AppendLine("    <unsignedLong>" + item + "</unsignedLong>");
+                }
+                sb.AppendLine("  </Mods>");
             }
             sb.AppendLine("  <GroupID>" + GroupID + "</GroupID>");
             if (ServerName == string.Empty)
@@ -593,6 +628,13 @@ namespace SESM.Tools.Helpers
                     ulong val = 0;
                     ulong.TryParse(item.Value, out val);
                     Banned.Add(val);
+                }
+            if (root.Element("Mods") != null)
+                foreach (XElement item in root.Element("Mods").Elements("unsignedLong"))
+                {
+                    ulong val = 0;
+                    ulong.TryParse(item.Value, out val);
+                    Mods.Add(val);
                 }
 
             if (root.Element("GroupID") != null)

@@ -1,0 +1,41 @@
+﻿@using SESM.DAL
+@model SESM.Models.Views.Backup.BackupViewModel
+@{
+    ViewBag.Title = "Backup List";
+    List<SelectListItem> listDir = (List<SelectListItem>)ViewData["listDir"];
+    int id = (int)ViewData["ID"];
+    AccessLevel accessLevel = (AccessLevel)ViewData["AccessLevel"];
+}
+<div class="row">
+    <section id="Form">
+        @using (Html.BeginForm("Index", "Backup", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            <div class="col-md-3">
+                @Html.ValidationSummary()
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.DropDownListFor(m => m.BackupName, listDir, new { @class = "form-control", size = "15" })
+                        @Html.ValidationMessageFor(m => m.BackupName)
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <br />
+                        <br />
+                        <div class="btn-group-vertical">
+                            <input type="submit" onclick="return confirm('This will delete this backup. Are you sure you want to do this ?');" value="Delete Backup" name="action:DeleteBackup" class="btn btn-default" />
+                            <input type="submit" value="Download Backup" name="action:DownloadBackup" class="btn btn-default" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </section>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-default" href="@(Url.Action("Status", "Server", new {id = ViewData["ID"]}))">Back to Server Status</a>
+    </div>
+</div>

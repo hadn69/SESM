@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Web.Configuration;
 using System.Web.Mvc;
 using Ionic.Zip;
+using Quartz;
+using Quartz.Impl;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Models.Views.Settings;
+using SESM.Tools;
 using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
@@ -392,6 +393,7 @@ namespace SESM.Controllers
             AutoUpdateViewModel model = new AutoUpdateViewModel();
             model.AutoUpdate = SESMConfigHelper.AutoUpdate;
             model.UserName = SESMConfigHelper.AUUsername;
+            model.CronInterval = SESMConfigHelper.AUInterval;
 
             return View(model);
         }
@@ -404,14 +406,138 @@ namespace SESM.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            SESMConfigHelper.AUUsername = model.UserName;
             SESMConfigHelper.AutoUpdate = model.AutoUpdate;
-
+            SESMConfigHelper.AUUsername = model.UserName;
             if (!string.IsNullOrEmpty(model.Password))
             {
                 SESMConfigHelper.AUPassword = model.Password;
             }
+
+            if (SESMConfigHelper.AUInterval != model.CronInterval)
+            {
+                SESMConfigHelper.AUInterval = model.CronInterval;
+
+                IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+
+                scheduler.UnscheduleJob(new TriggerKey("AutoUpdateJob", "AutoUpdate"));
+
+                IJobDetail autoUpdateJob = JobBuilder.Create<AutoUpdate>()
+                    .WithIdentity("AutoUpdateJob", "AutoUpdate")
+                    .Build();
+
+                ITrigger autoUpdateTrigger = TriggerBuilder.Create()
+                    .WithIdentity("AutoUpdateTrigger", "AutoUpdate")
+                    .WithCronSchedule(model.CronInterval)
+                    .StartNow()
+                    .Build();
+
+                scheduler.ScheduleJob(autoUpdateJob, autoUpdateTrigger);
+            }
+
             model.Password = "";
+            return RedirectToAction("Index", "Server");
+        }
+
+        [HttpGet]
+        [LoggedOnly]
+        [SuperAdmin]
+        public ActionResult Backups()
+        {
+            BackupsViewModel model = new BackupsViewModel();
+            model.EnableLvl1 = SESMConfigHelper.AutoBackupLvl1;
+            model.EnableLvl2 = SESMConfigHelper.AutoBackupLvl2;
+            model.EnableLvl3 = SESMConfigHelper.AutoBackupLvl3;
+
+            model.NbToKeepLvl1 = SESMConfigHelper.ABNbToKeepLvl1;
+            model.NbToKeepLvl2 = SESMConfigHelper.ABNbToKeepLvl2;
+            model.NbToKeepLvl3 = SESMConfigHelper.ABNbToKeepLvl3;
+
+            model.CronIntervalLvl1 = SESMConfigHelper.ABIntervalLvl1;
+            model.CronIntervalLvl2 = SESMConfigHelper.ABIntervalLvl2;
+            model.CronIntervalLvl3 = SESMConfigHelper.ABIntervalLvl3;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [LoggedOnly]
+        [SuperAdmin]
+        public ActionResult Backups(BackupsViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+
+            IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+            /*
+            scheduler.UnscheduleJob(new TriggerKey("BackupLvl1Job", "Backups"));
+            scheduler.UnscheduleJob(new TriggerKey("BackupLvl2Job", "Backups"));
+            scheduler.UnscheduleJob(new TriggerKey("BackupLvl3Job", "Backups"));
+             * 
+             * */
+            scheduler.DeleteJob(new JobKey("BackupLvl1Job", "Backups"));
+            scheduler.DeleteJob(new JobKey("BackupLvl2Job", "Backups"));
+            scheduler.DeleteJob(new JobKey("BackupLvl3Job", "Backups"));
+            if (model.EnableLvl1)
+            {
+                IJobDetail BackupJob = JobBuilder.Create<BackupJob>()
+                    .WithIdentity("BackupLvl1Job", "Backups")
+                    .UsingJobData("lvl", 1)
+                    .Build();
+
+                ITrigger BackupTrigger = TriggerBuilder.Create()
+                    .WithIdentity("BackupLvl1Trigger", "Backups")
+                    .WithCronSchedule(model.CronIntervalLvl1)
+                    .StartNow()
+                    .Build();
+
+                scheduler.ScheduleJob(BackupJob, BackupTrigger);
+            }
+
+            if (model.EnableLvl2)
+            {
+                IJobDetail BackupJob = JobBuilder.Create<BackupJob>()
+                    .WithIdentity("BackupLvl2Job", "Backups")
+                    .UsingJobData("lvl", 2)
+                    .Build();
+
+                ITrigger BackupTrigger = TriggerBuilder.Create()
+                    .WithIdentity("BackupLvl2Trigger", "Backups")
+                    .WithCronSchedule(model.CronIntervalLvl2)
+                    .StartNow()
+                    .Build();
+
+                scheduler.ScheduleJob(BackupJob, BackupTrigger);
+            }
+
+            if (model.EnableLvl3)
+            {
+                IJobDetail BackupJob = JobBuilder.Create<BackupJob>()
+                    .WithIdentity("BackupLvl3Job", "Backups")
+                    .UsingJobData("lvl", 3)
+                    .Build();
+
+                ITrigger BackupTrigger = TriggerBuilder.Create()
+                    .WithIdentity("BackupLvl3Trigger", "Backups")
+                    .WithCronSchedule(model.CronIntervalLvl3)
+                    .StartNow()
+                    .Build();
+
+                scheduler.ScheduleJob(BackupJob, BackupTrigger);
+            }
+
+            SESMConfigHelper.AutoBackupLvl1 = model.EnableLvl1;
+            SESMConfigHelper.AutoBackupLvl2 = model.EnableLvl2;
+            SESMConfigHelper.AutoBackupLvl3 = model.EnableLvl3;
+
+            SESMConfigHelper.ABNbToKeepLvl1 = model.NbToKeepLvl1;
+            SESMConfigHelper.ABNbToKeepLvl2 = model.NbToKeepLvl2;
+            SESMConfigHelper.ABNbToKeepLvl3 = model.NbToKeepLvl3;
+
+            SESMConfigHelper.ABIntervalLvl1 = model.CronIntervalLvl1;
+            SESMConfigHelper.ABIntervalLvl2 = model.CronIntervalLvl2;
+            SESMConfigHelper.ABIntervalLvl3 = model.CronIntervalLvl3;
+
             return RedirectToAction("Index", "Server");
         }
     }

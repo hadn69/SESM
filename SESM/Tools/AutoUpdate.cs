@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Web;
-using System.Xml.Linq;
 using Ionic.Zip;
 using Quartz;
 using SESM.DAL;

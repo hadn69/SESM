@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Configuration;
-using System.Web.Configuration;
 using SESM.DTO;
 
 namespace SESM.Tools.Helpers
@@ -44,6 +42,10 @@ namespace SESM.Tools.Helpers
         {
             return GetInstancePath(server) + @"SpaceEngineers-Dedicated.cfg";
             
+        }
+        public static string GetBackupsPath(EntityServer server)
+        {
+            return GetInstancePath(server) + @"Backups\";
         }
     }
 }

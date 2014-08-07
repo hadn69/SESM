@@ -9,6 +9,9 @@ namespace SESM.DTO
         public int Port { get; set; }
         public string Name { get; set; }
         public bool IsPublic { get; set; }
+        public bool IsLvl1BackupEnabled { get; set; }
+        public bool IsLvl2BackupEnabled { get; set; }
+        public bool IsLvl3BackupEnabled { get; set; }
 
         private ICollection<EntityUser> _administrators;
         public virtual ICollection<EntityUser> Administrators
@@ -41,6 +44,9 @@ namespace SESM.DTO
         public EntityServer()
         {
             IsPublic = false;
+            IsLvl1BackupEnabled = false;
+            IsLvl2BackupEnabled = false;
+            IsLvl3BackupEnabled = false;
         }
     }
 }

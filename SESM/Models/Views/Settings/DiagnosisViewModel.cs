@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Configuration;
 
 namespace SESM.Models.Views.Settings
 {

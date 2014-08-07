@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace SESM.Models.Views.Settings
+﻿namespace SESM.Models.Views.Settings
 {
     public class DiagnosisElement
     {

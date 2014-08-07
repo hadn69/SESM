@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Configuration;
 using System.Text;
-using System.Web.Configuration;
 using System.Web.Security;
 using Microsoft.Win32;
 using SESM.Models.Views.Settings;
-using Westwind.Utilities.Configuration;
 
 namespace SESM.Tools.Helpers
 {
@@ -206,6 +203,146 @@ namespace SESM.Tools.Helpers
                 string val = Convert.ToBase64String(MachineKey.Protect(Encoding.UTF8.GetBytes(value), "SteamPassword"));
                 ConfigStorage.AUPassword = val;
                 ConfigStorage.Write();            
+            }
+        }
+
+        public static string AUInterval
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AUInterval;
+            }
+            set
+            {
+                ConfigStorage.AUInterval = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool AutoBackupLvl1
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl1;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl1 = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string ABIntervalLvl1
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.ABIntervalLvl1;
+            }
+            set
+            {
+                ConfigStorage.ABIntervalLvl1 = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static int ABNbToKeepLvl1
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.ABNbToKeepLvl1;
+            }
+            set
+            {
+                ConfigStorage.ABNbToKeepLvl1 = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool AutoBackupLvl2
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl2;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl2 = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string ABIntervalLvl2
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.ABIntervalLvl2;
+            }
+            set
+            {
+                ConfigStorage.ABIntervalLvl2 = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static int ABNbToKeepLvl2
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.ABNbToKeepLvl2;
+            }
+            set
+            {
+                ConfigStorage.ABNbToKeepLvl2 = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool AutoBackupLvl3
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl3;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl3 = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string ABIntervalLvl3
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.ABIntervalLvl3;
+            }
+            set
+            {
+                ConfigStorage.ABIntervalLvl3 = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static int ABNbToKeepLvl3
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.ABNbToKeepLvl3;
+            }
+            set
+            {
+                ConfigStorage.ABNbToKeepLvl3 = value;
+                ConfigStorage.Write();
             }
         }
 

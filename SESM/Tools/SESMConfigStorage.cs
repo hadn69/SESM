@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Web;
-using Westwind.Utilities.Configuration;
+﻿using Westwind.Utilities.Configuration;
 
 namespace SESM.Tools
 {
@@ -16,6 +14,19 @@ namespace SESM.Tools
         public string AUUsername { get; set; }
         public string AUPassword { get; set; }
         public string LastAU { get; set; }
+        public string AUInterval { get; set; }
+
+        public bool AutoBackupLvl1 { get; set; }
+        public string ABIntervalLvl1 { get; set; }
+        public int ABNbToKeepLvl1 { get; set; }
+
+        public bool AutoBackupLvl2 { get; set; }
+        public string ABIntervalLvl2 { get; set; }
+        public int ABNbToKeepLvl2 { get; set; }
+        
+        public bool AutoBackupLvl3 { get; set; }
+        public string ABIntervalLvl3 { get; set; }
+        public int ABNbToKeepLvl3 { get; set; }
 
         public SESMConfigStorage()
         {
@@ -29,8 +40,20 @@ namespace SESM.Tools
             AUUsername = "SteamUsername";
             AUPassword = "";
             LastAU = "xxx";
+            AUInterval = "0 0/10 * * * ?";
 
-        }
+            AutoBackupLvl1 = false;
+            ABIntervalLvl1 = "0 0/10 * * * ?";
+            ABNbToKeepLvl1 = 12;
+
+            AutoBackupLvl2 = false;
+            ABIntervalLvl2 = "0 0 * * * ?";
+            ABNbToKeepLvl2 = 48;
+
+            AutoBackupLvl3 = false;
+            ABIntervalLvl3 = "0 0 0 * * ?";
+            ABNbToKeepLvl3 = 30;
+        }   
         protected override IConfigurationProvider OnCreateDefaultProvider(string sectionName, object configData)
         {
             var provider = new ConfigurationFileConfigurationProvider<SESMConfigStorage>()

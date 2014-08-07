@@ -11,7 +11,7 @@
         @using (Html.BeginForm("Index", "Mod", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
         {
             <div class="col-md-3">
-                @Html.ValidationSummary(true)
+                @Html.ValidationSummary()
                 <div class="form-group">
                     <div class="col-md-12">
                         @Html.DropDownListFor(m => m.ModName, listDir, new {@class = "form-control", size = "15"})

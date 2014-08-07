@@ -15,6 +15,18 @@ namespace SESM.Models.Views.Server
         public bool IsPublic { get; set; }
 
         [Required]
+        [DisplayName("Backup LvL 1")]
+        public bool IsLvl1BackupEnabled { get; set; }
+
+        [Required]
+        [DisplayName("Backup LvL 2")]
+        public bool IsLvl2BackupEnabled { get; set; }
+
+        [Required]
+        [DisplayName("Backup LvL 3")]
+        public bool IsLvl3BackupEnabled { get; set; }
+
+        [Required]
         [DisplayName("Game Mode")]
         public GameMode GameMode { get; set; }
 
@@ -151,6 +163,9 @@ namespace SESM.Models.Views.Server
 
         [DisplayName("In-Game Banned List")]
         public string Banned { get; set; }
+
+        [DisplayName("In-Game Mod List")]
+        public string Mods { get; set; }
 
         [DisplayName("Steam Group ID")]
         public ulong GroupID { get; set; }
