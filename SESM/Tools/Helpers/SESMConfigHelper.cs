@@ -162,6 +162,20 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public static bool StatusAutoRefresh
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.StatusAutoRefresh;
+            }
+            set
+            {
+                ConfigStorage.StatusAutoRefresh = value;
+                ConfigStorage.Write();
+            }
+        }
+
         public static bool AutoUpdate
         {
             get

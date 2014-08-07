@@ -10,6 +10,8 @@ namespace SESM.Tools
         public string SEDataPath { get; set; }
         public string Arch { get; set; }
         public bool Diagnosis { get; set; }
+        public bool StatusAutoRefresh { get; set; }
+
         public bool AutoUpdate { get; set; }
         public string AUUsername { get; set; }
         public string AUPassword { get; set; }
@@ -36,6 +38,8 @@ namespace SESM.Tools
             SEDataPath = @"C:\SpaceEngineer\";
             Arch = "x64";
             Diagnosis = false;
+            StatusAutoRefresh = true;
+
             AutoUpdate = false;
             AUUsername = "SteamUsername";
             AUPassword = "";

@@ -153,7 +153,10 @@ namespace SESM.Controllers
             else
                 ViewData["AccessLevel"] = srvPrv.GetAccessLevel(user.Id, serv.Id);
             ViewData["ID"] = id;
-            Response.AddHeader("Refresh", "10");
+
+            if (SESMConfigHelper.StatusAutoRefresh)
+                Response.AddHeader("Refresh", "10");
+
             return View(serverView);
         }
 
