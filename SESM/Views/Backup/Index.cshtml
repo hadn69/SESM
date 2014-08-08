@@ -10,16 +10,16 @@
     <section id="Form">
         @using (Html.BeginForm("Index", "Backup", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
         {
-            <div class="col-md-3">
+            <div class="col-md-6">
                 @Html.ValidationSummary()
                 <div class="form-group">
                     <div class="col-md-12">
-                        @Html.DropDownListFor(m => m.BackupName, listDir, new { @class = "form-control", size = "15" })
+                        @Html.DropDownListFor(m => m.BackupName, listDir, new { @class = "form-control", size = "15", style = "max-width:none;width:500px" })
                         @Html.ValidationMessageFor(m => m.BackupName)
                     </div>
                 </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-6">
                 <div class="form-group">
                     <div class="col-md-12">
                         <br />
@@ -27,6 +27,7 @@
                         <div class="btn-group-vertical">
                             <input type="submit" onclick="return confirm('This will delete this backup. Are you sure you want to do this ?');" value="Delete Backup" name="action:DeleteBackup" class="btn btn-default" />
                             <input type="submit" value="Download Backup" name="action:DownloadBackup" class="btn btn-default" />
+                            <input type="submit" onclick="return confirm('If a map with the same name as the bacuped one exist, it will be overwriten. If the overwriten map is in use, the server will be restarted. Are you sure you want to do this ?');" value="Restore Backup" name="action:RestoreBackup" class="btn btn-default" />
                         </div>
                     </div>
                 </div>

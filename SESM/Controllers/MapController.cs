@@ -266,7 +266,6 @@ namespace SESM.Controllers
         //
         // GET: Map/Upload/5
         [HttpGet]
-        [AdminAndAbove]
         public ActionResult Upload(int id)
         {
             ViewData["ID"] = id;
@@ -276,7 +275,6 @@ namespace SESM.Controllers
         //
         // POST: Map/Upload/5
         [HttpPost]
-        [AdminAndAbove]
         public ActionResult Upload(int id, UploadMapViewModel model)
         {
             if (!ZipFile.IsZipFile(model.SaveZip.InputStream, false))

@@ -34,10 +34,7 @@
                             <input type="submit" onclick="return confirm('This will delete this map. Are you sure you want to do this ?');" value="Delete Map" name="action:DeleteMap" class="btn btn-default" />
                             <input type="submit" value="Rename Map" name="action:RenameMap" class="btn btn-default" />
                             <input type="submit" value="Download Map" name="action:DownloadMap" class="btn btn-default" />
-                            @if (accessLevel == AccessLevel.Admin || accessLevel == AccessLevel.SuperAdmin)
-                            {
-                                <a class="btn btn-default" href="@(Url.Action("Upload", "Map", new {id = id}))">Upload Map</a>
-                            }
+                            <a class="btn btn-default" href="@(Url.Action("Upload", "Map", new {id = id}))">Upload Map</a>
                             <a class="btn btn-default" href="@(Url.Action("New", "Map", new {id = id}))">Create Map</a>
                             
                         </div>

@@ -84,7 +84,7 @@ namespace SESM.Tools
                             using (ZipFile zip = new ZipFile())
                             {
                                 zip.AddSelectedFiles("*", PathHelper.GetSavePath(item, config.SaveName), string.Empty, true);
-                                zip.Save(PathHelper.GetBackupsPath(item) + "AutoBackupLvl" + backupLvl + "_"+ DateTime.Now.ToString("yyyyMMddHHmmss")  + ".zip");
+                                zip.Save(PathHelper.GetBackupsPath(item) + "AutoBackupLvl" + backupLvl + "_" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + config.SaveName + ".zip");
                             }
                     }
                 }

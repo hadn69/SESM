@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Web.Mvc;
+using System.Xml;
 using Ionic.Zip;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
@@ -72,7 +73,7 @@ namespace SESM.Controllers
                 System.IO.File.Delete(PathHelper.GetBackupsPath(serv) + model.BackupName);
             }
 
-            return RedirectToAction("Index", new { id = id });
+            return RedirectToAction("Index", new {id = id});
         }
 
         [HttpPost]
@@ -94,13 +95,70 @@ namespace SESM.Controllers
                     Response.AddHeader("Content-Disposition",
                         String.Format("attachment; filename={0}", model.BackupName));
 
-                    FileStream fs = new FileStream(PathHelper.GetBackupsPath(serv) + model.BackupName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    FileStream fs = new FileStream(PathHelper.GetBackupsPath(serv) + model.BackupName, FileMode.Open,
+                        FileAccess.Read, FileShare.Read);
 
                     fs.CopyTo(Response.OutputStream);
                     Response.End();
                 }
             }
-            return RedirectToAction("Index", new { id = id });
+            return RedirectToAction("Index", new {id = id});
+        }
+
+        [HttpPost]
+        [MultipleButton(Name = "action", Argument = "RestoreBackup")]
+        public ActionResult Restore(int id, BackupViewModel model)
+        {
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(_context);
+            ViewData["ID"] = id;
+            EntityServer serv = srvPrv.GetServer(id);
+
+            if (ModelState.IsValid)
+            {
+                if(!System.IO.File.Exists(PathHelper.GetBackupsPath(serv) + model.BackupName))
+                    return RedirectToAction("Index", new {id = id});
+                using (ZipFile zip = ZipFile.Read(PathHelper.GetBackupsPath(serv) + model.BackupName))
+                {
+                    zip.ExtractAll(PathHelper.GetSavesPath(serv) + model.BackupName);
+                }
+
+                XmlDocument doc = new XmlDocument();
+                doc.Load(PathHelper.GetSavePath(serv, model.BackupName) + @"\Sandbox.sbc");
+                XmlNode root = doc.DocumentElement;
+                XmlNode nameNode = root.SelectSingleNode("descendant::SessionName");
+
+                string savename = nameNode.InnerText
+                    .Replace("/", "")
+                    .Replace("\\", "")
+                    .Replace(":", "")
+                    .Replace("*", "")
+                    .Replace("?", "")
+                    .Replace("\"", "")
+                    .Replace("<", "")
+                    .Replace(">", "")
+                    .Replace("|", "");
+
+                bool toRestart = false;
+
+                if (Directory.Exists(PathHelper.GetSavePath(serv, savename)))
+                {
+                    ServerConfigHelper config = new ServerConfigHelper();
+                    config.Load(PathHelper.GetConfigurationFilePath(serv));
+                    if (savename == config.SaveName && srvPrv.GetState(serv) != ServiceState.Stopped)
+                    {
+                        toRestart = true;
+                        ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                    }
+                    Directory.Delete(PathHelper.GetSavePath(serv, savename), true);
+                }
+
+                Directory.Move(PathHelper.GetSavesPath(serv) + model.BackupName, PathHelper.GetSavePath(serv, savename));
+
+                if(toRestart)
+                    ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
+            }
+            return RedirectToAction("Status","Server", new { id = id });
         }
     }
 }

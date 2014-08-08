@@ -35,7 +35,7 @@ namespace SESM.Tools
             DBConnString = @"Server=.\SQLEXPRESS;Database=SESM;User Id=sa;Password=MyPassword;MultipleActiveResultSets=true;";
             Prefix = "SESM";
             SESavePath = @"C:\ProgramData\SpaceEngineersDedicated\";
-            SEDataPath = @"C:\SpaceEngineer\";
+            SEDataPath = @"C:\SpaceEngineers\";
             Arch = "x64";
             Diagnosis = false;
             StatusAutoRefresh = true;
@@ -60,9 +60,8 @@ namespace SESM.Tools
         }   
         protected override IConfigurationProvider OnCreateDefaultProvider(string sectionName, object configData)
         {
-            var provider = new ConfigurationFileConfigurationProvider<SESMConfigStorage>()
+            ConfigurationFileConfigurationProvider<SESMConfigStorage> provider = new ConfigurationFileConfigurationProvider<SESMConfigStorage>()
             {
-                //ConfigurationFile = HttpContext.Current.Server.MapPath("/") + @"\SESM.config",
                 ConfigurationFile = System.AppDomain.CurrentDomain.BaseDirectory + @"\SESM.config",
                 ConfigurationSection = sectionName,
             };
