@@ -323,7 +323,7 @@ namespace SESM.Tools.Helpers
             else
             {
                 sb.AppendLine("  <Mods>");
-                foreach (ulong item in Banned)
+                foreach (ulong item in Mods)
                 {
                     sb.AppendLine("    <unsignedLong>" + item + "</unsignedLong>");
                 }

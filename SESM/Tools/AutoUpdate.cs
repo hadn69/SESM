@@ -18,6 +18,13 @@ namespace SESM.Tools
             if (!SESMConfigHelper.AutoUpdate)
                 return;
 
+
+
+            FileInfo fiBefore = null;
+            // Checking if the file has been modified since last check
+            if (!File.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
+                fiBefore = new FileInfo(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip");
+
             Process si = new Process();
             si.StartInfo.WorkingDirectory = SESMConfigHelper.SEDataPath + @"\SteamCMD\";
             si.StartInfo.UseShellExecute = false;
@@ -52,9 +59,9 @@ namespace SESM.Tools
 
             // Checking if the file has been modified since last check
             FileInfo fi = new FileInfo(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip");
-            if(fi.LastWriteTime.ToString("g") == SESMConfigHelper.LastAU)
-                return;
-            SESMConfigHelper.LastAU = fi.LastWriteTime.ToString("g");
+            if(fiBefore != null)
+                if (fi.LastWriteTime.ToString("g") == fiBefore.LastWriteTime.ToString("g"))
+                    return;
 
             DataContext context = new DataContext();
             ServerProvider srvPrv = new ServerProvider(context);
