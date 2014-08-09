@@ -22,7 +22,7 @@ namespace SESM.Tools
 
             FileInfo fiBefore = null;
             // Checking if the file has been modified since last check
-            if (!File.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
+            if (File.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
                 fiBefore = new FileInfo(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip");
 
             Process si = new Process();
@@ -93,8 +93,6 @@ namespace SESM.Tools
                     Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
                 if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
                     Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
-                //Directory.Delete(SESMConfigHelper.GetSEDataPath(), true);
-                //Directory.CreateDirectory(SESMConfigHelper.GetSEDataPath());
                 zip.ExtractAll(SESMConfigHelper.SEDataPath);
             }
 

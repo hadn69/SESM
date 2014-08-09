@@ -413,14 +413,14 @@ namespace SESM.Controllers
                 SESMConfigHelper.AUPassword = model.Password;
             }
 
-            if (SESMConfigHelper.AUInterval != model.CronInterval)
+            SESMConfigHelper.AUInterval = model.CronInterval;
+
+            IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+
+            scheduler.DeleteJob(new JobKey("AutoUpdateJob", "AutoUpdate"));
+
+            if (model.AutoUpdate)
             {
-                SESMConfigHelper.AUInterval = model.CronInterval;
-
-                IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
-
-                scheduler.UnscheduleJob(new TriggerKey("AutoUpdateJob", "AutoUpdate"));
-
                 IJobDetail autoUpdateJob = JobBuilder.Create<AutoUpdate>()
                     .WithIdentity("AutoUpdateJob", "AutoUpdate")
                     .Build();
