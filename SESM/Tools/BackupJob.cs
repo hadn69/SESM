@@ -79,7 +79,7 @@ namespace SESM.Tools
                             Array.Sort(backupList);
                         }
                         ServerConfigHelper config = new ServerConfigHelper();
-                        config.Load(PathHelper.GetConfigurationFilePath(item));
+                        config.LoadFromServConf(PathHelper.GetConfigurationFilePath(item));
                         if(!string.IsNullOrEmpty(config.SaveName))
                             using (ZipFile zip = new ZipFile())
                             {

@@ -140,25 +140,40 @@ namespace SESM.Controllers
                     .Replace("|", "");
 
                 bool toRestart = false;
+                ServerConfigHelper config = new ServerConfigHelper();
+                config.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
 
                 if (Directory.Exists(PathHelper.GetSavePath(serv, savename)))
                 {
-                    ServerConfigHelper config = new ServerConfigHelper();
-                    config.Load(PathHelper.GetConfigurationFilePath(serv));
-                    if (savename == config.SaveName && srvPrv.GetState(serv) != ServiceState.Stopped)
+                    
+                    if (savename == config.SaveName)
                     {
-                        toRestart = true;
-                        ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                        if(srvPrv.GetState(serv) != ServiceState.Stopped)
+                        {
+                            toRestart = true;
+                            ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                        }
+                        config.LoadFromSave(PathHelper.GetSavePath(serv, savename));
+                        
                     }
                     Directory.Delete(PathHelper.GetSavePath(serv, savename), true);
                 }
 
                 Directory.Move(PathHelper.GetSavesPath(serv) + model.BackupName, PathHelper.GetSavePath(serv, savename));
+                config.Save(serv);
 
                 if(toRestart)
                     ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
             }
             return RedirectToAction("Status","Server", new { id = id });
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _context.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

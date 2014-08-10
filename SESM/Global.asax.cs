@@ -17,7 +17,7 @@ namespace SESM
             
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.Start();
-            
+            /*
             IJobDetail collectorJob = JobBuilder.Create<Collector>()
                 .WithIdentity("CollectorJob", "Monitor")
                 .Build();
@@ -36,12 +36,12 @@ namespace SESM
 
             ITrigger hourlyCrusherTrigger = TriggerBuilder.Create()
                 .WithIdentity("HourlyCrusherTrigger", "Monitor")
-                .WithCronSchedule("0 0 * * * ?")
+                .WithCronSchedule("0 0/3 * * * ?")
                 .StartNow()
                 .Build();
             
             scheduler.ScheduleJob(hourlyCrusherJob, hourlyCrusherTrigger);
-            
+            */
             IJobDetail autoUpdateJob = JobBuilder.Create<AutoUpdate>()
                 .WithIdentity("AutoUpdateJob", "AutoUpdate")
                 .Build();

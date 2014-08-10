@@ -469,12 +469,6 @@ namespace SESM.Controllers
 
 
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
-            /*
-            scheduler.UnscheduleJob(new TriggerKey("BackupLvl1Job", "Backups"));
-            scheduler.UnscheduleJob(new TriggerKey("BackupLvl2Job", "Backups"));
-            scheduler.UnscheduleJob(new TriggerKey("BackupLvl3Job", "Backups"));
-             * 
-             * */
             scheduler.DeleteJob(new JobKey("BackupLvl1Job", "Backups"));
             scheduler.DeleteJob(new JobKey("BackupLvl2Job", "Backups"));
             scheduler.DeleteJob(new JobKey("BackupLvl3Job", "Backups"));
@@ -540,5 +534,24 @@ namespace SESM.Controllers
 
             return RedirectToAction("Index", "Server");
         }
+
+        [HttpGet]
+        [LoggedOnly]
+        [SuperAdmin]
+        public ActionResult CleanPerf()
+        {
+            _context.Database.ExecuteSqlCommand("truncate table SESM.dbo.EntityPerfEntries");
+            return RedirectToAction("Index", "Home");
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _context.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        
     }
 }

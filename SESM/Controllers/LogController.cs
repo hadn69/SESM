@@ -135,5 +135,13 @@ namespace SESM.Controllers
             }
             return RedirectToAction("Index", new { id = id });
         }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _context.Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
 }

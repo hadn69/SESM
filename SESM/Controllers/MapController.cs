@@ -54,7 +54,7 @@ namespace SESM.Controllers
             MapViewModel model = new MapViewModel();
 
             ServerConfigHelper serverConfig = new ServerConfigHelper();
-            serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
+            serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
             model.MapName = serverConfig.SaveName;
 
             return View(model);
@@ -77,8 +77,9 @@ namespace SESM.Controllers
                     return RedirectToAction("Index", new { id = id });
 
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
-                serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
+                serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.SaveName = model.MapName;
+                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
                 serverConfig.Save(serv);
                 return RedirectToAction("Status", "Server", new { id = id });
             }
@@ -101,8 +102,9 @@ namespace SESM.Controllers
             {
                 ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
-                serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
+                serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.SaveName = model.MapName;
+                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
                 serverConfig.Save(serv);
                 ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
                 return RedirectToAction("Status", "Server", new { id = id });
@@ -149,14 +151,18 @@ namespace SESM.Controllers
                     return RedirectToAction("Index", new { id = id });
 
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
-                serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
+                serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 bool toRestart = false;
-                if (model.CurrentMapName == serverConfig.SaveName && srvPrv.GetState(serv) == ServiceState.Running)
+                if (model.CurrentMapName == serverConfig.SaveName)
                 {
-                    ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
-                    toRestart = true;
-                }
+               
+                    if(srvPrv.GetState(serv) == ServiceState.Running)
+                    {
+                        ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                        toRestart = true;
+                    }
 
+                }
                 XmlDocument doc = new XmlDocument();
                 doc.Load(PathHelper.GetSavePath(serv, model.CurrentMapName) + @"\Sandbox.sbc");
                 XmlNode root = doc.DocumentElement;
@@ -165,11 +171,16 @@ namespace SESM.Controllers
                 doc.Save(PathHelper.GetSavePath(serv, model.CurrentMapName) + @"\Sandbox.sbc");
 
                 Directory.Move(PathHelper.GetSavePath(serv, model.CurrentMapName), PathHelper.GetSavePath(serv, model.NewMapName));
+                if (model.CurrentMapName == serverConfig.SaveName)
+                {
+                    serverConfig.SaveName = model.NewMapName;
+                    serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, serverConfig.SaveName));
+                    serverConfig.Save(serv);
+                }
 
                 if (toRestart)
                 {
-                    serverConfig.SaveName = model.NewMapName;
-                    serverConfig.Save(serv);
+                    
                     ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
                 }
             }
@@ -251,7 +262,7 @@ namespace SESM.Controllers
             {
                 ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
-                serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
+                serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.ScenarioType = model.MapType;
                 serverConfig.AsteroidAmount = model.AsteroidAmount;
                 serverConfig.SaveName = string.Empty;
@@ -306,6 +317,14 @@ namespace SESM.Controllers
                 zip.ExtractAll(path);
             }
             return RedirectToAction("Index", new { id = id });
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _context.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

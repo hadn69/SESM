@@ -528,6 +528,28 @@ namespace SESM.Tools.Helpers
                 settingsNode.SelectSingleNode("descendant::PermanentDeath").InnerText =
                     PermanentDeath.ToString().ToLower();
 
+
+
+
+
+
+
+
+                valueNode = root.SelectSingleNode("descendant::Mods");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "PermanentDeath", null));
+                valueNode.RemoveAll();
+                foreach (ulong item in Mods)
+                {
+                    XmlNode modItem = doc.CreateNode(XmlNodeType.Element, "ModItem", null);
+                    XmlNode name = doc.CreateNode(XmlNodeType.Element, "Name", null);
+                    XmlNode publishedFileId = doc.CreateNode(XmlNodeType.Element, "PublishedFileId", null);
+                    name.Value = item.ToString() + ".sbm";
+                    publishedFileId.Value = item.ToString();
+                    valueNode.AppendChild(modItem);
+                    modItem.AppendChild(name);
+                    modItem.AppendChild(publishedFileId);
+                }
                 doc.Save(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc");
             }
         }
@@ -536,8 +558,8 @@ namespace SESM.Tools.Helpers
         /// Load the config file located at "path"
         /// </summary>
         /// <param name="path">the full path to the config file</param>
-        /// <returns>true if the load succeded, fals if not</returns>
-        public bool Load(string path)
+        /// <returns>true if the load succeded, false if not</returns>
+        public bool LoadFromServConf(string path)
         {
             if (!File.Exists(path))
                 return false;
@@ -615,6 +637,7 @@ namespace SESM.Tools.Helpers
             if (root.Element("AsteroidAmount") != null)
                 int.TryParse(root.Element("AsteroidAmount").Value, out AsteroidAmount);
 
+            Administrators = new List<ulong>();
             if (root.Element("Administrators") != null)
                 foreach (XElement item in root.Element("Administrators").Elements("unsignedLong"))
                 {
@@ -622,6 +645,7 @@ namespace SESM.Tools.Helpers
                     ulong.TryParse(item.Value, out val);
                     Administrators.Add(val);
                 }
+            Banned = new List<ulong>();
             if (root.Element("Banned") != null)
                 foreach (XElement item in root.Element("Banned").Elements("unsignedLong"))
                 {
@@ -629,6 +653,7 @@ namespace SESM.Tools.Helpers
                     ulong.TryParse(item.Value, out val);
                     Banned.Add(val);
                 }
+            Mods = new List<ulong>();
             if (root.Element("Mods") != null)
                 foreach (XElement item in root.Element("Mods").Elements("unsignedLong"))
                 {
@@ -643,6 +668,91 @@ namespace SESM.Tools.Helpers
                 ServerName = root.Element("ServerName").Value;
             if (root.Element("PauseGameWhenEmpty") != null)
                 bool.TryParse(root.Element("PauseGameWhenEmpty").Value, out PauseGameWhenEmpty);
+            return true;
+        }
+
+        public bool LoadFromSave(string path)
+        {
+            if (!File.Exists(path))
+                return false;
+            XDocument doc = XDocument.Load(path);
+            XElement root = doc.Element("MyObjectBuilder_Checkpoint");
+            if (root == null)
+                return false;
+            XElement settings = root.Element("Settings");
+            if (settings == null)
+                return false;
+            if (settings.Element("GameMode") != null)
+                Enum.TryParse(settings.Element("GameMode").Value, out GameMode);
+            if (settings.Element("InventorySizeMultiplier") != null)
+                int.TryParse(settings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
+            if (settings.Element("AssemblerSpeedMultiplier") != null)
+                int.TryParse(settings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
+            if (settings.Element("AssemblerEfficiencyMultiplier") != null)
+                int.TryParse(settings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
+            if (settings.Element("RefinerySpeedMultiplier") != null)
+                int.TryParse(settings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
+            if (settings.Element("OnlineMode") != null)
+                Enum.TryParse(settings.Element("OnlineMode").Value, out OnlineMode);
+            if (settings.Element("MaxPlayers") != null)
+                int.TryParse(settings.Element("MaxPlayers").Value, out MaxPlayers);
+            if (settings.Element("MaxFloatingObjects") != null)
+                int.TryParse(settings.Element("MaxFloatingObjects").Value, out MaxFloatingObjects);
+            if (settings.Element("EnvironmentHostility") != null)
+                Enum.TryParse(settings.Element("EnvironmentHostility").Value, out EnvironmentHostility);
+            if (settings.Element("AutoHealing") != null)
+                bool.TryParse(settings.Element("AutoHealing").Value, out AutoHealing);
+            if (settings.Element("EnableCopyPaste") != null)
+                bool.TryParse(settings.Element("EnableCopyPaste").Value, out EnableCopyPaste);
+            if (settings.Element("AutoSave") != null)
+                bool.TryParse(settings.Element("AutoSave").Value, out AutoSave);
+            if (settings.Element("WeaponsEnabled") != null)
+                bool.TryParse(settings.Element("WeaponsEnabled").Value, out WeaponsEnabled);
+            if (settings.Element("ShowPlayerNamesOnHud") != null)
+                bool.TryParse(settings.Element("ShowPlayerNamesOnHud").Value, out ShowPlayerNamesOnHud);
+            if (settings.Element("ThrusterDamage") != null)
+                bool.TryParse(settings.Element("ThrusterDamage").Value, out ThrusterDamage);
+            if (settings.Element("CargoShipsEnabled") != null)
+                bool.TryParse(settings.Element("CargoShipsEnabled").Value, out CargoShipsEnabled);
+            if (settings.Element("EnableSpectator") != null)
+                bool.TryParse(settings.Element("EnableSpectator").Value, out EnableSpectator);
+            if (settings.Element("RemoveTrash") != null)
+                bool.TryParse(settings.Element("RemoveTrash").Value, out RemoveTrash);
+            if (settings.Element("WorldSizeKm") != null)
+                int.TryParse(settings.Element("WorldSizeKm").Value, out WorldSizeKm);
+            if (settings.Element("RespawnShipDelete") != null)
+                bool.TryParse(settings.Element("RespawnShipDelete").Value, out RespawnShipDelete);
+            if (settings.Element("ResetOwnership") != null)
+                bool.TryParse(settings.Element("ResetOwnership").Value, out ResetOwnership);
+            if (settings.Element("WelderSpeedMultiplier") != null)
+                double.TryParse(settings.Element("WelderSpeedMultiplier").Value, out WelderSpeedMultiplier);
+            if (settings.Element("GrinderSpeedMultiplier") != null)
+                double.TryParse(settings.Element("GrinderSpeedMultiplier").Value, out GrinderSpeedMultiplier);
+            if (settings.Element("RealisticSound") != null)
+                bool.TryParse(settings.Element("RealisticSound").Value, out RealisticSound);
+            if (settings.Element("ClientCanSave") != null)
+                bool.TryParse(settings.Element("ClientCanSave").Value, out ClientCanSave);
+            if (settings.Element("HackSpeedMultiplier") != null)
+                double.TryParse(settings.Element("HackSpeedMultiplier").Value, out HackSpeedMultiplier);
+            if (settings.Element("PermanentDeath") != null)
+                bool.TryParse(settings.Element("PermanentDeath").Value, out PermanentDeath);
+            
+            Mods = new List<ulong>();
+            if (root.Element("Mods") != null)
+            {
+                foreach (XElement item in root.Element("Mods").Elements("ModItem"))
+                {
+                    if (item.Element("Name") != null
+                        && item.Element("PublishedFileId") != null
+                        && item.Element("PublishedFileId").Value ==
+                        item.Element("Name").Value.Substring(0, item.Element("Name").Value.Length - 4))
+                    {
+                        ulong val = 0;
+                        ulong.TryParse(item.Element("PublishedFileId").Value, out val);
+                        Mods.Add(val);
+                    }
+                }
+            }
             return true;
         }
     }

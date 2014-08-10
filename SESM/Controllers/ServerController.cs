@@ -141,7 +141,7 @@ namespace SESM.Controllers
             EntityServer serv = srvPrv.GetServer(serverId);
 
             ServerConfigHelper serverConfig = new ServerConfigHelper();
-            serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
+            serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
 
             ServerViewModel serverView = new ServerViewModel();
             serverView = serverConfig.ParseOut(serverView);
@@ -374,7 +374,7 @@ namespace SESM.Controllers
             ViewData["AccessLevel"] = accessLevel;
 
             ServerConfigHelper serverConfig = new ServerConfigHelper();
-            serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
+            serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
             
             ServerViewModel serverView = new ServerViewModel();
             serverView = serverConfig.ParseOut(serverView);
@@ -416,7 +416,7 @@ namespace SESM.Controllers
             {
 
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
-                serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
+                serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
 
                 List<string> WebAdminsList = serv.Administrators.Select(item => item.Login).ToList();
                 List<string> WebManagersList = serv.Managers.Select(item => item.Login).ToList();
@@ -543,7 +543,7 @@ namespace SESM.Controllers
             {
 
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
-                serverConfig.Load(PathHelper.GetConfigurationFilePath(serv));
+                serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
 
                 List<string> WebAdminsList = serv.Administrators.Select(item => item.Login).ToList();
                 List<string> WebManagersList = serv.Managers.Select(item => item.Login).ToList();
@@ -682,6 +682,7 @@ namespace SESM.Controllers
             }
             base.Dispose(disposing);
         }
+
 
         
     }

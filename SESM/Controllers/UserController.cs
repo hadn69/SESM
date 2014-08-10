@@ -73,5 +73,14 @@ namespace SESM.Controllers
 
             return View(model);
         }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _context.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+        
     }
 }
