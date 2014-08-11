@@ -13,7 +13,7 @@ namespace SESM.DAL
             _context = context;
         }
 
-        public void RemoveServer(EntityPerfEntry perfEntry)
+        public void RemoveEntry(EntityPerfEntry perfEntry)
         {
             try
             {
@@ -26,7 +26,7 @@ namespace SESM.DAL
             }
         }
 
-        public void RemoveServer(IEnumerable<EntityPerfEntry> perfEntries)
+        public void RemoveEntries(IEnumerable<EntityPerfEntry> perfEntries)
         {
             try
             {

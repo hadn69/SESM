@@ -17,31 +17,35 @@ namespace SESM
             
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.Start();
-            /*
-            IJobDetail collectorJob = JobBuilder.Create<Collector>()
-                .WithIdentity("CollectorJob", "Monitor")
-                .Build();
 
-            ITrigger collectorTrigger = TriggerBuilder.Create()
-                .WithIdentity("CollectorTrigger", "Monitor")
-                .WithCronSchedule("0 * * * * ?")
-                .StartNow()
-                .Build();
 
-            scheduler.ScheduleJob(collectorJob, collectorTrigger);
+            if (SESMConfigHelper.PerfMonitor)
+            {
+                IJobDetail collectorJob = JobBuilder.Create<Collector>()
+                    .WithIdentity("CollectorJob", "Monitor")
+                    .Build();
 
-            IJobDetail hourlyCrusherJob = JobBuilder.Create<HourlyCrusher>()
-                .WithIdentity("HourlyCrusherJob", "Monitor")
-                .Build();
+                ITrigger collectorTrigger = TriggerBuilder.Create()
+                    .WithIdentity("CollectorTrigger", "Monitor")
+                    .WithCronSchedule("0 * * * * ?")
+                    .StartNow()
+                    .Build();
 
-            ITrigger hourlyCrusherTrigger = TriggerBuilder.Create()
-                .WithIdentity("HourlyCrusherTrigger", "Monitor")
-                .WithCronSchedule("0 0/3 * * * ?")
-                .StartNow()
-                .Build();
-            
-            scheduler.ScheduleJob(hourlyCrusherJob, hourlyCrusherTrigger);
-            */
+                scheduler.ScheduleJob(collectorJob, collectorTrigger);
+
+                IJobDetail hourlyCrusherJob = JobBuilder.Create<HourlyCrusher>()
+                    .WithIdentity("HourlyCrusherJob", "Monitor")
+                    .Build();
+
+                ITrigger hourlyCrusherTrigger = TriggerBuilder.Create()
+                    .WithIdentity("HourlyCrusherTrigger", "Monitor")
+                    .WithCronSchedule("0 0/5 * * * ?")
+                    .StartNow()
+                    .Build();
+
+                scheduler.ScheduleJob(hourlyCrusherJob, hourlyCrusherTrigger);
+            }
+
             IJobDetail autoUpdateJob = JobBuilder.Create<AutoUpdate>()
                 .WithIdentity("AutoUpdateJob", "AutoUpdate")
                 .Build();

@@ -176,6 +176,20 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public static bool PerfMonitor
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.PerfMonitor;
+            }
+            set
+            {
+                ConfigStorage.PerfMonitor = value;
+                ConfigStorage.Write();
+            }
+        }
+
         public static bool AutoUpdate
         {
             get

@@ -146,6 +146,9 @@ namespace SESM.Controllers
             ServerViewModel serverView = new ServerViewModel();
             serverView = serverConfig.ParseOut(serverView);
             serverView.Name = serv.Name;
+            serverView.IsLvl1BackupEnabled = serv.IsLvl1BackupEnabled;
+            serverView.IsLvl2BackupEnabled = serv.IsLvl2BackupEnabled;
+            serverView.IsLvl3BackupEnabled = serv.IsLvl3BackupEnabled;
 
             ViewData["State"] = srvPrv.GetState(serv);
             if (user == null)

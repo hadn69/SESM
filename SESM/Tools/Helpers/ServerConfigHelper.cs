@@ -528,13 +528,6 @@ namespace SESM.Tools.Helpers
                 settingsNode.SelectSingleNode("descendant::PermanentDeath").InnerText =
                     PermanentDeath.ToString().ToLower();
 
-
-
-
-
-
-
-
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "PermanentDeath", null));
@@ -544,8 +537,8 @@ namespace SESM.Tools.Helpers
                     XmlNode modItem = doc.CreateNode(XmlNodeType.Element, "ModItem", null);
                     XmlNode name = doc.CreateNode(XmlNodeType.Element, "Name", null);
                     XmlNode publishedFileId = doc.CreateNode(XmlNodeType.Element, "PublishedFileId", null);
-                    name.Value = item.ToString() + ".sbm";
-                    publishedFileId.Value = item.ToString();
+                    name.InnerText = item.ToString() + ".sbm";
+                    publishedFileId.InnerText = item.ToString();
                     valueNode.AppendChild(modItem);
                     modItem.AppendChild(name);
                     modItem.AppendChild(publishedFileId);

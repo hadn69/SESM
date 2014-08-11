@@ -23,7 +23,7 @@ namespace SESM.Tools.Monitor
                     item.PerfEntries.Where(x => x.Timestamp <= timestamp && x.CPUUsagePeak != null)
                         .OrderBy(x => x.Timestamp)
                         .ToList();
-                
+
                 EntityPerfEntry perfEntry = new EntityPerfEntry();
                 perfEntry.Timestamp = perfEntries[0].Timestamp;
 
@@ -50,7 +50,7 @@ namespace SESM.Tools.Monitor
                 perfEntry.RamUsageQ3 = perfEntries[(int) Math.Ceiling(perfEntries.Count/4.0*3)].RamUsage;
 
 
-                prfPrv.RemoveServer(perfEntries);
+                prfPrv.RemoveEntries(perfEntries);
                 item.PerfEntries.Add(perfEntry);
                 srvPrv.UpdateServer(item);
 

@@ -11,6 +11,7 @@ namespace SESM.Tools
         public string Arch { get; set; }
         public bool Diagnosis { get; set; }
         public bool StatusAutoRefresh { get; set; }
+        public bool PerfMonitor { get; set; }
 
         public bool AutoUpdate { get; set; }
         public string AUUsername { get; set; }
@@ -39,6 +40,7 @@ namespace SESM.Tools
             Arch = "x64";
             Diagnosis = false;
             StatusAutoRefresh = true;
+            PerfMonitor = false;
 
             AutoUpdate = false;
             AUUsername = "SteamUsername";

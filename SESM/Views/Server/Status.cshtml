@@ -7,6 +7,18 @@
     AccessLevel accessLevel = (AccessLevel)ViewData["AccessLevel"];
     int id = (int) ViewData["ID"];
 }
+@if ((accessLevel == AccessLevel.SuperAdmin || accessLevel == AccessLevel.Admin || accessLevel == AccessLevel.Manager)
+    && string.IsNullOrEmpty(Model.SaveName)
+    && (Model.IsLvl1BackupEnabled || Model.IsLvl2BackupEnabled || Model.IsLvl3BackupEnabled))
+{
+    <div class="row">
+        <div class="alert alert-dismissable alert-warning">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <h4><span class="glyphicon glyphicon-warning-sign "></span> Auto Backup Inactive !</h4>
+            <p>You must select your map <a href="@(Url.Action("Index", "Map", new {id = id}))" class="alert-link">in the map manager</a> if you want backups to be active.</p>
+        </div>
+    </div>
+}
 <div class="row">
     <div class="col-md-4">
         <h3>@Model.Name's Status : @switch (status)
@@ -30,7 +42,7 @@
             
         </h3>
         <h5>Game Mode : @Model.GameMode</h5>
-        @if (Model.SaveName == null)
+        @if (string.IsNullOrEmpty(Model.SaveName))
         {
             <h5>Current Map : New map at each start</h5>
         }
