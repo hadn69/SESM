@@ -148,6 +148,20 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public static bool Lockdown
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.Lockdown;
+            }
+            set
+            {
+                ConfigStorage.Lockdown = value;
+                ConfigStorage.Write();
+            }
+        }
+
         public static bool Diagnosis
         {
             get
@@ -370,20 +384,6 @@ namespace SESM.Tools.Helpers
             set
             {
                 ConfigStorage.ABNbToKeepLvl3 = value;
-                ConfigStorage.Write();
-            }
-        }
-
-        public static string LastAU
-        {
-            get
-            {
-                ConfigStorage.Read();
-                return ConfigStorage.LastAU;
-            }
-            set
-            {
-                ConfigStorage.LastAU = value;
                 ConfigStorage.Write();
             }
         }

@@ -13,6 +13,7 @@ namespace SESM.Controllers
 {
     [LoggedOnly]
     [CheckAuth]
+    [CheckLockout]
     public class ModController : Controller
     {
         private readonly DataContext _context = new DataContext();
@@ -65,7 +66,7 @@ namespace SESM.Controllers
         }
 
         //
-        // POST: Map/Upload/5
+        // POST: Mod/Upload/5
         [HttpPost]
         [AdminAndAbove]
         public ActionResult Upload(int id, UploadModViewModel model)
@@ -86,11 +87,9 @@ namespace SESM.Controllers
                 Directory.CreateDirectory(path);
                 zip.ExtractAll(path);
             }
-            return RedirectToAction("Index", new {id = id});
+            return RedirectToAction("Index", new {id = id}).Success("Mod Upload Successfull");
         }
 
-        //
-        // POST: Map/Save/5
         [HttpPost]
         [MultipleButton(Name = "action", Argument = "DeleteMod")]
         public ActionResult Delete(int id, MapViewModel model)
@@ -101,6 +100,7 @@ namespace SESM.Controllers
             if (ModelState.IsValid && Directory.Exists(PathHelper.GetModsPath(serv, model.MapName) + @"\"))
             {
                 Directory.Delete(PathHelper.GetModsPath(serv, model.MapName) + @"\", true);
+                return RedirectToAction("Index", new { id = id }).Success("Mod Deleted");
             }
 
             return RedirectToAction("Index", new { id = id });

@@ -30,7 +30,6 @@ namespace SESM.DAL
         {
             try
             {
-
                 _context.PerfEntries.RemoveRange(perfEntries);
                 _context.SaveChanges();
             }

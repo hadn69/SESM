@@ -3,54 +3,86 @@
 @model SESM.Models.Views.Server.ServerViewModel
 @{
     ViewBag.Title = "Server Status";
-    ServiceState status = (ServiceState) ViewData["State"];
+    ServiceState status = (ServiceState)ViewData["State"];
     AccessLevel accessLevel = (AccessLevel)ViewData["AccessLevel"];
-    int id = (int) ViewData["ID"];
+    int id = (int)ViewData["ID"];
 }
 @if ((accessLevel == AccessLevel.SuperAdmin || accessLevel == AccessLevel.Admin || accessLevel == AccessLevel.Manager)
     && string.IsNullOrEmpty(Model.SaveName)
     && (Model.IsLvl1BackupEnabled || Model.IsLvl2BackupEnabled || Model.IsLvl3BackupEnabled))
 {
     <div class="row">
-        <div class="alert alert-dismissable alert-warning">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            <h4><span class="glyphicon glyphicon-warning-sign "></span> Auto Backup Inactive !</h4>
-            <p>You must select your map <a href="@(Url.Action("Index", "Map", new {id = id}))" class="alert-link">in the map manager</a> if you want backups to be active.</p>
+        <div class="col-md-12">
+            <div class="alert alert-dismissable alert-warning">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <h4><span class="glyphicon glyphicon-warning-sign "></span> Auto Backup Inactive !</h4>
+                <p>You must select your map <a href="@(Url.Action("Index", "Map", new {id = id}))" class="alert-link">in the map manager</a> if you want backups to be active.</p>
+            </div>
         </div>
     </div>
 }
 <div class="row">
     <div class="col-md-4">
-        <h3>@Model.Name's Status : @switch (status)
-                                   {
-                                       case ServiceState.Running:
-                                           <span class="glyphicon glyphicon-ok-sign green"></span> @:Running
-                                           break;
-                                       case ServiceState.Starting:
-                                           <span class="glyphicon glyphicon-chevron-up blue"></span> @:Starting
-                                           break;
-                                       case ServiceState.Stopping:
-                                           <span class="glyphicon glyphicon-chevron-down blue"></span> @:Stopping
-                                           break;
-                                       case ServiceState.Stopped:
-                                           <span class="glyphicon glyphicon-remove-sign red"></span> @:Stopped
-                                           break;
-                                       case ServiceState.Unknow:
-                                           <span class="glyphicon glyphicon-warning-sign red"></span> @:Unknow
-                                           break;
-                                   }
-            
-        </h3>
-        <h5>Game Mode : @Model.GameMode</h5>
-        @if (string.IsNullOrEmpty(Model.SaveName))
+        @if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
         {
-            <h5>Current Map : New map at each start</h5>
+            <div class="btn-group btn-group-justified">
+                <a class="btn btn-lg btn-primary" href="@(Url.Action("Details", "Server", new {id = id}))">Configure Server</a>
+            </div>
+            <div class="btn-group btn-group-justified">
+                <a class="btn btn-lg btn-info" href="@(Url.Action("Index", "Log", new {id = id}))">Log Manager</a>
+            </div>
+            <div class="btn-group btn-group-justified">
+                <a class="btn btn-lg btn-warning" href="@(Url.Action("HourlyStats", "Server", new {id = id}))">Server Statistics</a>
+            </div>
+            if (accessLevel == AccessLevel.SuperAdmin)
+            {
+                <div class="btn-group btn-group-justified">
+                    <a class="btn btn-lg btn-danger" onclick="return confirm('Are you sure you want to delete this server?');" href="@(Url.Action("Delete", "Server", new {id = id}))">Delete</a>
+                </div>
+            }
         }
-        else
+    </div>
+    <div class="col-md-4 well">
+        <h2 class="text-center" style="margin-top: 0px">@Model.Name</h2>
+        <br />
+        @switch (status)
         {
-            <h5>Current Map : @Model.SaveName</h5>
+            case ServiceState.Running:
+                <h1 class="text-center" style="margin-top: 0px; margin-bottom: 20px;"><span style="transform: scale(2.0, 2.0);" class="glyphicon glyphicon glyphicon-ok-circle green"></span></h1>
+                <p class="text-center">Running</p>
+                break;
+            case ServiceState.Starting:
+            <h1 class="text-center" style="margin-top: 0px; margin-bottom: 20px;"><span style="transform: scale(2.0, 2.0);" class="glyphicon glyphicon glyphicon-chevron-up blue"></span></h1>
+            <p class="text-center">Starting</p>
+                break;
+            case ServiceState.Stopping:
+            <h1 class="text-center" style="margin-top: 0px; margin-bottom: 20px;"><span style="transform: scale(2.0, 2.0);" class="glyphicon glyphicon glyphicon-chevron-down blue"></span></h1>
+            <p class="text-center">Stopping</p>
+                break;
+            case ServiceState.Stopped:
+            <h1 class="text-center" style="margin-top: 0px; margin-bottom: 20px;"><span style="transform: scale(2.0, 2.0);" class="glyphicon glyphicon glyphicon-remove-sign red"></span></h1>
+            <p class="text-center">Stopped</p>
+                break;
+            case ServiceState.Unknow:
+            <h1 class="text-center" style="margin-top: 0px; margin-bottom: 20px;"><span style="transform: scale(2.0, 2.0);" class="glyphicon glyphicon glyphicon-minus red"></span></h1>
+            <p class="text-center">Unknow</p>
+                break;
         }
-        
+
+        <div class="text-center">
+            <h4>Game Mode</h4>
+
+            <h5>@Model.GameMode</h5>
+            <h4>Current Map</h4>
+            @if (string.IsNullOrEmpty(Model.SaveName))
+            {
+                <h5>New map at each start</h5>
+            }
+            else
+            {
+                <h5>@Model.SaveName</h5>
+            }
+        </div>
         @if (accessLevel == AccessLevel.SuperAdmin || accessLevel == AccessLevel.Admin || accessLevel == AccessLevel.Manager)
         {
             <div class="btn-group btn-group-justified">
@@ -64,7 +96,7 @@
                 }
                 @if (status == ServiceState.Running || status == ServiceState.Unknow)
                 {
-                    <a class="btn btn-danger" href="@(Url.Action("Stop", "Server", new { id = id }))">Stop</a>
+                    <a class="btn btn-primary" href="@(Url.Action("Stop", "Server", new { id = id }))">Stop</a>
                 }
                 @if (status != ServiceState.Stopped)
                 {
@@ -72,29 +104,29 @@
                 }
             </div>
         }
-        
+
     </div>
-    <div class="col-md-8">
-        <div class="btn-group-vertical">
-            @if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-            {
-                <a class="btn btn-default" href="@(Url.Action("Details", "Server", new {id = id}))">Edit</a>
-                <a class="btn btn-default" href="@(Url.Action("Index", "Log", new {id = id}))">Logs</a>
-                <a class="btn btn-default" href="@(Url.Action("Index", "Map", new {id = id}))">Maps</a>
-                <a class="btn btn-default" href="@(Url.Action("Index", "Backup", new {id = id}))">Backups</a>
-                <a class="btn btn-default" href="@(Url.Action("Index", "Mod", new {id = id}))">Mods</a>
-                <a class="btn btn-default" href="@(Url.Action("HourlyStats", "Server", new {id = id}))">Stats</a>
-            }
-            @if (accessLevel == AccessLevel.SuperAdmin)
-            {
-                <a class="btn btn-default" onclick="return confirm('Are you sure you want to delete this server?');" href="@(Url.Action("Delete", "Server", new {id = id}))">Delete</a>
-            }
-        </div>
+    <div class="col-md-4">
+        @if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+        {
+
+            <div class="btn-group btn-group-justified">
+                <a class="btn btn-lg btn-primary" href="@(Url.Action("Index", "Map", new {id = id}))">Map Manager</a>
+            </div>
+            <div class="btn-group btn-group-justified">
+                <a class="btn btn-lg btn-info" href="@(Url.Action("Index", "Backup", new {id = id}))">Backup Manager</a>
+            </div>
+            <div class="btn-group btn-group-justified">
+                <a class="btn btn-lg btn-warning" href="@(Url.Action("Index", "Mod", new {id = id}))">Mod Manager</a>
+            </div>
+
+        }
     </div>
 </div>
-<br/>
 <div class="row">
     <div class="col-md-12">
-        <a class="btn btn-default" href="@(Url.Action("Index", "Server"))">Back to List</a>
+        <a class="btn btn-default" href="@(Url.Action("Index"))">
+            <span class="glyphicon glyphicon-chevron-left"></span> Back to Server List
+        </a>
     </div>
 </div>

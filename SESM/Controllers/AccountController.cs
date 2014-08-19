@@ -34,7 +34,7 @@ namespace SESM.Controllers
                 if (usr != null && usr.Password == HashHelper.MD5Hash(model.Password))
                 {
                     Session["User"] = usr;
-                    return RedirectToAction("Index", "Server");
+                    return RedirectToAction("Index", "Server").Success("Login successful. Hello " + usr.Login);
                 }
                 else
                 {
@@ -77,7 +77,7 @@ namespace SESM.Controllers
                         usrPrv.AddUser(user);
 
                         Session["User"] = user;
-                        return RedirectToAction("Index", "Server");
+                        return RedirectToAction("Index", "Server").Success("Registration successful. Hello " + model.Login + " and welcome to SESM !");
                     }
                     else
                     {
@@ -100,7 +100,7 @@ namespace SESM.Controllers
         {
             Session.Abandon();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Home").Success("Logout Successfull").Danger("test danger").Warning("test warning").Information("test info");
         }
 
         //
@@ -147,10 +147,9 @@ namespace SESM.Controllers
 
 
                 }
-                
-                
                 user.Email = model.Email;
                 usrPrv.UpdateUser(user);
+                return View(model).Success("Account Updated");
             }
 
             return View(model);

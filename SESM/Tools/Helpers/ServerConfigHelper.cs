@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using SESM.DTO;
@@ -95,7 +96,8 @@ namespace SESM.Tools.Helpers
             Administrators = new List<ulong>();
             if (model.Administrators != null)
             {
-                string[] splittedAdmins = model.Administrators.Split(';');
+                string[] splittedAdmins = Regex.Split(model.Administrators, "\r\n");
+
 
                 foreach (string item in splittedAdmins)
                 {
@@ -106,7 +108,7 @@ namespace SESM.Tools.Helpers
             Banned = new List<ulong>();
             if (model.Banned != null)
             {
-                string[] splittedBanned = model.Banned.Split(';');
+                string[] splittedBanned = Regex.Split(model.Banned, "\r\n");
 
                 foreach (string item in splittedBanned)
                 {
@@ -117,7 +119,7 @@ namespace SESM.Tools.Helpers
             Mods = new List<ulong>();
             if (model.Mods != null)
             {
-                string[] splittedMod = model.Mods.Split(';');
+                string[] splittedMod = Regex.Split(model.Mods, "\r\n");
 
                 foreach (string item in splittedMod)
                 {
@@ -166,7 +168,8 @@ namespace SESM.Tools.Helpers
             Administrators = new List<ulong>();
             if (model.Administrators != null)
             {
-                string[] splittedAdmins = model.Administrators.Split(';');
+                string[] splittedAdmins = Regex.Split(model.Administrators, "\r\n");
+
 
                 foreach (string item in splittedAdmins)
                 {
@@ -177,7 +180,7 @@ namespace SESM.Tools.Helpers
             Banned = new List<ulong>();
             if (model.Banned != null)
             {
-                string[] splittedBanned = model.Banned.Split(';');
+                string[] splittedBanned = Regex.Split(model.Banned, "\r\n");
 
                 foreach (string item in splittedBanned)
                 {
@@ -188,7 +191,7 @@ namespace SESM.Tools.Helpers
             Mods = new List<ulong>();
             if (model.Mods != null)
             {
-                string[] splittedMod = model.Mods.Split(';');
+                string[] splittedMod = Regex.Split(model.Mods, "\r\n");
 
                 foreach (string item in splittedMod)
                 {
@@ -239,9 +242,9 @@ namespace SESM.Tools.Helpers
             model.SteamPort = SteamPort;
             model.ServerPort = ServerPort;
             model.AsteroidAmount = AsteroidAmount;
-            model.Administrators = String.Join(";", Administrators);
-            model.Banned = String.Join(";", Banned);
-            model.Mods = String.Join(";", Mods);
+            model.Administrators = String.Join("\r\n", Administrators);
+            model.Banned = String.Join("\r\n", Banned);
+            model.Mods = String.Join("\r\n", Mods);
             model.GroupID = GroupID;
             model.ServerName = ServerName;
             model.PauseGameWhenEmpty = PauseGameWhenEmpty;

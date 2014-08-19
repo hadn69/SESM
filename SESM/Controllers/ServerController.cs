@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
@@ -11,7 +12,7 @@ using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {
-    
+    [CheckLockout]
     public class ServerController : Controller
     {
         readonly DataContext _context = new DataContext();
@@ -119,7 +120,7 @@ namespace SESM.Controllers
                 configHelper.Save(serv);
                 ServiceHelper.RegisterService(ServiceHelper.GetServiceName(serv));
 
-                return RedirectToAction("Index","Map", new { id = serv.Id });
+                return RedirectToAction("Index","Map", new { id = serv.Id }).Success("Server created sucessfuly, you may now create a map or upload one in the map manager.");
             }
             return View(model);
         }
@@ -185,9 +186,10 @@ namespace SESM.Controllers
                 if (Directory.Exists(PathHelper.GetInstancePath(serv)))
                     Directory.Delete(PathHelper.GetInstancePath(serv), true);
                 srvPrv.RemoveServer(serv);
+                return RedirectToAction("Index").Success("Server Deleted");
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index").Danger("Unknown Server");
         }
 
         #region Start Stop Restart Kill
@@ -206,7 +208,7 @@ namespace SESM.Controllers
 
             ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
 
-            return RedirectToAction("Status", new { id = id });
+            return RedirectToAction("Status", new { id = id }).Success("Server Started");
         }
 
         //
@@ -226,7 +228,7 @@ namespace SESM.Controllers
                     ServiceHelper.StartService(ServiceHelper.GetServiceName(item));
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index").Success("All Server Started");
         }
 
         #endregion
@@ -387,9 +389,9 @@ namespace SESM.Controllers
             serverView.IsLvl2BackupEnabled = serv.IsLvl2BackupEnabled;
             serverView.IsLvl3BackupEnabled = serv.IsLvl3BackupEnabled;
 
-            serverView.WebAdministrators = string.Join(";", serv.Administrators.Select(item => item.Login).ToList());
-            serverView.WebManagers = string.Join(";", serv.Managers.Select(item => item.Login).ToList());
-            serverView.WebUsers = string.Join(";", serv.Users.Select(item => item.Login).ToList());
+            serverView.WebAdministrators = string.Join("\r\n", serv.Administrators.Select(item => item.Login).ToList());
+            serverView.WebManagers = string.Join("\r\n", serv.Managers.Select(item => item.Login).ToList());
+            serverView.WebUsers = string.Join("\r\n", serv.Users.Select(item => item.Login).ToList());
             if (!string.IsNullOrEmpty(serverView.SaveName))
                 serverView.AsteroidAmount = Directory.GetFiles(PathHelper.GetSavePath(serv, serverView.SaveName), "asteroid??.vox").Length;
  
@@ -426,10 +428,10 @@ namespace SESM.Controllers
                 List<string> WebUsersList = serv.Users.Select(item => item.Login).ToList();
 
                 if ((accessLevel == AccessLevel.Manager || accessLevel == AccessLevel.Admin)
-                    && model.WebAdministrators != string.Join(";", WebAdminsList))
+                    && model.WebAdministrators != string.Join("\r\n", WebAdminsList))
                 {
                     if (!(string.IsNullOrEmpty(model.WebAdministrators) &&
-                          string.IsNullOrEmpty(string.Join(";", WebAdminsList))))
+                          string.IsNullOrEmpty(string.Join("\r\n", WebAdminsList))))
                     {
                         ModelState.AddModelError("AdminModified", "You can't modify the Web Administrator list");
                         return View("Details", model);
@@ -438,7 +440,6 @@ namespace SESM.Controllers
 
                 if (accessLevel == AccessLevel.Manager
                     && (model.Name != serv.Name
-                    || model.ServerName != serverConfig.ServerName
                     || model.IP != serverConfig.IP
                     || model.ServerPort != serverConfig.ServerPort
                     || model.SteamPort != serverConfig.SteamPort
@@ -458,9 +459,9 @@ namespace SESM.Controllers
 
 
 
-                string[] webAdminsSplitted = model.WebAdministrators != null? model.WebAdministrators.Split(';'): new string[0];
-                string[] webManagerSplitted = model.WebManagers != null ? model.WebManagers.Split(';') : new string[0];
-                string[] webUsersSplitted = model.WebUsers != null ? model.WebUsers.Split(';') : new string[0];
+                string[] webAdminsSplitted = model.WebAdministrators != null ? Regex.Split(model.WebAdministrators, "\r\n") : new string[0];
+                string[] webManagerSplitted = model.WebManagers != null ? Regex.Split(model.WebManagers, "\r\n") : new string[0];
+                string[] webUsersSplitted = model.WebUsers != null ? Regex.Split(model.WebUsers, "\r\n") : new string[0];
                 UserProvider usrPrv = new UserProvider(_context);
                 bool errorFlag = false;
                 foreach (string item in webAdminsSplitted.Where(item => !usrPrv.UserExist(item)))
@@ -519,7 +520,7 @@ namespace SESM.Controllers
                 serverConfig.Save(serv);
 
                 ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
-                return RedirectToAction("Status", new { id = id });
+                return RedirectToAction("Status", new { id = id }).Success("Server Configuration Updated");
             }
             return View("Details", model);
         }
@@ -556,10 +557,10 @@ namespace SESM.Controllers
 
 
                 if ((accessLevel == AccessLevel.Manager || accessLevel == AccessLevel.Admin)
-                    && model.WebAdministrators != string.Join(";", WebAdminsList))
+                    && model.WebAdministrators != string.Join("\r\n", WebAdminsList))
                 {
                     if (!(string.IsNullOrEmpty(model.WebAdministrators) &&
-                          string.IsNullOrEmpty(string.Join(";", WebAdminsList))))
+                          string.IsNullOrEmpty(string.Join("\r\n", WebAdminsList))))
                     {
                         ModelState.AddModelError("AdminModified", "You can't modify the Web Administrator list");
                         return View("Details", model);
@@ -567,7 +568,6 @@ namespace SESM.Controllers
                 }
                 if (accessLevel == AccessLevel.Manager
                     && (model.Name != serv.Name
-                    || model.ServerName != serverConfig.ServerName
                     || model.IP != serverConfig.IP
                     || model.ServerPort != serverConfig.ServerPort
                     || model.SteamPort != serverConfig.SteamPort
@@ -585,9 +585,9 @@ namespace SESM.Controllers
                     return View("Details", model);
                 }
 
-                string[] webAdminsSplitted = model.WebAdministrators != null ? model.WebAdministrators.Split(';') : new string[0];
-                string[] webManagerSplitted = model.WebManagers != null ? model.WebManagers.Split(';') : new string[0];
-                string[] webUsersSplitted = model.WebUsers != null ? model.WebUsers.Split(';') : new string[0];
+                string[] webAdminsSplitted = model.WebAdministrators != null ? Regex.Split(model.WebAdministrators, "\r\n") : new string[0];
+                string[] webManagerSplitted = model.WebManagers != null ? Regex.Split(model.WebManagers, "\r\n") : new string[0];
+                string[] webUsersSplitted = model.WebUsers != null ? Regex.Split(model.WebUsers, "\r\n") : new string[0];
                 UserProvider usrPrv = new UserProvider(_context);
                 bool errorFlag = false;
                 foreach (string item in webAdminsSplitted.Where(item => !usrPrv.UserExist(item)))
@@ -642,7 +642,7 @@ namespace SESM.Controllers
                 serverConfig.ParseIn(model);
 
                 serverConfig.Save(serv);
-                return RedirectToAction("Status", new {id = id});
+                return RedirectToAction("Status", new { id = id }).Success("Server Configuration Updated");
             }
             return View("Details", model);
         }

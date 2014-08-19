@@ -3,45 +3,43 @@
     ViewBag.Title = "Manage Account";
 }
 <div class="row">
-    <section id="Form">
-        @using (Html.BeginForm("Manage", "Account", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    <div class="col-md-6">
+        @using (Html.BeginForm("Manage", "Account", null, FormMethod.Post, new { @class = "form-horizontal well", role = "form" }))
         {
-            <div class="col-md-12">
-                @Html.ValidationSummary()
-                <div class="form-group">
-                    @Html.LabelFor(m => m.OldPassword, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.PasswordFor(m => m.OldPassword, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.OldPassword)
-                    </div>
+            @Html.ValidationSummary()
+            <div class="form-group">
+                @Html.LabelFor(m => m.OldPassword, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.PasswordFor(m => m.OldPassword, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.OldPassword)
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.NewPassword, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.PasswordFor(m => m.NewPassword, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.NewPassword)
-                    </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.NewPassword, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.PasswordFor(m => m.NewPassword, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.NewPassword)
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.RetypedPassword, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.PasswordFor(m => m.RetypedPassword, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.RetypedPassword)
-                    </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.RetypedPassword, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.PasswordFor(m => m.RetypedPassword, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.RetypedPassword)
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.Email)
-                    </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Email, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Email)
                 </div>
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Save" class="btn btn-default" />
-                    </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-4 col-md-8">
+                    <input type="submit" value="Save" class="btn btn-primary" />
                 </div>
             </div>
         }
-    </section>
+    </div>
 </div>

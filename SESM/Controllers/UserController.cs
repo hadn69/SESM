@@ -9,6 +9,7 @@ namespace SESM.Controllers
 {
     [LoggedOnly]
     [SuperAdmin]
+    [CheckLockout]
     public class UserController : Controller
     {
         private readonly DataContext _context = new DataContext();
@@ -28,10 +29,16 @@ namespace SESM.Controllers
             {
                 UserProvider usrPrv = new UserProvider(_context);
                 EntityUser usr = usrPrv.GetUser(id);
+                if (usr == null)
+                {
+                    return RedirectToAction("Index").Warning("Unknow User");
+                }
+                string name = usr.Login;
                 if (usr != null)
                     usrPrv.RemoveUser(usr);
+                return RedirectToAction("Index").Success("User \"" + name + "\" deleted");
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Index").Warning("You can't delete yourself");
         }
 
         [HttpGet]
@@ -62,13 +69,13 @@ namespace SESM.Controllers
                 user.Email = model.Email;
                 user.Login = model.Login;
                 user.IsAdmin = model.IsAdmin;
-                if (!(model.Password == null || model.Password == string.Empty))
+                if (!string.IsNullOrEmpty(model.Password))
                 {
                     user.Password = HashHelper.MD5Hash(model.Password);
                 }
                 usrPrv.UpdateUser(user);
 
-                return RedirectToAction("Index");    
+                return RedirectToAction("Index").Success("User updated");    
             }
 
             return View(model);

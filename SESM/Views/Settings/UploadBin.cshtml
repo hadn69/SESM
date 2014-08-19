@@ -5,32 +5,30 @@
     ViewBag.Title = "Upload Game Files";
 }
 <div class="row">
-    <div class="col-md-12">
-        <section id="Form">
-            @using (Html.BeginForm("UploadBin", "Settings", null, FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" }))
-            {
-                @Html.ValidationSummary()
-                <div class="form-group">
-                    @Html.LabelFor(m => m.ServerZip, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.FileFor(m => m.ServerZip, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.ServerZip)
-                    </div>
+    <div class="col-md-6">
+        @using (Html.BeginForm("UploadBin", "Settings", null, FormMethod.Post, new { @class = "form-horizontal well", role = "form", enctype = "multipart/form-data" }))
+        {
+            @Html.ValidationSummary()
+            <div class="form-group">
+                @Html.LabelFor(m => m.ServerZip, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.FileFor(m => m.ServerZip, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ServerZip)
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Upload" onclick="return confirm('This will restart all running servers, are you sure you want to save?');" class="btn btn-default" />
-                    </div>
+            <div class="form-group">
+                <div class="col-md-offset-4 col-md-8">
+                    <input type="submit" value="Upload" onclick="return confirm('This will restart all running servers, are you sure you want to save?');" class="btn btn-primary" />
                 </div>
-            }
-        </section>
+            </div>
+        }
     </div>
-
 </div>
-<br />
 <div class="row">
     <div class="col-md-12">
-        <a class="btn btn-default" href="@(Url.Action("Index", "Settings"))">Back to Settings</a>
+        <a class="btn btn-default" href="@(Url.Action("Index"))">
+            <span class="glyphicon glyphicon-chevron-left"></span> Back to Settings
+        </a>
     </div>
 </div>

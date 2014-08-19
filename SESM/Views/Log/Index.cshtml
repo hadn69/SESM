@@ -5,36 +5,29 @@
     int id = (int)ViewData["ID"];
 }
 <div class="row">
-    <section id="Form">
-        @using (Html.BeginForm("Index", "Log", null, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    <div class="col-md-6">
+        @using (Html.BeginForm("Index", "Log", null, FormMethod.Post, new { @class = "form-horizontal well", role = "form" }))
         {
-            <div class="col-md-6">
-                @Html.ValidationSummary()
-                <div class="form-group">
-                    <div class="col-md-12">
-                        @Html.DropDownListFor(m => m.LogName, listLog, new { @class = "form-control", size = "15", style = "max-width:none;width:500px" })
-                        @Html.ValidationMessageFor(m => m.LogName)
-                    </div>
-                </div>
+            @Html.ValidationSummary()
+            <div class="form-group">
+                @Html.DropDownListFor(m => m.LogName, listLog, new { @class = "form-control center-block", size = "15", style = "max-width:none;width:94%" })
+                @Html.ValidationMessageFor(m => m.LogName)
             </div>
-            <div class="col-md-6" >
-                <div class="form-group">
-                    <div class="col-md-12">
-                        <br/>
-                        <br/>
-                        <div class="btn-group-vertical">
-                            <input type="submit" value="View Log" name="action:ViewLog" class="btn btn-default" />
-                            <input type="submit" onclick="return confirm('This will delete this log. Are you sure you want to do this ?');" value="Delete Log" name="action:DeleteLog" class="btn btn-default" />
-                            <input type="submit" value="Download Log" name="action:DownloadLog" class="btn btn-default" />
-                        </div>
-                    </div>
+            <div style="text-align: center;">
+                <div class="btn-group">
+                    <input type="submit" value="View" name="action:ViewLog" class="btn btn-primary" />
+                    <input type="submit" value="Download" name="action:DownloadLog" class="btn btn-success" />
+                    <a class="btn btn-warning" href="@Url.Action("DownloadAll", new {id = id})">Download All</a>
+                    <input type="submit" onclick="return confirm('This will delete this log. Are you sure you want to do this ?');" value="Delete" name="action:DeleteLog" class="btn btn-danger" />
                 </div>
             </div>
         }
-    </section>
+    </div>
 </div>
 <div class="row">
     <div class="col-md-12">
-        <a class="btn btn-default" href="@(Url.Action("Status", "Server", new {id = ViewData["ID"]}))">Back to Server Status</a>
+        <a class="btn btn-default" href="@(Url.Action("Status", "Server", new {id = id}))">
+            <span class="glyphicon glyphicon-chevron-left"></span> Back to Server Status
+        </a>
     </div>
 </div>

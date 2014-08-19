@@ -16,6 +16,7 @@ namespace SESM.Controllers
     [LoggedOnly]
     [CheckAuth]
     [ManagerAndAbove]
+    [CheckLockout]
     public class MapController : Controller
     {
         readonly DataContext _context = new DataContext();
@@ -81,7 +82,7 @@ namespace SESM.Controllers
                 serverConfig.SaveName = model.MapName;
                 serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
                 serverConfig.Save(serv);
-                return RedirectToAction("Status", "Server", new { id = id });
+                return RedirectToAction("Status", "Server", new { id = id }).Success("Map Selected");
             }
 
             return RedirectToAction("Index", new { id = id });
@@ -107,7 +108,7 @@ namespace SESM.Controllers
                 serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
                 serverConfig.Save(serv);
                 ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
-                return RedirectToAction("Status", "Server", new { id = id });
+                return RedirectToAction("Status", "Server", new { id = id }).Success("Map Selected, server is restarting"); ;
             }
 
             return RedirectToAction("Index", new { id = id });
@@ -129,7 +130,7 @@ namespace SESM.Controllers
                     return RedirectToAction("Index", new {id = id});
                 renameModel.CurrentMapName = model.MapName;
                 renameModel.NewMapName = model.MapName;
-                return View("Rename",renameModel);
+                return View("Rename", renameModel);
             }
 
             return RedirectToAction("Index", new { id = id });
@@ -146,7 +147,7 @@ namespace SESM.Controllers
             if (ModelState.IsValid)
             {
                 if (!Directory.Exists(PathHelper.GetSavePath(serv, model.CurrentMapName)))
-                    return RedirectToAction("Index", new { id = id });
+                    return RedirectToAction("Index", new { id = id }).Danger("Map \"" + model.CurrentMapName + "\" don't exist"); ;
                 if(model.CurrentMapName == model.NewMapName) // Nothing to do
                     return RedirectToAction("Index", new { id = id });
 
@@ -183,6 +184,7 @@ namespace SESM.Controllers
                     
                     ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
                 }
+                return RedirectToAction("Index", new { id = id }).Success("Map Renamed");
             }
 
             return RedirectToAction("Index", new { id = id });
@@ -201,8 +203,9 @@ namespace SESM.Controllers
             if (ModelState.IsValid && Directory.Exists(PathHelper.GetSavePath(serv, model.MapName) + @"\"))
             {
                 Directory.Delete(PathHelper.GetSavePath(serv, model.MapName) + @"\", true);
+                return RedirectToAction("Index", new { id = id }).Success("Map deleted");
             }
-
+            // TODO : better message
             return RedirectToAction("Index", new { id = id });
         }
 
@@ -268,7 +271,7 @@ namespace SESM.Controllers
                 serverConfig.SaveName = string.Empty;
                 serverConfig.Save(serv);
                 ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
-                return RedirectToAction("Status","Server",  new { id = id });
+                return RedirectToAction("Status","Server",  new { id = id }).Success("Server Starting, map in creation ...");
             }
 
             return View(model);
@@ -316,7 +319,7 @@ namespace SESM.Controllers
                 Directory.CreateDirectory(path);
                 zip.ExtractAll(path);
             }
-            return RedirectToAction("Index", new { id = id });
+            return RedirectToAction("Index", new { id = id }).Success("Map Upload Successful");
         }
         protected override void Dispose(bool disposing)
         {

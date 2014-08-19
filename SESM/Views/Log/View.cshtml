@@ -1,19 +1,26 @@
-﻿<div class="row">
-<div class="panel panel-default">
-    <div class="panel-body">
-        <div style="overflow:auto;height:350px">
-            <ul class="list-group">
-                @foreach (string item in (string[])ViewData["logEntries"])
-                {
-                    <li class="list-group-item">@item</li>
-                }
-            </ul>
+﻿@{
+    ViewBag.Title = "Log View";
+}
+
+<div class="row">
+    <div class="col-md-12 ">
+        <div class="well">
+            <h4>@ViewData["LogName"]</h4>
+            <div style="overflow:auto;height:370px">
+                <p>
+                    @foreach (string item in (string[])ViewData["logEntries"])
+                    {
+                        @item @:<br />
+                    }
+                </p>
+            </div>
         </div>
     </div>
 </div>
-</div>
 <div class="row">
     <div class="col-md-12">
-        <a class="btn btn-default" href="@(Url.Action("Index", "Log", new {id = ViewData["ID"]}))">Back to Log List</a>
+        <a class="btn btn-default" href="@(Url.Action("Index", "Log", new { id = ViewData["ID"] }))">
+            <span class="glyphicon glyphicon-chevron-left"></span> Back to Log List
+        </a>
     </div>
 </div>

@@ -9,6 +9,8 @@ namespace SESM.Tools
         public string SESavePath { get; set; }
         public string SEDataPath { get; set; }
         public string Arch { get; set; }
+        public bool Lockdown { get; set; }
+
         public bool Diagnosis { get; set; }
         public bool StatusAutoRefresh { get; set; }
         public bool PerfMonitor { get; set; }
@@ -16,7 +18,6 @@ namespace SESM.Tools
         public bool AutoUpdate { get; set; }
         public string AUUsername { get; set; }
         public string AUPassword { get; set; }
-        public string LastAU { get; set; }
         public string AUInterval { get; set; }
 
         public bool AutoBackupLvl1 { get; set; }
@@ -38,6 +39,8 @@ namespace SESM.Tools
             SESavePath = @"C:\ProgramData\SpaceEngineersDedicated\";
             SEDataPath = @"C:\SpaceEngineers\";
             Arch = "x64";
+            Lockdown = false;
+
             Diagnosis = false;
             StatusAutoRefresh = true;
             PerfMonitor = false;
@@ -45,7 +48,6 @@ namespace SESM.Tools
             AutoUpdate = false;
             AUUsername = "SteamUsername";
             AUPassword = "";
-            LastAU = "xxx";
             AUInterval = "0 0/10 * * * ?";
 
             AutoBackupLvl1 = false;

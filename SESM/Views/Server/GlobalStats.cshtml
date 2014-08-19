@@ -7,8 +7,8 @@
 <script type="text/javascript" src="~/Scripts/amcharts/serial.js"></script>
 <script type="text/javascript" src="~/Scripts/amcharts/themes/dark.js"></script>
 <div class="row">
-    <div class="panel panel-default">
-        <div class="panel-body">
+    <div class="col-md-12">
+        <div class="col-md-12 well">
             <div id="chartdiv"></div>
             <script type="text/javascript">
                 var chartData = [
@@ -18,11 +18,11 @@
                             string outStr = String.Empty;
                             outStr += "{";
                             outStr += "date:new Date(" + item.Timestamp.Year + ", "
-                                                        + item.Timestamp.Month + ","
-                                                        + item.Timestamp.Day + ", "
-                                                        + item.Timestamp.Hour + ", "
-                                                        + item.Timestamp.Minute + ", "
-                                                        + item.Timestamp.Second + "),";
+                                      + item.Timestamp.Month + ","
+                                      + item.Timestamp.Day + ", "
+                                      + item.Timestamp.Hour + ", "
+                                      + item.Timestamp.Minute + ", "
+                                      + item.Timestamp.Second + "),";
                             outStr += "CPUAvg:" + item.CPUUsage + ",";
                             outStr += "CPUPeak:" + item.CPUUsagePeak + ",";
                             outStr += "CPUTrough:" + item.CPUUsageTrough + ",";
@@ -102,7 +102,11 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        <a class="btn btn-default" href="@(Url.Action("HourlyStats", "Server", new {id = ViewData["ID"]}))">Back to standard stats</a>
-        <a class="btn btn-default" href="@(Url.Action("Status", "Server", new {id = ViewData["ID"]}))">Back to server status</a>
+        <a class="btn btn-default" href="@(Url.Action("Status", "Server", new { id = ViewData["ID"] }))">
+            <span class="glyphicon glyphicon-chevron-left"></span> Back to Server Status
+        </a>
+        <a class="btn btn-default" href="@(Url.Action("HourlyStats", "Server", new { id = ViewData["ID"] }))">
+            <span class="glyphicon glyphicon-dashboard"></span> Real Time Stats
+        </a>
     </div>
 </div>

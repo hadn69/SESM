@@ -13,6 +13,7 @@ namespace SESM.Controllers
 {
     [LoggedOnly]
     [CheckAuth]
+    [CheckLockout]
     public class LogController : Controller
     {
         readonly DataContext _context = new DataContext();
@@ -40,7 +41,7 @@ namespace SESM.Controllers
             foreach (string item in listLog)
             {
                 SelectListItem sli = new SelectListItem();
-                sli.Text = System.IO.File.GetLastWriteTime(item).ToString("dd/MM/yy HH:mm:ss") + "|" + PathHelper.GetLastDirName(item);
+                sli.Text = System.IO.File.GetLastWriteTime(item).ToString("dd/MM/yy HH:mm:ss") + " " + PathHelper.GetLastDirName(item);
                 sli.Value = PathHelper.GetLastDirName(item);
                 listSLI.Add(sli);
             }
@@ -70,7 +71,7 @@ namespace SESM.Controllers
             }
             if (System.IO.File.Exists(path))
             {
-                ViewBag.Title = model.LogName;
+                ViewData["LogName"] = model.LogName;
                 FileStream logFileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 StreamReader logFileReader = new StreamReader(logFileStream);
                 List<string> logList = new List<string>();
@@ -102,9 +103,10 @@ namespace SESM.Controllers
             if (ModelState.IsValid && System.IO.File.Exists(PathHelper.GetInstancePath(serv) + model.LogName))
             {
                 System.IO.File.Delete(PathHelper.GetInstancePath(serv) + model.LogName);
+                return RedirectToAction("Index", new { id = id }).Success("Log \"" + model.LogName + "\" deleted");
             }
 
-            return RedirectToAction("Index", new { id = id });
+            return RedirectToAction("Index", new { id = id }).Success("Log \"" + model.LogName + "\" don't exist");
         }
 
         //
@@ -128,13 +130,42 @@ namespace SESM.Controllers
 
                 using (ZipFile zip = new ZipFile())
                 {
-                    zip.AddFile(PathHelper.GetInstancePath(serv) + model.LogName);
+                    zip.AddFile(PathHelper.GetInstancePath(serv) + model.LogName,"/");
                     zip.Save(Response.OutputStream);
                 }
                 Response.End();
             }
             return RedirectToAction("Index", new { id = id });
         }
+
+        //
+        // POST: Log/DownloadLog/5
+        [HttpGet]
+        [ManagerAndAbove]
+        public ActionResult DownloadAll(int id)
+        {
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(_context);
+            ViewData["ID"] = id;
+            EntityServer serv = srvPrv.GetServer(id);
+
+            if (ModelState.IsValid)
+            {
+                Response.Clear();
+                Response.ContentType = "application/zip";
+                Response.AddHeader("Content-Disposition",
+                    String.Format("attachment; filename={0}", serv.Name + "_Logs.zip"));
+
+                using (ZipFile zip = new ZipFile())
+                {
+                    zip.AddFiles(Directory.GetFiles(PathHelper.GetInstancePath(serv), "*.log"),"/");
+                    zip.Save(Response.OutputStream);
+                }
+                Response.End();
+            }
+            return RedirectToAction("Index", new { id = id });
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

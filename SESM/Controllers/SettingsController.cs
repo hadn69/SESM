@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using Ionic.Zip;
+using NLog;
 using Quartz;
 using Quartz.Impl;
 using SESM.Controllers.ActionFilters;
@@ -15,6 +16,7 @@ using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {
+
     public class SettingsController : Controller
     {
         readonly DataContext _context = new DataContext();
@@ -24,6 +26,7 @@ namespace SESM.Controllers
         [HttpGet]
         [LoggedOnly]
         [SuperAdmin]
+        [CheckLockout]
         public ActionResult Index()
         {
             SettingsViewModel model = new SettingsViewModel();
@@ -43,6 +46,7 @@ namespace SESM.Controllers
         [HttpPost]
         [LoggedOnly]
         [SuperAdmin]
+        [CheckLockout]
         public ActionResult Index(SettingsViewModel model)
         {
             if (ModelState.IsValid)
@@ -118,7 +122,7 @@ namespace SESM.Controllers
                             Directory.Move(SESMConfigHelper.SEDataPath + @"SteamCMD\", model.SEDataPath + @"SteamCMD\");
                         if (Directory.Exists(SESMConfigHelper.SEDataPath + @"autoupdatedata\"))
                             Directory.Move(SESMConfigHelper.SEDataPath + @"autoupdatedata\", model.SEDataPath + @"autoupdatedata\");
-                        
+
                         SESMConfigHelper.SEDataPath = model.SEDataPath;
                     }
 
@@ -161,6 +165,7 @@ namespace SESM.Controllers
         [HttpGet]
         [LoggedOnly]
         [SuperAdmin]
+        [CheckLockout]
         public ActionResult UploadBin()
         {
             return View();
@@ -171,6 +176,7 @@ namespace SESM.Controllers
         [HttpPost]
         [LoggedOnly]
         [SuperAdmin]
+        [CheckLockout]
         public ActionResult UploadBin(UploadBinViewModel model)
         {
             if (ModelState.IsValid)
@@ -212,8 +218,6 @@ namespace SESM.Controllers
                         Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
                     if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
                         Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
-                    //Directory.Delete(SESMConfigHelper.GetSEDataPath(), true);
-                    //Directory.CreateDirectory(SESMConfigHelper.GetSEDataPath());
                     zip.ExtractAll(SESMConfigHelper.SEDataPath);
                 }
 
@@ -238,7 +242,7 @@ namespace SESM.Controllers
             }
             DiagnosisViewModel model = new DiagnosisViewModel();
 
-            
+
             if (_context.Database.Exists())
             {
                 model.DatabaseConnexion.State = true;
@@ -249,7 +253,7 @@ namespace SESM.Controllers
                 model.DatabaseConnexion.State = false;
                 model.DatabaseConnexion.Message = "Connection to database failed. <br/> Check your connexion string in SESM.config";
             }
-            
+
             switch (SESMConfigHelper.Arch)
             {
                 case ArchType.x64:
@@ -325,7 +329,7 @@ namespace SESM.Controllers
             {
                 model.ServiceCreation.State = false;
                 model.ServiceCreation.Message = "Creation of the service \"SESMDiagTest\" failed<br/>Check if the application pool have admin rights";
-                
+
                 model.ServiceDeletion.State = null;
                 model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" irrelevant";
             }
@@ -388,11 +392,11 @@ namespace SESM.Controllers
         [HttpGet]
         [LoggedOnly]
         [SuperAdmin]
+        [CheckLockout]
         public ActionResult AutoUpdate()
         {
             AutoUpdateViewModel model = new AutoUpdateViewModel();
             model.AutoUpdate = SESMConfigHelper.AutoUpdate;
-            model.UserName = SESMConfigHelper.AUUsername;
             model.CronInterval = SESMConfigHelper.AUInterval;
 
             return View(model);
@@ -401,18 +405,13 @@ namespace SESM.Controllers
         [HttpPost]
         [LoggedOnly]
         [SuperAdmin]
+        [CheckLockout]
         public ActionResult AutoUpdate(AutoUpdateViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
             SESMConfigHelper.AutoUpdate = model.AutoUpdate;
-            SESMConfigHelper.AUUsername = model.UserName;
-            if (!string.IsNullOrEmpty(model.Password))
-            {
-                SESMConfigHelper.AUPassword = model.Password;
-            }
-
             SESMConfigHelper.AUInterval = model.CronInterval;
 
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
@@ -434,13 +433,106 @@ namespace SESM.Controllers
                 scheduler.ScheduleJob(autoUpdateJob, autoUpdateTrigger);
             }
 
-            model.Password = "";
-            return RedirectToAction("Index", "Server");
+            return RedirectToAction("Index", "Settings").Success("Auto-Update Parameters Updated");
         }
 
         [HttpGet]
         [LoggedOnly]
         [SuperAdmin]
+        [CheckLockout]
+        public ActionResult ManualUpdate()
+        {
+            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
+
+            logger.Info("----Starting ManualUpdate----");
+            SteamCMDHelper.SteamCMDResult result = SteamCMDHelper.Update(logger);
+            logger.Info("----End of ManualUpdate----");
+
+            switch (result)
+            {
+                case SteamCMDHelper.SteamCMDResult.Fail_Credentials:
+                    return RedirectToAction("Index").Danger("Wrong credentials, please check and try again");
+                    break;
+                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardMissing:
+                    return RedirectToAction("Index").Danger("Steam Guard active on your account, please input the code in SteamCMD Configuration page and try again");
+                    break;
+                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardBadCode:
+                    return RedirectToAction("Index").Danger("Wrong Steam Guard code, please input the right code in SteamCMD Configuration page and try again");
+                    break;
+                case SteamCMDHelper.SteamCMDResult.Success_NothingToDo:
+                    return RedirectToAction("Index").Success("There are no updates available :-(");
+                    break;
+                case SteamCMDHelper.SteamCMDResult.Success_UpdateInstalled:
+                    return RedirectToAction("Index").Success("Manual Update Successful");
+                    break;
+                default:
+                    return RedirectToAction("Index").Danger("Manual Update : Unknow Error");
+                    break;
+
+            }
+        }
+
+        [HttpGet]
+        [LoggedOnly]
+        [SuperAdmin]
+        [CheckLockout]
+        public ActionResult SteamCMD()
+        {
+            SteamCMDViewModel model = new SteamCMDViewModel();
+            model.UserName = SESMConfigHelper.AUUsername;
+            return View(model);
+        }
+
+        [HttpPost]
+        [LoggedOnly]
+        [SuperAdmin]
+        [CheckLockout]
+        [MultipleButton(Name = "action", Argument = "SaveSteamCMD")]
+        public ActionResult SteamCMD(SteamCMDViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            SESMConfigHelper.AUUsername = model.UserName;
+            if (!string.IsNullOrEmpty(model.Password))
+            {
+                SESMConfigHelper.AUPassword = model.Password;
+            }
+            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
+            logger.Info("----Stating SteamCMD Initialisation----");
+            SteamCMDHelper.Initialise(logger, model.UserName, model.Password, model.SteamGuard);
+            logger.Info("----End of SteamCMD Initialisation----");
+
+            return RedirectToAction("Index", "Settings").Success("SteamCMD Initialized");
+        }
+
+        [HttpPost]
+        [LoggedOnly]
+        [SuperAdmin]
+        [CheckLockout]
+        [MultipleButton(Name = "action", Argument = "FireSteamGuard")]
+        public ActionResult FireSteamGuard(SteamCMDViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View("SteamCMD", model);
+
+            SESMConfigHelper.AUUsername = model.UserName;
+            if (!string.IsNullOrEmpty(model.Password))
+            {
+                SESMConfigHelper.AUPassword = model.Password;
+            }
+            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
+            logger.Info("----Stating SteamCMD SteamGuard Firering----");
+            SteamCMDHelper.Initialise(logger, model.UserName, model.Password, string.Empty);
+            logger.Info("----End of SteamCMD SteamGuard Firering----");
+
+            return RedirectToAction("SteamCMD", "Settings").Information("Steam Guard Fired, please check your Inbox and input the Steam Guard code below");
+        }
+
+        [HttpGet]
+        [LoggedOnly]
+        [SuperAdmin]
+        [CheckLockout]
         public ActionResult Backups()
         {
             BackupsViewModel model = new BackupsViewModel();
@@ -462,6 +554,7 @@ namespace SESM.Controllers
         [HttpPost]
         [LoggedOnly]
         [SuperAdmin]
+        [CheckLockout]
         public ActionResult Backups(BackupsViewModel model)
         {
             if (!ModelState.IsValid)
@@ -538,10 +631,26 @@ namespace SESM.Controllers
         [HttpGet]
         [LoggedOnly]
         [SuperAdmin]
+        [CheckLockout]
+        public ActionResult CleanSteamCMD()
+        {
+            if (Directory.Exists(SESMConfigHelper.SEDataPath + @"\SteamCMD\"))
+                Directory.Delete(SESMConfigHelper.SEDataPath + @"\SteamCMD\", true);
+
+            if (Directory.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\"))
+                Directory.Delete(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\", true);
+
+            return RedirectToAction("Index", "Home").Success("Auto/Manual Update Clened Up");
+        }
+
+        [HttpGet]
+        [LoggedOnly]
+        [SuperAdmin]
+        [CheckLockout]
         public ActionResult CleanPerf()
         {
             _context.Database.ExecuteSqlCommand("truncate table SESM.dbo.EntityPerfEntries");
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Home").Success("Perf Data Cleaned Up");
         }
         protected override void Dispose(bool disposing)
         {
@@ -552,6 +661,6 @@ namespace SESM.Controllers
             base.Dispose(disposing);
         }
 
-        
+
     }
 }

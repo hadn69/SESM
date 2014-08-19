@@ -3,87 +3,90 @@
     ViewBag.Title = "Backups";
 }
 <div class="row">
-    <div class="col-md-12">
-        <section id="Form">
-            @using (Html.BeginForm("Backups", "Settings", null, FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
-            {
-                @Html.ValidationSummary()
+    <div class="col-md-6">
+        @using (Html.BeginForm("Backups", "Settings", null, FormMethod.Post, new { @class = "form-horizontal well", role = "form" }))
+        {
+            @Html.ValidationSummary()
+            <div class="form-group">
+                @Html.LabelFor(m => m.EnableLvl1, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.CheckBoxFor(m => m.EnableLvl1, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.EnableLvl1)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.NbToKeepLvl1, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.NbToKeepLvl1, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.NbToKeepLvl1)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CronIntervalLvl1, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.CronIntervalLvl1, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.CronIntervalLvl1)
+                </div>
+            </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.EnableLvl1, new {@class = "col-md-2 control-label"})
-                    <div class="col-md-10">
-                        @Html.CheckBoxFor(m => m.EnableLvl1, new {@class = "form-control"})
-                        @Html.ValidationMessageFor(m => m.EnableLvl1)
-                    </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.EnableLvl2, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.CheckBoxFor(m => m.EnableLvl2, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.EnableLvl2)
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.NbToKeepLvl1, new {@class = "col-md-2 control-label"})
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.NbToKeepLvl1, new {@class = "form-control"})
-                        @Html.ValidationMessageFor(m => m.NbToKeepLvl1)
-                    </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.NbToKeepLvl2, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.NbToKeepLvl2, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.NbToKeepLvl2)
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.CronIntervalLvl1, new {@class = "col-md-2 control-label"})
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.CronIntervalLvl1, new {@class = "form-control"})
-                        @Html.ValidationMessageFor(m => m.CronIntervalLvl1)
-                    </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CronIntervalLvl2, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.CronIntervalLvl2, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.CronIntervalLvl2)
                 </div>
+            </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.EnableLvl2, new {@class = "col-md-2 control-label"})
-                    <div class="col-md-10">
-                        @Html.CheckBoxFor(m => m.EnableLvl2, new {@class = "form-control"})
-                        @Html.ValidationMessageFor(m => m.EnableLvl2)
-                    </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.EnableLvl3, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.CheckBoxFor(m => m.EnableLvl3, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.EnableLvl3)
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.NbToKeepLvl2, new {@class = "col-md-2 control-label"})
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.NbToKeepLvl2, new {@class = "form-control"})
-                        @Html.ValidationMessageFor(m => m.NbToKeepLvl2)
-                    </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.NbToKeepLvl3, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.NbToKeepLvl3, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.NbToKeepLvl3)
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.CronIntervalLvl2, new {@class = "col-md-2 control-label"})
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.CronIntervalLvl2, new {@class = "form-control"})
-                        @Html.ValidationMessageFor(m => m.CronIntervalLvl2)
-                    </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.CronIntervalLvl3, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.CronIntervalLvl3, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.CronIntervalLvl3)
                 </div>
+            </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(m => m.EnableLvl3, new {@class = "col-md-2 control-label"})
-                    <div class="col-md-10">
-                        @Html.CheckBoxFor(m => m.EnableLvl3, new {@class = "form-control"})
-                        @Html.ValidationMessageFor(m => m.EnableLvl3)
+            <div class="form-group">
+                <div class="col-md-offset-4 col-md-8">
+                    <div class="btn-group">
+                        <input type="submit" value="Save" class="btn btn-primary" />
                     </div>
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.NbToKeepLvl3, new {@class = "col-md-2 control-label"})
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.NbToKeepLvl3, new {@class = "form-control"})
-                        @Html.ValidationMessageFor(m => m.NbToKeepLvl3)
-                    </div>
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.CronIntervalLvl3, new {@class = "col-md-2 control-label"})
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.CronIntervalLvl3, new {@class = "form-control"})
-                        @Html.ValidationMessageFor(m => m.CronIntervalLvl3)
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <div class="btn-group">
-                            <input type="submit" value="Save" class="btn btn-default" />
-                        </div>
-                    </div>
-                </div>
-            }
-        </section>
+            </div>
+        }
     </div>
-
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <a class="btn btn-default" href="@(Url.Action("Index"))">
+            <span class="glyphicon glyphicon-chevron-left"></span> Back to Settings
+        </a>
+    </div>
 </div>

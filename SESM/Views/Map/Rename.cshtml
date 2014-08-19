@@ -3,37 +3,36 @@
     ViewBag.Title = "Rename Map";
 }
 <div class="row">
-    <div class="col-md-12">
-        <section id="Form">
-            @using (Html.BeginForm("Rename", "Map", new { id = (int)ViewData["ID"] }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-            {
-                @Html.ValidationSummary()
-                <div class="form-group">
-                    @Html.LabelFor(m => m.CurrentMapName, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.DisplayFor(m => m.CurrentMapName, new { @class = "form-control" })
-                        @Html.HiddenFor(m => m.CurrentMapName)
-                    </div>
+    <div class="col-md-6">
+        @using (Html.BeginForm("Rename", "Map", new { id = (int)ViewData["ID"] }, FormMethod.Post, new { @class = "form-horizontal well", role = "form" }))
+        {
+            @Html.ValidationSummary()
+            <div class="form-group">
+                @Html.LabelFor(m => m.CurrentMapName, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.DisplayFor(m => m.CurrentMapName, new { @class = "form-control" })
+                    @Html.HiddenFor(m => m.CurrentMapName)
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.NewMapName, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(m => m.NewMapName, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.NewMapName)
-                    </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.NewMapName, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.NewMapName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.NewMapName)
                 </div>
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Rename" onclick="return confirm('If the map is in use and this server is running, it will be restarted. Are you sure you want to do this ?');" class="btn btn-default" />
-                    </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-4 col-md-8">
+                    <input type="submit" value="Rename" onclick="return confirm('If the server is running and using the map, it will be restarted. Are you sure you want to do this ?');" class="btn btn-primary" />
                 </div>
-            }
-        </section>
+            </div>
+        }
     </div>
 </div>
-<br />
 <div class="row">
     <div class="col-md-12">
-        <a class="btn btn-default" href="@(Url.Action("Index", "Map", new {id = ViewData["ID"]}))">Back to Map List</a>
+        <a class="btn btn-default" href="@(Url.Action("Index", "Map", new { id = ViewData["ID"] }))">
+            <span class="glyphicon glyphicon-chevron-left"></span> Back to Map List
+        </a>
     </div>
 </div>
