@@ -39,7 +39,7 @@ namespace SESM
 
                 ITrigger hourlyCrusherTrigger = TriggerBuilder.Create()
                     .WithIdentity("HourlyCrusherTrigger", "Monitor")
-                    .WithCronSchedule("0 0/5 * * * ?")
+                    .WithCronSchedule("0 0 * * * ?")
                     .StartNow()
                     .Build();
 

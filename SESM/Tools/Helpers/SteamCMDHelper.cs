@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -19,8 +20,6 @@ namespace SESM.Tools.Helpers
             // Checking if steamCMD.exe exist in the right location
             CheckSteamCMD(logger);
 
-            logger.Info("Starting SteamCMD");
-
             Process si = new Process();
             si.StartInfo.WorkingDirectory = SESMConfigHelper.SEDataPath + @"\SteamCMD\";
             si.StartInfo.UseShellExecute = false;
@@ -31,6 +30,7 @@ namespace SESM.Tools.Helpers
             si.StartInfo.RedirectStandardInput = true;
             si.StartInfo.RedirectStandardOutput = true;
             si.StartInfo.RedirectStandardError = true;
+
             si.Start();
             si.WaitForExit(30000);
             logger.Info("SteamCMD execution finished");
@@ -47,17 +47,13 @@ namespace SESM.Tools.Helpers
             }
             logger.Info("End of SteamCMD Error output");
             si.Close();
+
         }
 
         public static SteamCMDResult Update(Logger logger)
         {
             // Checking if steamCMD.exe exist in the right location
             CheckSteamCMD(logger);
-
-            FileInfo fiBefore = null;
-            // Checking if the file has been modified since last check
-            if (File.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
-                fiBefore = new FileInfo(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip");
 
             string AUPassword = string.Empty;
 
@@ -77,7 +73,24 @@ namespace SESM.Tools.Helpers
                 return SteamCMDResult.Fail_Unknow;
             }
 
-            logger.Info("Starting SteamCMD");
+            string dedicatedZipPath = SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip";
+
+            FileInfo fiBefore = null;
+            MemoryStream original = null;
+            // Checking if the file has been modified since last check
+            if (File.Exists(dedicatedZipPath))
+            {
+                fiBefore = new FileInfo(dedicatedZipPath);
+
+                logger.Info("Backing up original DedicatedServer.zip");
+                original = new MemoryStream();
+                using (Stream input = File.OpenRead(dedicatedZipPath))
+                {
+                    input.CopyTo(original);
+                }
+                original.Position = 0;
+
+            }
 
             Process si = new Process();
             si.StartInfo.WorkingDirectory = SESMConfigHelper.SEDataPath + @"\SteamCMD\";
@@ -90,9 +103,15 @@ namespace SESM.Tools.Helpers
             si.StartInfo.RedirectStandardInput = true;
             si.StartInfo.RedirectStandardOutput = true;
             si.StartInfo.RedirectStandardError = true;
+
+            logger.Info("Starting SteamCMD (90 secs Max)");
             si.Start();
-            si.WaitForExit(60000);
-            logger.Info("SteamCMD execution finished");
+            bool exited = si.WaitForExit(90000);
+            if (exited)
+                logger.Info("Process ended sooner than timeout");
+            else
+                logger.Warn("Process ended by timeout");
+
             logger.Info("SteamCMD Standard output :");
             string output = string.Empty;
             while (si.StandardOutput.Peek() > -1)
@@ -108,7 +127,30 @@ namespace SESM.Tools.Helpers
                 logger.Info("    " + si.StandardError.ReadLine());
             }
             logger.Info("End of SteamCMD Error output");
-            si.Close();
+
+            if (!exited)
+            {
+                logger.Info("SteamCMD execution timouted, killing process...");
+                try
+                {
+                    si.Kill();
+                    logger.Info("Killing process sucessful");
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error while killing process", ex);
+                }
+                logger.Info("Restoring original DedicatedServer.zip");
+                File.Delete(dedicatedZipPath);
+
+                using (FileStream fs = new FileStream(dedicatedZipPath,FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    original.CopyTo(fs);
+                }
+                original.Dispose();
+                File.SetLastWriteTimeUtc(dedicatedZipPath, fiBefore.LastWriteTimeUtc);
+                return SteamCMDResult.Fail_Unknow;
+            }
 
             if (output.Contains("Login Failure:"))
             {
@@ -136,7 +178,7 @@ namespace SESM.Tools.Helpers
             // Checking if the file has been modified since last check
             FileInfo fi = new FileInfo(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip");
             if (fiBefore != null)
-                if (fi.LastWriteTime.ToString("g") == fiBefore.LastWriteTime.ToString("g"))
+                if (fi.LastWriteTimeUtc.ToString("g") == fiBefore.LastWriteTimeUtc.ToString("g"))
                 {
                     logger.Info("DedicatedServer.zip haven't changed, exiting");
                     return SteamCMDResult.Success_NothingToDo;
@@ -157,7 +199,7 @@ namespace SESM.Tools.Helpers
 
             foreach (EntityServer item in srvPrv.GetAllServers())
             {
-                logger.Info("Stopping " + item.Name);
+                logger.Info("Sending stop order to " + item.Name);
                 ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
             }
 
