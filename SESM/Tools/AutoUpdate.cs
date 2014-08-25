@@ -15,7 +15,7 @@ namespace SESM.Tools
 
             _logger.Info("----Starting AutoUpdateJob----");
 
-            SteamCMDHelper.Update(_logger);
+            SteamCMDHelper.Update(_logger, 200);
             
             _logger.Info("----End of AutoUpdateJob----");
         }

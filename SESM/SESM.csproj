@@ -127,6 +127,7 @@
     <Content Include="Content\bootstrap-superhero.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\logo-small.png" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\site.css" />
     <Content Include="Scripts\amcharts\amcharts.js" />
@@ -233,6 +234,15 @@
     <Content Include="Scripts\amcharts\themes\patterns.js" />
     <Content Include="Scripts\amcharts\xy.js" />
     <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\Color\css\bootstrap-colorpicker.css" />
+    <Content Include="Scripts\Color\css\bootstrap-colorpicker.min.css" />
+    <Content Include="Scripts\Color\img\bootstrap-colorpicker\alpha-horizontal.png" />
+    <Content Include="Scripts\Color\img\bootstrap-colorpicker\alpha.png" />
+    <Content Include="Scripts\Color\img\bootstrap-colorpicker\hue-horizontal.png" />
+    <Content Include="Scripts\Color\img\bootstrap-colorpicker\hue.png" />
+    <Content Include="Scripts\Color\img\bootstrap-colorpicker\saturation.png" />
+    <Content Include="Scripts\Color\js\bootstrap-colorpicker.js" />
+    <Content Include="Scripts\Color\js\bootstrap-colorpicker.min.js" />
     <Content Include="Scripts\jquery-2.1.1.js" />
     <Content Include="Scripts\jquery-2.1.1.min.js" />
     <Content Include="Scripts\jquery-2.1.1.min.map" />
@@ -297,6 +307,7 @@
     <Content Include="Views\Settings\ManualUpdate.cshtml" />
     <Content Include="Views\Settings\SteamCMD.cshtml" />
     <Content Include="Views\Shared\_Flash.cshtml" />
+    <Content Include="Views\External\SignGen.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -325,6 +336,7 @@
     <Compile Include="Controllers\ActionFilters\ManagerAndAboveAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\SuperAdminAttribute.cs" />
     <Compile Include="Controllers\BackupController.cs" />
+    <Compile Include="Controllers\ExternalController.cs" />
     <Compile Include="Controllers\FlashMessageExtensions.cs" />
     <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Controllers\MapController.cs" />
@@ -390,8 +402,10 @@
     <Compile Include="Tools\AutoUpdate.cs" />
     <Compile Include="Tools\BackupJob.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
+    <Compile Include="Tools\GraphHelper.cs" />
     <Compile Include="Tools\Helpers\HashHelper.cs" />
     <Compile Include="Tools\Helpers\PathHelper.cs" />
+    <Compile Include="Tools\Helpers\SignParams.cs" />
     <Compile Include="Tools\Monitor\Collector.cs" />
     <Compile Include="Tools\Helpers\ServiceHelper.cs" />
     <Compile Include="Tools\Helpers\ServerConfigHelper.cs" />

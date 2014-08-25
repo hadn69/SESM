@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
-using System.Web.ModelBinding;
+using System.Threading;
 using Ionic.Zip;
 using NLog;
 using SESM.DAL;
@@ -15,7 +15,7 @@ namespace SESM.Tools.Helpers
 {
     public class SteamCMDHelper
     {
-        public static void Initialise(Logger logger, string login, string password, string steamGuardCode)
+        public static SteamCMDResult Initialise(Logger logger, string login, string password, string steamGuardCode)
         {
             // Checking if steamCMD.exe exist in the right location
             CheckSteamCMD(logger);
@@ -29,28 +29,62 @@ namespace SESM.Tools.Helpers
             si.StartInfo.CreateNoWindow = true;
             si.StartInfo.RedirectStandardInput = true;
             si.StartInfo.RedirectStandardOutput = true;
-            si.StartInfo.RedirectStandardError = true;
+            si.StartInfo.RedirectStandardError = false;
 
+            logger.Info("Starting SteamCMD (30 secs Max)");
             si.Start();
-            si.WaitForExit(30000);
-            logger.Info("SteamCMD execution finished");
-            logger.Info("SteamCMD Standard output :");
-            while (si.StandardOutput.Peek() > -1)
+            DateTime endTime = DateTime.Now.AddSeconds(30);
+            string output = string.Empty;
+            logger.Info("Start of SteamCMD output :");
+            while (!si.HasExited && DateTime.Now <= endTime)
             {
-                logger.Info("    " + si.StandardOutput.ReadLine());
+                string val = si.StandardOutput.ReadLine();
+                output += val;
+                logger.Info("    " + val);
             }
-            logger.Info("End of SteamCMD Standard output");
-            logger.Info("SteamCMD Error output :");
-            while (si.StandardError.Peek() > -1)
-            {
-                logger.Info("    " + si.StandardError.ReadLine());
-            }
-            logger.Info("End of SteamCMD Error output");
-            si.Close();
+            logger.Info("End of SteamCMD output");
 
+            if (output.Contains("Login Failure:"))
+            {
+                if (output.Contains("Login Failure: Invalid Password"))
+                {
+                    logger.Error("Invalid Steam Credentials");
+                    return SteamCMDResult.Fail_Credentials;
+                }
+                if (output.Contains("Login Failure: Account Logon Denied"))
+                {
+                    logger.Error("SteamGuard Active, please input code in the panel");
+                    return SteamCMDResult.Fail_SteamGuardMissing;
+                }
+                if (output.Contains("Login Failure: Invalid Login Auth Code"))
+                {
+                    logger.Error("Wrong SteamGuard Code, please input the right one in the panel");
+                    return SteamCMDResult.Fail_SteamGuardBadCode;
+                }
+            }
+
+            if (si.HasExited)
+                logger.Info("Process closed itself gracefully");
+            else
+            {
+                logger.Warn("Process execution timeout");
+                try
+                {
+                    si.Kill();
+                    logger.Info("Killing process sucessful");
+                    Thread.Sleep(2000);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error while killing process", ex);
+                }
+                return SteamCMDResult.Fail_TooLong;
+            }
+
+            return SteamCMDResult.Success_NothingToDo;
         }
 
-        public static SteamCMDResult Update(Logger logger)
+        public static SteamCMDResult Update(Logger logger, int duration)
         {
             // Checking if steamCMD.exe exist in the right location
             CheckSteamCMD(logger);
@@ -95,61 +129,59 @@ namespace SESM.Tools.Helpers
             Process si = new Process();
             si.StartInfo.WorkingDirectory = SESMConfigHelper.SEDataPath + @"\SteamCMD\";
             si.StartInfo.UseShellExecute = false;
-            si.StartInfo.FileName = "cmd.exe";
-            si.StartInfo.Arguments = "/c \"" + SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe +login " + SESMConfigHelper.AUUsername
+            si.StartInfo.FileName = SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe";
+            si.StartInfo.Arguments = "+@NoPromptForPassword 1 +login " + SESMConfigHelper.AUUsername
                 + " " + AUPassword + " +force_install_dir "
-                + SESMConfigHelper.SEDataPath + "\\AutoUpdateData\\ +app_update 244850 validate +quit \"";
-            si.StartInfo.CreateNoWindow = true;
+                + SESMConfigHelper.SEDataPath + "AutoUpdateData +app_update 244850 validate +quit ";
+            si.StartInfo.CreateNoWindow = false;
             si.StartInfo.RedirectStandardInput = true;
             si.StartInfo.RedirectStandardOutput = true;
-            si.StartInfo.RedirectStandardError = true;
+            si.StartInfo.RedirectStandardError = false;
 
-            logger.Info("Starting SteamCMD (90 secs Max)");
+            logger.Info("Starting SteamCMD (" + duration + " secs Max)");
             si.Start();
-            bool exited = si.WaitForExit(90000);
-            if (exited)
-                logger.Info("Process ended sooner than timeout");
-            else
-                logger.Warn("Process ended by timeout");
-
-            logger.Info("SteamCMD Standard output :");
+            DateTime endTime = DateTime.Now.AddSeconds(duration);
             string output = string.Empty;
-            while (si.StandardOutput.Peek() > -1)
+            logger.Info("Start of SteamCMD output :");
+            while (!si.HasExited && DateTime.Now <= endTime)
             {
                 string val = si.StandardOutput.ReadLine();
                 output += val;
                 logger.Info("    " + val);
             }
-            logger.Info("End of SteamCMD Standard output");
-            logger.Info("SteamCMD Error output :");
-            while (si.StandardError.Peek() > -1)
-            {
-                logger.Info("    " + si.StandardError.ReadLine());
-            }
-            logger.Info("End of SteamCMD Error output");
+            logger.Info("End of SteamCMD output");
 
-            if (!exited)
+            if (si.HasExited)
+                logger.Info("Process closed itself gracefully");
+            else
             {
-                logger.Info("SteamCMD execution timouted, killing process...");
+                logger.Warn("Process execution timeout");
                 try
                 {
                     si.Kill();
                     logger.Info("Killing process sucessful");
+                    Thread.Sleep(2000);
                 }
                 catch (Exception ex)
                 {
                     logger.Error("Error while killing process", ex);
                 }
-                logger.Info("Restoring original DedicatedServer.zip");
-                File.Delete(dedicatedZipPath);
+                if (File.Exists(dedicatedZipPath))
+                    File.Delete(dedicatedZipPath);
 
-                using (FileStream fs = new FileStream(dedicatedZipPath,FileMode.Create, FileAccess.Write, FileShare.None))
+                if (original != null)
                 {
-                    original.CopyTo(fs);
+                    logger.Info("Restoring original DedicatedServer.zip");
+
+                    using (FileStream fs = new FileStream(dedicatedZipPath, FileMode.Create, FileAccess.Write,
+                        FileShare.None))
+                    {
+                        original.CopyTo(fs);
+                    }
+                    original.Dispose();
+                    File.SetLastWriteTimeUtc(dedicatedZipPath, fiBefore.LastWriteTimeUtc);
                 }
-                original.Dispose();
-                File.SetLastWriteTimeUtc(dedicatedZipPath, fiBefore.LastWriteTimeUtc);
-                return SteamCMDResult.Fail_Unknow;
+                return SteamCMDResult.Fail_TooLong;
             }
 
             if (output.Contains("Login Failure:"))
@@ -171,6 +203,7 @@ namespace SESM.Tools.Helpers
                 }
             }
 
+
             // Checking DedicatedServer.zip exist 
             if (!File.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
                 return SteamCMDResult.Fail_Unknow;
@@ -187,7 +220,7 @@ namespace SESM.Tools.Helpers
             SESMConfigHelper.Lockdown = true;
             logger.Info("Waiting 30 secs for all requests to end ...");
 
-            System.Threading.Thread.Sleep(30000);
+            Thread.Sleep(30000);
 
             DataContext context = new DataContext();
             ServerProvider srvPrv = new ServerProvider(context);
@@ -211,7 +244,6 @@ namespace SESM.Tools.Helpers
             logger.Info("Killing ghosts processes");
             // Killing some ghost processes that might still exists
             ServiceHelper.KillAllService();
-
 
             using (ZipFile zip = ZipFile.Read(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
             {
@@ -269,6 +301,7 @@ namespace SESM.Tools.Helpers
         public enum SteamCMDResult
         {
             Fail_Unknow,
+            Fail_TooLong,
             Fail_Credentials,
             Fail_SteamGuardMissing,
             Fail_SteamGuardBadCode,

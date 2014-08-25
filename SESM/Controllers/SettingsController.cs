@@ -445,7 +445,7 @@ namespace SESM.Controllers
             Logger logger = LogManager.GetLogger("ManualUpdateLogger");
 
             logger.Info("----Starting ManualUpdate----");
-            SteamCMDHelper.SteamCMDResult result = SteamCMDHelper.Update(logger);
+            SteamCMDHelper.SteamCMDResult result = SteamCMDHelper.Update(logger, 300);
             logger.Info("----End of ManualUpdate----");
 
             switch (result)
@@ -458,6 +458,9 @@ namespace SESM.Controllers
                     break;
                 case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardBadCode:
                     return RedirectToAction("Index").Danger("Wrong Steam Guard code, please input the right code in SteamCMD Configuration page and try again");
+                    break;
+                case SteamCMDHelper.SteamCMDResult.Fail_TooLong:
+                    return RedirectToAction("Index").Warning("Update took too long. If it's the first update and you don't have a server-grade connection, please try again");
                     break;
                 case SteamCMDHelper.SteamCMDResult.Success_NothingToDo:
                     return RedirectToAction("Index").Success("There are no updates available :-(");
