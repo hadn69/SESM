@@ -76,7 +76,20 @@
                         @Html.ValidationMessageFor(m => m.SteamPort)
                     </div>
                 </div>
-                
+                <div class="form-group" data-toggle="popover" data-content="If enabled, The server will restart at the interval defined by the cron below.">
+                    @Html.LabelFor(m => m.AutoRestart, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.AutoRestart, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.AutoRestart)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="The Cron for the Auto-Restart feature.">
+                    @Html.LabelFor(m => m.AutoRestartCron, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.AutoRestartCron, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.AutoRestartCron)
+                    </div>
+                </div>
             </section>
         </div>
         <div class="col-md-6">

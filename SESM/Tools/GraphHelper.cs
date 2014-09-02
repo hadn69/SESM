@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Text;
 using SESM.Tools.Helpers;
 
 namespace SESM.Tools
 {
     public class GraphHelper
     {
+        public static PrivateFontCollection privateFontCollection;
         [Flags]
         public enum Corners
         {
@@ -73,30 +75,65 @@ namespace SESM.Tools
 
         public static void Template1(Graphics graphics, SignParams signParams)
         {
-            graphics.Clear(Color.FromArgb(255, 78, 93, 108));
+            graphics.Clear(signParams.BgColor);
 
             int border = 10;
             int imageSize = 60;
 
-            //Color.FromArgb(255, 233, 105, 26)
-            CornerRectangle(graphics,
-                new Point(imageSize + border * 2, border),
-                new Size(signParams.SignSize.Width - imageSize - border * 3, signParams.SignSize.Height - 2 * border),
-                new Pen(Color.FromArgb(0), 2),
-                new SolidBrush(Color.FromArgb(255, 43, 62, 80)),
-                Corners.TOP_LEFT | Corners.BOTTOM_RIGHT,
-                15);
+            if (signParams.Logo)
+            {
+                CornerRectangle(graphics, new Point(imageSize + border*2, border),
+                    new Size(signParams.SignSize.Width - imageSize - border*3, signParams.SignSize.Height - 2*border),
+                    new Pen(Color.FromArgb(0), 1), new SolidBrush(signParams.PrimColor),
+                    Corners.TOP_LEFT | Corners.BOTTOM_RIGHT, 15);
 
-            CornerRectangle(graphics,
-                new Point(border, imageSize + border * 2),
-                new Size(signParams.SignSize.Width - border * 2, signParams.SignSize.Height - (imageSize + border * 3)),
-                new Pen(Color.FromArgb(0), 2),
-                new SolidBrush(Color.FromArgb(255, 43, 62, 80)),
-                Corners.BOTTOM_RIGHT,
-                15);
+                graphics.FillRectangle(new SolidBrush(signParams.PrimColor), border, imageSize + border*2,
+                    imageSize + border + 1, signParams.SignSize.Height - (imageSize + border*3));
 
-            graphics.DrawImage(Image.FromFile(AppDomain.CurrentDomain.BaseDirectory + @"\Content\logo.png"), 10, 10, 60, 60);
+                graphics.DrawImage(Image.FromFile(AppDomain.CurrentDomain.BaseDirectory + @"\Content\logo.png"), 10, 10,
+                    60, 60);
+            }
+            else
+            {
+                CornerRectangle(graphics, new Point(border, border),
+                    new Size(signParams.SignSize.Width - border * 2, signParams.SignSize.Height - 2 * border),
+                    new Pen(Color.FromArgb(0), 1), new SolidBrush(signParams.PrimColor),
+                    Corners.TOP_LEFT | Corners.BOTTOM_RIGHT, 15);
+            }
 
+        }
+
+        public static void Template2(Graphics graphics, SignParams signParams)
+        {
+            graphics.Clear(signParams.BgColor);
+            Random rnd = new Random();
+            Pen starPen = new Pen(signParams.PrimColor);
+            double nbStars = Math.Round(signParams.SignSize.Width*signParams.SignSize.Height/500.0);
+            for (int i = 0; i < nbStars; i++)
+            {
+                graphics.DrawEllipse(starPen, rnd.Next(0, signParams.SignSize.Width), rnd.Next(0, signParams.SignSize.Height), 1, 1);
+            }
+
+            if (signParams.Logo)
+            {
+                graphics.DrawImage(Image.FromFile(AppDomain.CurrentDomain.BaseDirectory + @"\Content\logo.png"), 10, 10,
+                    60, 60);
+            }
+        }
+
+        public static void ErrorSign(Graphics graphics)
+        {
+            graphics.Clear(Color.Black);
+
+            int width = 200;
+            int height = 100;
+
+
+            Font myFont = new Font("Lato", 24);
+            SizeF measure = graphics.MeasureString("Error", myFont);
+
+
+            graphics.DrawString("Error", myFont, new SolidBrush(Color.White), (width - measure.Width) / 2, (height - measure.Height) / 2);
 
         }
     }

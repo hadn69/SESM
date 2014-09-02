@@ -35,7 +35,7 @@
                 <a class="btn btn-lg btn-warning" href="@(Url.Action("HourlyStats", "Server", new {id = id}))">Server Statistics</a>
             </div>
         }
-        @if(!(!Model.IsPublic && accessLevel == AccessLevel.Guest))
+        @if(false && !(!Model.IsPublic && accessLevel == AccessLevel.Guest))
         {
             <div class="btn-group btn-group-justified">
                 <a class="btn btn-lg btn-info" href="@(Url.Action("SignGen", "External", new {id = id}))">Signature Generator</a>

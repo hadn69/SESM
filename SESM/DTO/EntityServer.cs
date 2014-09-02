@@ -12,6 +12,8 @@ namespace SESM.DTO
         public bool IsLvl1BackupEnabled { get; set; }
         public bool IsLvl2BackupEnabled { get; set; }
         public bool IsLvl3BackupEnabled { get; set; }
+        public bool IsAutoRestartEnabled { get; set; }
+        public string AutoRestartCron { get; set; }
 
         private ICollection<EntityUser> _administrators;
         public virtual ICollection<EntityUser> Administrators
@@ -47,6 +49,8 @@ namespace SESM.DTO
             IsLvl1BackupEnabled = false;
             IsLvl2BackupEnabled = false;
             IsLvl3BackupEnabled = false;
+            IsAutoRestartEnabled = false;
+            AutoRestartCron = "0 0 0 * * ?";
         }
     }
 }

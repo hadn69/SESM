@@ -27,6 +27,13 @@ namespace SESM.Models.Views.Server
         public bool IsLvl3BackupEnabled { get; set; }
 
         [Required]
+        [DisplayName("Auto Restart")]
+        public bool AutoRestart { get; set; }
+
+        [DisplayName("Auto Restart Cron")]
+        public string AutoRestartCron { get; set; }
+
+        [Required]
         [DisplayName("Game Mode")]
         public GameMode GameMode { get; set; }
 

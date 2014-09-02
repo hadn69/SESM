@@ -2,7 +2,7 @@
 
 namespace SESM.Tools
 {
-    public class SESMConfigStorage : Westwind.Utilities.Configuration.AppConfiguration
+    public class SESMConfigStorage : AppConfiguration
     {
         public string DBConnString { get; set; }
         public string Prefix { get; set; }

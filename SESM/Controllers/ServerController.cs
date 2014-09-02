@@ -4,10 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using Quartz;
+using Quartz.Impl;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Models.Views.Server;
+using SESM.Tools;
 using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
@@ -133,13 +136,12 @@ namespace SESM.Controllers
         // GET: Server/Status/5
         [HttpGet]
         [CheckAuth]
-        public ActionResult Status(int? id)
+        public ActionResult Status(int id)
         {
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
-            int serverId = id ?? 0;
 
-            EntityServer serv = srvPrv.GetServer(serverId);
+            EntityServer serv = srvPrv.GetServer(id);
 
             ServerConfigHelper serverConfig = new ServerConfigHelper();
             serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
@@ -388,6 +390,8 @@ namespace SESM.Controllers
             serverView.IsLvl1BackupEnabled = serv.IsLvl1BackupEnabled;
             serverView.IsLvl2BackupEnabled = serv.IsLvl2BackupEnabled;
             serverView.IsLvl3BackupEnabled = serv.IsLvl3BackupEnabled;
+            serverView.AutoRestart = serv.IsAutoRestartEnabled;
+            serverView.AutoRestartCron = serv.AutoRestartCron;
 
             serverView.WebAdministrators = string.Join("\r\n", serv.Administrators.Select(item => item.Login).ToList());
             serverView.WebManagers = string.Join("\r\n", serv.Managers.Select(item => item.Login).ToList());
@@ -494,6 +498,28 @@ namespace SESM.Controllers
                 srvPrv.AddAdministrator(webAdminsSplitted, serv);
                 srvPrv.AddManagers(webManagerSplitted, serv);
                 srvPrv.AddUsers(webUsersSplitted, serv);
+
+                serv.IsAutoRestartEnabled = model.AutoRestart;
+                serv.AutoRestartCron = model.AutoRestartCron;
+
+                IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+                scheduler.DeleteJob(new JobKey("AutoRestart" + serv.Id + "Job", "AutoRestart"));
+                if (serv.IsAutoRestartEnabled)
+                {
+                    IJobDetail autoRestartJob = JobBuilder.Create<BackupJob>()
+                        .WithIdentity("AutoRestart" + serv.Id + "Job", "AutoRestart")
+                        .UsingJobData("id", serv.Id)
+                        .Build();
+
+                    ITrigger autoRestartTrigger = TriggerBuilder.Create()
+                        .WithIdentity("AutoRestart" + serv.Id + "Trigger", "AutoRestart")
+                        .WithCronSchedule(SESMConfigHelper.ABIntervalLvl3)
+                        .StartNow()
+                        .Build();
+
+                    scheduler.ScheduleJob(autoRestartJob, autoRestartTrigger);
+                }
+
 
                 srvPrv.UpdateServer(serv);
 
@@ -620,6 +646,27 @@ namespace SESM.Controllers
                 srvPrv.AddAdministrator(webAdminsSplitted, serv);
                 srvPrv.AddManagers(webManagerSplitted, serv);
                 srvPrv.AddUsers(webUsersSplitted, serv);
+
+                serv.IsAutoRestartEnabled = model.AutoRestart;
+                serv.AutoRestartCron = model.AutoRestartCron;
+
+                IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+                scheduler.DeleteJob(new JobKey("AutoRestart" + serv.Id + "Job", "AutoRestart"));
+                if(serv.IsAutoRestartEnabled)
+                {
+                    IJobDetail autoRestartJob = JobBuilder.Create<BackupJob>()
+                        .WithIdentity("AutoRestart" + serv.Id + "Job", "AutoRestart")
+                        .UsingJobData("id", serv.Id)
+                        .Build();
+
+                    ITrigger autoRestartTrigger = TriggerBuilder.Create()
+                        .WithIdentity("AutoRestart" + serv.Id + "Trigger", "AutoRestart")
+                        .WithCronSchedule(SESMConfigHelper.ABIntervalLvl3)
+                        .StartNow()
+                        .Build();
+
+                    scheduler.ScheduleJob(autoRestartJob, autoRestartTrigger);
+                }
 
                 srvPrv.UpdateServer(serv);
 
