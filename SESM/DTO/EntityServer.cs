@@ -14,6 +14,8 @@ namespace SESM.DTO
         public bool IsLvl3BackupEnabled { get; set; }
         public bool IsAutoRestartEnabled { get; set; }
         public string AutoRestartCron { get; set; }
+        public bool UseServerExtender { get; set; }
+        public int ServerExtenderPort { get; set; }
 
         private ICollection<EntityUser> _administrators;
         public virtual ICollection<EntityUser> Administrators
@@ -51,6 +53,8 @@ namespace SESM.DTO
             IsLvl3BackupEnabled = false;
             IsAutoRestartEnabled = false;
             AutoRestartCron = "0 0 0 * * ?";
+            UseServerExtender = false;
+            ServerExtenderPort = 26016;
         }
     }
 }

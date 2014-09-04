@@ -29,7 +29,7 @@
         EasyStart1,
         EasyStart2,
         CrashedRedShip,
-        TwoPlateforms,
+        TwoPlatforms,
         Asteroids,
         EmptyWorld
     }
