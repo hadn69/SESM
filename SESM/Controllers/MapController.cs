@@ -107,7 +107,7 @@ namespace SESM.Controllers
                 serverConfig.SaveName = model.MapName;
                 serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
                 serverConfig.Save(serv);
-                ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StartService(serv);
                 return RedirectToAction("Status", "Server", new { id = id }).Success("Map Selected, server is restarting"); ;
             }
 
@@ -182,7 +182,7 @@ namespace SESM.Controllers
                 if (toRestart)
                 {
                     
-                    ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
+                    ServiceHelper.StartService(serv);
                 }
                 return RedirectToAction("Index", new { id = id }).Success("Map Renamed");
             }
@@ -270,7 +270,7 @@ namespace SESM.Controllers
                 serverConfig.AsteroidAmount = model.AsteroidAmount;
                 serverConfig.SaveName = string.Empty;
                 serverConfig.Save(serv);
-                ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StartService(serv);
                 return RedirectToAction("Status","Server",  new { id = id }).Success("Server Starting, map in creation ...");
             }
 

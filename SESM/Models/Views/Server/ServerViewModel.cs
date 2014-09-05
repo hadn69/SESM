@@ -34,6 +34,15 @@ namespace SESM.Models.Views.Server
         public string AutoRestartCron { get; set; }
 
         [Required]
+        [DisplayName("Server Extender")]
+        public bool UseServerExtender { get; set; }
+
+        [Required]
+        [DisplayName("Server Extender Port")]
+        [RegularExpression(@"^([1-9]|[1-9]\d|[1-9]\d{0,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$", ErrorMessage = "The server extender port must be a vaild number")]
+        public int ServerExtenderPort { get; set; }
+
+        [Required]
         [DisplayName("Game Mode")]
         public GameMode GameMode { get; set; }
 
@@ -80,6 +89,10 @@ namespace SESM.Models.Views.Server
         [Required]
         [DisplayName("Enable Auto Save")]
         public bool AutoSave { get; set; }
+
+        [Required]
+        [DisplayName("Auto Save Interval In Minutes")]
+        public int AutoSaveInMinutes { get; set; }
 
         [Required]
         [DisplayName("Enable Weapons")]
@@ -181,9 +194,16 @@ namespace SESM.Models.Views.Server
         [DisplayName("Server Display Name")]
         public string ServerName { get; set; }
 
+        [DisplayName("Map Display Name")]
+        public string WorldName { get; set; }
+
         [Required]
         [DisplayName("Pause Game When No Player")]
         public bool PauseGameWhenEmpty { get; set; }
+
+        [Required]
+        [DisplayName("Ignore Last Session")]
+        public bool IgnoreLastSession { get; set; }
 
         [DisplayName("Web Administrators List")]
         public string WebAdministrators { get; set; }
@@ -238,6 +258,18 @@ namespace SESM.Models.Views.Server
             WebAdministrators = string.Empty;
             WebManagers = string.Empty;
             WebUsers = string.Empty;
+
+            IsPublic = false;
+            IsLvl1BackupEnabled = false;
+            IsLvl2BackupEnabled = false;
+            IsLvl3BackupEnabled = false;
+            AutoRestart = false;
+            AutoRestartCron = "0 0 0 * * ?";
+            UseServerExtender = false;
+            ServerExtenderPort = 26016;
+            IgnoreLastSession = false;
+            WorldName = "SESM - MyMap";
+            AutoSaveInMinutes = 5;
         }
     }
 }

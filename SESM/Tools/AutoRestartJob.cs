@@ -16,7 +16,7 @@ namespace SESM.Tools
             ServerProvider srvPrv = new ServerProvider(context);
 
             EntityServer server = srvPrv.GetServer(serverId);
-            ServiceHelper.RestartService(ServiceHelper.GetServiceName(server));
+            ServiceHelper.RestartService(server);
         }
     }
 }

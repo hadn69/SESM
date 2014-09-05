@@ -41,6 +41,13 @@
                         @Html.ValidationMessageFor(m => m.ServerName)
                     </div>
                 </div>
+                <div class="form-group" data-toggle="popover" data-content="The world name displayed in the in-game server list. If Empty, the map name is used.">
+                    @Html.LabelFor(m => m.WorldName, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.WorldName, valueClass)
+                        @Html.ValidationMessageFor(m => m.WorldName)
+                    </div>
+                </div>
                 <div class="form-group" data-toggle="popover" data-content="The IP address on which the server will listen to.">
                     @Html.LabelFor(m => m.IP, labelClass)
                     <div class="@valueColumn">
@@ -62,7 +69,21 @@
                         @Html.ValidationMessageFor(m => m.SteamPort)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, The server will restart at the interval defined by the cron below.">
+                <div class="form-group" data-toggle="popover" data-content="If enabled, The server will use SE Server Extender to run.">
+                    @Html.LabelFor(m => m.UseServerExtender, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.UseServerExtender, valueClass)
+                        @Html.ValidationMessageFor(m => m.UseServerExtender)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="The port used by SE Server Extender WCF interface.">
+                    @Html.LabelFor(m => m.ServerExtenderPort, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.ServerExtenderPort, valueClass)
+                        @Html.ValidationMessageFor(m => m.ServerExtenderPort)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, the server will restart at the interval defined by the cron below.">
                     @Html.LabelFor(m => m.AutoRestart, labelClass)
                     <div class="@valueColumn">
                         @Html.CheckBoxFor(m => m.AutoRestart, valueClass)
@@ -236,7 +257,7 @@
                         @Html.ValidationMessageFor(m => m.CargoShipsEnabled)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, it will change somting about the sound, probably...">
+                <div class="form-group" data-toggle="popover" data-content="If enabled, it will change someting about the sound, probably...">
                     @Html.LabelFor(m => m.RealisticSound, labelClass)
                     <div class="@valueColumn">
                         @Html.CheckBoxFor(m => m.RealisticSound, valueClass)
@@ -259,11 +280,18 @@
                         @Html.ValidationMessageFor(m => m.WorldSizeKm)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, it will save the map state every 5 minutes.">
+                <div class="form-group" data-toggle="popover" data-content="If enabled, it will save the map state every below interval.">
                     @Html.LabelFor(m => m.AutoSave, labelClass)
                     <div class="@valueColumn">
                         @Html.CheckBoxFor(m => m.AutoSave, valueClass)
                         @Html.ValidationMessageFor(m => m.AutoSave)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="The interval in minutes at wich the auto save will fire.">
+                    @Html.LabelFor(m => m.AutoSaveInMinutes, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.AutoSaveInMinutes, valueClass)
+                        @Html.ValidationMessageFor(m => m.AutoSaveInMinutes)
                     </div>
                 </div>
                 <div class="form-group" data-toggle="popover" data-content="If enabled, it will automaticly remove small piece of ships, if they are in a linar motion and unpowered.">
@@ -348,6 +376,13 @@
                     <div class="@valueColumn">
                         @Html.CheckBoxFor(m => m.ResetOwnership, valueClass)
                         @Html.ValidationMessageFor(m => m.ResetOwnership)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, ??????????????">
+                    @Html.LabelFor(m => m.IgnoreLastSession, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.IgnoreLastSession, valueClass)
+                        @Html.ValidationMessageFor(m => m.IgnoreLastSession)
                     </div>
                 </div>
                 <div class="form-group" data-toggle="popover" data-content="The list of the administrators' steam's ids.

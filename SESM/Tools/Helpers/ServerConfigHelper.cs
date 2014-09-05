@@ -53,6 +53,10 @@ namespace SESM.Tools.Helpers
         public string ServerName = "SESM";
         public bool PauseGameWhenEmpty = false;
 
+        public bool IgnoreLastSession = false;
+        public string WorldName = "SESM - MyMap";
+        public int AutoSaveInMinutes = 5;
+
         /// <summary>
         /// Parse the View Model into the object
         /// </summary>
@@ -85,6 +89,7 @@ namespace SESM.Tools.Helpers
             ClientCanSave = model.ClientCanSave;
             HackSpeedMultiplier = model.HackSpeedMultiplier;
             PermanentDeath = model.PermanentDeath;
+            AutoSaveInMinutes = model.AutoSaveInMinutes;
 
             ScenarioType = model.ScenarioType;
             SaveName = model.SaveName;
@@ -128,7 +133,9 @@ namespace SESM.Tools.Helpers
             }
             GroupID = model.GroupID;
             ServerName = model.ServerName;
+            WorldName = model.WorldName;
             PauseGameWhenEmpty = model.PauseGameWhenEmpty;
+            IgnoreLastSession = model.IgnoreLastSession;
         }
 
         public void ParseIn(NewServerViewModel model)
@@ -160,6 +167,7 @@ namespace SESM.Tools.Helpers
             ClientCanSave = model.ClientCanSave;
             HackSpeedMultiplier = model.HackSpeedMultiplier;
             PermanentDeath = model.PermanentDeath;
+            AutoSaveInMinutes = model.AutoSaveInMinutes;
 
             IP = model.IP;
             SteamPort = model.SteamPort;
@@ -200,7 +208,9 @@ namespace SESM.Tools.Helpers
             }
             GroupID = model.GroupID;
             ServerName = model.ServerName;
+            WorldName = model.WorldName;
             PauseGameWhenEmpty = model.PauseGameWhenEmpty;
+            IgnoreLastSession = model.IgnoreLastSession;
         }
 
         /// <summary>
@@ -235,6 +245,7 @@ namespace SESM.Tools.Helpers
             model.ClientCanSave = ClientCanSave;
             model.HackSpeedMultiplier = HackSpeedMultiplier;
             model.PermanentDeath = PermanentDeath;
+            model.AutoSaveInMinutes = AutoSaveInMinutes;
 
             model.ScenarioType = ScenarioType;
             model.SaveName = SaveName;
@@ -248,6 +259,8 @@ namespace SESM.Tools.Helpers
             model.GroupID = GroupID;
             model.ServerName = ServerName;
             model.PauseGameWhenEmpty = PauseGameWhenEmpty;
+            model.IgnoreLastSession = IgnoreLastSession;
+            model.WorldName = WorldName;
             return model;
         }
 
@@ -285,6 +298,7 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <ClientCanSave>" + ClientCanSave.ToString().ToLower() + "</ClientCanSave>");
             sb.AppendLine("    <HackSpeedMultiplier>" + HackSpeedMultiplier + "</HackSpeedMultiplier>");
             sb.AppendLine("    <PermanentDeath>" + PermanentDeath.ToString().ToLower() + "</PermanentDeath>");
+            sb.AppendLine("    <AutoSaveInMinutes>" + AutoSaveInMinutes + "</AutoSaveInMinutes>");
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
             sb.AppendLine("    <TypeId>MyObjectBuilder_ScenarioDefinition</TypeId>");
@@ -333,11 +347,16 @@ namespace SESM.Tools.Helpers
                 sb.AppendLine("  </Mods>");
             }
             sb.AppendLine("  <GroupID>" + GroupID + "</GroupID>");
-            if (ServerName == string.Empty)
+            if (string.IsNullOrEmpty(ServerName))
                 sb.AppendLine("  <ServerName />");
+            else
+                sb.AppendLine("  <WorldName>" + ServerName + "</WorldName>");
+            if(string.IsNullOrEmpty(WorldName))
+                sb.AppendLine("  <WorldName />");
             else
                 sb.AppendLine("  <ServerName>" + ServerName + "</ServerName>");
             sb.AppendLine("  <PauseGameWhenEmpty>" + PauseGameWhenEmpty.ToString().ToLower() + "</PauseGameWhenEmpty>");
+            sb.AppendLine("  <IgnoreLastSession>" + IgnoreLastSession.ToString().ToLower() + "</IgnoreLastSession>");
             sb.AppendLine("</MyConfigDedicated>");
             File.WriteAllText(PathHelper.GetConfigurationFilePath(serv), sb.ToString());
 
@@ -531,6 +550,14 @@ namespace SESM.Tools.Helpers
                 settingsNode.SelectSingleNode("descendant::PermanentDeath").InnerText =
                     PermanentDeath.ToString().ToLower();
 
+
+                valueNode = settingsNode.SelectSingleNode("descendant::AutoSaveInMinutes");
+                if(valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "AutoSaveInMinutes", null));
+                settingsNode.SelectSingleNode("descendant::AutoSaveInMinutes").InnerText =
+                    AutoSaveInMinutes.ToString();
+
+
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "PermanentDeath", null));
@@ -620,6 +647,8 @@ namespace SESM.Tools.Helpers
                 double.TryParse(sessionSettings.Element("HackSpeedMultiplier").Value, out HackSpeedMultiplier);
             if (sessionSettings.Element("PermanentDeath") != null)
                 bool.TryParse(sessionSettings.Element("PermanentDeath").Value, out PermanentDeath);
+            if(sessionSettings.Element("AutoSaveInMinutes") != null)
+                int.TryParse(sessionSettings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
             if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                 Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
             if (root.Element("LoadWorld") != null)
@@ -662,8 +691,12 @@ namespace SESM.Tools.Helpers
                 ulong.TryParse(root.Element("GroupID").Value, out GroupID);
             if (root.Element("ServerName") != null)
                 ServerName = root.Element("ServerName").Value;
+            if(root.Element("WorldName") != null)
+                WorldName = root.Element("WorldName").Value;
             if (root.Element("PauseGameWhenEmpty") != null)
                 bool.TryParse(root.Element("PauseGameWhenEmpty").Value, out PauseGameWhenEmpty);
+            if(root.Element("IgnoreLastSession") != null)
+                bool.TryParse(root.Element("IgnoreLastSession").Value, out IgnoreLastSession);
             return true;
         }
 
@@ -732,6 +765,8 @@ namespace SESM.Tools.Helpers
                 double.TryParse(settings.Element("HackSpeedMultiplier").Value, out HackSpeedMultiplier);
             if (settings.Element("PermanentDeath") != null)
                 bool.TryParse(settings.Element("PermanentDeath").Value, out PermanentDeath);
+            if(settings.Element("AutoSaveInMinutes") != null)
+                int.TryParse(settings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
             
             Mods = new List<ulong>();
             if (root.Element("Mods") != null)

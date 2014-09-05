@@ -30,6 +30,19 @@ namespace SESM.DAL
                 return true;
             }
         }
+        public bool CheckSESEPortAvailability(int port)
+        {
+            try
+            {
+                if(_context.Servers.First(s => s.ServerExtenderPort == port) != null)
+                    return false;
+                return true;
+            }
+            catch(Exception)
+            {
+                return true;
+            }
+        }
         public void AddAdministrator(string[] listUsers, EntityServer server)
         {
             UserProvider usrPrv = new UserProvider(_context);
@@ -72,7 +85,17 @@ namespace SESM.DAL
                 return null;
             }
         }
-
+        public EntityServer GetServerBySESEPort(int port)
+        {
+            try
+            {
+                return _context.Servers.First(s => s.ServerExtenderPort == port);
+            }
+            catch(Exception)
+            {
+                return null;
+            }
+        }
         public EntityServer GetServer(int id)
         {
             try

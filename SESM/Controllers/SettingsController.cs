@@ -152,7 +152,7 @@ namespace SESM.Controllers
 
                     foreach (EntityServer item in listStartedServ)
                     {
-                        ServiceHelper.StartService(ServiceHelper.GetServiceName(item));
+                        ServiceHelper.StartService(item);
                     }
                     RedirectToAction("Index", "Server");
                 }
@@ -223,7 +223,7 @@ namespace SESM.Controllers
 
                 foreach (EntityServer item in listStartedServ)
                 {
-                    ServiceHelper.StartService(ServiceHelper.GetServiceName(item));
+                    ServiceHelper.StartService(item);
                 }
 
                 return RedirectToAction("Index", "Server");

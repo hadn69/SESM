@@ -163,7 +163,7 @@ namespace SESM.Controllers
             config.Save(serv);
 
             if(toRestart)
-                ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StartService(serv);
             return RedirectToAction("Status", "Server", new { id = id }).Success("Backup \"" + model.BackupName + "\" (Map \"" + nameNode.InnerText + "\") restored");
         }
         protected override void Dispose(bool disposing)

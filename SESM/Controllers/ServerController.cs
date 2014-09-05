@@ -72,10 +72,13 @@ namespace SESM.Controllers
                 if (!srvPrv.CheckPortAvailability(model.ServerPort))
                 {
                     ModelState.AddModelError("PortUnavailable", "The server port is already used (on " + srvPrv.GetServerByPort(model.ServerPort).Name + ")");
-                    return View(model);
+                    return View(model).Danger("The server port is already used (on " + srvPrv.GetServerByPort(model.ServerPort).Name + ")");
                 }
-
-
+                if(!srvPrv.CheckSESEPortAvailability(model.ServerExtenderPort))
+                {
+                    ModelState.AddModelError("PortUnavailable", "The server extender port is already in use (on " + srvPrv.GetServerBySESEPort(model.ServerExtenderPort).Name + ")");
+                    return View(model).Danger("The server extender port is already in use (on " + srvPrv.GetServerBySESEPort(model.ServerExtenderPort).Name + ")");
+                }
 
                 string[] webAdminsSplitted = model.WebAdministrators != null ? model.WebAdministrators.Split(';') : new string[0];
                 string[] webManagerSplitted = model.WebManagers != null ? model.WebManagers.Split(';') : new string[0];
@@ -108,6 +111,10 @@ namespace SESM.Controllers
                 serv.Port = model.ServerPort;
                 serv.Name = model.Name;
                 serv.IsPublic = model.IsPublic;
+                serv.IsAutoRestartEnabled = model.AutoRestart;
+                serv.AutoRestartCron = model.AutoRestartCron;
+                serv.UseServerExtender = model.UseServerExtender;
+                serv.ServerExtenderPort = model.ServerExtenderPort;
 
                 srvPrv.AddAdministrator(webAdminsSplitted, serv);
                 srvPrv.AddManagers(webManagerSplitted, serv);
@@ -121,7 +128,27 @@ namespace SESM.Controllers
                 ServerConfigHelper configHelper = new ServerConfigHelper();
                 configHelper.ParseIn(model);
                 configHelper.Save(serv);
-                ServiceHelper.RegisterService(ServiceHelper.GetServiceName(serv));
+                if(serv.UseServerExtender)
+                    ServiceHelper.RegisterServerExtenderService(serv);
+                else
+                    ServiceHelper.RegisterService(ServiceHelper.GetServiceName(serv));
+
+                IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+                if(serv.IsAutoRestartEnabled)
+                {
+                    IJobDetail autoRestartJob = JobBuilder.Create<AutoRestartJob>()
+                        .WithIdentity("AutoRestart" + serv.Id + "Job", "AutoRestart")
+                        .UsingJobData("id", serv.Id)
+                        .Build();
+
+                    ITrigger autoRestartTrigger = TriggerBuilder.Create()
+                        .WithIdentity("AutoRestart" + serv.Id + "Trigger", "AutoRestart")
+                        .WithCronSchedule(model.AutoRestartCron)
+                        .StartNow()
+                        .Build();
+
+                    scheduler.ScheduleJob(autoRestartJob, autoRestartTrigger);
+                }
 
                 return RedirectToAction("Index","Map", new { id = serv.Id }).Success("Server created sucessfuly, you may now create a map or upload one in the map manager.");
             }
@@ -208,7 +235,7 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 
-            ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
+            ServiceHelper.StartService(serv);
 
             return RedirectToAction("Status", new { id = id }).Success("Server Started");
         }
@@ -227,7 +254,7 @@ namespace SESM.Controllers
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-                    ServiceHelper.StartService(ServiceHelper.GetServiceName(item));
+                    ServiceHelper.StartService(item);
             }
 
             return RedirectToAction("Index").Success("All Server Started");
@@ -285,7 +312,7 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 
-            ServiceHelper.RestartService(ServiceHelper.GetServiceName(serv));
+            ServiceHelper.RestartService(serv);
 
             return RedirectToAction("Status", new { id = id });
         }
@@ -318,7 +345,7 @@ namespace SESM.Controllers
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-                    ServiceHelper.StartService(ServiceHelper.GetServiceName(item));
+                    ServiceHelper.StartService(item);
             }
 
             return RedirectToAction("Index");
@@ -392,6 +419,8 @@ namespace SESM.Controllers
             serverView.IsLvl3BackupEnabled = serv.IsLvl3BackupEnabled;
             serverView.AutoRestart = serv.IsAutoRestartEnabled;
             serverView.AutoRestartCron = serv.AutoRestartCron;
+            serverView.UseServerExtender = serv.UseServerExtender;
+            serverView.ServerExtenderPort = serv.ServerExtenderPort;
 
             serverView.WebAdministrators = string.Join("\r\n", serv.Administrators.Select(item => item.Login).ToList());
             serverView.WebManagers = string.Join("\r\n", serv.Managers.Select(item => item.Login).ToList());
@@ -438,7 +467,7 @@ namespace SESM.Controllers
                           string.IsNullOrEmpty(string.Join("\r\n", WebAdminsList))))
                     {
                         ModelState.AddModelError("AdminModified", "You can't modify the Web Administrator list");
-                        return View("Details", model);
+                        return View("Details", model).Danger("You can't modify the Web Administrator list");
                     }
                 }
 
@@ -452,15 +481,22 @@ namespace SESM.Controllers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
-                    return View("Details", model);
+                    return View("Details", model).Danger("You can't modify the greyed fields, bad boy !");
                 }
 
-                if (serv.Port != model.ServerPort && !srvPrv.CheckPortAvailability(model.ServerPort))
+                if (serv.Port != model.ServerPort 
+                    && !srvPrv.CheckPortAvailability(model.ServerPort))
                 {
                     ModelState.AddModelError("PortUnavailable", "The server port is already in use (on " + srvPrv.GetServerByPort(model.ServerPort).Name + ")");
-                    return View("Details", model);
+                    return View("Details", model).Danger("The server port is already in use (on " + srvPrv.GetServerByPort(model.ServerPort).Name + ")");
                 }
-
+                if(model.UseServerExtender
+                    && serv.ServerExtenderPort != model.ServerExtenderPort
+                    && !srvPrv.CheckSESEPortAvailability(model.ServerExtenderPort))
+                {
+                    ModelState.AddModelError("PortUnavailable", "The server extender port is already in use (on " + srvPrv.GetServerBySESEPort(model.ServerExtenderPort).Name + ")");
+                    return View("Details", model).Danger("The server extender port is already in use (on " + srvPrv.GetServerBySESEPort(model.ServerExtenderPort).Name + ")");
+                }
 
 
                 string[] webAdminsSplitted = model.WebAdministrators != null ? Regex.Split(model.WebAdministrators, "\r\n") : new string[0];
@@ -506,14 +542,14 @@ namespace SESM.Controllers
                 scheduler.DeleteJob(new JobKey("AutoRestart" + serv.Id + "Job", "AutoRestart"));
                 if (serv.IsAutoRestartEnabled)
                 {
-                    IJobDetail autoRestartJob = JobBuilder.Create<BackupJob>()
+                    IJobDetail autoRestartJob = JobBuilder.Create<AutoRestartJob>()
                         .WithIdentity("AutoRestart" + serv.Id + "Job", "AutoRestart")
                         .UsingJobData("id", serv.Id)
                         .Build();
 
                     ITrigger autoRestartTrigger = TriggerBuilder.Create()
                         .WithIdentity("AutoRestart" + serv.Id + "Trigger", "AutoRestart")
-                        .WithCronSchedule(SESMConfigHelper.ABIntervalLvl3)
+                        .WithCronSchedule(model.AutoRestartCron)
                         .StartNow()
                         .Build();
 
@@ -525,17 +561,30 @@ namespace SESM.Controllers
 
                 ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
 
-                if (model.Name != serv.Name)
+                if (model.Name != serv.Name 
+                    || model.UseServerExtender != serv.UseServerExtender 
+                    || model.ServerExtenderPort != serv.ServerExtenderPort)
                 {
                     ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(serv));
-                    
-                    string oldPath = PathHelper.GetInstancePath(serv);
-                    serv.Name = model.Name;
+                    if (model.Name != serv.Name)
+                    {
+                        string oldPath = PathHelper.GetInstancePath(serv);
+                        serv.Name = model.Name;
+                        srvPrv.UpdateServer(serv);
+                        if (Directory.Exists(oldPath))
+                            Directory.Move(oldPath, PathHelper.GetInstancePath(serv));
+                    }
+                    serv.UseServerExtender = model.UseServerExtender;
+                    serv.ServerExtenderPort = model.ServerExtenderPort;
                     srvPrv.UpdateServer(serv);
-                    if (Directory.Exists(oldPath))
-                        Directory.Move(oldPath, PathHelper.GetInstancePath(serv));
-
-                    ServiceHelper.RegisterService(ServiceHelper.GetServiceName(serv));
+                    if (model.UseServerExtender)
+                    {
+                        ServiceHelper.RegisterServerExtenderService(serv);
+                    }
+                    else
+                    {
+                        ServiceHelper.RegisterService(ServiceHelper.GetServiceName(serv));
+                    }
                 }
 
                 model.SaveName = serverConfig.SaveName;
@@ -545,7 +594,7 @@ namespace SESM.Controllers
 
                 serverConfig.Save(serv);
 
-                ServiceHelper.StartService(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StartService(serv);
                 return RedirectToAction("Status", new { id = id }).Success("Server Configuration Updated");
             }
             return View("Details", model);
@@ -579,9 +628,6 @@ namespace SESM.Controllers
                 List<string> WebManagersList = serv.Managers.Select(item => item.Login).ToList();
                 List<string> WebUsersList = serv.Users.Select(item => item.Login).ToList();
 
-
-
-
                 if ((accessLevel == AccessLevel.Manager || accessLevel == AccessLevel.Admin)
                     && model.WebAdministrators != string.Join("\r\n", WebAdminsList))
                 {
@@ -589,7 +635,7 @@ namespace SESM.Controllers
                           string.IsNullOrEmpty(string.Join("\r\n", WebAdminsList))))
                     {
                         ModelState.AddModelError("AdminModified", "You can't modify the Web Administrator list");
-                        return View("Details", model);
+                        return View("Details", model).Danger("You can't modify the Web Administrator list");
                     }
                 }
                 if (accessLevel == AccessLevel.Manager
@@ -599,16 +645,25 @@ namespace SESM.Controllers
                     || model.SteamPort != serverConfig.SteamPort
                     || model.GameMode != serverConfig.GameMode
                     || model.MaxPlayers != serverConfig.MaxPlayers
-                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects))
+                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
+                    || model.UseServerExtender != serv.UseServerExtender
+                    || model.ServerExtenderPort != serv.ServerExtenderPort))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
-                    return View("Details", model);
+                    return View("Details", model).Danger("You can't modify the greyed fields, bad boy !");
                 }
 
                 if (serv.Port != model.ServerPort && !srvPrv.CheckPortAvailability(model.ServerPort))
                 {
                     ModelState.AddModelError("PortUnavailable", "The server port is already in use (on " + srvPrv.GetServerByPort(model.ServerPort).Name + ")");
-                    return View("Details", model);
+                    return View("Details", model).Danger("The server port is already in use (on " + srvPrv.GetServerByPort(model.ServerPort).Name + ")");
+                }
+                if(model.UseServerExtender
+                    && serv.ServerExtenderPort != model.ServerExtenderPort
+                    && !srvPrv.CheckSESEPortAvailability(model.ServerExtenderPort))
+                {
+                    ModelState.AddModelError("PortUnavailable", "The server extender port is already in use (on " + srvPrv.GetServerBySESEPort(model.ServerExtenderPort).Name + ")");
+                    return View("Details", model).Danger("The server extender port is already in use (on " + srvPrv.GetServerBySESEPort(model.ServerExtenderPort).Name + ")");
                 }
 
                 string[] webAdminsSplitted = model.WebAdministrators != null ? Regex.Split(model.WebAdministrators, "\r\n") : new string[0];
@@ -635,6 +690,14 @@ namespace SESM.Controllers
                 if (errorFlag)
                     return View("Details", model);
 
+                if ((srvPrv.GetState(serv) != ServiceState.Stopped && srvPrv.GetState(serv) != ServiceState.Unknow )
+                    && (model.Name != serv.Name
+                    || model.UseServerExtender != serv.UseServerExtender
+                    || model.ServerExtenderPort != serv.ServerExtenderPort))
+                {
+                    return View("Details", model).Danger("You can't change the name, activate/deactivate SE Server Extender or change it's port whan the server is running !");
+                }
+
                 serv.Ip = model.IP;
                 serv.Port = model.ServerPort;
                 serv.IsPublic = model.IsPublic;
@@ -654,14 +717,14 @@ namespace SESM.Controllers
                 scheduler.DeleteJob(new JobKey("AutoRestart" + serv.Id + "Job", "AutoRestart"));
                 if(serv.IsAutoRestartEnabled)
                 {
-                    IJobDetail autoRestartJob = JobBuilder.Create<BackupJob>()
+                    IJobDetail autoRestartJob = JobBuilder.Create<AutoRestartJob>()
                         .WithIdentity("AutoRestart" + serv.Id + "Job", "AutoRestart")
                         .UsingJobData("id", serv.Id)
                         .Build();
 
                     ITrigger autoRestartTrigger = TriggerBuilder.Create()
                         .WithIdentity("AutoRestart" + serv.Id + "Trigger", "AutoRestart")
-                        .WithCronSchedule(SESMConfigHelper.ABIntervalLvl3)
+                        .WithCronSchedule(model.AutoRestartCron)
                         .StartNow()
                         .Build();
 
@@ -670,17 +733,30 @@ namespace SESM.Controllers
 
                 srvPrv.UpdateServer(serv);
 
-                if (model.Name != serv.Name)
+                if(model.Name != serv.Name
+                    || model.UseServerExtender != serv.UseServerExtender
+                    || model.ServerExtenderPort != serv.ServerExtenderPort)
                 {
                     ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(serv));
-
-                    string oldPath = PathHelper.GetInstancePath(serv);
-                    serv.Name = model.Name;
+                    if(model.Name != serv.Name)
+                    {
+                        string oldPath = PathHelper.GetInstancePath(serv);
+                        serv.Name = model.Name;
+                        srvPrv.UpdateServer(serv);
+                        if(Directory.Exists(oldPath))
+                            Directory.Move(oldPath, PathHelper.GetInstancePath(serv));
+                    }
+                    serv.UseServerExtender = model.UseServerExtender;
+                    serv.ServerExtenderPort = model.ServerExtenderPort;
                     srvPrv.UpdateServer(serv);
-                    if (Directory.Exists(oldPath))
-                        Directory.Move(oldPath, PathHelper.GetInstancePath(serv));
-
-                    ServiceHelper.RegisterService(ServiceHelper.GetServiceName(serv));
+                    if(model.UseServerExtender)
+                    {
+                        ServiceHelper.RegisterServerExtenderService(serv);
+                    }
+                    else
+                    {
+                        ServiceHelper.RegisterService(ServiceHelper.GetServiceName(serv));
+                    }
                 }
 
                 model.SaveName = serverConfig.SaveName;

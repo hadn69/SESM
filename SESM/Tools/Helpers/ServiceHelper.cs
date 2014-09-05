@@ -15,7 +15,7 @@ namespace SESM.Tools.Helpers
         
         public static string GetServiceName(EntityServer server)
         {
-            return PathHelper.GetPrefix() + "_" + server.Id + "_" + server.Name;
+            return GetServiceName(PathHelper.GetPrefix(), server);
         }
 
         public static string GetServiceName(string prefix, EntityServer server)
@@ -68,14 +68,29 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public static void StartService(string serviceName)
+        public static void StartService(EntityServer server)
         {
+            string serviceName = GetServiceName(server);
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
-
-                if (svcController.Status == ServiceControllerStatus.Stopped)
-                    svcController.Start();
+                if (svcController.Status != ServiceControllerStatus.Running)
+                {
+                    if (!server.UseServerExtender)
+                    {
+                        svcController.Start();
+                    }
+                    else
+                    {
+                        string[] argsStr = new string[5];
+                        argsStr[0] = "nogui";
+                        argsStr[1] = "noconsole";
+                        argsStr[2] = "wcfport=" + server.ServerExtenderPort;
+                        argsStr[3] = "instance=" + serviceName;
+                        argsStr[4] = "gamepath=" + SESMConfigHelper.SEDataPath;
+                        svcController.Start(argsStr);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -83,8 +98,9 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public static void RestartService(string serviceName)
+        public static void RestartService(EntityServer server)
         {
+            string serviceName = GetServiceName(server);
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
@@ -92,7 +108,7 @@ namespace SESM.Tools.Helpers
                 {
                     svcController.Stop();
                     svcController.WaitForStatus(ServiceControllerStatus.Stopped);
-                    svcController.Start();
+                    StartService(server);
                 }
             }
             catch (Exception ex)
@@ -144,7 +160,29 @@ namespace SESM.Tools.Helpers
                 si.Close();
             }
         }
-        
+
+        public static void RegisterServerExtenderService(EntityServer server)
+        {
+            if(DoesServiceExist(server))
+                return;
+
+            string dataPath = SESMConfigHelper.SEDataPath + @"DedicatedServer64\SEServerExtender.exe";
+
+            Process si = new Process();
+            si.StartInfo.WorkingDirectory = @"c:\";
+            si.StartInfo.UseShellExecute = false;
+            si.StartInfo.FileName = "cmd.exe";
+            si.StartInfo.Arguments = "/c \"sc create " + GetServiceName(server) + " start= auto binPath= ^\"" + dataPath
+                + " ^\" \"";
+            si.StartInfo.CreateNoWindow = true;
+            si.StartInfo.RedirectStandardInput = true;
+            si.StartInfo.RedirectStandardOutput = true;
+            si.StartInfo.RedirectStandardError = true;
+            si.Start();
+            string output = si.StandardOutput.ReadToEnd();
+            si.Close();
+        }
+
         // Source : http://stackoverflow.com/a/566089
         public static void KillService(string serviceName)
         {
@@ -252,6 +290,11 @@ namespace SESM.Tools.Helpers
             ServiceController[] services = ServiceController.GetServices();
             var service = services.FirstOrDefault(s => s.ServiceName == serviceName);
             return service != null;
+        }
+
+        public static bool DoesServiceExist(EntityServer server)
+        {
+            return DoesServiceExist(GetServiceName(server));
         }
 
         public struct Ressources
