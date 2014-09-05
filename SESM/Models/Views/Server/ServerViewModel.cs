@@ -268,7 +268,7 @@ namespace SESM.Models.Views.Server
             UseServerExtender = false;
             ServerExtenderPort = 26016;
             IgnoreLastSession = false;
-            WorldName = "SESM - MyMap";
+            //WorldName = "SESM - MyMap";
             AutoSaveInMinutes = 5;
         }
     }

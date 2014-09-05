@@ -54,7 +54,7 @@ namespace SESM.Tools.Helpers
         public bool PauseGameWhenEmpty = false;
 
         public bool IgnoreLastSession = false;
-        public string WorldName = "SESM - MyMap";
+        public string WorldName = string.Empty;
         public int AutoSaveInMinutes = 5;
 
         /// <summary>
@@ -350,11 +350,11 @@ namespace SESM.Tools.Helpers
             if (string.IsNullOrEmpty(ServerName))
                 sb.AppendLine("  <ServerName />");
             else
-                sb.AppendLine("  <WorldName>" + ServerName + "</WorldName>");
+                sb.AppendLine("  <ServerName>" + ServerName + "</ServerName>");
             if(string.IsNullOrEmpty(WorldName))
                 sb.AppendLine("  <WorldName />");
             else
-                sb.AppendLine("  <ServerName>" + ServerName + "</ServerName>");
+                sb.AppendLine("  <WorldName>" + WorldName + "</WorldName>");
             sb.AppendLine("  <PauseGameWhenEmpty>" + PauseGameWhenEmpty.ToString().ToLower() + "</PauseGameWhenEmpty>");
             sb.AppendLine("  <IgnoreLastSession>" + IgnoreLastSession.ToString().ToLower() + "</IgnoreLastSession>");
             sb.AppendLine("</MyConfigDedicated>");
