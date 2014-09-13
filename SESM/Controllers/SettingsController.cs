@@ -19,7 +19,7 @@ namespace SESM.Controllers
 
     public class SettingsController : Controller
     {
-        readonly DataContext _context = new DataContext();
+        private readonly DataContext _context = new DataContext();
 
         //
         // GET: Settings
@@ -75,7 +75,8 @@ namespace SESM.Controllers
                     || model.SendLogToKeen != SESMConfigHelper.SendLogToKeen)
                 {
                     // Getting started server list
-                    List<EntityServer> listStartedServ = srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
+                    List<EntityServer> listStartedServ =
+                        srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
 
                     foreach (EntityServer item in srvPrv.GetAllServers())
                     {
@@ -115,13 +116,16 @@ namespace SESM.Controllers
                         if (Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
                             Directory.Move(SESMConfigHelper.SEDataPath + @"Content\", model.SEDataPath + @"Content\");
                         if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
-                            Directory.Move(SESMConfigHelper.SEDataPath + @"DedicatedServer\", model.SEDataPath + @"DedicatedServer\");
+                            Directory.Move(SESMConfigHelper.SEDataPath + @"DedicatedServer\",
+                                model.SEDataPath + @"DedicatedServer\");
                         if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
-                            Directory.Move(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", model.SEDataPath + @"DedicatedServer64\");
+                            Directory.Move(SESMConfigHelper.SEDataPath + @"DedicatedServer64\",
+                                model.SEDataPath + @"DedicatedServer64\");
                         if (Directory.Exists(SESMConfigHelper.SEDataPath + @"SteamCMD\"))
                             Directory.Move(SESMConfigHelper.SEDataPath + @"SteamCMD\", model.SEDataPath + @"SteamCMD\");
                         if (Directory.Exists(SESMConfigHelper.SEDataPath + @"autoupdatedata\"))
-                            Directory.Move(SESMConfigHelper.SEDataPath + @"autoupdatedata\", model.SEDataPath + @"autoupdatedata\");
+                            Directory.Move(SESMConfigHelper.SEDataPath + @"autoupdatedata\",
+                                model.SEDataPath + @"autoupdatedata\");
 
                         SESMConfigHelper.SEDataPath = model.SEDataPath;
                     }
@@ -130,8 +134,10 @@ namespace SESM.Controllers
                     {
                         foreach (EntityServer item in srvPrv.GetAllServers())
                         {
-                            Directory.Move(SESMConfigHelper.SEDataPath + ServiceHelper.GetServiceName(SESMConfigHelper.Prefix, item),
-                                            SESMConfigHelper.SEDataPath + ServiceHelper.GetServiceName(model.Prefix, item));
+                            Directory.Move(
+                                SESMConfigHelper.SEDataPath +
+                                ServiceHelper.GetServiceName(SESMConfigHelper.Prefix, item),
+                                SESMConfigHelper.SEDataPath + ServiceHelper.GetServiceName(model.Prefix, item));
                         }
                         SESMConfigHelper.Prefix = model.Prefix;
                     }
@@ -251,7 +257,8 @@ namespace SESM.Controllers
             else
             {
                 model.DatabaseConnexion.State = false;
-                model.DatabaseConnexion.Message = "Connection to database failed. <br/> Check your connexion string in SESM.config";
+                model.DatabaseConnexion.Message =
+                    "Connection to database failed. <br/> Check your connexion string in SESM.config";
             }
 
             switch (SESMConfigHelper.Arch)
@@ -260,24 +267,28 @@ namespace SESM.Controllers
                     if (System.Environment.Is64BitOperatingSystem)
                     {
                         model.ArchMatch.State = true;
-                        model.ArchMatch.Message = "You are on a 64 Bits computer and you want to run 64 Bits servers. It will work !";
+                        model.ArchMatch.Message =
+                            "You are on a 64 Bits computer and you want to run 64 Bits servers. It will work !";
                     }
                     else
                     {
                         model.ArchMatch.State = false;
-                        model.ArchMatch.Message = "You are on a 32 Bits computer and you want to run 64 Bits servers. It won't work ! <br/>Please consider changing your Architecture variable to x86";
+                        model.ArchMatch.Message =
+                            "You are on a 32 Bits computer and you want to run 64 Bits servers. It won't work ! <br/>Please consider changing your Architecture variable to x86";
                     }
                     break;
                 case ArchType.x86:
                     if (System.Environment.Is64BitOperatingSystem)
                     {
                         model.ArchMatch.State = true;
-                        model.ArchMatch.Message = "You are on a 64 Bits computer and you want to run 32 Bits servers. It will work ! <br/>(but you should consider switching your arch variable to x64 for better performances)";
+                        model.ArchMatch.Message =
+                            "You are on a 64 Bits computer and you want to run 32 Bits servers. It will work ! <br/>(but you should consider switching your arch variable to x64 for better performances)";
                     }
                     else
                     {
                         model.ArchMatch.State = true;
-                        model.ArchMatch.Message = "You are on a 32 Bits computer and you want to run 32 Bits servers. It will work !";
+                        model.ArchMatch.Message =
+                            "You are on a 32 Bits computer and you want to run 32 Bits servers. It will work !";
                     }
                     break;
             }
@@ -286,24 +297,30 @@ namespace SESM.Controllers
             if (System.IO.File.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\SpaceEngineersDedicated.exe"))
             {
                 model.Binariesx86.State = true;
-                model.Binariesx86.Message = "32 Bits Space Engineers bianries found at " + SESMConfigHelper.SEDataPath + @"DedicatedServer\SpaceEngineersDedicated.exe";
+                model.Binariesx86.Message = "32 Bits Space Engineers bianries found at " + SESMConfigHelper.SEDataPath +
+                                            @"DedicatedServer\SpaceEngineersDedicated.exe";
             }
             else
             {
                 model.Binariesx86.State = false;
-                model.Binariesx86.Message = "32 Bits Space Engineers bianries not found at " + SESMConfigHelper.SEDataPath + @"DedicatedServer\SpaceEngineersDedicated.exe<br/>You should try to reupload your game files or activate the auto update";
+                model.Binariesx86.Message = "32 Bits Space Engineers bianries not found at " +
+                                            SESMConfigHelper.SEDataPath +
+                                            @"DedicatedServer\SpaceEngineersDedicated.exe<br/>You should try to reupload your game files or activate the auto update";
             }
 
 
             if (System.IO.File.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\SpaceEngineersDedicated.exe"))
             {
                 model.Binariesx64.State = true;
-                model.Binariesx64.Message = "64 Bits Space Engineers bianries found at " + SESMConfigHelper.SEDataPath + @"DedicatedServer64\SpaceEngineersDedicated.exe";
+                model.Binariesx64.Message = "64 Bits Space Engineers bianries found at " + SESMConfigHelper.SEDataPath +
+                                            @"DedicatedServer64\SpaceEngineersDedicated.exe";
             }
             else
             {
                 model.Binariesx64.State = false;
-                model.Binariesx64.Message = "64 Bits Space Engineers bianries not found at " + SESMConfigHelper.SEDataPath + @"DedicatedServer64\SpaceEngineersDedicated.exe<br/>You should try to reupload your game files or activate the auto update";
+                model.Binariesx64.Message = "64 Bits Space Engineers bianries not found at " +
+                                            SESMConfigHelper.SEDataPath +
+                                            @"DedicatedServer64\SpaceEngineersDedicated.exe<br/>You should try to reupload your game files or activate the auto update";
             }
 
 
@@ -322,13 +339,15 @@ namespace SESM.Controllers
                 else
                 {
                     model.ServiceDeletion.State = false;
-                    model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" failed<br/>Check if the application pool have admin rights";
+                    model.ServiceDeletion.Message =
+                        "Deletion of the service \"SESMDiagTest\" failed<br/>Check if the application pool have admin rights";
                 }
             }
             else
             {
                 model.ServiceCreation.State = false;
-                model.ServiceCreation.Message = "Creation of the service \"SESMDiagTest\" failed<br/>Check if the application pool have admin rights";
+                model.ServiceCreation.Message =
+                    "Creation of the service \"SESMDiagTest\" failed<br/>Check if the application pool have admin rights";
 
                 model.ServiceDeletion.State = null;
                 model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" irrelevant";
@@ -351,7 +370,8 @@ namespace SESM.Controllers
                 catch (Exception)
                 {
                     model.FileDeletion.State = false;
-                    model.FileDeletion.Message = @"Deletion of the file C:\SESMDiagTest.bin failed <br/>Check if the application pool have admin rights";
+                    model.FileDeletion.Message =
+                        @"Deletion of the file C:\SESMDiagTest.bin failed <br/>Check if the application pool have admin rights";
                 }
 
 
@@ -359,7 +379,8 @@ namespace SESM.Controllers
             catch (Exception)
             {
                 model.FileCreation.State = false;
-                model.FileCreation.Message = @"Creation of the file C:\SESMDiagTest.bin failed <br/>Check if the application pool have admin rights";
+                model.FileCreation.Message =
+                    @"Creation of the file C:\SESMDiagTest.bin failed <br/>Check if the application pool have admin rights";
 
                 model.FileDeletion.State = null;
                 model.FileDeletion.Message = @"Deletion of the file C:\SESMDiagTest.bin irrelevant";
@@ -454,13 +475,22 @@ namespace SESM.Controllers
                     return RedirectToAction("Index").Danger("Wrong credentials, please check and try again");
                     break;
                 case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardMissing:
-                    return RedirectToAction("Index").Danger("Steam Guard active on your account, please input the code in SteamCMD Configuration page and try again");
+                    return
+                        RedirectToAction("Index")
+                            .Danger(
+                                "Steam Guard active on your account, please input the code in SteamCMD Configuration page and try again");
                     break;
                 case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardBadCode:
-                    return RedirectToAction("Index").Danger("Wrong Steam Guard code, please input the right code in SteamCMD Configuration page and try again");
+                    return
+                        RedirectToAction("Index")
+                            .Danger(
+                                "Wrong Steam Guard code, please input the right code in SteamCMD Configuration page and try again");
                     break;
                 case SteamCMDHelper.SteamCMDResult.Fail_TooLong:
-                    return RedirectToAction("Index").Warning("Update took too long. If it's the first update and you don't have a server-grade connection, please try again");
+                    return
+                        RedirectToAction("Index")
+                            .Warning(
+                                "Update took too long. If it's the first update and you don't have a server-grade connection, please try again");
                     break;
                 case SteamCMDHelper.SteamCMDResult.Success_NothingToDo:
                     return RedirectToAction("Index").Success("There are no updates available :-(");
@@ -529,7 +559,9 @@ namespace SESM.Controllers
             SteamCMDHelper.Initialise(logger, model.UserName, model.Password, string.Empty);
             logger.Info("----End of SteamCMD SteamGuard Firering----");
 
-            return RedirectToAction("SteamCMD", "Settings").Information("Steam Guard Fired, please check your Inbox and input the Steam Guard code below");
+            return
+                RedirectToAction("SteamCMD", "Settings")
+                    .Information("Steam Guard Fired, please check your Inbox and input the Steam Guard code below");
         }
 
         [HttpGet]
@@ -643,7 +675,7 @@ namespace SESM.Controllers
             if (Directory.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\"))
                 Directory.Delete(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\", true);
 
-            return RedirectToAction("Index", "Home").Success("Auto/Manual Update Clened Up");
+            return RedirectToAction("Index", "Home").Success("Auto/Manual Update Cleaned Up");
         }
 
         [HttpGet]
@@ -655,6 +687,48 @@ namespace SESM.Controllers
             _context.Database.ExecuteSqlCommand("truncate table SESM.dbo.EntityPerfEntries");
             return RedirectToAction("Index", "Home").Success("Perf Data Cleaned Up");
         }
+
+        public ActionResult ManualUpdateForce()
+        {
+            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
+
+            logger.Info("----Starting ManualUpdateForce----");
+            SteamCMDHelper.SteamCMDResult result = SteamCMDHelper.ForceUpdate(logger, 300);
+            logger.Info("----End of ManualUpdateForce----");
+
+            switch (result)
+            {
+                case SteamCMDHelper.SteamCMDResult.Fail_Credentials:
+                    return RedirectToAction("Index").Danger("Wrong credentials, please check and try again");
+                    break;
+                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardMissing:
+                    return
+                        RedirectToAction("Index")
+                            .Danger(
+                                "Steam Guard active on your account, please input the code in SteamCMD Configuration page and try again");
+                    break;
+                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardBadCode:
+                    return
+                        RedirectToAction("Index")
+                            .Danger(
+                                "Wrong Steam Guard code, please input the right code in SteamCMD Configuration page and try again");
+                    break;
+                case SteamCMDHelper.SteamCMDResult.Fail_TooLong:
+                    return RedirectToAction("Index")
+                            .Warning("Update took too long. If it's the first update and you don't have a server-grade connection, please try again");
+                    break;
+                case SteamCMDHelper.SteamCMDResult.Success_NothingToDo:
+                    return RedirectToAction("Index").Success("There are no updates available :-(");
+                    break;
+                case SteamCMDHelper.SteamCMDResult.Success_UpdateInstalled:
+                    return RedirectToAction("Index").Success("Manual Update Successful");
+                    break;
+                default:
+                    return RedirectToAction("Index").Danger("Manual Update : Unknow Error");
+                    break;
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -663,7 +737,6 @@ namespace SESM.Controllers
             }
             base.Dispose(disposing);
         }
-
 
     }
 }

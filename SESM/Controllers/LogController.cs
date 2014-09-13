@@ -41,8 +41,8 @@ namespace SESM.Controllers
             foreach (string item in listLog)
             {
                 SelectListItem sli = new SelectListItem();
-                sli.Text = System.IO.File.GetLastWriteTime(item).ToString("dd/MM/yy HH:mm:ss") + " " + PathHelper.GetLastDirName(item);
-                sli.Value = PathHelper.GetLastDirName(item);
+                sli.Text = System.IO.File.GetLastWriteTime(item).ToString("dd/MM/yy HH:mm:ss") + " " + PathHelper.GetLastLeaf(item);
+                sli.Value = PathHelper.GetLastLeaf(item);
                 listSLI.Add(sli);
             }
 

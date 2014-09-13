@@ -652,7 +652,7 @@ namespace SESM.Tools.Helpers
             if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                 Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
             if (root.Element("LoadWorld") != null)
-                SaveName = PathHelper.GetLastDirName(root.Element("LoadWorld").Value);
+                SaveName = PathHelper.GetLastLeaf(root.Element("LoadWorld").Value);
             if (root.Element("IP") != null)
                 IP = root.Element("IP").Value;
             if (root.Element("SteamPort") != null)

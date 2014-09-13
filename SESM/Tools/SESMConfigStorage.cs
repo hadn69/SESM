@@ -19,6 +19,11 @@ namespace SESM.Tools
         public string AUUsername { get; set; }
         public string AUPassword { get; set; }
         public string AUInterval { get; set; }
+        public string AUBetaName { get; set; }
+        public string AUBetaPassword { get; set; }
+
+        public bool UseSESE { get; set; }
+        public bool SESEDev { get; set; }
 
         public bool AutoBackupLvl1 { get; set; }
         public string ABIntervalLvl1 { get; set; }
@@ -49,6 +54,11 @@ namespace SESM.Tools
             AUUsername = "SteamUsername";
             AUPassword = "";
             AUInterval = "0 0/10 * * * ?";
+            AUBetaName = "";
+            AUBetaPassword = "";
+
+            UseSESE = false;
+            SESEDev = true;
 
             AutoBackupLvl1 = false;
             ABIntervalLvl1 = "0 0/10 * * * ?";

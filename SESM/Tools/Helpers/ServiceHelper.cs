@@ -226,8 +226,23 @@ namespace SESM.Tools.Helpers
                 }
                 
             }
+            KillAllSESEService();
         }
+        public static void KillAllSESEService()
+        {
+            foreach(Process proc in Process.GetProcessesByName("SEServerExtender"))
+            {
+                try
+                {
+                    proc.Kill();
+                }
+                catch(Exception)
+                {
+                    throw;
+                }
 
+            }
+        }
         public static uint? GetServicePID(string serviceName)
         {
             if (!DoesServiceExist(serviceName))

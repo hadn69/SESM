@@ -78,6 +78,8 @@
       <HintPath>..\packages\Microsoft.SqlServer.Compact.4.0.8876.1\lib\net40\System.Data.SqlServerCe.dll</HintPath>
     </Reference>
     <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -314,7 +316,6 @@
     <Content Include="Views\Map\Rename.cshtml" />
     <Content Include="Views\Settings\Backups.cshtml" />
     <Content Include="Views\Backup\Index.cshtml" />
-    <Content Include="Views\Settings\ManualUpdate.cshtml" />
     <Content Include="Views\Settings\SteamCMD.cshtml" />
     <Content Include="Views\Shared\_Flash.cshtml" />
     <Content Include="Views\External\SignGen.cshtml" />
@@ -422,6 +423,7 @@
     <Compile Include="Tools\BackupJob.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
     <Compile Include="Tools\GraphHelper.cs" />
+    <Compile Include="Tools\Helpers\GithubHelper.cs" />
     <Compile Include="Tools\Helpers\HashHelper.cs" />
     <Compile Include="Tools\Helpers\PathHelper.cs" />
     <Compile Include="Tools\Helpers\SignParams.cs" />

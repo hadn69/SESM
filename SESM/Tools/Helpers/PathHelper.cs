@@ -5,7 +5,7 @@ namespace SESM.Tools.Helpers
 {
     public static class PathHelper
     {
-        public static string GetLastDirName(string path)
+        public static string GetLastLeaf(string path)
         {
             if (path == String.Empty)
             {

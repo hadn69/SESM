@@ -86,6 +86,11 @@ namespace SESM.Tools.Helpers
 
         public static SteamCMDResult Update(Logger logger, int duration)
         {
+            bool SEUpdate = false;
+            bool SESEUpdate = false;
+
+            // ----------- Start of SE Update Detection -----------
+
             // Checking if steamCMD.exe exist in the right location
             CheckSteamCMD(logger);
 
@@ -98,7 +103,8 @@ namespace SESM.Tools.Helpers
             }
             catch(CryptographicException)
             {
-                logger.Error("Error decoding the credentials, to solve the issue, please re-input them in the auto update configuration. If it occur more than once, please report the bug.");
+                logger.Error(
+                    "Error decoding the credentials, to solve the issue, please re-input them in the auto update configuration. If it already occured, please report the bug.");
                 return SteamCMDResult.Fail_Unknow;
             }
             catch
@@ -118,7 +124,7 @@ namespace SESM.Tools.Helpers
                 original = new MemoryStream();
                 using(Stream input = File.OpenRead(dedicatedZipPath))
                 {
-                    using (MD5 md5 = MD5.Create())
+                    using(MD5 md5 = MD5.Create())
                     {
                         md5Original = Convert.ToBase64String(md5.ComputeHash(input));
                     }
@@ -134,8 +140,20 @@ namespace SESM.Tools.Helpers
             si.StartInfo.UseShellExecute = false;
             si.StartInfo.FileName = SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe";
             si.StartInfo.Arguments = "+@NoPromptForPassword 1 +login " + SESMConfigHelper.AUUsername
-                + " " + AUPassword + " +force_install_dir "
-                + SESMConfigHelper.SEDataPath + "AutoUpdateData +app_update 244850 validate +quit ";
+                                     + " " + AUPassword + " +force_install_dir "
+                                     + SESMConfigHelper.SEDataPath + "AutoUpdateData";
+            if(string.IsNullOrEmpty(SESMConfigHelper.AUBetaName))
+            {
+                si.StartInfo.Arguments += " +app_update 244850 -validate -beta public ";
+            }
+            else
+            {
+                si.StartInfo.Arguments += " +app_update 244850 -validate -beta \""
+                                          + SESMConfigHelper.AUBetaName + "\" -betapassword \"" +
+                                          SESMConfigHelper.AUBetaPassword + "\" ";
+            }
+
+            si.StartInfo.Arguments += " +quit ";
             si.StartInfo.CreateNoWindow = false;
             si.StartInfo.RedirectStandardInput = true;
             si.StartInfo.RedirectStandardOutput = true;
@@ -212,24 +230,58 @@ namespace SESM.Tools.Helpers
 
             // Checking if the file has been modified since last check
             FileInfo fi = new FileInfo(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip");
-            if (md5Original != null)
+            if(md5Original != null)
             {
                 string md5New = "";
-                using (Stream input = File.OpenRead(dedicatedZipPath))
+                using(Stream input = File.OpenRead(dedicatedZipPath))
                 {
-                    using (MD5 md5 = MD5.Create())
+                    using(MD5 md5 = MD5.Create())
                     {
                         md5New = Convert.ToBase64String(md5.ComputeHash(input));
                     }
                     logger.Info("New File hash : " + md5New);
                 }
-                if (md5Original == md5New)
+                if(md5Original == md5New)
                 {
-                    logger.Info("DedicatedServer.zip haven't changed, exiting");
-                    return SteamCMDResult.Success_NothingToDo;
+                    logger.Info("DedicatedServer.zip haven't changed, no SE Update Detected");
+
+                }
+                else
+                {
+                    logger.Info("DedicatedServer.zip have changed, update on the way !");
+                    SEUpdate = true;
                 }
             }
-            logger.Info("DedicatedServer.zip have changed, initiating lockdown mode ...");
+            // ----------- End of SE Update Detection -----------
+
+            // ----------- Start of SESE Update Detection -----------
+            if(SESMConfigHelper.UseSESE)
+            {
+
+                string SESEUrl = GithubHelper.UpdateIsAvailable();
+                if(!string.IsNullOrEmpty(SESEUrl))
+                {
+                    logger.Info("SE Server Extender Update detected");
+                    logger.Info("Cleaning up SESE Zip");
+                    GithubHelper.CleanupUpdate();
+                    logger.Info("Downloading New SESE Update Zip");
+                    GithubHelper.DownloadUpdate(SESEUrl);
+                    SESEUpdate = true;
+                }
+                else
+                {
+                    logger.Info("No SE Server Extender Update detected");
+                }
+            }
+
+            // ----------- End of SESE Update Detection -----------
+            if(!SEUpdate && !SESEUpdate)
+            {
+                logger.Info("No Update detected, exiting ...");
+                return SteamCMDResult.Success_NothingToDo;
+            }
+
+            logger.Info("Initiating lockdown mode ...");
             SESMConfigHelper.Lockdown = true;
             logger.Info("Waiting 30 secs for all requests to end ...");
 
@@ -238,41 +290,71 @@ namespace SESM.Tools.Helpers
             DataContext context = new DataContext();
             ServerProvider srvPrv = new ServerProvider(context);
 
-            logger.Info("Stopping the running server ...");
+
+            List<EntityServer> listStartedServ;
             // Getting started server list
-            List<EntityServer> listStartedServ =
-                srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
+            if(SEUpdate)
+                listStartedServ = srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
+            else
+                listStartedServ = srvPrv.GetAllServers().Where(item => item.UseServerExtender && srvPrv.GetState(item) == ServiceState.Running)
+                    .ToList();
 
-            foreach(EntityServer item in srvPrv.GetAllServers())
+            if(SEUpdate)
             {
-                logger.Info("Sending stop order to " + item.Name);
-                ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
+                logger.Info("Stopping all running server ...");
+                foreach(EntityServer item in srvPrv.GetAllServers())
+                {
+                    logger.Info("Sending stop order to " + item.Name);
+                    ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
+                }
+
+                foreach(EntityServer item in srvPrv.GetAllServers())
+                {
+                    ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
+                }
+
+                logger.Info("Killing ghosts processes");
+                // Killing some ghost processes that might still exists
+                ServiceHelper.KillAllService();
+            }
+            else
+            {
+                logger.Info("Stopping SESE running server ...");
+                foreach(EntityServer item in listStartedServ)
+                {
+                    logger.Info("Sending stop order to " + item.Name);
+                    ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
+                }
+                logger.Info("Waiting 30 secs for server to stop");
+                Thread.Sleep(30000);
+                logger.Info("Killing ghosts processes");
+                // Killing some ghost processes that might still exists
+                ServiceHelper.KillAllSESEService();
+            }
+            if(SEUpdate)
+                using(ZipFile zip = ZipFile.Read(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
+                {
+                    logger.Info("Deleting old game files");
+                    if(!Directory.Exists(SESMConfigHelper.SEDataPath))
+                        Directory.CreateDirectory(SESMConfigHelper.SEDataPath);
+                    if(Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
+                        Directory.Delete(SESMConfigHelper.SEDataPath + @"Content\", true);
+                    if(Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
+                        Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
+                    if(Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
+                        Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
+
+                    logger.Info("Unzipping new game files");
+                    zip.ExtractAll(SESMConfigHelper.SEDataPath);
+                }
+
+            if(SESMConfigHelper.UseSESE)
+            {
+                logger.Info("Applying SESE Files");
+                GithubHelper.ApplyUpdate();
             }
 
-            foreach(EntityServer item in srvPrv.GetAllServers())
-            {
-                ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
-            }
 
-            logger.Info("Killing ghosts processes");
-            // Killing some ghost processes that might still exists
-            ServiceHelper.KillAllService();
-
-            using(ZipFile zip = ZipFile.Read(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
-            {
-                logger.Info("Deleting old game files");
-                if(!Directory.Exists(SESMConfigHelper.SEDataPath))
-                    Directory.CreateDirectory(SESMConfigHelper.SEDataPath);
-                if(Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
-                    Directory.Delete(SESMConfigHelper.SEDataPath + @"Content\", true);
-                if(Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
-                    Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
-                if(Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
-                    Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
-
-                logger.Info("Unzipping new game files");
-                zip.ExtractAll(SESMConfigHelper.SEDataPath);
-            }
             logger.Info("Game file Update finished, lifting lockdown");
             SESMConfigHelper.Lockdown = false;
 
@@ -284,7 +366,37 @@ namespace SESM.Tools.Helpers
             return SteamCMDResult.Success_UpdateInstalled;
         }
 
-        public static void CheckSteamCMD(Logger logger)
+        public static SteamCMDResult ForceUpdate(Logger logger, int duration)
+        {
+            string zipPath = SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip";
+            if(File.Exists(zipPath))
+            {
+                logger.Info("DedicatedServer.zip Detected, deleting it ...");
+                try
+                {
+                    File.Delete(zipPath);
+                }
+                catch(Exception)
+                {
+                    logger.Error("Failed deleting DedicatedServer.zip !");
+                }
+
+                if(File.Exists(zipPath))
+                {
+                    logger.Error("DedicatedServer.zip still present, Manual Update Force Failed !");
+                    return SteamCMDResult.Fail_Unknow;
+                }
+
+                logger.Info("Done !");
+            }
+            else
+            {
+                logger.Info("DedicatedServer.zip not present, (Why are you doing a manual update force ..., useless here !)");
+            }
+            return Update(logger, duration);
+        }
+
+        private static void CheckSteamCMD(Logger logger)
         {
             if(!File.Exists(SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe"))
             {

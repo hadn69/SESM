@@ -262,6 +262,62 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public static string AUBetaName
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AUBetaName;
+            }
+            set
+            {
+                ConfigStorage.AUBetaName = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string AUBetaPassword
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AUBetaPassword;
+            }
+            set
+            {
+                ConfigStorage.AUBetaPassword = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool UseSESE
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.UseSESE;
+            }
+            set
+            {
+                ConfigStorage.UseSESE = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool SESEDev
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.SESEDev;
+            }
+            set
+            {
+                ConfigStorage.SESEDev = value;
+                ConfigStorage.Write();
+            }
+        }
+
         public static bool AutoBackupLvl1
         {
             get

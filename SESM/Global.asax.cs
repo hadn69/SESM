@@ -15,6 +15,7 @@ namespace SESM
     {
         protected void Application_Start()
         {
+            GithubHelper.DownloadUpdate("http://test.com/rep/file.zip");
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             

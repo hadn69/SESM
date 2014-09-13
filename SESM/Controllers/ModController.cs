@@ -42,8 +42,8 @@ namespace SESM.Controllers
             foreach (string item in listDir)
             {
                 SelectListItem sli = new SelectListItem();
-                sli.Text = PathHelper.GetLastDirName(item);
-                sli.Value = PathHelper.GetLastDirName(item);
+                sli.Text = PathHelper.GetLastLeaf(item);
+                sli.Value = PathHelper.GetLastLeaf(item);
                 listSLI.Add(sli);
             }
 
