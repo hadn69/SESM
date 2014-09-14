@@ -15,7 +15,6 @@ namespace SESM
     {
         protected void Application_Start()
         {
-            GithubHelper.DownloadUpdate("http://test.com/rep/file.zip");
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             
@@ -134,7 +133,7 @@ namespace SESM
                 }
             }
 
-
+            /*
             // Font for the signature generator
             GraphHelper.privateFontCollection = new PrivateFontCollection();
 
@@ -147,7 +146,7 @@ namespace SESM
             GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Italic.ttf");
             GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Light.ttf");
             GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-LightItalic.ttf");
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Regular.ttf");
+            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Regular.ttf");*/
         }
     }
 }
