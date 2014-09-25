@@ -17,11 +17,11 @@ namespace SESM.Tools.Helpers
             {
                 if (SESMConfigHelper.SESEDev)
                 {
-                    return GetLastetDevVersion(data);
+                    return GetLastetDevVersionURL(data);
                 }
                 else
                 {
-                    return GetLastetVersion(data);
+                    return GetLastetVersionURL(data);
                 }
             }
             if(files.Length != 1)
@@ -175,7 +175,8 @@ namespace SESM.Tools.Helpers
             }
             using(ZipFile zip = new ZipFile(files[0]))
             {
-                zip.ExtractAll(SESMConfigHelper.SEDataPath + "DedicatedServer64");
+                zip.ExtractAll(SESMConfigHelper.SEDataPath + "DedicatedServer64",
+                    ExtractExistingFileAction.OverwriteSilently);
             }
         }
     }

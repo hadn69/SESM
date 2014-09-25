@@ -262,6 +262,7 @@ namespace SESM.Tools.Helpers
                 if(!string.IsNullOrEmpty(SESEUrl))
                 {
                     logger.Info("SE Server Extender Update detected");
+                    logger.Info("URL : " + SESEUrl);
                     logger.Info("Cleaning up SESE Zip");
                     GithubHelper.CleanupUpdate();
                     logger.Info("Downloading New SESE Update Zip");

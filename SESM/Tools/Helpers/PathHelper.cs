@@ -11,8 +11,17 @@ namespace SESM.Tools.Helpers
             {
                 return null;
             }
-            string[] pathSplitted = path.Split('\\');
-            return pathSplitted[pathSplitted.Length - 1];
+            if (path.Contains("\\"))
+            {
+                string[] pathSplitted = path.Split('\\');
+                return pathSplitted[pathSplitted.Length - 1];
+            }
+            if(path.Contains("/"))
+            {
+                string[] pathSplitted = path.Split('/');
+                return pathSplitted[pathSplitted.Length - 1];
+            }
+            return null;
         }
         public static string GetPrefix()
         {
