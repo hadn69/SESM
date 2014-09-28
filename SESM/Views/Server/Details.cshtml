@@ -227,6 +227,14 @@
                         @Html.ValidationMessageFor(m => m.RefinerySpeedMultiplier)
                     </div>
                 </div>
+                <div class="form-group" data-toggle="popover" data-content="The multiplier of the respawn time of the respawn ships. The bigger it is, the longer the timers will be.
+                    <br />Default value is 1.">
+                    @Html.LabelFor(m => m.SpawnShipTimeMultiplier, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.SpawnShipTimeMultiplier, null, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.SpawnShipTimeMultiplier)
+                    </div>
+                </div>
             </section>
         </div>
         <div class="col-md-6">

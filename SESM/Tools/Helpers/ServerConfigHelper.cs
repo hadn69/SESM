@@ -56,6 +56,7 @@ namespace SESM.Tools.Helpers
         public bool IgnoreLastSession = false;
         public string WorldName = string.Empty;
         public int AutoSaveInMinutes = 5;
+        public int SpawnShipTimeMultiplier = 1;
 
         /// <summary>
         /// Parse the View Model into the object
@@ -90,6 +91,7 @@ namespace SESM.Tools.Helpers
             HackSpeedMultiplier = model.HackSpeedMultiplier;
             PermanentDeath = model.PermanentDeath;
             AutoSaveInMinutes = model.AutoSaveInMinutes;
+            SpawnShipTimeMultiplier = model.SpawnShipTimeMultiplier;
 
             ScenarioType = model.ScenarioType;
             SaveName = model.SaveName;
@@ -168,6 +170,7 @@ namespace SESM.Tools.Helpers
             HackSpeedMultiplier = model.HackSpeedMultiplier;
             PermanentDeath = model.PermanentDeath;
             AutoSaveInMinutes = model.AutoSaveInMinutes;
+            SpawnShipTimeMultiplier = model.SpawnShipTimeMultiplier;
 
             IP = model.IP;
             SteamPort = model.SteamPort;
@@ -246,6 +249,7 @@ namespace SESM.Tools.Helpers
             model.HackSpeedMultiplier = HackSpeedMultiplier;
             model.PermanentDeath = PermanentDeath;
             model.AutoSaveInMinutes = AutoSaveInMinutes;
+            model.SpawnShipTimeMultiplier = SpawnShipTimeMultiplier;
 
             model.ScenarioType = ScenarioType;
             model.SaveName = SaveName;
@@ -299,6 +303,7 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <HackSpeedMultiplier>" + HackSpeedMultiplier + "</HackSpeedMultiplier>");
             sb.AppendLine("    <PermanentDeath>" + PermanentDeath.ToString().ToLower() + "</PermanentDeath>");
             sb.AppendLine("    <AutoSaveInMinutes>" + AutoSaveInMinutes + "</AutoSaveInMinutes>");
+            sb.AppendLine("    <SpawnShipTimeMultiplier>" + SpawnShipTimeMultiplier + "</SpawnShipTimeMultiplier>");
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
             sb.AppendLine("    <TypeId>MyObjectBuilder_ScenarioDefinition</TypeId>");
@@ -557,6 +562,11 @@ namespace SESM.Tools.Helpers
                 settingsNode.SelectSingleNode("descendant::AutoSaveInMinutes").InnerText =
                     AutoSaveInMinutes.ToString();
 
+                valueNode = settingsNode.SelectSingleNode("descendant::SpawnShipTimeMultiplier");
+                if(valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "SpawnShipTimeMultiplier", null));
+                settingsNode.SelectSingleNode("descendant::SpawnShipTimeMultiplier").InnerText =
+                    SpawnShipTimeMultiplier.ToString();
 
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if (valueNode == null)
@@ -649,6 +659,9 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(sessionSettings.Element("PermanentDeath").Value, out PermanentDeath);
             if(sessionSettings.Element("AutoSaveInMinutes") != null)
                 int.TryParse(sessionSettings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
+            if(sessionSettings.Element("SpawnShipTimeMultiplier") != null)
+                int.TryParse(sessionSettings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
+
             if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                 Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
             if (root.Element("LoadWorld") != null)
@@ -767,7 +780,9 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(settings.Element("PermanentDeath").Value, out PermanentDeath);
             if(settings.Element("AutoSaveInMinutes") != null)
                 int.TryParse(settings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
-            
+            if(settings.Element("SpawnShipTimeMultiplier") != null)
+                int.TryParse(settings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
+
             Mods = new List<ulong>();
             if (root.Element("Mods") != null)
             {

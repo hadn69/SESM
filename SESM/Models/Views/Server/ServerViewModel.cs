@@ -63,6 +63,10 @@ namespace SESM.Models.Views.Server
         public int RefinerySpeedMultiplier { get; set; }
 
         [Required]
+        [DisplayName("Spawn Ship Time")]
+        public int SpawnShipTimeMultiplier { get; set; }
+
+        [Required]
         [DisplayName("Online Mode")]
         public OnlineMode OnlineMode { get; set; }
 
