@@ -86,6 +86,10 @@ namespace SESM.Tools.Helpers
 
         public static SteamCMDResult Update(Logger logger, int duration)
         {
+            try
+            {
+
+            
             bool SEUpdate = false;
             bool SESEUpdate = false;
 
@@ -365,6 +369,12 @@ namespace SESM.Tools.Helpers
                 ServiceHelper.StartService(item);
             }
             return SteamCMDResult.Success_UpdateInstalled;
+            }
+            catch(Exception ex)
+            {
+                logger.Fatal("AutoUpdate failed miserably ... (Exception)", ex);
+                return  SteamCMDResult.Fail_Unknow;
+            }
         }
 
         public static SteamCMDResult ForceUpdate(Logger logger, int duration)
