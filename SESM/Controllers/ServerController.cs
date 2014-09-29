@@ -193,6 +193,39 @@ namespace SESM.Controllers
             return View(serverView);
         }
 
+        //
+        // GET: Server/Status/5
+        [HttpGet]
+        [CheckAuth]
+        public ActionResult Dashboard(int id)
+        {
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityServer serv = srvPrv.GetServer(id);
+
+            ServerConfigHelper serverConfig = new ServerConfigHelper();
+            serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+
+            ServerViewModel serverView = new ServerViewModel();
+            serverView = serverConfig.ParseOut(serverView);
+            serverView.Name = serv.Name;
+            serverView.IsLvl1BackupEnabled = serv.IsLvl1BackupEnabled;
+            serverView.IsLvl2BackupEnabled = serv.IsLvl2BackupEnabled;
+            serverView.IsLvl3BackupEnabled = serv.IsLvl3BackupEnabled;
+
+            ViewData["State"] = srvPrv.GetState(serv);
+            if(user == null)
+                ViewData["AccessLevel"] = AccessLevel.Guest;
+            else
+                ViewData["AccessLevel"] = srvPrv.GetAccessLevel(user.Id, serv.Id);
+            ViewData["ID"] = id;
+
+            /*if(SESMConfigHelper.StatusAutoRefresh)
+                Response.AddHeader("Refresh", "10");*/
+
+            return View(serverView);
+        }
         #endregion
 
         

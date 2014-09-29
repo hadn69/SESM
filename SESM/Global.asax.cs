@@ -136,7 +136,7 @@ namespace SESM
             // Font for the signature generator
             GraphHelper.privateFontCollection = new PrivateFontCollection();
 
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Black.ttf");
+            /*GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Black.ttf");
             GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-BlackItalic.ttf");
             GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Bold.ttf");
             GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-BoldItalic.ttf");

@@ -1,0 +1,60 @@
+﻿<html>
+<head>
+
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/Content/css/extra.css" />
+    <title>SESM</title>
+</head>
+<body>
+    <div class="global-wrapper">
+
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        Hi Test
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1" id="brand-cell" onclick="location.href='/';">
+                        <span id="ColorBrand">S</span>ESM
+                    </div>
+                    <div class="col-md-1 navbar-selected">
+                        <i class="fa fa-tachometer fa-2x"></i>
+                        Dashboard
+                    </div>
+                    <div class="col-md-1">
+                        <i class="fa fa-users fa-2x"></i>
+                        Factions
+                    </div>
+                    <div class="col-md-1">
+                        <i class="fa fa-puzzle-piece fa-2x fa-flip-horizontal"></i>
+                        Mods
+                    </div>
+                    <div class="col-md-1">
+                        <i class="fa fa-star fa-2x"></i>
+                        Maps
+                    </div>
+                    <div class="col-md-1">
+                        <i class="fa fa-hdd-o fa-2x"></i>
+                        Backups
+                    </div>
+                    <div class="col-md-1">
+                        <i class="fa fa-cogs fa-2x"></i>
+                        Configuration
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="row">
+            <div class="col-md-12">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</body>
+</html>

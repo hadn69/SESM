@@ -128,7 +128,13 @@
   <ItemGroup>
     <Content Include="Content\bootstrap-superhero.min.css" />
     <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\css\bootstrap\bootstrap-theme.css" />
+    <Content Include="Content\css\bootstrap\bootstrap-theme.min.css" />
+    <Content Include="Content\css\bootstrap\bootstrap.css" />
+    <Content Include="Content\css\bootstrap\bootstrap.min.css" />
+    <Content Include="Content\css\extra.css" />
     <Content Include="Content\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\img\panel-bg.jpg" />
     <Content Include="Content\logo-small.png" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\site.css" />
@@ -258,6 +264,8 @@
     <Content Include="Content\font\Lato-Light.ttf" />
     <Content Include="Content\font\Lato-LightItalic.ttf" />
     <Content Include="Content\font\Lato-Regular.ttf" />
+    <Content Include="Content\css\bootstrap\bootstrap-theme.css.map" />
+    <Content Include="Content\css\bootstrap\bootstrap.css.map" />
     <None Include="job_scheduling_data_2_0.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -319,6 +327,8 @@
     <Content Include="Views\Settings\SteamCMD.cshtml" />
     <Content Include="Views\Shared\_Flash.cshtml" />
     <Content Include="Views\External\SignGen.cshtml" />
+    <Content Include="Views\Server\Dashboard.cshtml" />
+    <Content Include="Views\Shared\_NewLayout.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -425,6 +435,7 @@
     <Compile Include="Tools\GraphHelper.cs" />
     <Compile Include="Tools\Helpers\GithubHelper.cs" />
     <Compile Include="Tools\Helpers\HashHelper.cs" />
+    <Compile Include="Tools\Helpers\HTMLHelper\NavHelperExtensions.cs" />
     <Compile Include="Tools\Helpers\PathHelper.cs" />
     <Compile Include="Tools\Helpers\SignParams.cs" />
     <Compile Include="Tools\Monitor\Collector.cs" />
