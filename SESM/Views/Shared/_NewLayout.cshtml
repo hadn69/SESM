@@ -24,7 +24,7 @@
                     <div class="col-md-1" id="brand-cell" onclick="location.href='/';">
                         <span id="ColorBrand">S</span>ESM
                     </div>
-                    @Html.NavServer(Convert.ToInt32(Url.RequestContext.RouteData.Values["id"]), 1)
+                    @Html.NavServer(Convert.ToInt32(Url.RequestContext.RouteData.Values["id"]), (int)ViewBag.Category)
                 </div>
             </div>
         </nav>

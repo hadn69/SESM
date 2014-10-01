@@ -463,7 +463,45 @@ namespace SESM.Controllers
  
             return View(serverView);
         }
+        //
+        // GET: Server/Configuration/5
+        [HttpGet]
+        [LoggedOnly]
+        [CheckAuth]
+        [ManagerAndAbove]
+        public ActionResult Configuration(int id)
+        {
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(_context);
+            ViewData["ID"] = id;
+            EntityServer serv = srvPrv.GetServer(id);
+            AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, serv.Id);
 
+            ViewData["AccessLevel"] = accessLevel;
+
+            ServerConfigHelper serverConfig = new ServerConfigHelper();
+            serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+
+            ServerViewModel serverView = new ServerViewModel();
+            serverView = serverConfig.ParseOut(serverView);
+            serverView.Name = serv.Name;
+            serverView.IsPublic = serv.IsPublic;
+            serverView.IsLvl1BackupEnabled = serv.IsLvl1BackupEnabled;
+            serverView.IsLvl2BackupEnabled = serv.IsLvl2BackupEnabled;
+            serverView.IsLvl3BackupEnabled = serv.IsLvl3BackupEnabled;
+            serverView.AutoRestart = serv.IsAutoRestartEnabled;
+            serverView.AutoRestartCron = serv.AutoRestartCron;
+            serverView.UseServerExtender = serv.UseServerExtender;
+            serverView.ServerExtenderPort = serv.ServerExtenderPort;
+
+            serverView.WebAdministrators = string.Join("\r\n", serv.Administrators.Select(item => item.Login).ToList());
+            serverView.WebManagers = string.Join("\r\n", serv.Managers.Select(item => item.Login).ToList());
+            serverView.WebUsers = string.Join("\r\n", serv.Users.Select(item => item.Login).ToList());
+            if(!string.IsNullOrEmpty(serverView.SaveName))
+                serverView.AsteroidAmount = Directory.GetFiles(PathHelper.GetSavePath(serv, serverView.SaveName), "asteroid??.vox").Length;
+
+            return View(serverView);
+        }
         //
         // POST: Server/Details/5
         [HttpPost]

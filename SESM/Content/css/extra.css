@@ -10,6 +10,7 @@ body {
     background-image: url("/Content/img/panel-bg.jpg");
     background-attachment: fixed;
     background-repeat: no-repeat;
+    color: white;
 }
 
 .navbar-fixed-top {
@@ -70,11 +71,6 @@ nav > .container {
             left: 0;
             text-decoration: none;
             color: inherit;
-            /*
-            z-index: 10;
-            background-color: #FFF; 
-            opacity: 0; 
-            filter: alpha(opacity=1); */
         }
     
         .navbar-fixed-top > .container > .row:last-child > .col-md-1 > a > i {
