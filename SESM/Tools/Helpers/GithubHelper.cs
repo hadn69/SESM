@@ -163,6 +163,7 @@ namespace SESM.Tools.Helpers
             WebResponse objResponse = objRequest.GetResponse();
             FileStream fileStream = new FileStream(SESMConfigHelper.SEDataPath + PathHelper.GetLastLeaf(url), FileMode.Create, FileAccess.Write, FileShare.None);
             objResponse.GetResponseStream().CopyTo(fileStream);
+            fileStream.Close();
         }
 
         public static void ApplyUpdate()
