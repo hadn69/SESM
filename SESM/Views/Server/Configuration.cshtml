@@ -27,9 +27,74 @@
 
 }
 <br />
-<div class="col-md-4" style="height: 500px; background-color: rgb(49, 74, 99); margin-bottom: 15px"></div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#LocSearchBox').on('input', function () {
+            var searchedStr = $('#LocSearchBox').val().toLowerCase();
+            console.log(searchedStr);
+
+            $(".tab-pane").each(function (index) {
+                var count = 0;
+                $(this).css("display", "none");
+                $('ul.nav > li > a[href="#' + $(this).attr("id") + '"]').parent().css("display", "none");;
+                $(this).children(".form-group").each(function (index) {
+                    $(this).hide();
+                    if ($(this).attr("data-content").toLowerCase().indexOf(searchedStr) > -1) {
+                        $(this).css("display", "");
+                        count++;
+                    }
+                    else if ($(this).children("label").first().text().toLowerCase().indexOf(searchedStr) > -1) {
+                        $(this).css("display", "");
+                        count++;
+                    }
+                    else if ($(this).children("div > input, div > textarea, div > select").first().val() != undefined
+                        && $(this).children("div > input, div > textarea, div > select").first().val().toLowerCase().indexOf(searchedStr) > -1) {
+                        $(this).css("display", "");
+                        count++;
+                    }
+                });
+                if (count != 0) {
+                    $(this).css("display", "");
+                    $('ul.nav > li > a[href="#' + $(this).attr("id") + '"]').parent().css("display", "");;
+                }
+
+            });
+
+            if ($('ul.nav > li.active').css("display") == "none") {
+                $('ul.nav > li[style!="display: none;"] > a').first().tab('show');
+            }
+
+        });
+
+        $('.form-group').each(function (index) {
+            $(this).mouseover(function () {
+                $("#toolTipDiv").html("<h3>" + $(this).children("label").text() + "</h3>" +
+                    "<p>" + $(this).attr("data-content") + "</p>");
+            });
+            $(this).focusin(function () {
+                $("#toolTipDiv").html("<h3>" + $(this).children("label").text() + "</h3>" +
+                    "<p>" + $(this).attr("data-content") + "</p>");
+            });
+            $(this).mouseout(function () {
+                $("#toolTipDiv").html("");
+            });
+            $(this).focusout(function () {
+                $("#toolTipDiv").html("");
+            });
+        });
+
+    });
+</script>
+<div class="col-md-4" style="height: 475px; background-color: rgb(49, 74, 99); margin-bottom: 15px;padding: 15px 15px 15px 15px;">
+    <input id="LocSearchBox" type="text" class="form-control" placeholder="Search" />
+
+    <hr />
+    <div id="toolTipDiv">
+
+    </div>
+</div>
 <div class="col-md-8" style="padding-right: 0px">
-    <div class="row" style="background-color: rgb(29, 28, 28); padding: 15px 15px 15px 15px; margin: 0px 0px 10px 0px;">
+    <div class="row" style="height: 475px;background-color: rgb(29, 28, 28); padding: 15px 15px 15px 15px; margin: 0px 0px 10px 0px;">
         <ul class="nav nav-tabs nav-justified" role="tablist">
             <li class="active"><a href="#Web" role="tab" data-toggle="tab">Web</a></li>
             <li><a href="#Network" role="tab" data-toggle="tab">Network</a></li>
@@ -303,6 +368,26 @@
                         @Html.ValidationMessageFor(m => m.MaxFloatingObjects)
                     </div>
                 </div>
+                <div class="form-group" data-toggle="popover" data-content="
+                    <strong>Survival :</strong><br />You have to mine asteroids and grind ships to gather your materials.<br />
+                    <strong>Creative :</strong><br />You can place every block without having to weld them.">
+                    @Html.LabelFor(m => m.GameMode, labelClass)
+                    <div class="@valueColumn">
+                        @Html.EnumDropDownListFor(m => m.GameMode, null, adminAccessClass)
+                        @Html.ValidationMessageFor(m => m.GameMode)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="
+                    <strong>SAFE :</strong><br />Nothing will fall from the sky, you can relax ...<br />
+                    <strong>NORMAL :</strong><br />Cloudy, with a chance of meteors.<br />
+                    <strong>CATACLYSM :</strong><br />You REALLY should take your iron umbrella !<br />
+                    <strong>CATACLYSM_UNREAL :</strong><br />Basically , Run !!">
+                    @Html.LabelFor(m => m.EnvironmentHostility, labelClass)
+                    <div class="@valueColumn">
+                        @Html.EnumDropDownListFor(m => m.EnvironmentHostility, null, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.EnvironmentHostility)
+                    </div>
+                </div>
             </div>
             <div class="tab-pane fade form-horizontal" id="Players">
                 <h3>Players Settings</h3>
@@ -401,6 +486,22 @@
                     <div class="@valueColumn">
                         @Html.CheckBoxFor(m => m.RealisticSound, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.RealisticSound)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="The list of the administrators' steam's ids.
+                    <br />One per line.">
+                    @Html.LabelFor(m => m.Administrators, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextAreaFor(m => m.Administrators, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.Administrators)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="The list of the banneds' steam's ids.
+                    <br />One per line.">
+                    @Html.LabelFor(m => m.Banned, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextAreaFor(m => m.Banned, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.Banned)
                     </div>
                 </div>
             </div>
