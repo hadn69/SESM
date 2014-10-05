@@ -16,6 +16,7 @@ namespace SESM.DTO
         public string AutoRestartCron { get; set; }
         public bool UseServerExtender { get; set; }
         public int ServerExtenderPort { get; set; }
+        public bool IsAutoStartEnabled { get; set; }
 
         private ICollection<EntityUser> _administrators;
         public virtual ICollection<EntityUser> Administrators
@@ -55,6 +56,8 @@ namespace SESM.DTO
             AutoRestartCron = "0 0 0 * * ?";
             UseServerExtender = false;
             ServerExtenderPort = 26016;
+            IsAutoStartEnabled = false;
+
         }
     }
 }

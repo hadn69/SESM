@@ -132,6 +132,18 @@ namespace SESM
                 }
             }
 
+            IJobDetail autoStartJob = JobBuilder.Create<AutoStartJob>()
+                        .WithIdentity("AutoStartJob", "AutoStart")
+                        .Build();
+
+            ITrigger autoStartTrigger = TriggerBuilder.Create()
+                .WithIdentity("AutoStartTrigger", "AutoStart")
+                .WithCronSchedule("0 0/15 * * * ?")
+                .StartNow()
+                .Build();
+
+            scheduler.ScheduleJob(autoStartJob, autoStartTrigger);
+
             /*
             // Font for the signature generator
             GraphHelper.privateFontCollection = new PrivateFontCollection();

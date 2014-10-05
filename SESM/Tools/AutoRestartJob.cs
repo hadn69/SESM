@@ -9,14 +9,17 @@ namespace SESM.Tools
     {
         public void Execute(IJobExecutionContext jobContext)
         {
-            JobDataMap dataMap = jobContext.JobDetail.JobDataMap;
-            int serverId = dataMap.GetInt("id");
+            if (!SESMConfigHelper.Lockdown)
+            {
+                JobDataMap dataMap = jobContext.JobDetail.JobDataMap;
+                int serverId = dataMap.GetInt("id");
 
-            DataContext context = new DataContext();
-            ServerProvider srvPrv = new ServerProvider(context);
+                DataContext context = new DataContext();
+                ServerProvider srvPrv = new ServerProvider(context);
 
-            EntityServer server = srvPrv.GetServer(serverId);
-            ServiceHelper.RestartService(server);
+                EntityServer server = srvPrv.GetServer(serverId);
+                ServiceHelper.RestartService(server);
+            }
         }
     }
 }

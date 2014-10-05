@@ -34,6 +34,10 @@ namespace SESM.Models.Views.Server
         public string AutoRestartCron { get; set; }
 
         [Required]
+        [DisplayName("Auto Start")]
+        public bool AutoStart { get; set; }
+
+        [Required]
         [DisplayName("Server Extender")]
         public bool UseServerExtender { get; set; }
 

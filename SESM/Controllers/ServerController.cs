@@ -115,6 +115,7 @@ namespace SESM.Controllers
                 serv.AutoRestartCron = model.AutoRestartCron;
                 serv.UseServerExtender = model.UseServerExtender;
                 serv.ServerExtenderPort = model.ServerExtenderPort;
+                serv.IsAutoStartEnabled = model.AutoStart;
 
                 srvPrv.AddAdministrator(webAdminsSplitted, serv);
                 srvPrv.AddManagers(webManagerSplitted, serv);
@@ -421,6 +422,7 @@ namespace SESM.Controllers
             serverView.AutoRestartCron = serv.AutoRestartCron;
             serverView.UseServerExtender = serv.UseServerExtender;
             serverView.ServerExtenderPort = serv.ServerExtenderPort;
+            serverView.AutoStart = serv.IsAutoStartEnabled;
 
             serverView.WebAdministrators = string.Join("\r\n", serv.Administrators.Select(item => item.Login).ToList());
             serverView.WebManagers = string.Join("\r\n", serv.Managers.Select(item => item.Login).ToList());
@@ -537,6 +539,7 @@ namespace SESM.Controllers
 
                 serv.IsAutoRestartEnabled = model.AutoRestart;
                 serv.AutoRestartCron = model.AutoRestartCron;
+                serv.IsAutoStartEnabled = model.AutoStart;
 
                 IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
                 scheduler.DeleteJob(new JobKey("AutoRestart" + serv.Id + "Job", "AutoRestart"));
@@ -712,6 +715,7 @@ namespace SESM.Controllers
 
                 serv.IsAutoRestartEnabled = model.AutoRestart;
                 serv.AutoRestartCron = model.AutoRestartCron;
+                serv.IsAutoStartEnabled = model.AutoStart;
 
                 IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
                 scheduler.DeleteJob(new JobKey("AutoRestart" + serv.Id + "Job", "AutoRestart"));
