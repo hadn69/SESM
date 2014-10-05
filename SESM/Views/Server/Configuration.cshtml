@@ -7,9 +7,9 @@
     Layout = "~/Views/Shared/_NewLayout.cshtml";
 
 
-    object labelClass = new { @class = "col-md-4 control-label" };
+    object labelClass = new { @class = "col-md-5 control-label" };
 
-    const string valueColumn = "col-md-8";
+    const string valueColumn = "col-md-7";
     int id = (int)ViewData["ID"];
 
     object superAdminAccessClass = new { @class = "form-control", @readonly = "readonly", onclick = "return false" };
@@ -33,7 +33,7 @@
             var searchedStr = $('#LocSearchBox').val().toLowerCase();
             console.log(searchedStr);
 
-            $(".tab-pane").each(function (index) {
+            $(".tab").each(function (index) {
                 var count = 0;
                 $(this).css("display", "none");
                 $('ul.nav > li > a[href="#' + $(this).attr("id") + '"]').parent().css("display", "none");;
@@ -66,6 +66,19 @@
 
         });
 
+
+        $('ul > li > a').each(function (index) {
+            var targt = $(this).attr("href");
+            $(this).click(function () {
+                $.smoothScroll({
+                    offset: -20,
+                    scrollElement: $('#scrollZone'),
+                    scrollTarget: targt
+                });
+            });
+        });
+
+
         $('.form-group').each(function (index) {
             $(this).mouseover(function () {
                 $("#toolTipDiv").html("<h3>" + $(this).children("label").text() + "</h3>" +
@@ -85,6 +98,7 @@
 
     });
 </script>
+<script src="~/Content/js/jquery.smooth-scroll.js"></script>
 <div class="col-md-4" style="height: 475px; background-color: rgb(49, 74, 99); margin-bottom: 15px;padding: 15px 15px 15px 15px;">
     <input id="LocSearchBox" type="text" class="form-control" placeholder="Search" />
 
@@ -96,7 +110,14 @@
 <div class="col-md-8" style="padding-right: 0px">
     <div class="row" style="height: 475px;background-color: rgb(29, 28, 28); padding: 15px 15px 15px 15px; margin: 0px 0px 10px 0px;">
         <ul class="nav nav-tabs nav-justified" role="tablist">
-            <li class="active"><a href="#Web" role="tab" data-toggle="tab">Web</a></li>
+            <li class="active"><a href="#General" role="tab" data-toggle="tab">General</a></li>
+            <li><a href="#Network" role="tab" data-toggle="tab">Network</a></li>
+            <li><a href="#Multipliers" role="tab" data-toggle="tab">Multipliers</a></li>
+            <li><a href="#Server" role="tab" data-toggle="tab">Server</a></li>
+            <li><a href="#Map" role="tab" data-toggle="tab">Map</a></li>
+            <li><a href="#Players" role="tab" data-toggle="tab">Players</a></li>
+            <li><a href="#Rights" role="tab" data-toggle="tab">Rights</a></li>
+            <!--
             <li><a href="#Network" role="tab" data-toggle="tab">Network</a></li>
             <li><a href="#Server" role="tab" data-toggle="tab">Server</a></li>
             <li><a href="#SESEAR" role="tab" data-toggle="tab">SESE&nbsp;&&nbsp;AR</a></li>
@@ -104,12 +125,12 @@
             <li><a href="#Map" role="tab" data-toggle="tab">Map</a></li>
             <li><a href="#Players" role="tab" data-toggle="tab">Players</a></li>
             <li><a href="#Gameplay" role="tab" data-toggle="tab">Gameplay</a></li>
-            <li><a href="#Misc" role="tab" data-toggle="tab">Misc.</a></li>
+            <li><a href="#Misc" role="tab" data-toggle="tab">Misc.</a></li>-->
         </ul>
 
-        <div id="confTabsContent" class="tab-content">
-            <div class="tab-pane fade in active form-horizontal" id="Web">
-                <h3>Web Settings</h3>
+        <div id="scrollZone" style="overflow: auto; height: 400px; padding-right: 20px;">
+            <div class="form-horizontal tab" id="General">
+                <h3>General Settings</h3>
                 <hr />
                 <div class="form-group" data-toggle="popover" data-content="The name displayed on the server list.">
                     @Html.LabelFor(m => m.Name, labelClass)
@@ -125,48 +146,38 @@
                         @Html.ValidationMessageFor(m => m.IsPublic)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="The list of the web administrators' logins.
-                    <br />One per line.<br />Administrators can change every settings of the servers.">
-                    @Html.LabelFor(m => m.WebAdministrators, labelClass)
+                <div class="form-group" data-toggle="popover" data-content="If enabled, The server will use SE Server Extender to run.">
+                    @Html.LabelFor(m => m.UseServerExtender, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextAreaFor(m => m.WebAdministrators, superAdminAccessClass)
-                        @Html.ValidationMessageFor(m => m.WebAdministrators)
+                        @Html.CheckBoxFor(m => m.UseServerExtender, adminAccessClass)
+                        @Html.ValidationMessageFor(m => m.UseServerExtender)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="The list of the web managers' logins.
-                    <br />One per line.<br />Managers can change some settings of the servers.">
-                    @Html.LabelFor(m => m.WebManagers, labelClass)
+                <div class="form-group" data-toggle="popover" data-content="If enabled, The server will restart at the interval defined by the cron below.">
+                    @Html.LabelFor(m => m.AutoRestart, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextAreaFor(m => m.WebManagers, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.WebManagers)
+                        @Html.CheckBoxFor(m => m.AutoRestart, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.AutoRestart)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="The list of the web users' logins.
-                    <br />One per line.<br />Users can see the server in theirs server list.">
-                    @Html.LabelFor(m => m.WebUsers, labelClass)
+                <div class="form-group" data-toggle="popover" data-content="The Cron for the Auto-Restart feature.">
+                    @Html.LabelFor(m => m.AutoRestartCron, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextAreaFor(m => m.WebUsers, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.WebUsers)
+                        @Html.TextBoxFor(m => m.AutoRestartCron, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.AutoRestartCron)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, ??????????????">
+                    @Html.LabelFor(m => m.IgnoreLastSession, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.IgnoreLastSession, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.IgnoreLastSession)
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade form-horizontal" id="Network">
+            <div class="form-horizontal tab" id="Network">
                 <h3>Network Settings</h3>
                 <hr />
-                <div class="form-group" data-toggle="popover" data-content="The name displayed in the in-game server list.">
-                    @Html.LabelFor(m => m.ServerName, labelClass)
-                    <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.ServerName, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.ServerName)
-                    </div>
-                </div>
-                <div class="form-group" data-toggle="popover" data-content="The world name displayed in the in-game server list. If Empty, the map name is used.">
-                    @Html.LabelFor(m => m.WorldName, labelClass)
-                    <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.WorldName, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.WorldName)
-                    </div>
-                </div>
                 <div class="form-group" data-toggle="popover" data-content="The IP address on which the server will listen to.">
                     @Html.LabelFor(m => m.IP, labelClass)
                     <div class="@valueColumn">
@@ -188,6 +199,13 @@
                         @Html.ValidationMessageFor(m => m.SteamPort)
                     </div>
                 </div>
+                <div class="form-group" data-toggle="popover" data-content="The port used by SE Server Extender WCF interface.">
+                    @Html.LabelFor(m => m.ServerExtenderPort, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.ServerExtenderPort, adminAccessClass)
+                        @Html.ValidationMessageFor(m => m.ServerExtenderPort)
+                    </div>
+                </div>
                 <div class="form-group" data-toggle="popover" data-content="
                     <strong>OFFLINE :</strong><br />The server will not be accessible at all.<br />
                     <strong>PUBLIC :</strong><br />The server will be visible for all in the in-game server list.<br />
@@ -199,95 +217,11 @@
                         @Html.ValidationMessageFor(m => m.OnlineMode)
                     </div>
                 </div>
-            </div>
-            <div class="tab-pane fade form-horizontal" id="Server">
-                <h3>Server Settings</h3>
-                <hr />
-                <div class="form-group" data-toggle="popover" data-content="If enabled, it will save the map state every below interval.">
-                    @Html.LabelFor(m => m.AutoSave, labelClass)
-                    <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.AutoSave, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.AutoSave)
-                    </div>
-                </div>
-                <div class="form-group" data-toggle="popover" data-content="The interval in minutes at which the auto save will fire.">
-                    @Html.LabelFor(m => m.AutoSaveInMinutes, labelClass)
-                    <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.AutoSaveInMinutes, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.AutoSaveInMinutes)
-                    </div>
-                </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, the spawn ships are deleted as soon as the players leave the server.">
-                    @Html.LabelFor(m => m.RespawnShipDelete, labelClass)
-                    <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.RespawnShipDelete, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.RespawnShipDelete)
-                    </div>
-                </div>
-                <div class="form-group" data-toggle="popover" data-content="The multiplier of the respawn time of the respawn ships. The bigger it is, the longer the timers will be.
-                    <br />Default value is 1.">
-                    @Html.LabelFor(m => m.SpawnShipTimeMultiplier, labelClass)
-                    <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.SpawnShipTimeMultiplier, null, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.SpawnShipTimeMultiplier)
-                    </div>
-                </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, the server will pause itself when no player is connected.">
-                    @Html.LabelFor(m => m.PauseGameWhenEmpty, labelClass)
-                    <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.PauseGameWhenEmpty, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.PauseGameWhenEmpty)
-                    </div>
-                </div>
-                <div class="form-group" data-toggle="popover" data-content="The maximum number of player allowed to join the server.">
-                    @Html.LabelFor(m => m.MaxPlayers, labelClass)
-                    <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.MaxPlayers, adminAccessClass)
-                        @Html.ValidationMessageFor(m => m.MaxPlayers)
-                    </div>
-                </div>
 
             </div>
-            <div class="tab-pane fade form-horizontal" id="SESEAR">
-                <h3>SE Server Extender Settings</h3>
-                <hr />
-                <div class="form-group" data-toggle="popover" data-content="If enabled, The server will use SE Server Extender to run.">
-                    @Html.LabelFor(m => m.UseServerExtender, labelClass)
-                    <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.UseServerExtender, adminAccessClass)
-                        @Html.ValidationMessageFor(m => m.UseServerExtender)
-                    </div>
-                </div>
-                <div class="form-group" data-toggle="popover" data-content="The port used by SE Server Extender WCF interface.">
-                    @Html.LabelFor(m => m.ServerExtenderPort, labelClass)
-                    <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.ServerExtenderPort, adminAccessClass)
-                        @Html.ValidationMessageFor(m => m.ServerExtenderPort)
-                    </div>
-                </div>
-                <hr />
-                <h3>Auto-Restart Settings</h3>
-                <hr />
-                <div class="form-group" data-toggle="popover" data-content="If enabled, The server will restart at the interval defined by the cron below.">
-                    @Html.LabelFor(m => m.AutoRestart, labelClass)
-                    <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.AutoRestart, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.AutoRestart)
-                    </div>
-                </div>
-                <div class="form-group" data-toggle="popover" data-content="The Cron for the Auto-Restart feature.">
-                    @Html.LabelFor(m => m.AutoRestartCron, labelClass)
-                    <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.AutoRestartCron, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.AutoRestartCron)
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade form-horizontal" id="Multipliers">
+            <div class="form-horizontal tab" id="Multipliers">
                 <h3>Multipliers Settings</h3>
                 <hr />
-
                 <div class="form-group" data-toggle="popover" data-content="The multiplier of the base Inventory size. The bigger it is, the larger your inventories will be.
                     <br /> Recomanded values are 1, 3, 5 or 10.">
                     @Html.LabelFor(m => m.InventorySizeMultiplier, labelClass)
@@ -336,29 +270,45 @@
                         @Html.ValidationMessageFor(m => m.GrinderSpeedMultiplier)
                     </div>
                 </div>
+                <div class="form-group" data-toggle="popover" data-content="The multiplier of the base grinding speed when hacking a block. The bigger it is, the faster an enemy will grind you blocks.
+                    <br /> Recomanded values is 0.33.">
+                    @Html.LabelFor(m => m.HackSpeedMultiplier, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.HackSpeedMultiplier, null, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.HackSpeedMultiplier)
+                    </div>
+                </div>
             </div>
-            <div class="tab-pane fade form-horizontal" id="Map">
-                <h3>Map Settings</h3>
+            <div class="form-horizontal tab" id="Server">
+                <h3>Server Settings</h3>
                 <hr />
-                <div class="form-group" data-toggle="popover" data-content="The boundaries of your server. Any object, player or ship will be destroyed if they go past the limit.">
-                    @Html.LabelFor(m => m.WorldSizeKm, labelClass)
+
+                <div class="form-group" data-toggle="popover" data-content="The name displayed in the in-game server list.">
+                    @Html.LabelFor(m => m.ServerName, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.WorldSizeKm, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.WorldSizeKm)
+                        @Html.TextBoxFor(m => m.ServerName, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.ServerName)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, it will automaticly remove small piece of ships, if they are in a linar motion and unpowered.">
-                    @Html.LabelFor(m => m.RemoveTrash, labelClass)
+                <div class="form-group" data-toggle="popover" data-content="The world name displayed in the in-game server list. If Empty, the map name is used.">
+                    @Html.LabelFor(m => m.WorldName, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.RemoveTrash, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.RemoveTrash)
+                        @Html.TextBoxFor(m => m.WorldName, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.WorldName)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, players will be able to save the map locally.">
-                    @Html.LabelFor(m => m.ClientCanSave, labelClass)
+                <div class="form-group" data-toggle="popover" data-content="If enabled, it will save the map state every below interval.">
+                    @Html.LabelFor(m => m.AutoSave, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.ClientCanSave, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.ClientCanSave)
+                        @Html.CheckBoxFor(m => m.AutoSave, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.AutoSave)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="The interval in minutes at which the auto save will fire.">
+                    @Html.LabelFor(m => m.AutoSaveInMinutes, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.AutoSaveInMinutes, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.AutoSaveInMinutes)
                     </div>
                 </div>
                 <div class="form-group" data-toggle="popover" data-content="The maximum number of items allowed to exist on the map. If the number is reached, the oldest ones will be deleted.">
@@ -368,6 +318,53 @@
                         @Html.ValidationMessageFor(m => m.MaxFloatingObjects)
                     </div>
                 </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, it will automaticly remove small piece of ships, if they are in a linar motion and unpowered.">
+                    @Html.LabelFor(m => m.RemoveTrash, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.RemoveTrash, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.RemoveTrash)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, the spawn ships are deleted as soon as the players leave the server.">
+                    @Html.LabelFor(m => m.RespawnShipDelete, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.RespawnShipDelete, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.RespawnShipDelete)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="The multiplier of the respawn time of the respawn ships. The bigger it is, the longer the timers will be.
+                    <br />Default value is 1.">
+                    @Html.LabelFor(m => m.SpawnShipTimeMultiplier, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.SpawnShipTimeMultiplier, null, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.SpawnShipTimeMultiplier)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, the server will pause itself when no player is connected.">
+                    @Html.LabelFor(m => m.PauseGameWhenEmpty, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.PauseGameWhenEmpty, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.PauseGameWhenEmpty)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="The maximum number of player allowed to join the server.">
+                    @Html.LabelFor(m => m.MaxPlayers, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.MaxPlayers, adminAccessClass)
+                        @Html.ValidationMessageFor(m => m.MaxPlayers)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, it will change someting about the sound, probably...">
+                    @Html.LabelFor(m => m.RealisticSound, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.RealisticSound, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.RealisticSound)
+                    </div>
+                </div>
+            </div>
+            <div class="form-horizontal tab" id="Map">
+                <h3>Map Settings</h3>
+                <hr />
                 <div class="form-group" data-toggle="popover" data-content="
                     <strong>Survival :</strong><br />You have to mine asteroids and grind ships to gather your materials.<br />
                     <strong>Creative :</strong><br />You can place every block without having to weld them.">
@@ -388,8 +385,36 @@
                         @Html.ValidationMessageFor(m => m.EnvironmentHostility)
                     </div>
                 </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, players will be able to save the map locally.">
+                    @Html.LabelFor(m => m.ClientCanSave, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.ClientCanSave, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.ClientCanSave)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, thrusters' flames will damage blocks.">
+                    @Html.LabelFor(m => m.ThrusterDamage, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.ThrusterDamage, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.ThrusterDamage)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, random cargo-ships will spawn on your server.">
+                    @Html.LabelFor(m => m.CargoShipsEnabled, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.CargoShipsEnabled, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.CargoShipsEnabled)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="The boundaries of your server. Any object, player or ship will be destroyed if they go past the limit.">
+                    @Html.LabelFor(m => m.WorldSizeKm, labelClass)
+                    <div class="@valueColumn">
+                        @Html.TextBoxFor(m => m.WorldSizeKm, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.WorldSizeKm)
+                    </div>
+                </div>
             </div>
-            <div class="tab-pane fade form-horizontal" id="Players">
+            <div class="form-horizontal tab" id="Players">
                 <h3>Players Settings</h3>
                 <hr />
                 <div class="form-group" data-toggle="popover" data-content="If enabled, the players will heal any wound over time.">
@@ -399,7 +424,6 @@
                         @Html.ValidationMessageFor(m => m.AutoHealing)
                     </div>
                 </div>
-
                 <div class="form-group" data-toggle="popover" data-content="If enabled, the players will be able to use weapons.">
                     @Html.LabelFor(m => m.WeaponsEnabled, labelClass)
                     <div class="@valueColumn">
@@ -421,10 +445,6 @@
                         @Html.ValidationMessageFor(m => m.PermanentDeath)
                     </div>
                 </div>
-            </div>
-            <div class="tab-pane fade form-horizontal" id="Gameplay">
-                <h3>Gameplay Settings</h3>
-                <hr />
                 <div class="form-group" data-toggle="popover" data-content="If enabled, players will be able to copy-paste ships in creative mode.">
                     @Html.LabelFor(m => m.EnableCopyPaste, labelClass)
                     <div class="@valueColumn">
@@ -439,53 +459,34 @@
                         @Html.ValidationMessageFor(m => m.EnableSpectator)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="The multiplier of the base grinding speed when hacking a block. The bigger it is, the faster an enemy will grind you blocks.
-                    <br /> Recomanded values is 0.33.">
-                    @Html.LabelFor(m => m.HackSpeedMultiplier, labelClass)
-                    <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.HackSpeedMultiplier, null, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.HackSpeedMultiplier)
-                    </div>
-                </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, thrusters' flames will damage blocks.">
-                    @Html.LabelFor(m => m.ThrusterDamage, labelClass)
-                    <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.ThrusterDamage, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.ThrusterDamage)
-                    </div>
-                </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, random cargo-ships will spawn on your server.">
-                    @Html.LabelFor(m => m.CargoShipsEnabled, labelClass)
-                    <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.CargoShipsEnabled, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.CargoShipsEnabled)
-                    </div>
-                </div>
+
+
             </div>
-            <div class="tab-pane fade form-horizontal" id="Misc">
-                <h3>Miscellaneous</h3>
+            <div class="form-horizontal tab" id="Rights">
+                <h3>Rights</h3>
                 <hr />
-
-
-                <div class="form-group" data-toggle="popover" data-content="If enabled, the server will reset all block ownership.">
-                    @Html.LabelFor(m => m.ResetOwnership, labelClass)
+                <div class="form-group" data-toggle="popover" data-content="The list of the web administrators' logins.
+                    <br />One per line.<br />Administrators can change every settings of the servers.">
+                    @Html.LabelFor(m => m.WebAdministrators, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.ResetOwnership, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.ResetOwnership)
+                        @Html.TextAreaFor(m => m.WebAdministrators, superAdminAccessClass)
+                        @Html.ValidationMessageFor(m => m.WebAdministrators)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, ??????????????">
-                    @Html.LabelFor(m => m.IgnoreLastSession, labelClass)
+                <div class="form-group" data-toggle="popover" data-content="The list of the web managers' logins.
+                    <br />One per line.<br />Managers can change some settings of the servers.">
+                    @Html.LabelFor(m => m.WebManagers, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.IgnoreLastSession, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.IgnoreLastSession)
+                        @Html.TextAreaFor(m => m.WebManagers, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.WebManagers)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, it will change someting about the sound, probably...">
-                    @Html.LabelFor(m => m.RealisticSound, labelClass)
+                <div class="form-group" data-toggle="popover" data-content="The list of the web users' logins.
+                    <br />One per line.<br />Users can see the server in theirs server list.">
+                    @Html.LabelFor(m => m.WebUsers, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.RealisticSound, managerAccessClass)
-                        @Html.ValidationMessageFor(m => m.RealisticSound)
+                        @Html.TextAreaFor(m => m.WebUsers, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.WebUsers)
                     </div>
                 </div>
                 <div class="form-group" data-toggle="popover" data-content="The list of the administrators' steam's ids.
@@ -502,6 +503,13 @@
                     <div class="@valueColumn">
                         @Html.TextAreaFor(m => m.Banned, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.Banned)
+                    </div>
+                </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, the server will reset all block ownership.">
+                    @Html.LabelFor(m => m.ResetOwnership, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.ResetOwnership, managerAccessClass)
+                        @Html.ValidationMessageFor(m => m.ResetOwnership)
                     </div>
                 </div>
             </div>

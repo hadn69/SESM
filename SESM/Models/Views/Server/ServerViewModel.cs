@@ -38,7 +38,7 @@ namespace SESM.Models.Views.Server
         public bool UseServerExtender { get; set; }
 
         [Required]
-        [DisplayName("Server Extender Port")]
+        [DisplayName("SESE Port")]
         [RegularExpression(@"^([1-9]|[1-9]\d|[1-9]\d{0,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$", ErrorMessage = "The server extender port must be a vaild number")]
         public int ServerExtenderPort { get; set; }
 
@@ -83,51 +83,51 @@ namespace SESM.Models.Views.Server
         public EnvironmentHostility EnvironmentHostility { get; set; }
 
         [Required]
-        [DisplayName("Enable Auto Healing")]
+        [DisplayName("Auto Healing")]
         public bool AutoHealing { get; set; }
 
         [Required]
-        [DisplayName("Enable Copy Paste")]
+        [DisplayName("Copy Paste")]
         public bool EnableCopyPaste { get; set; }
 
         [Required]
-        [DisplayName("Enable Auto Save")]
+        [DisplayName("Auto Save")]
         public bool AutoSave { get; set; }
 
         [Required]
-        [DisplayName("Auto Save Interval In Minutes")]
+        [DisplayName("Auto Save Interval")]
         public int AutoSaveInMinutes { get; set; }
 
         [Required]
-        [DisplayName("Enable Weapons")]
+        [DisplayName("Weapons")]
         public bool WeaponsEnabled { get; set; }
 
         [Required]
-        [DisplayName("Show Player Names On Hud")]
+        [DisplayName("Show Player Names")]
         public bool ShowPlayerNamesOnHud { get; set; }
 
         [Required]
-        [DisplayName("Enable Thruster Damage")]
+        [DisplayName("Thruster Damage")]
         public bool ThrusterDamage { get; set; }
 
         [Required]
-        [DisplayName("Enable Cargo Ships")]
+        [DisplayName("Cargo Ships")]
         public bool CargoShipsEnabled { get; set; }
 
         [Required]
-        [DisplayName("Enable Spectator Mode")]
+        [DisplayName("Spectator Mode")]
         public bool EnableSpectator { get; set; }
 
         [Required]
-        [DisplayName("Enable Auto Trash Remover")]
+        [DisplayName("Auto Trash Remover")]
         public bool RemoveTrash { get; set; }
 
         [Required]
-        [DisplayName("World Border Size (in Km)")]
+        [DisplayName("World Border Size")]
         public int WorldSizeKm { get; set; }
 
         [Required]
-        [DisplayName("Enable Respawn Ship Auto Delete")]
+        [DisplayName("Respawn Ship Auto Delete")]
         public bool RespawnShipDelete { get; set; }
 
         [Required]
@@ -143,11 +143,11 @@ namespace SESM.Models.Views.Server
         public double GrinderSpeedMultiplier { get; set; }
 
         [Required]
-        [DisplayName("Enable Realistic Sound")]
+        [DisplayName("Realistic Sound")]
         public bool RealisticSound { get; set; }
 
         [Required]
-        [DisplayName("Enable Client-Side Saving")]
+        [DisplayName("Client-Side Saving")]
         public bool ClientCanSave { get; set; }
 
         [Required]
@@ -155,7 +155,7 @@ namespace SESM.Models.Views.Server
         public double HackSpeedMultiplier { get; set; }
 
         [Required]
-        [DisplayName("Enable Permanent Death")]
+        [DisplayName("Permanent Death")]
         public bool PermanentDeath { get; set; }
 
         [DisplayName("Current Scenario")]
@@ -170,25 +170,25 @@ namespace SESM.Models.Views.Server
         public string IP { get; set; }
 
         [Required]
-        [DisplayName("Steam Connexion Port")]
+        [DisplayName("Steam Port")]
         [RegularExpression(@"^([1-9]|[1-9]\d|[1-9]\d{0,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$", ErrorMessage = "The server port must be a vaild number")]
         public int SteamPort { get; set; }
 
         [Required]
-        [DisplayName("Server Connexion Port")]
+        [DisplayName("Server Port")]
         [RegularExpression(@"^([1-9]|[1-9]\d|[1-9]\d{0,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$", ErrorMessage = "The steam port must be a vaild number")]
         public int ServerPort { get; set; }
 
         [DisplayName("Asteroid Amount")]
         public int AsteroidAmount { get; set; }
 
-        [DisplayName("In-Game Administrators List")]
+        [DisplayName("In-Game Administrators")]
         public string Administrators { get; set; }
 
-        [DisplayName("In-Game Banned List")]
+        [DisplayName("In-Game Banned")]
         public string Banned { get; set; }
 
-        [DisplayName("In-Game Mod List")]
+        [DisplayName("In-Game Mod")]
         public string Mods { get; set; }
 
         [DisplayName("Steam Group ID")]
@@ -202,20 +202,20 @@ namespace SESM.Models.Views.Server
         public string WorldName { get; set; }
 
         [Required]
-        [DisplayName("Pause Game When No Player")]
+        [DisplayName("Pause on Empty")]
         public bool PauseGameWhenEmpty { get; set; }
 
         [Required]
         [DisplayName("Ignore Last Session")]
         public bool IgnoreLastSession { get; set; }
 
-        [DisplayName("Web Administrators List")]
+        [DisplayName("Web Administrators")]
         public string WebAdministrators { get; set; }
 
-        [DisplayName("Web Managers List")]
+        [DisplayName("Web Managers")]
         public string WebManagers { get; set; }
 
-        [DisplayName("Web Users List")]
+        [DisplayName("Web Users")]
         public string WebUsers { get; set; }
 
 
