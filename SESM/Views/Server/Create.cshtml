@@ -97,6 +97,13 @@
                         @Html.ValidationMessageFor(m => m.AutoRestartCron)
                     </div>
                 </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, The server will try to start every 15 minutes.">
+                    @Html.LabelFor(m => m.AutoStart, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.AutoStart, valueClass)
+                        @Html.ValidationMessageFor(m => m.AutoStart)
+                    </div>
+                </div>
             </section>
         </div>
         <div class="col-md-6">

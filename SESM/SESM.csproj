@@ -394,6 +394,10 @@
     <Compile Include="Migrations\201409041151509_ServerExtender.Designer.cs">
       <DependentUpon>201409041151509_ServerExtender.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201410051651508_AutoStart.cs" />
+    <Compile Include="Migrations\201410051651508_AutoStart.Designer.cs">
+      <DependentUpon>201410051651508_AutoStart.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Views\Account\LoginViewModel.cs" />
     <Compile Include="Models\Views\Account\ManageViewModel.cs" />
@@ -419,6 +423,7 @@
     <Compile Include="Models\Views\User\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\AutoRestartJob.cs" />
+    <Compile Include="Tools\AutoStartJob.cs" />
     <Compile Include="Tools\AutoUpdate.cs" />
     <Compile Include="Tools\BackupJob.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
@@ -464,6 +469,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201409041151509_ServerExtender.resx">
       <DependentUpon>201409041151509_ServerExtender.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410051651508_AutoStart.resx">
+      <DependentUpon>201410051651508_AutoStart.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
