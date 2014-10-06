@@ -15,6 +15,12 @@ namespace SESM.Controllers
 {
     public class ExternalController : Controller
     {
+        // GET: External/Version
+        public ActionResult Version()
+        {
+            return Content(Constants.GetVersion());
+        }
+
         // GET: External
         public ActionResult RandomRGB(int id = 10)
         {
