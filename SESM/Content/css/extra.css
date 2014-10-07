@@ -1,7 +1,7 @@
 @import url("//fonts.googleapis.com/css?family=Lato:300,400,700");
 
 .global-wrapper {
-    width: 1200px;
+    width: 95%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -13,6 +13,41 @@ body {
     color: white;
 }
 
+html {
+  height: 100%;
+}
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+/* Wrapper for page content to push down footer */
+.global-wrapper > .row {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    /* Negative indent footer by it's height */
+    margin-bottom: -60px;
+}
+
+/* Set the fixed height of the footer here */
+#push,
+#footer {
+    height: 60px;
+}
+
+#footer {
+    background-color: rgb(20, 20, 20);
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+
+
+
 .navbar-fixed-top {
     right: auto;
     left: auto;
@@ -22,8 +57,12 @@ body {
     border-color: rgba(0, 0, 0, 0);
 }
 
+.global-wrapper > nav {
+    width: 95%;
+}
+
 nav > .container {
-    width: 1200px;
+    width: 100%;
     padding-left: 0;
     padding-right: 0;
 }
@@ -61,10 +100,9 @@ nav > .container {
         .navbar-fixed-top > .container > .row:last-child > .col-md-1:hover {
             background-color: rgb(66, 66, 66);
         }
-        
+
         .navbar-fixed-top > .container > .row:last-child > .col-md-1 > a {
             position: absolute;
-            
             width: 100%;
             height: 100%;
             top: 0;
@@ -72,14 +110,14 @@ nav > .container {
             text-decoration: none;
             color: inherit;
         }
-    
-        .navbar-fixed-top > .container > .row:last-child > .col-md-1 > a > i {
-            position: absolute;
-            left: 0;
-            right: 0;
-            margin: 20px auto;
-            z-index: 20;
-        }
+
+            .navbar-fixed-top > .container > .row:last-child > .col-md-1 > a > i {
+                position: absolute;
+                left: 0;
+                right: 0;
+                margin: 20px auto;
+                z-index: 20;
+            }
 
 #brand-cell {
     background-color: rgb(49, 74, 99);
@@ -97,6 +135,7 @@ nav > .container {
 #ColorBrand {
     color: rgb(100, 122, 168);
 }
+
 .navbar-selected {
     color: rgb(90, 198, 223);
 }

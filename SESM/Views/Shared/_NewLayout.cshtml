@@ -12,7 +12,6 @@
 </head>
 <body>
     <div class="global-wrapper">
-
         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="container">
                 <div class="row">
@@ -28,9 +27,15 @@
                 </div>
             </div>
         </nav>
-        <div class="row">
+        <div class="row" style="height: 100%;">
             <div class="col-md-12">
                 @RenderBody()
+            </div>
+            <div id="push"></div>
+        </div>
+        <div id="footer">
+            <div class="container">
+                <p class="muted credit">Example courtesy <a href="http://martinbean.co.uk">Martin Bean</a> and <a href="http://ryanfait.com/sticky-footer/">Ryan Fait</a>.</p>
             </div>
         </div>
     </div>
