@@ -1,13 +1,13 @@
 ﻿@using SESM.Tools.Helpers.HTMLHelper
 <html>
 <head>
-
-    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="/Content/js/jquery-2.1.1.min.js"></script>
+    <link rel="stylesheet" href="/Content/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/Content/css/bootstrap-theme.min.css">
+    <script src="/Content/js/bootstrap.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="~/Content/css/extra.css" />
+    <link rel="stylesheet" href="/Content/css/extra.css" />
+    <script src="~/Content/js/jquery.smooth-scroll.min.js"></script>
     <title>SESM</title>
 </head>
 <body>
@@ -27,16 +27,16 @@
                 </div>
             </div>
         </nav>
-        <div class="row" style="height: 100%;">
-            <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12" style="min-height: calc(100% - 200px); ">
                 @RenderBody()
             </div>
-            <div id="push"></div>
         </div>
-        <div id="footer">
-            <div class="container">
-                <p class="muted credit">Example courtesy <a href="http://martinbean.co.uk">Martin Bean</a> and <a href="http://ryanfait.com/sticky-footer/">Ryan Fait</a>.</p>
-            </div>
+        <div id="push"></div>
+    </div>
+    <div id="footer">
+        <div class="row">
+            <p><a href="https://bitbucket.org/remygrandin/sesm-public/wiki/Home">SESM</a> V3-DEV. <a href="http://www.spaceengineersgame.com/">Space Engineers &reg;</a> is a game of <a href="http://www.keenswh.com/"> KEEN SWH LTD</a>.</p>
         </div>
     </div>
 </body>

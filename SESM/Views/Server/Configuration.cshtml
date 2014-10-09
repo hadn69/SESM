@@ -60,41 +60,33 @@
                 }
 
             });
-            console.log(splittedSearchedStr);
 
             $(".tab").each(function (index) {
                 var count = 0;
                 $(this).css("display", "none");
-                $('ul.nav > li > a[href="#' + $(this).attr("id") + '"]').parent().css("display", "none");;
+                $('ul.nav > li > a[href="#' + $(this).attr("id") + '"]').parent().css("display", "none");
+
                 $(this).children(".form-group").each(function (index) {
                     $(this).hide();
+                    locThis = $(this);
 
-                    if (splittedSearchedStr.some(function (element, index, array) {
-                        if (element.type == "desc" || element.type == "all") {
-                            return $(this).attr("data-content").toLowerCase().indexOf(element.keyword) > -1;
-                    }
-                        return false;
-                    })) {
-                        $(this).css("display", "");
-                        count++;
-                    }
-                    else if (splittedSearchedStr.some(function (element, index, array) {
-                        if (element.type == "name" || element.type == "all") {
-                            return $(this).children("label").first().text().toLowerCase().indexOf(element.keyword) > -1;
+                    if (terms.every(function (element, index, array) {
+                        if (element.type == "desc") {
+                            return locThis.attr("data-content").toLowerCase().indexOf(element.keyword) > -1;
+                        } else if (element.type == "name") {
+                            return locThis.children("label").first().text().toLowerCase().indexOf(element.keyword) > -1;
+                        } else if (element.type == "val") {
+                            return locThis.children("div").first().children("input, textarea, select").first().val() != undefined
+                            && locThis.children("div").first().children("input, textarea, select").first().val().toLowerCase().indexOf(element.keyword) > -1;
+                        } else {
+                            return locThis.attr("data-content").toLowerCase().indexOf(element.keyword) > -1
+                                || locThis.children("label").first().text().toLowerCase().indexOf(element.keyword) > -1
+                                || (locThis.children("div").first().children("input, textarea, select").first().val() != undefined
+                                    && locThis.children("div").first().children("input, textarea, select").first().val().toLowerCase().indexOf(element.keyword) > -1);
                         }
-                        return false;
+                            
                     })) {
-                        $(this).css("display", "");
-                        count++;
-                    }
-                    else if (splittedSearchedStr.some(function (element, index, array) {
-                        if (element.type == "name" || element.type == "all") {
-                            return $(this).children("div > input, div > textarea, div > select").first().val() != undefined
-                            && $(this).children("div > input, div > textarea, div > select").first().val().toLowerCase().indexOf(element.keyword) > -1;
-                        }
-                        return false;
-                    })) {
-                        $(this).css("display", "");
+                        locThis.css("display", "");
                         count++;
                     }
                 });
@@ -143,8 +135,8 @@
 
     });
 </script>
-<script src="~/Content/js/jquery.smooth-scroll.js"></script>
-<div class="col-md-4" style="height: 475px; background-color: rgb(49, 74, 99); margin-bottom: 15px;padding: 15px 15px 15px 15px;">
+
+<div class="col-md-4" style="height: calc(100% - 235px); background-color: rgb(49, 74, 99); margin-bottom: 15px;padding: 15px 15px 15px 15px;">
     <input id="LocSearchBox" type="text" class="form-control" placeholder="Search" />
 
     <hr />
@@ -152,7 +144,7 @@
 
     </div>
 </div>
-<div class="col-md-8" style="padding-right: 0px; height: 200px;">
+<div class="col-md-8" style="padding-right: 0px; height: calc(100% - 235px); ">
     <div class="row" style="background-color: rgb(29, 28, 28); padding: 15px 15px 15px 15px; margin: 0px 0px 0px 0px;">
         <ul class="nav nav-tabs nav-justified" role="tablist">
             <li class="active"><a href="#General" role="tab" data-toggle="tab">General</a></li>
@@ -164,7 +156,7 @@
             <li><a href="#Rights" role="tab" data-toggle="tab">Rights</a></li>
         </ul>
 
-        <div id="scrollZone" style="overflow: auto; height: 100%; padding-right: 20px;">
+        <div id="scrollZone" style="overflow: auto; height: calc(100% - 71px);padding-right: 20px;">
             <div class="form-horizontal tab" id="General">
                 <h3>General Settings</h3>
                 <hr />

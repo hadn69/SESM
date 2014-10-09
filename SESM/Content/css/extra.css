@@ -1,4 +1,4 @@
-@import url("//fonts.googleapis.com/css?family=Lato:300,400,700");
+@import url("/Content/css/Lato.css");
 
 .global-wrapper {
     width: 95%;
@@ -9,44 +9,46 @@
 body {
     background-image: url("/Content/img/panel-bg.jpg");
     background-attachment: fixed;
-    background-repeat: no-repeat;
+    background-repeat: repeat;
     color: white;
 }
 
 html {
-  height: 100%;
+    height: 100%;
 }
+
 body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
-
-
 
 /* Wrapper for page content to push down footer */
-.global-wrapper > .row {
+.global-wrapper {
     min-height: 100%;
     height: auto !important;
     height: 100%;
     /* Negative indent footer by it's height */
-    margin-bottom: -60px;
+    margin: 0 auto -50px auto;
 }
 
 /* Set the fixed height of the footer here */
 #push,
 #footer {
-    height: 60px;
+    height: 50px;
 }
 
 #footer {
-    background-color: rgb(20, 20, 20);
-    margin-left: -15px;
-    margin-right: -15px;
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-
-
+    #footer > div {
+        background-color: rgb(50, 50, 50);
+        height: 100%;
+        padding: 15px 15px 15px 15px;
+    }
 
 .navbar-fixed-top {
     right: auto;

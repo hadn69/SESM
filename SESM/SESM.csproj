@@ -128,14 +128,16 @@
   <ItemGroup>
     <Content Include="Content\bootstrap-superhero.min.css" />
     <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\css\bootstrap\bootstrap-theme.css" />
-    <Content Include="Content\css\bootstrap\bootstrap-theme.min.css" />
-    <Content Include="Content\css\bootstrap\bootstrap.css" />
-    <Content Include="Content\css\bootstrap\bootstrap.min.css" />
+    <Content Include="Content\css\bootstrap-theme.min.css" />
+    <Content Include="Content\css\bootstrap.min.css" />
     <Content Include="Content\css\extra.css" />
+    <Content Include="Content\css\Lato.css" />
+    <Content Include="Content\font\glyphicons\glyphicons-halflings-regular.svg" />
     <Content Include="Content\glyphicons-halflings-regular.svg" />
     <Content Include="Content\img\panel-bg.jpg" />
-    <Content Include="Content\js\jquery.smooth-scroll.js" />
+    <Content Include="Content\js\bootstrap.min.js" />
+    <Content Include="Content\js\jquery-2.1.1.min.js" />
+    <Content Include="Content\js\jquery.smooth-scroll.min.js" />
     <Content Include="Content\logo-small.png" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\site.css" />
@@ -255,18 +257,18 @@
     <Content Include="Scripts\jquery-2.1.1.js" />
     <Content Include="Scripts\jquery-2.1.1.min.js" />
     <Content Include="Scripts\jquery-2.1.1.min.map" />
-    <Content Include="Content\font\Lato-Black.ttf" />
-    <Content Include="Content\font\Lato-BlackItalic.ttf" />
-    <Content Include="Content\font\Lato-Bold.ttf" />
-    <Content Include="Content\font\Lato-BoldItalic.ttf" />
-    <Content Include="Content\font\Lato-Hairline.ttf" />
-    <Content Include="Content\font\Lato-HairlineItalic.ttf" />
-    <Content Include="Content\font\Lato-Italic.ttf" />
-    <Content Include="Content\font\Lato-Light.ttf" />
-    <Content Include="Content\font\Lato-LightItalic.ttf" />
-    <Content Include="Content\font\Lato-Regular.ttf" />
-    <Content Include="Content\css\bootstrap\bootstrap-theme.css.map" />
-    <Content Include="Content\css\bootstrap\bootstrap.css.map" />
+    <Content Include="Content\font\glyphicons\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\font\glyphicons\glyphicons-halflings-regular.ttf" />
+    <Content Include="Content\font\glyphicons\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\font\lato\LatoBold.woff2" />
+    <Content Include="Content\font\lato\LatoBoldExt.woff2" />
+    <Content Include="Content\font\lato\LatoLight.woff2" />
+    <Content Include="Content\font\lato\LatoLightExt.woff2" />
+    <Content Include="Content\font\lato\LatoRegular.woff2" />
+    <Content Include="Content\font\lato\LatoRegularExt.woff2" />
+    <Content Include="Content\font\lato\LatoBold.woff" />
+    <Content Include="Content\font\lato\LatoLight.woff" />
+    <Content Include="Content\font\lato\LatoRegular.woff" />
     <None Include="job_scheduling_data_2_0.xsd">
       <SubType>Designer</SubType>
     </None>
