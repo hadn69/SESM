@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using System.Xml.Linq;
 using Ionic.Zip;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
@@ -33,9 +35,8 @@ namespace SESM.Controllers
             }
 
             ViewData["ID"] = id;
-            ViewData["AccessLevel"] = srvPrv.GetAccessLevel(user.Id, serv.Id);
 
-            string[] listDir = Directory.GetDirectories(PathHelper.GetModsPath(serv));
+            /*string[] listDir = Directory.GetDirectories(PathHelper.GetModsPath(serv));
 
             List<SelectListItem> listSLI = new List<SelectListItem>();
 
@@ -49,11 +50,40 @@ namespace SESM.Controllers
 
             ViewData["listDir"] = listSLI;
 
-            ModViewModel model = new ModViewModel();
+            ModViewModelOld model = new ModViewModelOld();
+            */
 
+            ModViewModel model = new ModViewModel();
+            ServerConfigHelper serverConfig = new ServerConfigHelper();
+            serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+
+            foreach (ulong mod in serverConfig.Mods)
+            {
+                model.ModName.Add(mod.ToString());
+            }
 
             return View(model);
         }
+
+        // GET: Mod/GetWorkshopInfo/12345678
+        [HttpGet]
+        public ActionResult GetWorkshopInfo(int id)
+        {
+            string item = Request.QueryString["item"];
+            string data = new System.Net.WebClient().DownloadString("http://steamcommunity.com/sharedfiles/filedetails/?id=" + item);
+
+            Match matchTitle = Regex.Match(data, @"<div class=""workshopItemTitle"">(.*)</div>", RegexOptions.IgnoreCase);
+            Match matchURL = Regex.Match(data, @"(http:.*)' \);""><img id=""previewImageMain""", RegexOptions.IgnoreCase);
+
+            XElement response = new XElement("WorkshopInfo",
+                                    new XAttribute("ModName", matchTitle.Groups[1]),
+                                    new XAttribute("ThumbnailURL", matchURL.Groups[1]));
+
+            return Content(response.ToString());
+        }
+
+
+
 
         //
         // GET: Map/Upload/5

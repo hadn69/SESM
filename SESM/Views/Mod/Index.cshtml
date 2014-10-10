@@ -1,36 +1,152 @@
 ﻿@using SESM.DAL
 @model SESM.Models.Views.Mod.ModViewModel
 @{
-    ViewBag.Title = "Mod List";
-    List<SelectListItem> listDir = (List<SelectListItem>)ViewData["listDir"];
-    int id = (int)ViewData["ID"];
-    AccessLevel accessLevel = (AccessLevel)ViewData["AccessLevel"];
-}
-<div class="row">
-    <div class="col-md-6">
-        @using (Html.BeginForm("Index", "Mod", null, FormMethod.Post, new { @class = "form-horizontal well", role = "form" }))
-        {
-            @Html.ValidationSummary()
-            <div class="form-group">
-                <div class="col-md-12">
-                    @Html.DropDownListFor(m => m.ModName, listDir, new { @class = "form-control center-block", size = "10", style = "max-width:none;width:94%" })
-                    @Html.ValidationMessageFor(m => m.ModName)
-                </div>
-            </div>
-            <div style="text-align: center;">
-                <div class="btn-group">
-                    <input type="submit" onclick="return confirm('This will delete this mod. Are you sure you want to do this ?');" value="Delete" name="action:DeleteMod" class="btn btn-danger" />
-                    <a class="btn btn-success" href="@(Url.Action("Upload", "Mod", new {id = id}))">Upload</a>
-                </div>
-            </div>
+    ViewBag.Title = "Mod Manager";
+    ViewBag.Category = 2;
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
 
-        }
+    int id = (int)ViewData["ID"];
+
+
+}
+<br />
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#LocSearchBox').on('input', function () {
+            var searchedStr = $('#LocSearchBox').val().toLowerCase();
+
+            var terms = new Array();
+            var splittedSearchedStr = searchedStr.split(" ");
+            splittedSearchedStr.forEach(function (entry) {
+                var type = "";
+                switch (entry.toLowerCase().split(":")[0]) {
+                    case "desc":
+                    case "description":
+                        type = "desc";
+                        break;
+                    case "name":
+                    case "label":
+                        type = "name";
+                        break;
+                    case "val":
+                    case "value":
+                        type = "val";
+                        break;
+                    default:
+                        type = "all";
+                        break;
+                }
+                if (type == "all") {
+                    terms.push({ type: type, keyword: entry });
+                } else {
+                    terms.push({ type: type, keyword: entry.toLowerCase().substring(entry.indexOf(":") + 1) });
+                }
+
+            });
+
+            $(".tab").each(function (index) {
+                var count = 0;
+                $(this).css("display", "none");
+                $('ul.nav > li > a[href="#' + $(this).attr("id") + '"]').parent().css("display", "none");
+
+                $(this).children(".form-group").each(function (index) {
+                    $(this).hide();
+                    locThis = $(this);
+
+                    if (terms.every(function (element, index, array) {
+                        if (element.type == "desc") {
+                            return locThis.attr("data-content").toLowerCase().indexOf(element.keyword) > -1;
+                    } else if (element.type == "name") {
+                            return locThis.children("label").first().text().toLowerCase().indexOf(element.keyword) > -1;
+                    } else if (element.type == "val") {
+                            return locThis.children("div").first().children("input, textarea, select").first().val() != undefined
+                            && locThis.children("div").first().children("input, textarea, select").first().val().toLowerCase().indexOf(element.keyword) > -1;
+                    } else {
+                            return locThis.attr("data-content").toLowerCase().indexOf(element.keyword) > -1
+                                || locThis.children("label").first().text().toLowerCase().indexOf(element.keyword) > -1
+                                || (locThis.children("div").first().children("input, textarea, select").first().val() != undefined
+                                    && locThis.children("div").first().children("input, textarea, select").first().val().toLowerCase().indexOf(element.keyword) > -1);
+                    }
+
+                    })) {
+                        locThis.css("display", "");
+                        count++;
+                    }
+                });
+                if (count != 0) {
+                    $(this).css("display", "");
+                    $('ul.nav > li > a[href="#' + $(this).attr("id") + '"]').parent().css("display", "");;
+                }
+
+            });
+
+            if ($('ul.nav > li.active').css("display") == "none") {
+                $('ul.nav > li[style!="display: none;"] > a').first().tab('show');
+            }
+
+        });
+
+
+        $('ul > li > a').each(function (index) {
+            var targt = $(this).attr("href");
+            $(this).click(function () {
+                $.smoothScroll({
+                    offset: -20,
+                    scrollElement: $('#scrollZone'),
+                    scrollTarget: targt
+                });
+            });
+        });
+
+
+        $('.form-group').each(function (index) {
+            $(this).mouseover(function () {
+                $("#toolTipDiv").html("<h3>" + $(this).children("label").text() + "</h3>" +
+                    "<p>" + $(this).attr("data-content") + "</p>");
+            });
+            $(this).focusin(function () {
+                $("#toolTipDiv").html("<h3>" + $(this).children("label").text() + "</h3>" +
+                    "<p>" + $(this).attr("data-content") + "</p>");
+            });
+            $(this).mouseout(function () {
+                $("#toolTipDiv").html("");
+            });
+            $(this).focusout(function () {
+                $("#toolTipDiv").html("");
+            });
+        });
+
+        $('.list-group-item').each(function (index) {
+            $.get("/Mod/GetWorkshopInfo/" + "@id" + "?item=" + $(this).text(), function (data) {
+                console.log(data);
+                //var arr = /(http:.*)' \);"><img id="previewImageMain"/ig.exec(data);
+                //console.log(arr);
+            });
+        });
+
+    });
+</script>
+<style>
+    .list-group-item {
+        background-color: rgb(40, 40, 40);
+    }
+</style>
+<div class="col-md-4" style="height: calc(100% - 235px); background-color: rgb(49, 74, 99); margin-bottom: 15px;padding: 15px 15px 15px 15px;">
+    <input id="LocSearchBox" type="text" class="form-control" placeholder="Search" />
+
+    <hr />
+    <div id="toolTipDiv">
+
     </div>
 </div>
-<div class="row">
-    <div class="col-md-12">
-        <a class="btn btn-default" href="@(Url.Action("Status", "Server", new {id = id}))">
-            <span class="glyphicon glyphicon-chevron-left"></span> Back to Server Status
-        </a>
+<div class="col-md-8" style="padding-right: 0px; height: calc(100% - 235px); ">
+    <div class="row" style="background-color: rgb(29, 28, 28); padding: 15px 15px 15px 15px; margin: 0px 0px 0px 0px; height: 100%">
+        <ul class="list-group">
+            
+            @foreach (string item in Model.ModName)
+            {
+                <li class="list-group-item">@item</li>
+            }
+        </ul>
     </div>
 </div>
