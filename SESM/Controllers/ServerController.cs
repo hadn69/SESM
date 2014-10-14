@@ -211,7 +211,7 @@ namespace SESM.Controllers
             EntityServer serv = srvPrv.GetServer(id);
             if (serv != null)
             {
-                ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StopServiceAndWait(serv);
                 ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(serv));
                 if (Directory.Exists(PathHelper.GetInstancePath(serv)))
                     Directory.Delete(PathHelper.GetInstancePath(serv), true);
@@ -275,7 +275,7 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 
-            ServiceHelper.StopService(ServiceHelper.GetServiceName(serv));
+            ServiceHelper.StopService(serv);
 
             return RedirectToAction("Status", new {id = id});
         }
@@ -294,7 +294,7 @@ namespace SESM.Controllers
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-                    ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
+                    ServiceHelper.StopService(item);
             }
 
             return RedirectToAction("Index");
@@ -332,14 +332,14 @@ namespace SESM.Controllers
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-                    ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
+                    ServiceHelper.StopService(item);
             }
 
             foreach (EntityServer item in serverList)
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-                    ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
+                    ServiceHelper.WaitForStopped(item);
             }
 
             foreach (EntityServer item in serverList)
@@ -562,7 +562,7 @@ namespace SESM.Controllers
 
                 srvPrv.UpdateServer(serv);
 
-                ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StopServiceAndWait(serv);
 
                 if (model.Name != serv.Name 
                     || model.UseServerExtender != serv.UseServerExtender 

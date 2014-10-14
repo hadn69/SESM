@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.ServiceProcess;
+using System.Threading;
 using SESM.DTO;
 using SESM.Models.Views.Settings;
 
@@ -23,13 +24,15 @@ namespace SESM.Tools.Helpers
             return prefix + "_" + server.Id + "_" + server.Name;
         }
 
-        public static void StopService(string serviceName)
+        public static void StopService(EntityServer server)
         {
+            string serviceName = GetServiceName(server);
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
                 if (svcController.Status == ServiceControllerStatus.Running)
                     svcController.Stop();
+                
             }
             catch (Exception ex)
             {
@@ -37,16 +40,17 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public static void StopServiceAndWait(string serviceName)
+        public static void StopServiceAndWait(EntityServer server)
         {
+            string serviceName = GetServiceName(server);
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
 
                 if (svcController.Status == ServiceControllerStatus.Running)
                 {
-                    svcController.Stop();
-                    svcController.WaitForStatus(ServiceControllerStatus.Stopped);
+                    StopService(server);
+                    WaitForStopped(server);
                 }
             }
             catch (Exception ex)
@@ -55,12 +59,15 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public static void WaitForStopped(string serviceName)
+        public static void WaitForStopped(EntityServer server)
         {
+            string serviceName = GetServiceName(server);
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
                 svcController.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 10));
+                if(server.UseServerExtender)
+                    Thread.Sleep(8000);
             }
             catch (Exception ex)
             {
@@ -106,8 +113,8 @@ namespace SESM.Tools.Helpers
                 ServiceController svcController = new ServiceController(serviceName);
                 if (svcController.Status == ServiceControllerStatus.Running)
                 {
-                    svcController.Stop();
-                    svcController.WaitForStatus(ServiceControllerStatus.Stopped);
+                    StopService(server);
+                    WaitForStopped(server);
                     StartService(server);
                 }
             }

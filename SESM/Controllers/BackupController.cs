@@ -151,7 +151,7 @@ namespace SESM.Controllers
                     if(srvPrv.GetState(serv) != ServiceState.Stopped)
                     {
                         toRestart = true;
-                        ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                        ServiceHelper.StopServiceAndWait(serv);
                     }
                     config.LoadFromSave(PathHelper.GetSavePath(serv, savename));
                         

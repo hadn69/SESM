@@ -101,7 +101,7 @@ namespace SESM.Controllers
 
             if (ModelState.IsValid)
             {
-                ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StopServiceAndWait(serv);
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.SaveName = model.MapName;
@@ -159,7 +159,7 @@ namespace SESM.Controllers
                
                     if(srvPrv.GetState(serv) == ServiceState.Running)
                     {
-                        ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                        ServiceHelper.StopServiceAndWait(serv);
                         toRestart = true;
                     }
 
@@ -263,7 +263,7 @@ namespace SESM.Controllers
 
             if (ModelState.IsValid)
             {
-                ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StopServiceAndWait(serv);
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.ScenarioType = model.MapType;
