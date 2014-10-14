@@ -290,6 +290,20 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public static int SESEDelay
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.SESEDelay;
+            }
+            set
+            {
+                ConfigStorage.SESEDelay = value;
+                ConfigStorage.Write();
+            }
+        }
+
         public static bool UseSESE
         {
             get
