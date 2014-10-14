@@ -316,12 +316,12 @@ namespace SESM.Tools.Helpers
                     foreach(EntityServer item in srvPrv.GetAllServers())
                     {
                         logger.Info("Sending stop order to " + item.Name);
-                        ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
+                        ServiceHelper.StopService(item);
                     }
 
                     foreach(EntityServer item in srvPrv.GetAllServers())
                     {
-                        ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
+                        ServiceHelper.WaitForStopped(item);
                     }
 
                     logger.Info("Killing ghosts processes");
@@ -334,7 +334,7 @@ namespace SESM.Tools.Helpers
                     foreach(EntityServer item in listStartedServ)
                     {
                         logger.Info("Sending stop order to " + item.Name);
-                        ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
+                        ServiceHelper.StopService(item);
                     }
                     logger.Info("Waiting 30 secs for server to stop");
                     Thread.Sleep(30000);

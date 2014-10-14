@@ -85,17 +85,17 @@ namespace SESM.Controllers
                 string[] webUsersSplitted = model.WebUsers != null ? model.WebUsers.Split(';') : new string[0];
                 UserProvider usrPrv = new UserProvider(_context);
                 bool errorFlag = false;
-                foreach (string item in webAdminsSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webAdminsSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("adm" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
                 }
-                foreach (string item in webManagerSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webManagerSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("man" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
                 }
-                foreach (string item in webUsersSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webUsersSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("usr" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
@@ -120,6 +120,9 @@ namespace SESM.Controllers
                 srvPrv.AddAdministrator(webAdminsSplitted, serv);
                 srvPrv.AddManagers(webManagerSplitted, serv);
                 srvPrv.AddUsers(webUsersSplitted, serv);
+
+                if (model.UseServerExtender)
+                    model.AutoSave = false;
 
                 srvPrv.CreateServer(serv);
 
@@ -211,7 +214,7 @@ namespace SESM.Controllers
             EntityServer serv = srvPrv.GetServer(id);
             if (serv != null)
             {
-                ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StopServiceAndWait(serv);
                 ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(serv));
                 if (Directory.Exists(PathHelper.GetInstancePath(serv)))
                     Directory.Delete(PathHelper.GetInstancePath(serv), true);
@@ -275,7 +278,7 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 
-            ServiceHelper.StopService(ServiceHelper.GetServiceName(serv));
+            ServiceHelper.StopService(serv);
 
             return RedirectToAction("Status", new {id = id});
         }
@@ -294,7 +297,7 @@ namespace SESM.Controllers
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-                    ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
+                    ServiceHelper.StopService(item);
             }
 
             return RedirectToAction("Index");
@@ -332,14 +335,14 @@ namespace SESM.Controllers
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-                    ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
+                    ServiceHelper.StopService(item);
             }
 
             foreach (EntityServer item in serverList)
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-                    ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
+                    ServiceHelper.WaitForStopped(item);
             }
 
             foreach (EntityServer item in serverList)
@@ -480,7 +483,11 @@ namespace SESM.Controllers
                     || model.SteamPort != serverConfig.SteamPort
                     || model.GameMode != serverConfig.GameMode
                     || model.MaxPlayers != serverConfig.MaxPlayers
-                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects))
+                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
+                    || model.UseServerExtender != serv.UseServerExtender
+                    || model.RemoveTrash != serverConfig.RemoveTrash
+                    || model.WorldSizeKm != serverConfig.WorldSizeKm
+                    || model.ServerExtenderPort != serv.ServerExtenderPort))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
                     return View("Details", model).Danger("You can't modify the greyed fields, bad boy !");
@@ -506,17 +513,17 @@ namespace SESM.Controllers
                 string[] webUsersSplitted = model.WebUsers != null ? Regex.Split(model.WebUsers, "\r\n") : new string[0];
                 UserProvider usrPrv = new UserProvider(_context);
                 bool errorFlag = false;
-                foreach (string item in webAdminsSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webAdminsSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("adm" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
                 }
-                foreach (string item in webManagerSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webManagerSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("man" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
                 }
-                foreach (string item in webUsersSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webUsersSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("usr" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
@@ -562,7 +569,7 @@ namespace SESM.Controllers
 
                 srvPrv.UpdateServer(serv);
 
-                ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StopServiceAndWait(serv);
 
                 if (model.Name != serv.Name 
                     || model.UseServerExtender != serv.UseServerExtender 
@@ -592,6 +599,9 @@ namespace SESM.Controllers
 
                 model.SaveName = serverConfig.SaveName;
                 model.ScenarioType = serverConfig.ScenarioType;
+
+                if(model.UseServerExtender)
+                    model.AutoSave = false;
 
                 serverConfig.ParseIn(model);
 
@@ -650,6 +660,8 @@ namespace SESM.Controllers
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.UseServerExtender != serv.UseServerExtender
+                    || model.RemoveTrash != serverConfig.RemoveTrash
+                    || model.WorldSizeKm != serverConfig.WorldSizeKm
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
@@ -765,6 +777,9 @@ namespace SESM.Controllers
 
                 model.SaveName = serverConfig.SaveName;
                 model.ScenarioType = serverConfig.ScenarioType;
+
+                if(model.UseServerExtender)
+                    model.AutoSave = false;
 
                 serverConfig.ParseIn(model);
 

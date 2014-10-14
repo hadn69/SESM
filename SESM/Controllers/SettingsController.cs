@@ -80,12 +80,12 @@ namespace SESM.Controllers
 
                     foreach (EntityServer item in srvPrv.GetAllServers())
                     {
-                        ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
+                        ServiceHelper.StopService(item);
                     }
 
                     foreach (EntityServer item in srvPrv.GetAllServers())
                     {
-                        ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
+                        ServiceHelper.WaitForStopped(item);
                     }
 
                     // Killing some ghost processes that might still exists
@@ -201,12 +201,12 @@ namespace SESM.Controllers
 
                 foreach (EntityServer item in srvPrv.GetAllServers())
                 {
-                    ServiceHelper.StopService(ServiceHelper.GetServiceName(item));
+                    ServiceHelper.StopService(item);
                 }
 
                 foreach (EntityServer item in srvPrv.GetAllServers())
                 {
-                    ServiceHelper.WaitForStopped(ServiceHelper.GetServiceName(item));
+                    ServiceHelper.WaitForStopped(item);
                 }
 
                 // Killing some ghost processes that might still exists

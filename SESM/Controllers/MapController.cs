@@ -81,6 +81,8 @@ namespace SESM.Controllers
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.SaveName = model.MapName;
                 serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
+                if(serv.UseServerExtender)
+                    serverConfig.AutoSave = false;
                 serverConfig.Save(serv);
                 return RedirectToAction("Status", "Server", new { id = id }).Success("Map Selected");
             }
@@ -101,11 +103,13 @@ namespace SESM.Controllers
 
             if (ModelState.IsValid)
             {
-                ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StopServiceAndWait(serv);
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.SaveName = model.MapName;
                 serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
+                if(serv.UseServerExtender)
+                    serverConfig.AutoSave = false;
                 serverConfig.Save(serv);
                 ServiceHelper.StartService(serv);
                 return RedirectToAction("Status", "Server", new { id = id }).Success("Map Selected, server is restarting"); ;
@@ -159,7 +163,7 @@ namespace SESM.Controllers
                
                     if(srvPrv.GetState(serv) == ServiceState.Running)
                     {
-                        ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                        ServiceHelper.StopServiceAndWait(serv);
                         toRestart = true;
                     }
 
@@ -263,7 +267,7 @@ namespace SESM.Controllers
 
             if (ModelState.IsValid)
             {
-                ServiceHelper.StopServiceAndWait(ServiceHelper.GetServiceName(serv));
+                ServiceHelper.StopServiceAndWait(serv);
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.ScenarioType = model.MapType;
