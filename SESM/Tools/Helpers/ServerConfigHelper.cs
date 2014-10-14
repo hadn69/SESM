@@ -101,36 +101,63 @@ namespace SESM.Tools.Helpers
             AsteroidAmount = model.AsteroidAmount;
 
             Administrators = new List<ulong>();
-            if (model.Administrators != null)
+            if (!string.IsNullOrWhiteSpace(model.Administrators))
             {
                 string[] splittedAdmins = Regex.Split(model.Administrators, "\r\n");
 
 
                 foreach (string item in splittedAdmins)
                 {
-                    Administrators.Add(ulong.Parse(item));
+                    if(!string.IsNullOrWhiteSpace(item))
+                    {
+                        try
+                        {
+                            Administrators.Add(ulong.Parse(item));
+                        }
+                        catch(Exception)
+                        {
+                        }
+                    }
                 }
             }
 
             Banned = new List<ulong>();
-            if (model.Banned != null)
+            if (!string.IsNullOrWhiteSpace(model.Banned))
             {
                 string[] splittedBanned = Regex.Split(model.Banned, "\r\n");
 
                 foreach (string item in splittedBanned)
                 {
-                    Banned.Add(ulong.Parse(item));
+                    if(!string.IsNullOrWhiteSpace(item))
+                    {
+                        try
+                        {
+                            Banned.Add(ulong.Parse(item));
+                        }
+                        catch(Exception)
+                        {
+                        }
+                    }
                 }
             }
 
             Mods = new List<ulong>();
-            if (model.Mods != null)
+            if (!string.IsNullOrWhiteSpace(model.Mods))
             {
                 string[] splittedMod = Regex.Split(model.Mods, "\r\n");
 
                 foreach (string item in splittedMod)
                 {
-                    Mods.Add(ulong.Parse(item));
+                    if (!string.IsNullOrWhiteSpace(item))
+                    {
+                        try
+                        {
+                            Mods.Add(ulong.Parse(item));
+                        }
+                        catch (Exception)
+                        {
+                        } 
+                    }
                 }
             }
             GroupID = model.GroupID;
@@ -177,36 +204,63 @@ namespace SESM.Tools.Helpers
             ServerPort = model.ServerPort;
 
             Administrators = new List<ulong>();
-            if (model.Administrators != null)
+            if (!string.IsNullOrWhiteSpace(model.Administrators))
             {
                 string[] splittedAdmins = Regex.Split(model.Administrators, "\r\n");
 
 
                 foreach (string item in splittedAdmins)
                 {
-                    Administrators.Add(ulong.Parse(item));
+                    if(!string.IsNullOrWhiteSpace(item))
+                    {
+                        try
+                        {
+                            Administrators.Add(ulong.Parse(item));
+                        }
+                        catch(Exception)
+                        {
+                        }
+                    }
                 }
             }
 
             Banned = new List<ulong>();
-            if (model.Banned != null)
+            if (!string.IsNullOrWhiteSpace(model.Banned))
             {
                 string[] splittedBanned = Regex.Split(model.Banned, "\r\n");
 
                 foreach (string item in splittedBanned)
                 {
-                    Banned.Add(ulong.Parse(item));
+                    if(!string.IsNullOrWhiteSpace(item))
+                    {
+                        try
+                        {
+                            Banned.Add(ulong.Parse(item));
+                        }
+                        catch(Exception)
+                        {
+                        }
+                    }
                 }
             }
 
             Mods = new List<ulong>();
-            if (model.Mods != null)
+            if (!string.IsNullOrWhiteSpace(model.Mods))
             {
                 string[] splittedMod = Regex.Split(model.Mods, "\r\n");
 
                 foreach (string item in splittedMod)
                 {
-                    Mods.Add(ulong.Parse(item));
+                    if(!string.IsNullOrWhiteSpace(item))
+                    {
+                        try
+                        {
+                            Mods.Add(ulong.Parse(item));
+                        }
+                        catch(Exception)
+                        {
+                        }
+                    }
                 }
             }
             GroupID = model.GroupID;

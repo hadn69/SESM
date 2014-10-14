@@ -85,17 +85,17 @@ namespace SESM.Controllers
                 string[] webUsersSplitted = model.WebUsers != null ? model.WebUsers.Split(';') : new string[0];
                 UserProvider usrPrv = new UserProvider(_context);
                 bool errorFlag = false;
-                foreach (string item in webAdminsSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webAdminsSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("adm" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
                 }
-                foreach (string item in webManagerSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webManagerSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("man" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
                 }
-                foreach (string item in webUsersSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webUsersSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("usr" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
@@ -506,17 +506,17 @@ namespace SESM.Controllers
                 string[] webUsersSplitted = model.WebUsers != null ? Regex.Split(model.WebUsers, "\r\n") : new string[0];
                 UserProvider usrPrv = new UserProvider(_context);
                 bool errorFlag = false;
-                foreach (string item in webAdminsSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webAdminsSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("adm" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
                 }
-                foreach (string item in webManagerSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webManagerSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("man" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
                 }
-                foreach (string item in webUsersSplitted.Where(item => !usrPrv.UserExist(item)))
+                foreach(string item in webUsersSplitted.Where(item => !string.IsNullOrWhiteSpace(item) && !usrPrv.UserExist(item)))
                 {
                     ModelState.AddModelError("usr" + item, "The user '" + item + " don't exist");
                     errorFlag = true;
