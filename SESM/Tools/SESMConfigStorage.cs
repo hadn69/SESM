@@ -22,6 +22,7 @@ namespace SESM.Tools
         public string AUBetaName { get; set; }
         public string AUBetaPassword { get; set; }
 
+        public int SESEDelay { get; set; }
         public bool UseSESE { get; set; }
         public bool SESEDev { get; set; }
 
@@ -57,6 +58,7 @@ namespace SESM.Tools
             AUBetaName = "";
             AUBetaPassword = "";
 
+            SESEDelay = 8;
             UseSESE = false;
             SESEDev = true;
 

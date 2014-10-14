@@ -67,7 +67,7 @@ namespace SESM.Tools.Helpers
                 ServiceController svcController = new ServiceController(serviceName);
                 svcController.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 10));
                 if(server.UseServerExtender)
-                    Thread.Sleep(8000);
+                    Thread.Sleep(SESMConfigHelper.SESEDelay * 1000);
             }
             catch (Exception ex)
             {
