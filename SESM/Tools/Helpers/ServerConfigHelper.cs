@@ -409,11 +409,11 @@ namespace SESM.Tools.Helpers
             if (string.IsNullOrEmpty(ServerName))
                 sb.AppendLine("  <ServerName />");
             else
-                sb.AppendLine("  <ServerName>" + ServerName + "</ServerName>");
+                sb.AppendLine("  <ServerName>" + ServerName.Replace('&',' ') + "</ServerName>");
             if(string.IsNullOrEmpty(WorldName))
                 sb.AppendLine("  <WorldName />");
             else
-                sb.AppendLine("  <WorldName>" + WorldName + "</WorldName>");
+                sb.AppendLine("  <WorldName>" + WorldName.Replace('&', ' ') + "</WorldName>");
             sb.AppendLine("  <PauseGameWhenEmpty>" + PauseGameWhenEmpty.ToString().ToLower() + "</PauseGameWhenEmpty>");
             sb.AppendLine("  <IgnoreLastSession>" + IgnoreLastSession.ToString().ToLower() + "</IgnoreLastSession>");
             sb.AppendLine("</MyConfigDedicated>");
