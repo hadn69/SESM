@@ -17,10 +17,10 @@
         {
             <a class="btn btn-default" href="@(Url.Action("Create", "Server"))">Add Server</a>
         }
-        <a class="btn btn-success" href="@(Url.Action("StartAll", "Server"))">Start All</a>
-        <a class="btn btn-warning" href="@(Url.Action("RestartAll", "Server"))">Restart All</a>
-        <a class="btn btn-primary" href="@(Url.Action("StopAll", "Server"))">Stop All</a>
-        <a class="btn btn-danger" onclick="return confirm('This will kill all running servers and may cause save corruption! Are you sure you want to do this?');" href="@(Url.Action("KillAll", "Server"))">Kill All</a>
+        <a class="btn btn-success" onclick="return confirm('This will start all servers ! Are you sure you want to do this ?');" href="@(Url.Action("StartAll", "Server"))">Start All</a>
+        <a class="btn btn-warning" onclick="return confirm('This will restart all running servers and start all stopped ones ! Are you sure you want to do this ?');" href="@(Url.Action("RestartAll", "Server"))">Restart All</a>
+        <a class="btn btn-primary" onclick="return confirm('This will stop all running servers ! Are you sure you want to do this ?');" href="@(Url.Action("StopAll", "Server"))">Stop All</a>
+        <a class="btn btn-danger" onclick="return confirm('This will kill all running servers and may cause save corruption ! Are you sure you want to do this ?');" href="@(Url.Action("KillAll", "Server"))">Kill All</a>
     </div>
 }
 <table class="table table-striped table-hover">
