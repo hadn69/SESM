@@ -6,8 +6,6 @@
     Layout = "~/Views/Shared/_NewLayout.cshtml";
 
     int id = (int)ViewData["ID"];
-
-
 }
 <br />
 <script type="text/javascript">
@@ -117,10 +115,27 @@
         });
 
         $('.list-group-item').each(function (index) {
-            $.get("/Mod/GetWorkshopInfo/" + "@id" + "?item=" + $(this).text(), function (data) {
+            var locthis = $(this);
+            $.get("/Mod/GetWorkshopInfo/" + "@id" + "?item=" + $(this).children("span").text(), function (data) {
                 console.log(data);
-                //var arr = /(http:.*)' \);"><img id="previewImageMain"/ig.exec(data);
-                //console.log(arr);
+                var xmlDoc = $.parseXML(data);
+                var xml = $(xmlDoc);
+                var ModName = xml.find("ModName").text();
+                var ThumbnailURL = xml.find("ThumbnailURL").text();
+                var Description = xml.find("Description").text();
+
+                locthis.html("<img src=\"" + ThumbnailURL + "\" style=\"width:35px;height:35px;float:left;\" />" +
+                    "<h5 style=\"margin-left:50px; width: 50%\">" + ModName + " (<span>" + locthis.children("span").text() + "</span>)</h5> " +
+                    "<div class=\"pull-right\">" +
+                    "<button type=\"button\" class=\"btn btn-danger\">Delete</button>" +
+                    "</div>");
+
+                locthis.mouseover(function () {
+                    $("#DescMod").html("<h3>" + ModName + "</h3>" +
+                        "<div style=\"height: calc(100% - 110px);overflow: auto;\">" +
+                        "<img class=\"img-responsive\" style=\"width:25%; float:left; margin-right: 15px; margin-bottom: 15px;\" src=\"" + ThumbnailURL + "\"/>" + 
+                        Description + "</div>");
+                });
             });
         });
 
@@ -128,24 +143,37 @@
 </script>
 <style>
     .list-group-item {
-        background-color: rgb(40, 40, 40);
+        border-color: rgba(0,0,0,0);
+
+    }
+
+    .list-group-item:nth-child(even) {
+        background: rgb(40, 40, 40);
+    }
+
+    .list-group-item:nth-child(odd) {
+        background: rgb(35, 35, 35);
+    }
+
+    .list-group-item:hover {
+        background: rgb(55, 55, 55);
     }
 </style>
 <div class="col-md-4" style="height: calc(100% - 235px); background-color: rgb(49, 74, 99); margin-bottom: 15px;padding: 15px 15px 15px 15px;">
     <input id="LocSearchBox" type="text" class="form-control" placeholder="Search" />
 
     <hr />
-    <div id="toolTipDiv">
+    <div id="DescMod" style="height: 100%;">
 
     </div>
 </div>
 <div class="col-md-8" style="padding-right: 0px; height: calc(100% - 235px); ">
     <div class="row" style="background-color: rgb(29, 28, 28); padding: 15px 15px 15px 15px; margin: 0px 0px 0px 0px; height: 100%">
         <ul class="list-group">
-            
-            @foreach (string item in Model.ModName)
+
+            @foreach(string item in Model.ModName)
             {
-                <li class="list-group-item">@item</li>
+                <li class="list-group-item"><i class="fa fa-cog fa-spin"></i> <span>@item</span></li>
             }
         </ul>
     </div>

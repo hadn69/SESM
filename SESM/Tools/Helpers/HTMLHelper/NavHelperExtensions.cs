@@ -11,9 +11,9 @@ namespace SESM.Tools.Helpers.HTMLHelper
             List<string[]> Entries = new List<string[]>();
             Entries.Add(new[] { "/Server/Dashboard/" + serverId,"fa-tachometer", "Dashboard" });
             Entries.Add(new[] { "/Faction/Index/" + serverId, "fa-users", "Factions" });
-            Entries.Add(new[] { "/Mods/Index/" + serverId,"fa-puzzle-piece fa-flip-horizontal", "Mods" });
-            Entries.Add(new[] { "/Maps/Index/" + serverId, "fa-star", "Maps" });
-            Entries.Add(new[] { "/Backups/Index/" + serverId, "fa-hdd-o", "Backups" });
+            Entries.Add(new[] { "/Mod/Index/" + serverId,"fa-puzzle-piece fa-flip-horizontal", "Mods" });
+            Entries.Add(new[] { "/Map/Index/" + serverId, "fa-star", "Maps" });
+            Entries.Add(new[] { "/Backup/Index/" + serverId, "fa-hdd-o", "Backups" });
             Entries.Add(new[] { "/Server/Configuration/" + serverId, "fa-cogs", "Configuration" });
 
             string builder = string.Empty;

@@ -74,11 +74,12 @@ namespace SESM.Controllers
 
             Match matchTitle = Regex.Match(data, @"<div class=""workshopItemTitle"">(.*)</div>", RegexOptions.IgnoreCase);
             Match matchURL = Regex.Match(data, @"(http:.*)' \);""><img id=""previewImageMain""", RegexOptions.IgnoreCase);
+            Match matchDesc = Regex.Match(data, @"<div class=""workshopItemDescription"" id=""highlightContent"">(.*)</div>", RegexOptions.IgnoreCase);
 
             XElement response = new XElement("WorkshopInfo",
-                                    new XAttribute("ModName", matchTitle.Groups[1]),
-                                    new XAttribute("ThumbnailURL", matchURL.Groups[1]));
-
+                new XElement("ModName", new XCData(matchTitle.Groups[1].ToString())),
+                new XElement("ThumbnailURL", matchURL.Groups[1]),
+                new XElement("Description", new XCData(matchDesc.Groups[1].ToString())));
             return Content(response.ToString());
         }
 

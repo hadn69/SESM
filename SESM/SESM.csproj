@@ -131,7 +131,9 @@
     <Content Include="Content\css\bootstrap-theme.min.css" />
     <Content Include="Content\css\bootstrap.min.css" />
     <Content Include="Content\css\extra.css" />
+    <Content Include="Content\css\font-awesome.min.css" />
     <Content Include="Content\css\Lato.css" />
+    <Content Include="Content\font\FontAwesome\fontawesome-webfont.svg" />
     <Content Include="Content\font\glyphicons\glyphicons-halflings-regular.svg" />
     <Content Include="Content\glyphicons-halflings-regular.svg" />
     <Content Include="Content\img\panel-bg.jpg" />
@@ -269,6 +271,10 @@
     <Content Include="Content\font\lato\LatoBold.woff" />
     <Content Include="Content\font\lato\LatoLight.woff" />
     <Content Include="Content\font\lato\LatoRegular.woff" />
+    <Content Include="Content\font\FontAwesome\fontawesome-webfont.eot" />
+    <Content Include="Content\font\FontAwesome\fontawesome-webfont.ttf" />
+    <Content Include="Content\font\FontAwesome\fontawesome-webfont.woff" />
+    <Content Include="Content\font\FontAwesome\FontAwesome.otf" />
     <None Include="job_scheduling_data_2_0.xsd">
       <SubType>Designer</SubType>
     </None>
