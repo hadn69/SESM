@@ -81,6 +81,8 @@ namespace SESM.Controllers
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.SaveName = model.MapName;
                 serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
+                if(serv.UseServerExtender)
+                    serverConfig.AutoSave = false;
                 serverConfig.Save(serv);
                 return RedirectToAction("Status", "Server", new { id = id }).Success("Map Selected");
             }
@@ -106,6 +108,8 @@ namespace SESM.Controllers
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.SaveName = model.MapName;
                 serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
+                if(serv.UseServerExtender)
+                    serverConfig.AutoSave = false;
                 serverConfig.Save(serv);
                 ServiceHelper.StartService(serv);
                 return RedirectToAction("Status", "Server", new { id = id }).Success("Map Selected, server is restarting"); ;

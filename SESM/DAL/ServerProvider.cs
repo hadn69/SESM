@@ -61,7 +61,7 @@ namespace SESM.DAL
             UserProvider usrPrv = new UserProvider(_context);
             server.Administrators = null;
 
-            foreach (string item in listUsers.Where(item => usrPrv.UserExist(item) && !server.Administrators.Contains(usrPrv.GetUser(item))))
+            foreach (string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Administrators.Contains(usrPrv.GetUser(item))))
             {
                 server.Administrators.Add(usrPrv.GetUser(item));
             }
@@ -71,7 +71,7 @@ namespace SESM.DAL
             UserProvider usrPrv = new UserProvider(_context);
             server.Managers = null;
 
-            foreach (string item in listUsers.Where(item => usrPrv.UserExist(item) && !server.Managers.Contains(usrPrv.GetUser(item))))
+            foreach(string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Managers.Contains(usrPrv.GetUser(item))))
             {
                 server.Managers.Add(usrPrv.GetUser(item));
             }
@@ -82,7 +82,7 @@ namespace SESM.DAL
             UserProvider usrPrv = new UserProvider(_context);
             server.Users = null;
 
-            foreach (string item in listUsers.Where(item => usrPrv.UserExist(item) && !server.Users.Contains(usrPrv.GetUser(item))))
+            foreach(string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Users.Contains(usrPrv.GetUser(item))))
             {
                 server.Users.Add(usrPrv.GetUser(item));
             }

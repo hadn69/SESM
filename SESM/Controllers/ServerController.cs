@@ -121,6 +121,9 @@ namespace SESM.Controllers
                 srvPrv.AddManagers(webManagerSplitted, serv);
                 srvPrv.AddUsers(webUsersSplitted, serv);
 
+                if (model.UseServerExtender)
+                    model.AutoSave = false;
+
                 srvPrv.CreateServer(serv);
 
                 Directory.CreateDirectory(PathHelper.GetSavesPath(serv));
@@ -593,6 +596,9 @@ namespace SESM.Controllers
                 model.SaveName = serverConfig.SaveName;
                 model.ScenarioType = serverConfig.ScenarioType;
 
+                if(model.UseServerExtender)
+                    model.AutoSave = false;
+
                 serverConfig.ParseIn(model);
 
                 serverConfig.Save(serv);
@@ -765,6 +771,9 @@ namespace SESM.Controllers
 
                 model.SaveName = serverConfig.SaveName;
                 model.ScenarioType = serverConfig.ScenarioType;
+
+                if(model.UseServerExtender)
+                    model.AutoSave = false;
 
                 serverConfig.ParseIn(model);
 
