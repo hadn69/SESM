@@ -483,7 +483,11 @@ namespace SESM.Controllers
                     || model.SteamPort != serverConfig.SteamPort
                     || model.GameMode != serverConfig.GameMode
                     || model.MaxPlayers != serverConfig.MaxPlayers
-                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects))
+                    || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
+                    || model.UseServerExtender != serv.UseServerExtender
+                    || model.RemoveTrash != serverConfig.RemoveTrash
+                    || model.WorldSizeKm != serverConfig.WorldSizeKm
+                    || model.ServerExtenderPort != serv.ServerExtenderPort))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
                     return View("Details", model).Danger("You can't modify the greyed fields, bad boy !");
@@ -656,6 +660,8 @@ namespace SESM.Controllers
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.UseServerExtender != serv.UseServerExtender
+                    || model.RemoveTrash != serverConfig.RemoveTrash
+                    || model.WorldSizeKm != serverConfig.WorldSizeKm
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");

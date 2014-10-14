@@ -58,7 +58,7 @@
                 <div class="form-group" data-toggle="popover" data-content="The world name displayed in the in-game server list. If Empty, the map name is used.">
                     @Html.LabelFor(m => m.WorldName, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.WorldName, managerAccessClass)
+                        @Html.TextBoxFor(m => m.WorldName, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.WorldName)
                     </div>
                 </div>
@@ -349,7 +349,7 @@
                 <div class="form-group" data-toggle="popover" data-content="If enabled, it will automaticly remove small piece of ships, if they are in a linar motion and unpowered.">
                     @Html.LabelFor(m => m.RemoveTrash, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.RemoveTrash, managerAccessClass)
+                        @Html.CheckBoxFor(m => m.RemoveTrash, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.RemoveTrash)
                     </div>
                 </div>
