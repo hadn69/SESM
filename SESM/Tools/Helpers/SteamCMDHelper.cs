@@ -359,12 +359,8 @@ namespace SESM.Tools.Helpers
                         zip.ExtractAll(SESMConfigHelper.SEDataPath);
                     }
 
-                if(SESMConfigHelper.UseSESE)
-                {
-                    logger.Info("Applying SESE Files");
-                    GithubHelper.ApplyUpdate();
-                }
-
+                logger.Info("Applying SESE Files if they exist");
+                GithubHelper.ApplyUpdate();
 
                 logger.Info("Game file Update finished, lifting lockdown");
                 SESMConfigHelper.Lockdown = false;
