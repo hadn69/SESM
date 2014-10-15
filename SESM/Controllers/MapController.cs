@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Xml;
 using Ionic.Zip;
+using NLog;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
@@ -103,6 +104,9 @@ namespace SESM.Controllers
 
             if (ModelState.IsValid)
             {
+                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+
+                serviceLogger.Info(serv.Name + " stopped by " + user.Login + " by select and restart map button");
                 ServiceHelper.StopServiceAndWait(serv);
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
@@ -111,6 +115,8 @@ namespace SESM.Controllers
                 if(serv.UseServerExtender)
                     serverConfig.AutoSave = false;
                 serverConfig.Save(serv);
+                
+                serviceLogger.Info(serv.Name + " started by " + user.Login + " by select and restart map button");
                 ServiceHelper.StartService(serv);
                 return RedirectToAction("Status", "Server", new { id = id }).Success("Map Selected, server is restarting"); ;
             }
@@ -158,11 +164,13 @@ namespace SESM.Controllers
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 bool toRestart = false;
+                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
                 if (model.CurrentMapName == serverConfig.SaveName)
                 {
                
                     if(srvPrv.GetState(serv) == ServiceState.Running)
                     {
+                        serviceLogger.Info(serv.Name + " stopped by " + user.Login + " for map renaming");
                         ServiceHelper.StopServiceAndWait(serv);
                         toRestart = true;
                     }
@@ -185,7 +193,7 @@ namespace SESM.Controllers
 
                 if (toRestart)
                 {
-                    
+                    serviceLogger.Info(serv.Name + " started by " + user.Login + " for map renaming");
                     ServiceHelper.StartService(serv);
                 }
                 return RedirectToAction("Index", new { id = id }).Success("Map Renamed");
@@ -267,6 +275,8 @@ namespace SESM.Controllers
 
             if (ModelState.IsValid)
             {
+                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+                serviceLogger.Info(serv.Name + " stopped by " + user.Login + " for new map");
                 ServiceHelper.StopServiceAndWait(serv);
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
@@ -274,6 +284,7 @@ namespace SESM.Controllers
                 serverConfig.AsteroidAmount = model.AsteroidAmount;
                 serverConfig.SaveName = string.Empty;
                 serverConfig.Save(serv);
+                serviceLogger.Info(serv.Name + " stopped by " + user.Login + " for new map");
                 ServiceHelper.StartService(serv);
                 return RedirectToAction("Status","Server",  new { id = id }).Success("Server Starting, map in creation ...");
             }

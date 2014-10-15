@@ -4,6 +4,7 @@ using System.IO;
 using System.Web.Mvc;
 using System.Xml;
 using Ionic.Zip;
+using NLog;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
@@ -142,7 +143,7 @@ namespace SESM.Controllers
             bool toRestart = false;
             ServerConfigHelper config = new ServerConfigHelper();
             config.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
-
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
             if (Directory.Exists(PathHelper.GetSavePath(serv, savename)))
             {
                     
@@ -151,6 +152,8 @@ namespace SESM.Controllers
                     if(srvPrv.GetState(serv) != ServiceState.Stopped)
                     {
                         toRestart = true;
+                        
+                        serviceLogger.Info(serv.Name + " stopped by " + user.Login + " by applying backup");
                         ServiceHelper.StopServiceAndWait(serv);
                     }
                     config.LoadFromSave(PathHelper.GetSavePath(serv, savename));
@@ -162,8 +165,11 @@ namespace SESM.Controllers
             Directory.Move(PathHelper.GetSavesPath(serv) + model.BackupName, PathHelper.GetSavePath(serv, savename));
             config.Save(serv);
 
-            if(toRestart)
+            if (toRestart)
+            {
+                serviceLogger.Info(serv.Name + " started by " + user.Login + " by applying backup");
                 ServiceHelper.StartService(serv);
+            }
             return RedirectToAction("Status", "Server", new { id = id }).Success("Backup \"" + model.BackupName + "\" (Map \"" + nameNode.InnerText + "\") restored");
         }
         protected override void Dispose(bool disposing)

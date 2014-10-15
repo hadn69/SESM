@@ -89,12 +89,15 @@ namespace SESM.Tools.Helpers
                     }
                     else
                     {
+                        ServerConfigHelper serverConfig = new ServerConfigHelper();
+                        serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(server));
                         string[] argsStr = new string[5];
                         argsStr[0] = "nogui";
                         argsStr[1] = "noconsole";
                         argsStr[2] = "wcfport=" + server.ServerExtenderPort;
-                        argsStr[3] = "instance=" + serviceName;
-                        argsStr[4] = "gamepath=" + SESMConfigHelper.SEDataPath;
+                        argsStr[3] = "autosave=" + serverConfig.AutoSaveInMinutes;
+                        argsStr[4] = "instance=" + serviceName;
+                        argsStr[5] = "gamepath=" + SESMConfigHelper.SEDataPath;
                         svcController.Start(argsStr);
                     }
                 }

@@ -51,6 +51,7 @@ namespace SESM.Controllers
         {
             if (ModelState.IsValid)
             {
+                EntityUser user = Session["User"] as EntityUser;
                 ServerProvider srvPrv = new ServerProvider(_context);
                 bool flag = false;
                 if (model.SEDataPath.Substring(model.SEDataPath.Length - 1, 1) != @"\")
@@ -77,9 +78,10 @@ namespace SESM.Controllers
                     // Getting started server list
                     List<EntityServer> listStartedServ =
                         srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
-
+                    Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
                     foreach (EntityServer item in srvPrv.GetAllServers())
                     {
+                        serviceLogger.Info(item.Name + " stopped by " + user.Login + " to Update Global Settings");
                         ServiceHelper.StopService(item);
                     }
 
@@ -158,6 +160,7 @@ namespace SESM.Controllers
 
                     foreach (EntityServer item in listStartedServ)
                     {
+                        serviceLogger.Info(item.Name + " started by " + user.Login + " to Update Global Settings");
                         ServiceHelper.StartService(item);
                     }
                     RedirectToAction("Index", "Server");
@@ -187,6 +190,7 @@ namespace SESM.Controllers
         {
             if (ModelState.IsValid)
             {
+                EntityUser user = Session["User"] as EntityUser;
                 if (!ZipFile.IsZipFile(model.ServerZip.InputStream, false))
                 {
                     ModelState.AddModelError("ZipError", "Your File is not a valid zip file");
@@ -198,9 +202,10 @@ namespace SESM.Controllers
                 // Getting started server list
                 List<EntityServer> listStartedServ =
                     srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
-
+                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
                 foreach (EntityServer item in srvPrv.GetAllServers())
                 {
+                    serviceLogger.Info(item.Name + " stopped by " + user.Login + " to Update Binaries");
                     ServiceHelper.StopService(item);
                 }
 
@@ -229,6 +234,7 @@ namespace SESM.Controllers
 
                 foreach (EntityServer item in listStartedServ)
                 {
+                    serviceLogger.Info(item.Name + " started by " + user.Login + " to Update Binaries");
                     ServiceHelper.StartService(item);
                 }
 

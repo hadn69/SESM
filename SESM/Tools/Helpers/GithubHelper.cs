@@ -171,7 +171,7 @@ namespace SESM.Tools.Helpers
             string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender_*.zip", SearchOption.TopDirectoryOnly);
             if(files.Length != 1)
             {
-                // If multiple zip available, we don't risk an update 
+                // If multiple zip available or no zip, we don't risk an update 
                 return;
             }
             using(ZipFile zip = new ZipFile(files[0]))
