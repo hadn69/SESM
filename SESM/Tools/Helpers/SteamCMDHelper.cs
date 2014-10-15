@@ -86,10 +86,9 @@ namespace SESM.Tools.Helpers
 
         public static SteamCMDResult Update(Logger logger, int duration)
         {
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
             try
             {
-
-
                 bool SEUpdate = false;
                 bool SESEUpdate = false;
 
@@ -313,9 +312,11 @@ namespace SESM.Tools.Helpers
                 if(SEUpdate)
                 {
                     logger.Info("Stopping all running server ...");
+                    
                     foreach(EntityServer item in srvPrv.GetAllServers())
                     {
                         logger.Info("Sending stop order to " + item.Name);
+                        serviceLogger.Info(item.Name + " stopped by Updater");
                         ServiceHelper.StopService(item);
                     }
 
@@ -334,6 +335,7 @@ namespace SESM.Tools.Helpers
                     foreach(EntityServer item in listStartedServ)
                     {
                         logger.Info("Sending stop order to " + item.Name);
+                        serviceLogger.Info(item.Name + " stopped by Updater");
                         ServiceHelper.StopService(item);
                     }
                     logger.Info("Waiting 30 secs for server to stop");
@@ -368,6 +370,7 @@ namespace SESM.Tools.Helpers
                 foreach(EntityServer item in listStartedServ)
                 {
                     logger.Info("Restarting " + item.Name);
+                    serviceLogger.Info(item.Name + " stopped by Updater");
                     ServiceHelper.StartService(item);
                 }
                 return SteamCMDResult.Success_UpdateInstalled;

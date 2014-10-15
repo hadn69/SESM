@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using NLog;
 using Quartz;
 using Quartz.Impl;
 using SESM.Controllers.ActionFilters;
@@ -214,6 +215,8 @@ namespace SESM.Controllers
             EntityServer serv = srvPrv.GetServer(id);
             if (serv != null)
             {
+                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+                serviceLogger.Info(serv.Name + " stopped by " + user.Login + " for server deletion");
                 ServiceHelper.StopServiceAndWait(serv);
                 ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(serv));
                 if (Directory.Exists(PathHelper.GetInstancePath(serv)))
@@ -236,9 +239,11 @@ namespace SESM.Controllers
         [ManagerAndAbove]
         public ActionResult Start(int id)
         {
+            EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
-
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+            serviceLogger.Info(serv.Name + " started by " + user.Login + " by start button");
             ServiceHelper.StartService(serv);
 
             return RedirectToAction("Status", new { id = id }).Success("Server Started");
@@ -251,14 +256,17 @@ namespace SESM.Controllers
         public ActionResult StartAll()
         {
             EntityUser user = Session["User"] as EntityUser;
-
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
             ServerProvider srvPrv = new ServerProvider(_context);
             List<EntityServer> serverList = srvPrv.GetServers(user);
             foreach (EntityServer item in serverList)
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+                {
+                    serviceLogger.Info(item.Name + " started by " + user.Login + " by startAll button");
                     ServiceHelper.StartService(item);
+                }
             }
 
             return RedirectToAction("Index").Success("All Server Started");
@@ -275,9 +283,11 @@ namespace SESM.Controllers
         [ManagerAndAbove]
         public ActionResult Stop(int id)
         {
+            EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
-
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+            serviceLogger.Info(serv.Name + " stopped by " + user.Login + " by stop button");
             ServiceHelper.StopService(serv);
 
             return RedirectToAction("Status", new {id = id});
@@ -293,11 +303,15 @@ namespace SESM.Controllers
 
             ServerProvider srvPrv = new ServerProvider(_context);
             List<EntityServer> serverList = srvPrv.GetServers(user);
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
             foreach (EntityServer item in serverList)
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+                {
+                    serviceLogger.Info(item.Name + " stopped by " + user.Login + " by stopAll button");
                     ServiceHelper.StopService(item);
+                }
             }
 
             return RedirectToAction("Index");
@@ -313,9 +327,11 @@ namespace SESM.Controllers
         [ManagerAndAbove]
         public ActionResult Restart(int id)
         {
+            EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
-
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+            serviceLogger.Info(serv.Name + " restarted by " + user.Login + " by restart button");
             ServiceHelper.RestartService(serv);
 
             return RedirectToAction("Status", new { id = id });
@@ -328,6 +344,7 @@ namespace SESM.Controllers
         public ActionResult RestartAll()
         {
             EntityUser user = Session["User"] as EntityUser;
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
 
             ServerProvider srvPrv = new ServerProvider(_context);
             List<EntityServer> serverList = srvPrv.GetServers(user);
@@ -335,7 +352,10 @@ namespace SESM.Controllers
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+                {
+                    serviceLogger.Info(item.Name + " stopped by " + user.Login + " by restartAll button");
                     ServiceHelper.StopService(item);
+                }
             }
 
             foreach (EntityServer item in serverList)
@@ -349,7 +369,10 @@ namespace SESM.Controllers
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+                {
+                    serviceLogger.Info(item.Name + " started by " + user.Login + " by restartAll button");
                     ServiceHelper.StartService(item);
+                }
             }
 
             return RedirectToAction("Index");
@@ -365,8 +388,11 @@ namespace SESM.Controllers
         [ManagerAndAbove]
         public ActionResult Kill(int id)
         {
+            EntityUser user = Session["User"] as EntityUser;
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
+            serviceLogger.Info(serv.Name + " killed by " + user.Login + " by kill button");
             ServiceHelper.KillService(ServiceHelper.GetServiceName(serv));
 
             return RedirectToAction("Status", new { id = id });
@@ -379,14 +405,17 @@ namespace SESM.Controllers
         public ActionResult KillAll()
         {
             EntityUser user = Session["User"] as EntityUser;
-
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
             ServerProvider srvPrv = new ServerProvider(_context);
             List<EntityServer> serverList = srvPrv.GetServers(user);
             foreach (EntityServer item in serverList)
             {
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, item.Id);
                 if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+                {
+                    serviceLogger.Info(item.Name + " killed by " + user.Login + " by killAll button");
                     ServiceHelper.KillService(ServiceHelper.GetServiceName(item));
+                }
             }
 
             return RedirectToAction("Index");
@@ -568,7 +597,8 @@ namespace SESM.Controllers
 
 
                 srvPrv.UpdateServer(serv);
-
+                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+                serviceLogger.Info(serv.Name + " stopped by " + user.Login + " by save and restart in configuration");
                 ServiceHelper.StopServiceAndWait(serv);
 
                 if (model.Name != serv.Name 
@@ -606,7 +636,7 @@ namespace SESM.Controllers
                 serverConfig.ParseIn(model);
 
                 serverConfig.Save(serv);
-
+                serviceLogger.Info(serv.Name + " started by " + user.Login + " by save and restart in configuration");
                 ServiceHelper.StartService(serv);
                 return RedirectToAction("Status", new { id = id }).Success("Server Configuration Updated");
             }
