@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Mvc;
 using System.Web.Routing;
 using Quartz;
 using Quartz.Impl;
@@ -14,16 +15,16 @@ namespace SESM
     {
         protected void Application_Start()
         {
-            Constants.SetVersion(2,7,1);
+            Constants.SetVersion(2, 7, 2);
 
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            
+
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.Start();
 
 
-            if (SESMConfigHelper.PerfMonitor)
+            if(SESMConfigHelper.PerfMonitor)
             {
                 IJobDetail collectorJob = JobBuilder.Create<Collector>()
                     .WithIdentity("CollectorJob", "Monitor")
@@ -49,7 +50,7 @@ namespace SESM
 
                 scheduler.ScheduleJob(hourlyCrusherJob, hourlyCrusherTrigger);
             }
-            if (SESMConfigHelper.AutoUpdate)
+            if(SESMConfigHelper.AutoUpdate)
             {
                 IJobDetail autoUpdateJob = JobBuilder.Create<AutoUpdate>()
                     .WithIdentity("AutoUpdateJob", "AutoUpdate")
@@ -63,7 +64,7 @@ namespace SESM
 
                 scheduler.ScheduleJob(autoUpdateJob, autoUpdateTrigger);
             }
-            if (SESMConfigHelper.AutoBackupLvl1)
+            if(SESMConfigHelper.AutoBackupLvl1)
             {
                 IJobDetail backupJob = JobBuilder.Create<BackupJob>()
                     .WithIdentity("BackupLvl1Job", "Backups")
@@ -79,7 +80,7 @@ namespace SESM
                 scheduler.ScheduleJob(backupJob, backupTrigger);
             }
 
-            if (SESMConfigHelper.AutoBackupLvl2)
+            if(SESMConfigHelper.AutoBackupLvl2)
             {
                 IJobDetail backupJob = JobBuilder.Create<BackupJob>()
                     .WithIdentity("BackupLvl2Job", "Backups")
@@ -95,7 +96,7 @@ namespace SESM
                 scheduler.ScheduleJob(backupJob, backupTrigger);
             }
 
-            if (SESMConfigHelper.AutoBackupLvl3)
+            if(SESMConfigHelper.AutoBackupLvl3)
             {
                 IJobDetail backupJob = JobBuilder.Create<BackupJob>()
                     .WithIdentity("BackupLvl3Job", "Backups")
@@ -107,7 +108,7 @@ namespace SESM
                     .WithCronSchedule(SESMConfigHelper.ABIntervalLvl3)
                     .StartNow()
                     .Build();
-                
+
                 scheduler.ScheduleJob(backupJob, backupTrigger);
             }
 
@@ -115,22 +116,30 @@ namespace SESM
 
             ServerProvider srvPrv = new ServerProvider(context);
 
-            foreach (EntityServer item in srvPrv.GetAllServers())
+            foreach(EntityServer item in srvPrv.GetAllServers())
             {
-                if (item.IsAutoRestartEnabled)
+                if(item.IsAutoRestartEnabled)
                 {
-                    IJobDetail autoRestartJob = JobBuilder.Create<AutoRestartJob>()
-                        .WithIdentity("AutoRestart" + item.Id + "Job", "AutoRestart")
-                        .UsingJobData("id", item.Id)
-                        .Build();
+                    try
+                    {
 
-                    ITrigger autoRestartTrigger = TriggerBuilder.Create()
-                        .WithIdentity("AutoRestart" + item.Id + "Trigger", "AutoRestart")
-                        .WithCronSchedule(SESMConfigHelper.ABIntervalLvl3)
-                        .StartNow()
-                        .Build();
+                        IJobDetail autoRestartJob = JobBuilder.Create<AutoRestartJob>()
+                            .WithIdentity("AutoRestart" + item.Id + "Job", "AutoRestart")
+                            .UsingJobData("id", item.Id)
+                            .Build();
 
-                    scheduler.ScheduleJob(autoRestartJob, autoRestartTrigger);
+                        ITrigger autoRestartTrigger = TriggerBuilder.Create()
+                            .WithIdentity("AutoRestart" + item.Id + "Trigger", "AutoRestart")
+                            .WithCronSchedule(item.AutoRestartCron)
+                            .StartNow()
+                            .Build();
+
+                        scheduler.ScheduleJob(autoRestartJob, autoRestartTrigger);
+
+                    }
+                    catch(Exception)
+                    {
+                    }
                 }
             }
 
