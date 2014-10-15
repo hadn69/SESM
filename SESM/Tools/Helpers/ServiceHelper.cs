@@ -91,7 +91,7 @@ namespace SESM.Tools.Helpers
                     {
                         ServerConfigHelper serverConfig = new ServerConfigHelper();
                         serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(server));
-                        string[] argsStr = new string[5];
+                        string[] argsStr = new string[6];
                         argsStr[0] = "nogui";
                         argsStr[1] = "noconsole";
                         argsStr[2] = "wcfport=" + server.ServerExtenderPort;
