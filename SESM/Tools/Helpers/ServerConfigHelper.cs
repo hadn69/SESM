@@ -30,7 +30,7 @@ namespace SESM.Tools.Helpers
         public bool CargoShipsEnabled = false;
         public bool EnableSpectator = false;
         public bool RemoveTrash = false;
-        public int WorldSizeKm = 0;
+        public int WorldSizeKm = 20;
         public bool RespawnShipDelete = true;
         public bool ResetOwnership = false;
         public double WelderSpeedMultiplier = 1;

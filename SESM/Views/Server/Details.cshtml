@@ -58,7 +58,7 @@
                 <div class="form-group" data-toggle="popover" data-content="The world name displayed in the in-game server list. If Empty, the map name is used.">
                     @Html.LabelFor(m => m.WorldName, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.WorldName, adminAccessClass)
+                        @Html.TextBoxFor(m => m.WorldName, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.WorldName)
                     </div>
                 </div>
@@ -328,7 +328,7 @@
                 <div class="form-group" data-toggle="popover" data-content="The boundaries of your server. Any object, player or ship will be destroyed if they go past the limit.">
                     @Html.LabelFor(m => m.WorldSizeKm, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.WorldSizeKm, managerAccessClass)
+                        @Html.TextBoxFor(m => m.WorldSizeKm, adminAccessClass)
                         @Html.ValidationMessageFor(m => m.WorldSizeKm)
                     </div>
                 </div>
