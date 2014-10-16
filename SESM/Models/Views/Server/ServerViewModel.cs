@@ -243,7 +243,7 @@ namespace SESM.Models.Views.Server
             CargoShipsEnabled = false;
             EnableSpectator = false;
             RemoveTrash = false;
-            WorldSizeKm = 0;
+            WorldSizeKm = 20;
             RespawnShipDelete = true;
             ResetOwnership = false;
             WelderSpeedMultiplier = 1;
