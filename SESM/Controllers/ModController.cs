@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Xml.Linq;
@@ -35,23 +34,6 @@ namespace SESM.Controllers
             }
 
             ViewData["ID"] = id;
-
-            /*string[] listDir = Directory.GetDirectories(PathHelper.GetModsPath(serv));
-
-            List<SelectListItem> listSLI = new List<SelectListItem>();
-
-            foreach (string item in listDir)
-            {
-                SelectListItem sli = new SelectListItem();
-                sli.Text = PathHelper.GetLastLeaf(item);
-                sli.Value = PathHelper.GetLastLeaf(item);
-                listSLI.Add(sli);
-            }
-
-            ViewData["listDir"] = listSLI;
-
-            ModViewModelOld model = new ModViewModelOld();
-            */
 
             ModViewModel model = new ModViewModel();
             ServerConfigHelper serverConfig = new ServerConfigHelper();

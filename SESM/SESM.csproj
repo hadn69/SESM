@@ -325,7 +325,6 @@
     <Content Include="Views\User\Edit.cshtml" />
     <Content Include="Views\Settings\Diagnosis.cshtml" />
     <Content Include="Views\Log\Index.cshtml" />
-    <Content Include="Views\Mod\IndexOld.cshtml" />
     <Content Include="Views\Mod\Upload.cshtml" />
     <Content Include="Views\Server\HourlyStats.cshtml" />
     <Content Include="Views\Server\GlobalStats.cshtml" />
@@ -340,6 +339,7 @@
     <Content Include="Views\Shared\_NewLayout.cshtml" />
     <Content Include="Views\Server\Configuration.cshtml" />
     <Content Include="Views\Mod\Index.cshtml" />
+    <Content Include="Views\Explorer\Index.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -368,6 +368,7 @@
     <Compile Include="Controllers\ActionFilters\ManagerAndAboveAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\SuperAdminAttribute.cs" />
     <Compile Include="Controllers\BackupController.cs" />
+    <Compile Include="Controllers\ExplorerController.cs" />
     <Compile Include="Controllers\ExternalController.cs" />
     <Compile Include="Controllers\FlashMessageExtensions.cs" />
     <Compile Include="Controllers\LogController.cs" />
