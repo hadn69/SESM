@@ -8,39 +8,64 @@
 }
 <script type="text/javascript" src="/Content/js/jstree.min.js"></script>
 <link rel="stylesheet" href="/Content/css/jstree.min.css" />
+<script type="text/javascript">
+    $(function () {
 
-<br/>
+        $('#jstree_demo_div').jstree({
+            "plugins": ["wholerow"],
+            'core': {
+                "data": function (obj, cb) {
+                    if (obj.id == "#") {
+                        cb.call(this, [{ text: "\\", children: true }]);
+                        return;
+                    }
+                    var path = "";
+                    if (obj.id != "#") {
+                        console.log($('#jstree_demo_div').jstree(true).get_path(obj, "\\").substring(2));
+                        path = $('#jstree_demo_div').jstree(true).get_path(obj, "\\").substring(2);
+                    }
+
+
+                    $.post("/explorer/GetDirectoryDirectories/@((int)ViewBag.id)",
+                    {
+                        path: path
+                    },
+                    function (data, status) {
+                        var xmlDoc = $.parseXML(data);
+                        var xmlObj = $(xmlDoc);
+                        var root = xmlObj.find("DirectoryContent");
+                        if (root.children("Type").first().text() == "Error") {
+                            alert(xmlObj.children("Message").text().text());
+                        } else {
+                            var dirArray = new Array();
+                            root.children("Data").first().children("Item").each(function (index) {
+                                dirArray.push({ text: $(this).children("Name").first().text(), children: true });
+                            });
+                            cb.call(this, dirArray);
+                        }
+                    });
+
+                }
+            }
+        });
+
+
+    });
+</script>
+
+<br />
 <div class="col-md-4" style="height: calc(100% - 235px); background-color: rgb(49, 74, 99); margin-bottom: 15px;padding: 15px 15px 15px 15px;">
     <div id="jstree_demo_div">
         <ul>
-            <li>
-                Root node 1
-                <ul>
-                    <li>Child node 1</li>
-                    <li><a href="#">Child node 2</a></li>
-                </ul>
+            <li class="jstree-closed">
+                aaa
             </li>
         </ul>
     </div>
-    <script type="text/javascript">
-        $(function () {
-            $('#jstree_demo_div').jstree();
-        });
-    </script>
 </div>
 <div class="col-md-8" style="padding-right: 0px; height: calc(100% - 235px); ">
     <div class="row" style="background-color: rgb(29, 28, 28); padding: 15px 15px 15px 15px; margin: 0px 0px 0px 0px;">
-        <ul class="nav nav-tabs nav-justified" role="tablist">
-            <li class="active"><a href="#General" role="tab" data-toggle="tab">General</a></li>
-            <li><a href="#Network" role="tab" data-toggle="tab">Network</a></li>
-            <li><a href="#Multipliers" role="tab" data-toggle="tab">Multipliers</a></li>
-            <li><a href="#Server" role="tab" data-toggle="tab">Server</a></li>
-            <li><a href="#Map" role="tab" data-toggle="tab">Map</a></li>
-            <li><a href="#Players" role="tab" data-toggle="tab">Players</a></li>
-            <li><a href="#Rights" role="tab" data-toggle="tab">Rights</a></li>
-        </ul>
-
-        <div id="scrollZone" style="overflow: auto; height: calc(100% - 71px); padding-right: 20px;">
+        <div id="scrollZone" style="overflow: auto; height: calc(100% - 30px); padding-right: 20px;">
             <h2 id="noResult" class="text-center" style="display:none;">No Results Match Your Criterias</h2>
         </div>
     </div>

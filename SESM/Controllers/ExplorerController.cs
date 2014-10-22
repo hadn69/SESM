@@ -14,8 +14,9 @@ namespace SESM.Controllers
         private readonly DataContext _context = new DataContext();
 
         // GET: Explorer
-        public ActionResult Index()
+        public ActionResult Index(int id)
         {
+            ViewBag.id = id;
             return View();
         }
 
@@ -29,8 +30,10 @@ namespace SESM.Controllers
                 new XDeclaration("1.0", "utf-8", "no"),
                 xmlResponse
             );
-            
-            string path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), Request.QueryString["path"]));
+            string path = Request.Form["path"];
+            if (string.IsNullOrWhiteSpace(path))
+                path = string.Empty;
+            path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), path));
             if (path.Substring(path.Length - 1) != "\\")
             {
                 path += "\\";
@@ -74,6 +77,54 @@ namespace SESM.Controllers
                     new XElement("Timestamp", file.Timestamp.ToString("yyyy/MM/dd-HH:mm:ss"))));
             }
 
+            return Content(xdoc.Declaration + xdoc.ToString());
+        }
+        [CheckAuth]
+        public ActionResult GetDirectoryDirectories(int id)
+        {
+            ServerProvider srvPrv = new ServerProvider(_context);
+            EntityServer server = srvPrv.GetServer(id);
+            XElement xmlResponse = new XElement("DirectoryContent");
+            XDocument xdoc = new XDocument(
+                new XDeclaration("1.0", "utf-8", "no"),
+                xmlResponse
+            );
+            string path = Request.Form["path"];
+            if(string.IsNullOrWhiteSpace(path))
+                path = string.Empty;
+            path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), path));
+            if(path.Substring(path.Length - 1) != "\\")
+            {
+                path += "\\";
+            }
+
+            if(!path.Contains(PathHelper.GetInstancePath(server)))
+            {
+                xmlResponse.Add(new XElement("Type", "Error"));
+                xmlResponse.Add(new XElement("Message", "The directory isn't accessible for you, bad boy !"));
+                return Content(xdoc.Declaration + xdoc.ToString());
+            }
+
+            if(!Directory.Exists(path))
+            {
+                xmlResponse.Add(new XElement("Type", "Error"));
+                xmlResponse.Add(new XElement("Message", "The directory don't exist"));
+                return Content(xdoc.Declaration + xdoc.ToString());
+            }
+
+            xmlResponse.Add(new XElement("Type", "Success"));
+            XElement data = new XElement("Data");
+            xmlResponse.Add(data);
+
+            List<NodeInfo> directories = FSHelper.GetDirectories(path);
+
+            foreach(NodeInfo directory in directories)
+            {
+                data.Add(new XElement("Item", new XElement("Type", "Directory"),
+                    new XElement("Name", directory.Name),
+                    new XElement("Size", directory.Size),
+                    new XElement("Timestamp", directory.Timestamp.ToString("yyyy/MM/dd-HH:mm:ss"))));
+            }
             return Content(xdoc.Declaration + xdoc.ToString());
         }
     }
