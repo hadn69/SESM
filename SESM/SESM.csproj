@@ -132,14 +132,19 @@
     <Content Include="Content\css\bootstrap.min.css" />
     <Content Include="Content\css\extra.css" />
     <Content Include="Content\css\font-awesome.min.css" />
+    <Content Include="Content\css\jstree.min.css" />
     <Content Include="Content\css\Lato.css" />
     <Content Include="Content\font\FontAwesome\fontawesome-webfont.svg" />
     <Content Include="Content\font\glyphicons\glyphicons-halflings-regular.svg" />
     <Content Include="Content\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\img\jstree\32px.png" />
+    <Content Include="Content\img\jstree\40px.png" />
+    <Content Include="Content\img\jstree\throbber.gif" />
     <Content Include="Content\img\panel-bg.jpg" />
     <Content Include="Content\js\bootstrap.min.js" />
     <Content Include="Content\js\jquery-2.1.1.min.js" />
     <Content Include="Content\js\jquery.smooth-scroll.min.js" />
+    <Content Include="Content\js\jstree.min.js" />
     <Content Include="Content\logo-small.png" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\site.css" />
@@ -446,6 +451,7 @@
     <Compile Include="Tools\BackupJob.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
     <Compile Include="Tools\GraphHelper.cs" />
+    <Compile Include="Tools\Helpers\FSHelper.cs" />
     <Compile Include="Tools\Helpers\GithubHelper.cs" />
     <Compile Include="Tools\Helpers\HashHelper.cs" />
     <Compile Include="Tools\Helpers\HTMLHelper\NavHelperExtensions.cs" />

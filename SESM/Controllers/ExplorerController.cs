@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Web.Mvc;
 using System.Xml.Linq;
 using SESM.Controllers.ActionFilters;
@@ -23,34 +24,57 @@ namespace SESM.Controllers
         {
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer server = srvPrv.GetServer(id);
-
             XElement xmlResponse = new XElement("DirectoryContent");
-            string path = Request.QueryString["path"];
+            XDocument xdoc = new XDocument(
+                new XDeclaration("1.0", "utf-8", "no"),
+                xmlResponse
+            );
+            
+            string path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), Request.QueryString["path"]));
+            if (path.Substring(path.Length - 1) != "\\")
+            {
+                path += "\\";
+            }
 
-            path = PathHelper.GetInstancePath(server) + path; 
+            if (!path.Contains(PathHelper.GetInstancePath(server)))
+            {
+                xmlResponse.Add(new XElement("Type", "Error"));
+                xmlResponse.Add(new XElement("Message", "The directory isn't accessible for you, bad boy !"));
+                return Content(xdoc.Declaration + xdoc.ToString());
+            } 
 
             if (!Directory.Exists(path))
             {
                 xmlResponse.Add(new XElement("Type", "Error"));
                 xmlResponse.Add(new XElement("Message", "The directory don't exist"));
-                return Content(xmlResponse.ToString());
-            }
-            xmlResponse.Add(new XElement("Type", "Success"));
-            XElement data = new XElement("Content");
-            xmlResponse.Add(data);
-            string[] directories = Directory.GetDirectories(path);
-            foreach (string directory in directories)
-            {
-                data.Add(new XElement("Item",new XElement("Type","Directory"), new XElement("Name", PathHelper.GetLastLeaf(directory))));
+                return Content(xdoc.Declaration + xdoc.ToString());
             }
 
-            string[] files = Directory.GetFiles(path);
-            foreach(string directory in directories)
+            xmlResponse.Add(new XElement("Type", "Success"));
+            XElement data = new XElement("Data");
+            xmlResponse.Add(data);
+
+            List<NodeInfo> directories = FSHelper.GetDirectories(path);
+
+            foreach (NodeInfo directory in directories)
             {
-                data.Add(new XElement("Item", new XElement("Type", "Directory"), new XElement("Name", PathHelper.GetLastLeaf(directory))));
+                data.Add(new XElement("Item",new XElement("Type","Directory"), 
+                    new XElement("Name", directory.Name),
+                    new XElement("Size", directory.Size),
+                    new XElement("Timestamp", directory.Timestamp.ToString("yyyy/MM/dd-HH:mm:ss"))));
             }
-              
-            return Content(xmlResponse.ToString());
+
+            List<NodeInfo> files = FSHelper.GetFiles(path);
+
+            foreach (NodeInfo file in files)
+            {
+                data.Add(new XElement("Item", new XElement("Type", "File"),
+                    new XElement("Name", file.Name),
+                    new XElement("Size", file.Size),
+                    new XElement("Timestamp", file.Timestamp.ToString("yyyy/MM/dd-HH:mm:ss"))));
+            }
+
+            return Content(xdoc.Declaration + xdoc.ToString());
         }
     }
 }
