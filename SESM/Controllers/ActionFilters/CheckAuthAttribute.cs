@@ -26,6 +26,10 @@ namespace SESM.Controllers.ActionFilters
                         {"Action", "Index"}
                     });
                 }
+                else
+                {
+                    HttpContext.Current.Session["User"] = user;
+                }
             }
             catch (Exception)
             {

@@ -9,9 +9,56 @@
 <script type="text/javascript" src="/Content/js/jstree.min.js"></script>
 <link rel="stylesheet" href="/Content/css/jstree.min.css" />
 <script type="text/javascript">
-    $(function () {
+    function fileSizeIEC(a, b, c, d, e) {
+        return (b = Math, c = b.log, d = 1024, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2)
+            + ' ' + (e ? 'KMGTPEZY'[--e] + 'B' : 'Bytes');
+    }
 
-        $('#jstree_demo_div').jstree({
+    $(function () {
+        $('#jstree_div').on('select_node.jstree', function (e, data) {
+            var path = $('#jstree_div').jstree(true).get_path(data.node, "\\").substring(2);
+
+            $.post("/explorer/GetDirectoryContent/@((int)ViewBag.id)",
+                {
+                    path: path
+                },
+                function (data, status) {
+                    console.log(data);
+                    var xmlDoc = $.parseXML(data);
+                    var xmlObj = $(xmlDoc);
+                    var root = xmlObj.find("DirectoryContent");
+                    if (root.children("Type").first().text() == "Error") {
+                        alert(xmlObj.children("Message").text().text());
+                    } else {
+                        root.children("Data").first().children("Item").each(function (index) {
+                            var row = "<tr>";
+                            row += "<td><input type=\"checkbox\"/></td>";
+                            if ($(this).children("Type").first().text() == "Directory") {
+                                row += "<td><i class=\"fa fa-folder fa-inverse\"></i></td>";
+                            }
+                            if ($(this).children("Type").first().text() == "File") {
+                                row += "<td><i class=\"fa fa-file fa-inverse\"></i></td>";
+                            }
+                            row += "<td>" + $(this).children("Name").first().text() + "</td>";
+                            row += "<td>" + fileSizeIEC($(this).children("Size").first().text()) + "</td>";
+                            row += "<td>" + $(this).children("Timestamp").first().text() + "</td>";
+                            row += "<td>";
+                            row += "<span class=\"fa-stack\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-cut text-info\"></i></span>&nbsp;";
+                            row += "<span class=\"fa-stack\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-copy text-success\"></i></span>&nbsp;";
+                            row += "<span class=\"fa-stack\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-times-circle text-danger\"></i></span>&nbsp;";
+                            row += "<span class=\"fa-stack\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-pencil text-warning\"></i></span>&nbsp;";
+                            if ($(this).children("Type").first().text() == "File" && $(this).children("Size").first().text() <= (512 * 1024)) {
+                                row += "<span class=\"fa-stack\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-pencil-square-o text-warning\"></i></span>&nbsp;";
+                            }
+                            row += "</td>";
+                            row += "</tr>";
+                            $("#listBody").append(row);
+                        });
+                    }
+                });
+        });
+
+        $('#jstree_div').jstree({
             "plugins": ["wholerow"],
             'core': {
                 "data": function (obj, cb) {
@@ -21,29 +68,26 @@
                     }
                     var path = "";
                     if (obj.id != "#") {
-                        console.log($('#jstree_demo_div').jstree(true).get_path(obj, "\\").substring(2));
-                        path = $('#jstree_demo_div').jstree(true).get_path(obj, "\\").substring(2);
+                        path = $('#jstree_div').jstree(true).get_path(obj, "\\").substring(2);
                     }
-
-
                     $.post("/explorer/GetDirectoryDirectories/@((int)ViewBag.id)",
-                    {
-                        path: path
-                    },
-                    function (data, status) {
-                        var xmlDoc = $.parseXML(data);
-                        var xmlObj = $(xmlDoc);
-                        var root = xmlObj.find("DirectoryContent");
-                        if (root.children("Type").first().text() == "Error") {
-                            alert(xmlObj.children("Message").text().text());
-                        } else {
-                            var dirArray = new Array();
-                            root.children("Data").first().children("Item").each(function (index) {
-                                dirArray.push({ text: $(this).children("Name").first().text(), children: true });
-                            });
-                            cb.call(this, dirArray);
-                        }
-                    });
+                        {
+                            path: path
+                        },
+                        function (data, status) {
+                            var xmlDoc = $.parseXML(data);
+                            var xmlObj = $(xmlDoc);
+                            var root = xmlObj.find("DirectoryContent");
+                            if (root.children("Type").first().text() == "Error") {
+                                alert(xmlObj.children("Message").text().text());
+                            } else {
+                                var dirArray = new Array();
+                                root.children("Data").first().children("Item").each(function (index) {
+                                    dirArray.push({ text: $(this).children("Name").first().text(), children: true });
+                                });
+                                cb.call(this, dirArray);
+                            }
+                        });
 
                 }
             }
@@ -52,21 +96,43 @@
 
     });
 </script>
-
+<style>
+    .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
+        background: rgb(35, 35, 35);
+    }
+    .table-striped > tbody > tr:nth-child(even) > td, .table-striped > tbody > tr:nth-child(even) > th {
+        background: rgb(40, 40, 40);
+    }
+    .table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
+        background: rgb(55, 55, 55);
+    }
+    .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+        border-top: none;
+    }
+    #listBody tbody > tr > th {
+        border-bottom: 1px solid #ddd;
+    }
+</style>
 <br />
 <div class="col-md-4" style="height: calc(100% - 235px); background-color: rgb(49, 74, 99); margin-bottom: 15px;padding: 15px 15px 15px 15px;">
-    <div id="jstree_demo_div">
-        <ul>
-            <li class="jstree-closed">
-                aaa
-            </li>
-        </ul>
+    <div id="jstree_div">
     </div>
 </div>
 <div class="col-md-8" style="padding-right: 0px; height: calc(100% - 235px); ">
     <div class="row" style="background-color: rgb(29, 28, 28); padding: 15px 15px 15px 15px; margin: 0px 0px 0px 0px;">
         <div id="scrollZone" style="overflow: auto; height: calc(100% - 30px); padding-right: 20px;">
-            <h2 id="noResult" class="text-center" style="display:none;">No Results Match Your Criterias</h2>
+            <table class="table table-hover table-striped" id="listBody">
+                <tbody id="listBody">
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Time</th>
+                        <th></th>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
