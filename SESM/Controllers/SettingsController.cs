@@ -29,14 +29,15 @@ namespace SESM.Controllers
         [CheckLockout]
         public ActionResult Index()
         {
-            SettingsViewModel model = new SettingsViewModel();
-
-            model.Prefix = SESMConfigHelper.Prefix;
-            model.SESavePath = SESMConfigHelper.SESavePath;
-            model.SEDataPath = SESMConfigHelper.SEDataPath;
-            model.Arch = SESMConfigHelper.Arch;
-            model.AddDateToLog = SESMConfigHelper.AddDateToLog;
-            model.SendLogToKeen = SESMConfigHelper.SendLogToKeen;
+            SettingsViewModel model = new SettingsViewModel
+            {
+                Prefix = SESMConfigHelper.Prefix,
+                SESavePath = SESMConfigHelper.SESavePath,
+                SEDataPath = SESMConfigHelper.SEDataPath,
+                Arch = SESMConfigHelper.Arch,
+                AddDateToLog = SESMConfigHelper.AddDateToLog,
+                SendLogToKeen = SESMConfigHelper.SendLogToKeen
+            };
 
             return View(model);
         }
@@ -97,9 +98,10 @@ namespace SESM.Controllers
                     {
                         ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(item));
                     }
-
+                    
                     if (model.SEDataPath != SESMConfigHelper.SEDataPath)
                     {
+                        /*
                         if (!Directory.Exists(model.SEDataPath))
                             Directory.CreateDirectory(model.SEDataPath);
                         if (Directory.Exists(model.SEDataPath + @"Content\"))
@@ -128,7 +130,7 @@ namespace SESM.Controllers
                         if (Directory.Exists(SESMConfigHelper.SEDataPath + @"autoupdatedata\"))
                             Directory.Move(SESMConfigHelper.SEDataPath + @"autoupdatedata\",
                                 model.SEDataPath + @"autoupdatedata\");
-
+                        */
                         SESMConfigHelper.SEDataPath = model.SEDataPath;
                     }
 
@@ -146,7 +148,7 @@ namespace SESM.Controllers
 
                     if (model.SESavePath != SESMConfigHelper.SESavePath)
                     {
-                        Directory.Move(SESMConfigHelper.SESavePath, model.SESavePath);
+                        //Directory.Move(SESMConfigHelper.SESavePath, model.SESavePath);
                         SESMConfigHelper.SESavePath = model.SESavePath;
                     }
                     SESMConfigHelper.Arch = model.Arch;
