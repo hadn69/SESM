@@ -20,6 +20,20 @@ namespace SESM.Controllers
             return View();
         }
 
+        private bool SecurityCheck(int id, EntityServer server)
+        {
+            EntityUser user = Session["User"] as EntityUser;
+            if(user == null)
+                return false;
+
+            ServerProvider srvPrv = new ServerProvider(_context);
+            AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, server.Id);
+            if(accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+            {
+
+            }
+        }
+
         [CheckAuth]
         public ActionResult GetDirectoryContent(int id)
         {
