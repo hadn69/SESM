@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NLog;
 using Quartz;
@@ -12,21 +13,29 @@ namespace SESM.Tools
     {
         public void Execute(IJobExecutionContext jobContext)
         {
-            if(!SESMConfigHelper.Lockdown)
+            try
             {
-                DataContext context = new DataContext();
-                ServerProvider srvPrv = new ServerProvider(context);
-
-                List<EntityServer> listServ = srvPrv.GetAllServers()
-                    .Where(x => x.IsAutoStartEnabled && srvPrv.GetState(x) != ServiceState.Running)
-                    .ToList();
-                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
-                foreach (EntityServer server in listServ)
+                if (!SESMConfigHelper.Lockdown)
                 {
-                    
-                    serviceLogger.Info(server.Name + " started by autostart");
-                    ServiceHelper.StartService(server);
+                    DataContext context = new DataContext();
+                    ServerProvider srvPrv = new ServerProvider(context);
+
+                    List<EntityServer> listServ = srvPrv.GetAllServers()
+                        .Where(x => x.IsAutoStartEnabled && srvPrv.GetState(x) != ServiceState.Running)
+                        .ToList();
+                    Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+                    foreach (EntityServer server in listServ)
+                    {
+
+                        serviceLogger.Info(server.Name + " started by autostart");
+                        ServiceHelper.StartService(server);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger exceptionLogger = LogManager.GetLogger("GenericExceptionLogger");
+                exceptionLogger.Fatal("Caught Exception in AutoStart Job", ex);
             }
         }
     }

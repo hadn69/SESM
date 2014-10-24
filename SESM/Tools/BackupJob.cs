@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using Ionic.Zip;
 using NLog;
 using Quartz;
@@ -9,7 +10,7 @@ using SESM.Tools.Helpers;
 
 namespace SESM.Tools
 {
-    public class BackupJob :IJob
+    public class BackupJob : IJob
     {
         public void Execute(IJobExecutionContext jobContext)
         {
@@ -68,30 +69,66 @@ namespace SESM.Tools
                     }
                     if (enabled)
                     {
-                        logger.Info("Backup lvl " + backupLvl + " selected for this server, checking for backup number");
-                        if (!Directory.Exists(PathHelper.GetBackupsPath(item)))
-                            Directory.CreateDirectory(PathHelper.GetBackupsPath(item));
-
-                        string[] backupList = Directory.GetFiles(PathHelper.GetBackupsPath(item), "AutoBackupLvl" + backupLvl + "_*.zip");
-                        logger.Info(backupList.Length + " Baclup(s) present for this server (max : " + nbToKeep + ")");
-                        Array.Sort(backupList);
-
-                        while (nbToKeep != 0 && backupList.Length >= nbToKeep)
+                        try
                         {
-                            logger.Info("Deleting oldest backup");
-                            File.Delete(backupList[0]);
-                            backupList = Directory.GetFiles(PathHelper.GetBackupsPath(item), "AutoBackupLvl" + backupLvl + "_*.zip");
+                            logger.Info("Backup lvl " + backupLvl + " selected for this server, checking for backup number");
+                            if (!Directory.Exists(PathHelper.GetBackupsPath(item)))
+                                Directory.CreateDirectory(PathHelper.GetBackupsPath(item));
+
+                            string[] backupList = Directory.GetFiles(PathHelper.GetBackupsPath(item), "AutoBackupLvl" + backupLvl + "_*.zip");
+                            logger.Info(backupList.Length + " Backup(s) present for this server (max : " + nbToKeep + ")");
                             Array.Sort(backupList);
-                        }
-                        ServerConfigHelper config = new ServerConfigHelper();
-                        config.LoadFromServConf(PathHelper.GetConfigurationFilePath(item));
-                        if(!string.IsNullOrEmpty(config.SaveName))
-                            using (ZipFile zip = new ZipFile())
+
+                            while (nbToKeep != 0 && backupList.Length >= nbToKeep)
                             {
-                                logger.Info("Creating backup zip : " + PathHelper.GetBackupsPath(item) + "AutoBackupLvl" + backupLvl + "_" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + config.SaveName + ".zip");
-                                zip.AddSelectedFiles("*", PathHelper.GetSavePath(item, config.SaveName), string.Empty, true);
-                                zip.Save(PathHelper.GetBackupsPath(item) + "AutoBackupLvl" + backupLvl + "_" + DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + config.SaveName + ".zip");
+                                logger.Info("Deleting oldest backup");
+                                File.Delete(backupList[0]);
+                                backupList = Directory.GetFiles(PathHelper.GetBackupsPath(item), "AutoBackupLvl" + backupLvl + "_*.zip");
+                                Array.Sort(backupList);
                             }
+                            ServerConfigHelper config = new ServerConfigHelper();
+                            config.LoadFromServConf(PathHelper.GetConfigurationFilePath(item));
+                            if (!string.IsNullOrEmpty(config.SaveName))
+                            {
+                                int trycount = 1;
+                                int maxtry = 3;
+                                while (trycount <= maxtry)
+                                {
+                                    using (ZipFile zip = new ZipFile())
+                                    {
+                                        try
+                                        {
+                                            logger.Info("Trying to create backup zip (try " + trycount + " of " + maxtry + ") : " +
+                                                        PathHelper.GetBackupsPath(item) + "AutoBackupLvl" + backupLvl + "_" +
+                                                        DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + config.SaveName +
+                                                        ".zip");
+                                            zip.AddSelectedFiles("*", PathHelper.GetSavePath(item, config.SaveName),
+                                                string.Empty, true);
+                                            zip.Save(PathHelper.GetBackupsPath(item) + "AutoBackupLvl" + backupLvl + "_" +
+                                                     DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + config.SaveName +
+                                                     ".zip");
+                                            break;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            logger.Info("Caught Exception in Backup lvl " + backupLvl + " Job for server " + item.Name + ":", ex);
+                                            logger.Info("Waiting 5 seconds");
+                                            Thread.Sleep(5000);
+                                        } 
+                                    }
+                                    trycount++;
+                                }
+                                if (trycount > maxtry)
+                                    logger.Error("Failed to save backup, please report !");
+                                else
+                                    logger.Info("Success !");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger exceptionLogger = LogManager.GetLogger("GenericExceptionLogger");
+                            exceptionLogger.Fatal("Caught Exception in Backup lvl " + backupLvl + " Job for server " + item.Name + ":", ex);
+                        }
                     }
                     else
                     {
