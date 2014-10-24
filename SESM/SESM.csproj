@@ -457,6 +457,7 @@
     <Compile Include="Tools\Helpers\HTMLHelper\NavHelperExtensions.cs" />
     <Compile Include="Tools\Helpers\PathHelper.cs" />
     <Compile Include="Tools\Helpers\SignParams.cs" />
+    <Compile Include="Tools\Helpers\XmlResponse.cs" />
     <Compile Include="Tools\Monitor\Collector.cs" />
     <Compile Include="Tools\Helpers\ServiceHelper.cs" />
     <Compile Include="Tools\Helpers\ServerConfigHelper.cs" />

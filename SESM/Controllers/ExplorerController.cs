@@ -20,21 +20,22 @@ namespace SESM.Controllers
             return View();
         }
 
-        private bool SecurityCheck(int id, EntityServer server)
+        private bool SecurityCheck(EntityServer server)
         {
             EntityUser user = Session["User"] as EntityUser;
-            if(user == null)
+            if(user == null || server == null)
                 return false;
 
             ServerProvider srvPrv = new ServerProvider(_context);
+
             AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, server.Id);
             if(accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
             {
-
+                return true;
             }
+            return false;
         }
 
-        [CheckAuth]
         public ActionResult GetDirectoryContent(int id)
         {
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -44,6 +45,21 @@ namespace SESM.Controllers
                 new XDeclaration("1.0", "utf-8", "no"),
                 xmlResponse
             );
+
+            if (server == null)
+            {
+                xmlResponse.Add(new XElement("Type", "Error"));
+                xmlResponse.Add(new XElement("Message", "The server doesn't exist"));
+                return Content(xdoc.Declaration + xdoc.ToString());
+            }
+
+            if (!SecurityCheck(server))
+            {
+                xmlResponse.Add(new XElement("Type", "Error"));
+                xmlResponse.Add(new XElement("Message", "You don't have access to this server"));
+                return Content(xdoc.Declaration + xdoc.ToString());
+            }
+
             string path = Request.Form["path"];
             if (string.IsNullOrWhiteSpace(path))
                 path = string.Empty;
@@ -93,16 +109,29 @@ namespace SESM.Controllers
 
             return Content(xdoc.Declaration + xdoc.ToString());
         }
-        [CheckAuth]
+
         public ActionResult GetDirectoryDirectories(int id)
         {
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer server = srvPrv.GetServer(id);
-            XElement xmlResponse = new XElement("DirectoryContent");
-            XDocument xdoc = new XDocument(
-                new XDeclaration("1.0", "utf-8", "no"),
-                xmlResponse
-            );
+
+
+            if (server == null)
+                return Content(new XmlResponse(XmlResponseType.Error, "The server doesn't exist").Build().ToString());
+
+            {
+                xmlResponse.Add(new XElement("Type", "Error"));
+                xmlResponse.Add(new XElement("Message", "The server doesn't exist"));
+                return Content(xdoc.Declaration + xdoc.ToString());
+            }
+
+            if (!SecurityCheck(server))
+            {
+                xmlResponse.Add(new XElement("Type", "Error"));
+                xmlResponse.Add(new XElement("Message", "You don't have access to this server"));
+                return Content(xdoc.Declaration + xdoc.ToString());
+            }
+
             string path = Request.Form["path"];
             if(string.IsNullOrWhiteSpace(path))
                 path = string.Empty;
@@ -140,6 +169,57 @@ namespace SESM.Controllers
                     new XElement("Timestamp", directory.Timestamp.ToString("yyyy/MM/dd-HH:mm:ss"))));
             }
             return Content(xdoc.Declaration + xdoc.ToString());
+        }
+
+        public ActionResult Delete(int id)
+        {
+            ServerProvider srvPrv = new ServerProvider(_context);
+            EntityServer server = srvPrv.GetServer(id);
+            XElement xmlResponse = new XElement("DirectoryContent");
+            XDocument xdoc = new XDocument(
+                new XDeclaration("1.0", "utf-8", "no"),
+                xmlResponse
+            );
+
+            if (server == null)
+            {
+                xmlResponse.Add(new XElement("Type", "Error"));
+                xmlResponse.Add(new XElement("Message", "The server doesn't exist"));
+                return Content(xdoc.Declaration + xdoc.ToString());
+            }
+
+            if (!SecurityCheck(server))
+            {
+                xmlResponse.Add(new XElement("Type", "Error"));
+                xmlResponse.Add(new XElement("Message", "You don't have access to this server"));
+                return Content(xdoc.Declaration + xdoc.ToString());
+            }
+
+            string path = Request.Form["path"];
+            if (string.IsNullOrWhiteSpace(path))
+                path = string.Empty;
+            path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), path));
+            if (path.Substring(path.Length - 1) != "\\")
+            {
+                path += "\\";
+            }
+
+            if (!path.Contains(PathHelper.GetInstancePath(server)))
+            {
+                xmlResponse.Add(new XElement("Type", "Error"));
+                xmlResponse.Add(new XElement("Message", "The directory isn't accessible for you, bad boy !"));
+                return Content(xdoc.Declaration + xdoc.ToString());
+            }
+
+            if (!Directory.Exists(path))
+            {
+                xmlResponse.Add(new XElement("Type", "Error"));
+                xmlResponse.Add(new XElement("Message", "The directory don't exist"));
+                return Content(xdoc.Declaration + xdoc.ToString());
+            }
+
+            xmlResponse.Add(new XElement("Type", "Success"));
+
         }
     }
 }

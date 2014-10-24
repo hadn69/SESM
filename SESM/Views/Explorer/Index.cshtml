@@ -13,11 +13,15 @@
         return (b = Math, c = b.log, d = 1024, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2)
             + ' ' + (e ? 'KMGTPEZY'[--e] + 'B' : 'Bytes');
     }
+    function isEmptyOrSpaces(str) {
+        return str === null || str.match(/^\s*$/) !== null;
+    }
 
+    var currentPath = "";
     $(function () {
         $('#jstree_div').on('select_node.jstree', function (e, data) {
             var path = $('#jstree_div').jstree(true).get_path(data.node, "\\").substring(2);
-
+            currentPath = path;
             $.post("/explorer/GetDirectoryContent/@((int)ViewBag.id)",
                 {
                     path: path
@@ -28,8 +32,9 @@
                     var xmlObj = $(xmlDoc);
                     var root = xmlObj.find("DirectoryContent");
                     if (root.children("Type").first().text() == "Error") {
-                        alert(xmlObj.children("Message").text().text());
+                        alert(xmlObj.children("Message").text());
                     } else {
+                        $("#listBody").find("tr:gt(0)").remove();
                         root.children("Data").first().children("Item").each(function (index) {
                             var row = "<tr>";
                             row += "<td><input type=\"checkbox\"/></td>";
@@ -43,16 +48,35 @@
                             row += "<td>" + fileSizeIEC($(this).children("Size").first().text()) + "</td>";
                             row += "<td>" + $(this).children("Timestamp").first().text() + "</td>";
                             row += "<td>";
-                            row += "<span class=\"fa-stack\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-cut text-info\"></i></span>&nbsp;";
-                            row += "<span class=\"fa-stack\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-copy text-success\"></i></span>&nbsp;";
-                            row += "<span class=\"fa-stack\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-times-circle text-danger\"></i></span>&nbsp;";
-                            row += "<span class=\"fa-stack\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-pencil text-warning\"></i></span>&nbsp;";
+                            row += "<span class=\"fa-stack\" title=\"Cut\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-cut text-info\"></i></span>&nbsp;";
+                            row += "<span class=\"fa-stack\" title=\"Copy\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-copy text-success\"></i></span>&nbsp;";
+                            row += "<span class=\"fa-stack\" title=\"Download\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-download text-warning\"></i></span>&nbsp;";
+                            row += "<span class=\"fa-stack\" title=\"Delete\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-times-circle text-danger\"></i></span>&nbsp;";
+                            row += "<span class=\"fa-stack\" title=\"Rename\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-pencil text-warning\"></i></span>&nbsp;";
                             if ($(this).children("Type").first().text() == "File" && $(this).children("Size").first().text() <= (512 * 1024)) {
-                                row += "<span class=\"fa-stack\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-pencil-square-o text-warning\"></i></span>&nbsp;";
+                                row += "<span class=\"fa-stack\" title=\"Edit\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-pencil-square-o text-warning\"></i></span>&nbsp;";
                             }
                             row += "</td>";
                             row += "</tr>";
                             $("#listBody").append(row);
+
+                            var itemPath = "";
+                            if (isEmptyOrSpaces(currentPath)) {
+                                itemPath = $(this).children("Name").first().text();
+                            } else {
+                                itemPath = currentPath + "\\" + $(this).children("Name").first().text();
+                            }
+
+                            $('#listBody > tr:last-child > td:last-child > span[title="Cut"]').on("click", function () {
+                                $.post("/explorer/GetDirectoryContent/@((int) ViewBag.id)",
+                                    {
+                                        path: itemPath
+                                    },
+                                    function (data, status) {
+
+                                    }
+                                );
+                            });
                         });
                     }
                 });
@@ -100,15 +124,19 @@
     .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
         background: rgb(35, 35, 35);
     }
+
     .table-striped > tbody > tr:nth-child(even) > td, .table-striped > tbody > tr:nth-child(even) > th {
         background: rgb(40, 40, 40);
     }
+
     .table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
         background: rgb(55, 55, 55);
     }
+
     .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
         border-top: none;
     }
+
     #listBody tbody > tr > th {
         border-bottom: 1px solid #ddd;
     }
