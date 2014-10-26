@@ -4,6 +4,7 @@
     ViewBag.Title = "File Explorer";
     ViewBag.Category = 5;
     Layout = "~/Views/Shared/_NewLayout.cshtml";
+    int serverId = (int)ViewBag.id;
 
 }
 <script type="text/javascript" src="/Content/js/jstree.min.js"></script>
@@ -17,69 +18,82 @@
         return str === null || str.match(/^\s*$/) !== null;
     }
 
+    var serverId = "@serverId";
     var currentPath = "";
+
+    function refresh() {
+        $.post("/Explorer/GetDirectoryContent/" + serverId,
+        {
+            path: currentPath
+        },
+        function (data, status) {
+            console.log(data);
+            var xmlDoc = $.parseXML(data);
+            var xmlObj = $(xmlDoc);
+            var root = xmlObj.find("Response");
+            if (root.children("Type").first().text() == "Error") {
+                alert(root.children("Content").text());
+            } else {
+                $("#listBody").find("tr:gt(0)").remove();
+                root.children("Content").first().children("Item").each(function (index) {
+                    var row = "<tr>";
+                    row += "<td><input type=\"checkbox\"/></td>";
+                    if ($(this).children("Type").first().text() == "Directory") {
+                        row += "<td><i class=\"fa fa-folder fa-inverse\"></i></td>";
+                    }
+                    if ($(this).children("Type").first().text() == "File") {
+                        row += "<td><i class=\"fa fa-file fa-inverse\"></i></td>";
+                    }
+                    row += "<td>" + $(this).children("Name").first().text() + "</td>";
+                    row += "<td>" + fileSizeIEC($(this).children("Size").first().text()) + "</td>";
+                    row += "<td>" + $(this).children("Timestamp").first().text() + "</td>";
+                    row += "<td>";
+                    row += "<span class=\"fa-stack\" title=\"Cut\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-cut text-info\"></i></span>&nbsp;";
+                    row += "<span class=\"fa-stack\" title=\"Copy\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-copy text-success\"></i></span>&nbsp;";
+                    row += "<span class=\"fa-stack\" title=\"Download\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-download text-warning\"></i></span>&nbsp;";
+                    row += "<span class=\"fa-stack\" title=\"Delete\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-trash-o text-danger\"></i></span>&nbsp;";
+                    row += "<span class=\"fa-stack\" title=\"Rename\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-pencil text-warning\"></i></span>&nbsp;";
+                    if ($(this).children("Type").first().text() == "File" && $(this).children("Size").first().text() <= (512 * 1024)) {
+                        row += "<span class=\"fa-stack\" title=\"Edit\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-pencil-square-o text-warning\"></i></span>&nbsp;";
+                    }
+                    row += "</td>";
+                    row += "</tr>";
+                    $("#listBody").append(row);
+
+                    var itemPath = "";
+                    if (isEmptyOrSpaces(currentPath)) {
+                        itemPath = $(this).children("Name").first().text();
+                    } else {
+                        itemPath = currentPath + "\\" + $(this).children("Name").first().text();
+                    }
+
+                    $('#listBody > tr:last-child > td:last-child > span[title="Delete"]').on("click", function () {
+                        $.post("/Explorer/Delete/" + serverId,
+                            {
+                                paths: itemPath
+                            },
+                            function (data, status) {
+                                console.log(data);
+                                var xmlDoc = $.parseXML(data);
+                                var xmlObj = $(xmlDoc);
+                                var root = xmlObj.find("Response");
+                                if (root.children("Type").first().text() == "Error") {
+                                    alert(root.children("Content").text());
+                                }
+                                refresh();
+                            }
+                        );
+                    });
+                });
+            }
+        });
+    }
+
     $(function () {
         $('#jstree_div').on('select_node.jstree', function (e, data) {
             var path = $('#jstree_div').jstree(true).get_path(data.node, "\\").substring(2);
             currentPath = path;
-            $.post("/explorer/GetDirectoryContent/@((int)ViewBag.id)",
-                {
-                    path: path
-                },
-                function (data, status) {
-                    console.log(data);
-                    var xmlDoc = $.parseXML(data);
-                    var xmlObj = $(xmlDoc);
-                    var root = xmlObj.find("DirectoryContent");
-                    if (root.children("Type").first().text() == "Error") {
-                        alert(xmlObj.children("Message").text());
-                    } else {
-                        $("#listBody").find("tr:gt(0)").remove();
-                        root.children("Data").first().children("Item").each(function (index) {
-                            var row = "<tr>";
-                            row += "<td><input type=\"checkbox\"/></td>";
-                            if ($(this).children("Type").first().text() == "Directory") {
-                                row += "<td><i class=\"fa fa-folder fa-inverse\"></i></td>";
-                            }
-                            if ($(this).children("Type").first().text() == "File") {
-                                row += "<td><i class=\"fa fa-file fa-inverse\"></i></td>";
-                            }
-                            row += "<td>" + $(this).children("Name").first().text() + "</td>";
-                            row += "<td>" + fileSizeIEC($(this).children("Size").first().text()) + "</td>";
-                            row += "<td>" + $(this).children("Timestamp").first().text() + "</td>";
-                            row += "<td>";
-                            row += "<span class=\"fa-stack\" title=\"Cut\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-cut text-info\"></i></span>&nbsp;";
-                            row += "<span class=\"fa-stack\" title=\"Copy\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-copy text-success\"></i></span>&nbsp;";
-                            row += "<span class=\"fa-stack\" title=\"Download\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-download text-warning\"></i></span>&nbsp;";
-                            row += "<span class=\"fa-stack\" title=\"Delete\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-times-circle text-danger\"></i></span>&nbsp;";
-                            row += "<span class=\"fa-stack\" title=\"Rename\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-pencil text-warning\"></i></span>&nbsp;";
-                            if ($(this).children("Type").first().text() == "File" && $(this).children("Size").first().text() <= (512 * 1024)) {
-                                row += "<span class=\"fa-stack\" title=\"Edit\"><i class=\"fa fa-stack-2x fa-square white\"></i><i class=\"fa fa-stack-1x fa-pencil-square-o text-warning\"></i></span>&nbsp;";
-                            }
-                            row += "</td>";
-                            row += "</tr>";
-                            $("#listBody").append(row);
-
-                            var itemPath = "";
-                            if (isEmptyOrSpaces(currentPath)) {
-                                itemPath = $(this).children("Name").first().text();
-                            } else {
-                                itemPath = currentPath + "\\" + $(this).children("Name").first().text();
-                            }
-
-                            $('#listBody > tr:last-child > td:last-child > span[title="Cut"]').on("click", function () {
-                                $.post("/explorer/GetDirectoryContent/@((int) ViewBag.id)",
-                                    {
-                                        path: itemPath
-                                    },
-                                    function (data, status) {
-
-                                    }
-                                );
-                            });
-                        });
-                    }
-                });
+            refresh();
         });
 
         $('#jstree_div').jstree({
@@ -87,26 +101,32 @@
             'core': {
                 "data": function (obj, cb) {
                     if (obj.id == "#") {
-                        cb.call(this, [{ text: "\\", children: true }]);
+                        cb.call(this, [{ text: "\\", id: "rootNode", children: true }]);
+                        setTimeout(function () {
+                            $('#jstree_div').jstree(true).select_node("rootNode");
+                        }, 1000);
+
                         return;
                     }
                     var path = "";
                     if (obj.id != "#") {
                         path = $('#jstree_div').jstree(true).get_path(obj, "\\").substring(2);
                     }
-                    $.post("/explorer/GetDirectoryDirectories/@((int)ViewBag.id)",
+                    $.post("/explorer/GetDirectoryDirectories/" + serverId,
                         {
                             path: path
                         },
                         function (data, status) {
+                            console.log(data);
                             var xmlDoc = $.parseXML(data);
                             var xmlObj = $(xmlDoc);
-                            var root = xmlObj.find("DirectoryContent");
+                            var root = xmlObj.find("Response");
                             if (root.children("Type").first().text() == "Error") {
-                                alert(xmlObj.children("Message").text().text());
+                                alert(root.children("Content").text());
+                                cb.call(this, new Array());
                             } else {
                                 var dirArray = new Array();
-                                root.children("Data").first().children("Item").each(function (index) {
+                                root.children("Content").first().children("Item").each(function (index) {
                                     dirArray.push({ text: $(this).children("Name").first().text(), children: true });
                                 });
                                 cb.call(this, dirArray);
@@ -116,9 +136,40 @@
                 }
             }
         });
+        $('#checkAll').change(function () {
+            console.log(this.checked);
+            $('#listBody > tr > td > input[type="checkbox"]').prop('checked', this.checked);
+        });
+        $('#deleteAll').on("click", function () {
+            var toDelete = new Array();
 
+            $('#listBody > tr:not(:first-child) > td:first-child > input:checked').each(function () {
+                if (isEmptyOrSpaces(currentPath)) {
+                    toDelete.push($(this).parent().parent().children('td:nth-child(3)').text());
+                } else {
+                    toDelete.push(currentPath + "\\" + $(this).parent().parent().children('td:nth-child(3)').text());
+                }
+            });
+
+            $.post("/Explorer/Delete/" + serverId,
+                {
+                    paths: toDelete.join(":")
+                },
+                function (data, status) {
+                    console.log(data);
+                    var xmlDoc = $.parseXML(data);
+                    var xmlObj = $(xmlDoc);
+                    var root = xmlObj.find("Response");
+                    if (root.children("Type").first().text() == "Error") {
+                        alert(root.children("Content").text());
+                    }
+                    refresh();
+                }
+            );
+        });
 
     });
+
 </script>
 <style>
     .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
@@ -149,10 +200,11 @@
 <div class="col-md-8" style="padding-right: 0px; height: calc(100% - 235px); ">
     <div class="row" style="background-color: rgb(29, 28, 28); padding: 15px 15px 15px 15px; margin: 0px 0px 0px 0px;">
         <div id="scrollZone" style="overflow: auto; height: calc(100% - 30px); padding-right: 20px;">
+            <button class="btn btn-danger" id="deleteAll"><i class="fa fa-trash-o fa-lg"></i> Delete</button>
             <table class="table table-hover table-striped" id="listBody">
                 <tbody id="listBody">
                     <tr>
-                        <th></th>
+                        <th><input type="checkbox" id="checkAll" /></th>
                         <th></th>
                         <th>Name</th>
                         <th>Size</th>
