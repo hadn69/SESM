@@ -20,6 +20,7 @@
 
     var serverId = "@serverId";
     var currentPath = "";
+    var currentNode = null;
 
     function refresh() {
         $.post("/Explorer/GetDirectoryContent/" + serverId,
@@ -31,7 +32,7 @@
             var xmlDoc = $.parseXML(data);
             var xmlObj = $(xmlDoc);
             var root = xmlObj.find("Response");
-            if (root.children("Type").first().text() == "Error") {
+            if (root.children("Type").text() == "Error") {
                 alert(root.children("Content").text());
             } else {
                 $("#listBody").find("tr:gt(0)").remove();
@@ -61,14 +62,19 @@
                     $("#listBody").append(row);
 
                     var itemPath = "";
+                    var itemName = $(this).children("Name").first().text();
                     if (isEmptyOrSpaces(currentPath)) {
-                        itemPath = $(this).children("Name").first().text();
+                        itemPath = itemName;
                     } else {
-                        itemPath = currentPath + "\\" + $(this).children("Name").first().text();
+                        itemPath = currentPath + "\\" + itemName;
                     }
 
+                    // DELETE
                     $('#listBody > tr:last-child > td:last-child > span[title="Delete"]').on("click", function () {
-                        $.post("/Explorer/Delete/" + serverId,
+                        $("#confirmDeleteContent").text(itemName);
+                        $("#confirmDeleteButton").off("click").on("click", function () {
+                            $('#confirmDeleteModal').modal('hide');
+                            $.post("/Explorer/Delete/" + serverId,
                             {
                                 paths: itemPath
                             },
@@ -77,12 +83,49 @@
                                 var xmlDoc = $.parseXML(data);
                                 var xmlObj = $(xmlDoc);
                                 var root = xmlObj.find("Response");
-                                if (root.children("Type").first().text() == "Error") {
+                                if (root.children("Type").text() == "Error") {
                                     alert(root.children("Content").text());
                                 }
                                 refresh();
+                                $('#jstree_div').jstree(true).refresh_node(currentNode);
+                            });
+                        });
+                        $('#confirmDeleteModal').modal('show');
+
+
+                    });
+                    // RENAME
+                    $('#listBody > tr:last-child > td:last-child > span[title="Rename"]').on("click", function () {
+
+                        $("#renameInput").val(itemName);
+                        $("#renameButton").off("click").on("click", function () {
+                            $('#renameModal').modal('hide');
+                            var newName = $("#renameInput").val();
+                            if (newName != null && newName != itemName) {
+                                $.post("/Explorer/Rename/" + serverId,
+                                {
+                                    sourcePath: itemPath,
+                                    newName: newName
+                                },
+                                function (data, status) {
+                                    console.log(data);
+                                    var xmlDoc = $.parseXML(data);
+                                    var xmlObj = $(xmlDoc);
+                                    var root = xmlObj.find("Response");
+                                    if (root.children("Type").text() == "Error") {
+                                        alert(root.children("Content").text());
+                                    }
+                                    refresh();
+                                    $('#jstree_div').jstree(true).refresh_node(currentNode);
+                                });
                             }
-                        );
+                        });
+                        $('#renameModal').modal('show');
+                    });
+                    // DOWNLOAD
+                    $('#listBody > tr:last-child > td:last-child > span[title="Download"]').on("click", function () {
+                        $("#downloadForm > input").val(itemPath);
+                        $("#downloadForm").submit();
                     });
                 });
             }
@@ -93,7 +136,13 @@
         $('#jstree_div').on('select_node.jstree', function (e, data) {
             var path = $('#jstree_div').jstree(true).get_path(data.node, "\\").substring(2);
             currentPath = path;
+            currentNode = data.node;
             refresh();
+        });
+
+        $('#jstree_div').on('loaded.jstree', function () {
+            $('#jstree_div').jstree(true).select_node("rootNode");
+            $('#jstree_div').jstree(true).open_node("rootNode");
         });
 
         $('#jstree_div').jstree({
@@ -102,10 +151,6 @@
                 "data": function (obj, cb) {
                     if (obj.id == "#") {
                         cb.call(this, [{ text: "\\", id: "rootNode", children: true }]);
-                        setTimeout(function () {
-                            $('#jstree_div').jstree(true).select_node("rootNode");
-                        }, 1000);
-
                         return;
                     }
                     var path = "";
@@ -113,26 +158,25 @@
                         path = $('#jstree_div').jstree(true).get_path(obj, "\\").substring(2);
                     }
                     $.post("/explorer/GetDirectoryDirectories/" + serverId,
-                        {
-                            path: path
-                        },
-                        function (data, status) {
-                            console.log(data);
-                            var xmlDoc = $.parseXML(data);
-                            var xmlObj = $(xmlDoc);
-                            var root = xmlObj.find("Response");
-                            if (root.children("Type").first().text() == "Error") {
-                                alert(root.children("Content").text());
-                                cb.call(this, new Array());
-                            } else {
-                                var dirArray = new Array();
-                                root.children("Content").first().children("Item").each(function (index) {
-                                    dirArray.push({ text: $(this).children("Name").first().text(), children: true });
-                                });
-                                cb.call(this, dirArray);
-                            }
-                        });
-
+                    {
+                        path: path
+                    },
+                    function (data, status) {
+                        console.log(data);
+                        var xmlDoc = $.parseXML(data);
+                        var xmlObj = $(xmlDoc);
+                        var root = xmlObj.find("Response");
+                        if (root.children("Type").first().text() == "Error") {
+                            alert(root.children("Content").text());
+                            cb.call(this, new Array());
+                        } else {
+                            var dirArray = new Array();
+                            root.children("Content").first().children("Item").each(function (index) {
+                                dirArray.push({ text: $(this).children("Name").first().text(), children: true });
+                            });
+                            cb.call(this, dirArray);
+                        }
+                    });
                 }
             }
         });
@@ -140,7 +184,7 @@
             console.log(this.checked);
             $('#listBody > tr > td > input[type="checkbox"]').prop('checked', this.checked);
         });
-        $('#deleteAll').on("click", function () {
+        $('#deleteSelected').on("click", function () {
             var toDelete = new Array();
 
             $('#listBody > tr:not(:first-child) > td:first-child > input:checked').each(function () {
@@ -151,9 +195,54 @@
                 }
             });
 
-            $.post("/Explorer/Delete/" + serverId,
+            $("#confirmDeleteContent").html(toDelete.join("<br/>"));
+            $("#confirmDeleteButton").off("click").on("click", function () {
+                $('#confirmDeleteModal').modal('hide');
+                $.post("/Explorer/Delete/" + serverId,
+                    {
+                        paths: toDelete.join(":")
+                    },
+                    function (data, status) {
+                        console.log(data);
+                        var xmlDoc = $.parseXML(data);
+                        var xmlObj = $(xmlDoc);
+                        var root = xmlObj.find("Response");
+                        if (root.children("Type").first().text() == "Error") {
+                            alert(root.children("Content").text());
+                        }
+                        refresh();
+                    }
+                );
+            });
+            $('#confirmDeleteModal').modal('show');
+        });
+        $('#downloadSelected').on("click", function () {
+            var toDownload = new Array();
+
+            $('#listBody > tr:not(:first-child) > td:first-child > input:checked').each(function () {
+                if (isEmptyOrSpaces(currentPath)) {
+                    toDownload.push($(this).parent().parent().children('td:nth-child(3)').text());
+                } else {
+                    toDownload.push(currentPath + "\\" + $(this).parent().parent().children('td:nth-child(3)').text());
+                }
+            });
+
+            $("#downloadForm > input").val(toDownload.join(":"));
+            $("#downloadForm").submit();
+        });
+        $('#newFile').on("click", function () {
+            $("#newFileInput").val("");
+            $("#newFileButton").off("click").on("click", function () {
+                $('#newFileModal').modal('hide');
+                var path = "";
+                if (isEmptyOrSpaces(currentPath)) {
+                    path = $("#newFolderInput").val();
+                } else {
+                    path = currentPath + "\\" + $("#newFileInput").val();
+                }
+                $.post("/Explorer/NewFile/" + serverId,
                 {
-                    paths: toDelete.join(":")
+                    path: path
                 },
                 function (data, status) {
                     console.log(data);
@@ -166,10 +255,82 @@
                     refresh();
                 }
             );
+            });
+            $('#newFileModal').modal('show');
         });
+        $('#newFolder').on("click", function () {
+            $("#newFolderInput").val("");
+            $("#newfolderButton").off("click").on("click", function () {
+                $('#newFolderModal').modal('hide');
+                var path = "";
+                if (isEmptyOrSpaces(currentPath)) {
+                    path = $("#newFolderInput").val();
+                } else {
+                    path = currentPath + "\\" + $("#newFolderInput").val();
+                }
+                $.post("/Explorer/NewFolder/" + serverId,
+                {
+                    path: path
+                },
+                function (data, status) {
+                    console.log(data);
+                    var xmlDoc = $.parseXML(data);
+                    var xmlObj = $(xmlDoc);
+                    var root = xmlObj.find("Response");
+                    if (root.children("Type").first().text() == "Error") {
+                        alert(root.children("Content").text());
+                    }
+                    refresh();
+                    $('#jstree_div').jstree(true).refresh_node(currentNode);
+                }
+            );
+            });
+            $('#newFolderModal').modal('show');
+        });
+        $('#upload').on("click", function () {
+            $("#uploadInput").val("");
+            $("#uploadButton").off("click").on("click", function () {
 
+                var options = {
+                    beforeSend: function () {
+                        $("#progress").show();
+                        $("#progress > div").width('0%');
+                    },
+                    uploadProgress: function (event, position, total, percentComplete) {
+                        $("#progress > div").width(percentComplete + '%');
+
+                    },
+                    success: function () {
+                        $("#progress > div").width('100%');
+
+                    },
+                    complete: function (data) {
+                        console.log(data);
+                        var xmlDoc = $.parseXML(data);
+                        var xmlObj = $(xmlDoc);
+                        var root = xmlObj.find("Response");
+                        if (root.children("Type").first().text() == "Error") {
+                            alert(root.children("Content").text());
+                        }
+                        refresh();
+                        $('#jstree_div').jstree(true).refresh_node(currentNode);
+                    },
+                    error: function () {
+                        alert("Error while uploading");
+                    },
+                    data: {
+                        path: currentPath
+                    }
+                };
+
+                $("#myForm").ajaxForm(options);
+
+
+
+            });
+        });
+        $('#uploadModal ').modal('show');
     });
-
 </script>
 <style>
     .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
@@ -192,6 +353,119 @@
         border-bottom: 1px solid #ddd;
     }
 </style>
+
+
+<!-- Rename Modal -->
+<div class="modal fade" id="renameModal" tabindex="-1" role="dialog" aria-labelledby="renameModalLabel" aria-hidden="true" style="color:black">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="renameModalLabel">Rename File/Folder</h4>
+            </div>
+            <div class="modal-body">
+                New Name :<br />
+                <input id="renameInput" type="text" class="form-control" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="renameButton">Rename</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- New File Modal -->
+<div class="modal fade" id="newFileModal" tabindex="-1" role="dialog" aria-labelledby="newFileModalLabel" aria-hidden="true" style="color:black">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="newFileModalLabel">Create File</h4>
+            </div>
+            <div class="modal-body">
+                File Name :<br />
+                <input id="newFileInput" type="text" class="form-control" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="newFileButton">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- New Folder Modal -->
+<div class="modal fade" id="newFolderModal" tabindex="-1" role="dialog" aria-labelledby="newFolderModalLabel" aria-hidden="true" style="color:black">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="newFileModalLabel">Create Folder</h4>
+            </div>
+            <div class="modal-body">
+                Folder Name :<br />
+                <input id="newFolderInput" type="text" class="form-control" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="newfolderButton">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true" style="color:black">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="uploadModalLabel">Create Folder</h4>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm" method="POST" action="/Explorer/Upload/@serverId" enctype="multipart/form-data">
+                    Zip File :<br />
+                    <input id="uploadInput" type="text" class="form-control" />
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="uploadButton">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true" style="color:black">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="confirmDeleteModalLabel">Delete File/Folder</h4>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the following file(s) / folder(s) ? :<br />
+                <div id="confirmDeleteContent">
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmDeleteButton">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="display:none">
+    <form id="downloadForm" method="POST" action="/Explorer/Download/@serverId" target="_blank">
+        <input type="hidden" name="paths" value="" />
+    </form>
+</div>
+
+
 <br />
 <div class="col-md-4" style="height: calc(100% - 235px); background-color: rgb(49, 74, 99); margin-bottom: 15px;padding: 15px 15px 15px 15px;">
     <div id="jstree_div">
@@ -200,7 +474,11 @@
 <div class="col-md-8" style="padding-right: 0px; height: calc(100% - 235px); ">
     <div class="row" style="background-color: rgb(29, 28, 28); padding: 15px 15px 15px 15px; margin: 0px 0px 0px 0px;">
         <div id="scrollZone" style="overflow: auto; height: calc(100% - 30px); padding-right: 20px;">
-            <button class="btn btn-danger" id="deleteAll"><i class="fa fa-trash-o fa-lg"></i> Delete</button>
+            <button class="btn btn-success" id="newFolder"><i class="fa fa-folder fa-lg"></i> New Folder</button>
+            <button class="btn btn-primary" id="newFile"><i class="fa fa-file-text fa-lg"></i> New File</button>
+            <button class="btn btn-danger" id="deleteSelected"><i class="fa fa-trash-o fa-lg"></i> Delete</button>
+            <button class="btn btn-info" id="downloadSelected"><i class="fa fa-download fa-lg"></i> Download</button>
+            <button class="btn btn-warning" id="upload"><i class="fa fa-upload fa-lg"></i> Upload</button>
             <table class="table table-hover table-striped" id="listBody">
                 <tbody id="listBody">
                     <tr>

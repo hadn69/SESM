@@ -31,6 +31,11 @@ namespace SESM.Tools.Helpers
         {
             return SESMConfigHelper.SESavePath + GetPrefix() + "_" + server.Id + "_" + server.Name + @"\";
         }
+
+        public static string GetFSDirName(EntityServer server)
+        {
+            return GetPrefix() + "_" + server.Id + "_" + server.Name;
+        }
         public static string GetSavesPath(EntityServer server)
         {
             return GetInstancePath(server) + @"Saves\";
