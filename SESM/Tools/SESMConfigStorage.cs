@@ -82,7 +82,7 @@ namespace SESM.Tools
             BlockDll = true;
             LowPriorityStart = false;
 
-            SESEUpdateURL = "https://api.github.com/repos/SEModCommunity/SE-Community-Mod-API/releases";
+            SESEUpdateURL = "https://api.github.com/repos/Tyrsis/SE-Community-Mod-API/releases";
         }   
         protected override IConfigurationProvider OnCreateDefaultProvider(string sectionName, object configData)
         {
