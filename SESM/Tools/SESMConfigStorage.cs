@@ -39,6 +39,7 @@ namespace SESM.Tools
         public int ABNbToKeepLvl3 { get; set; }
 
         public bool BlockDll { get; set; }
+        public bool LowPriorityStart { get; set; }
 
         public SESMConfigStorage()
         {
@@ -77,6 +78,7 @@ namespace SESM.Tools
             ABNbToKeepLvl3 = 30;
 
             BlockDll = true;
+            LowPriorityStart = false;
         }   
         protected override IConfigurationProvider OnCreateDefaultProvider(string sectionName, object configData)
         {

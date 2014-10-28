@@ -473,6 +473,20 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public static bool LowPriorityStart
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.LowPriorityStart;
+            }
+            set
+            {
+                ConfigStorage.LowPriorityStart = value;
+                ConfigStorage.Write();
+            }
+        }
+
         public static ArchType Arch
         {
             get
