@@ -71,6 +71,7 @@ namespace SESM.Controllers
         [AdminAndAbove]
         public ActionResult Upload(int id, UploadModViewModel model)
         {
+            EntityUser user = Session["User"] as EntityUser;
             if (!ZipFile.IsZipFile(model.ModZip.InputStream, false))
             {
                 ModelState.AddModelError("ZipError", "Your File is not a valid zip file");
@@ -85,6 +86,8 @@ namespace SESM.Controllers
             using (ZipFile zip = ZipFile.Read(model.ModZip.InputStream))
             {
                 Directory.CreateDirectory(path);
+                if(!user.IsAdmin && SESMConfigHelper.BlockDll)
+                    zip.RemoveEntries(zip.SelectEntries("*.dll"));
                 zip.ExtractAll(path);
             }
             return RedirectToAction("Index", new {id = id}).Success("Mod Upload Successfull");

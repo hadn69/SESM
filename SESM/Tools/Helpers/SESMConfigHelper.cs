@@ -458,6 +458,21 @@ namespace SESM.Tools.Helpers
             }
         }
 
+
+        public static bool BlockDll
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.BlockDll;
+            }
+            set
+            {
+                ConfigStorage.BlockDll = value;
+                ConfigStorage.Write();
+            }
+        }
+
         public static ArchType Arch
         {
             get
