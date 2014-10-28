@@ -487,6 +487,20 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public static string SESEUpdateURL
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.SESEUpdateURL;
+            }
+            set
+            {
+                ConfigStorage.SESEUpdateURL = value;
+                ConfigStorage.Write();
+            }
+        }
+
         public static ArchType Arch
         {
             get

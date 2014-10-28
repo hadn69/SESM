@@ -513,7 +513,6 @@ namespace SESM.Controllers
                     || model.GameMode != serverConfig.GameMode
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
-                    || model.UseServerExtender != serv.UseServerExtender
                     || model.RemoveTrash != serverConfig.RemoveTrash
                     || model.WorldSizeKm != serverConfig.WorldSizeKm
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
@@ -689,7 +688,6 @@ namespace SESM.Controllers
                     || model.GameMode != serverConfig.GameMode
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
-                    || model.UseServerExtender != serv.UseServerExtender
                     || model.RemoveTrash != serverConfig.RemoveTrash
                     || model.WorldSizeKm != serverConfig.WorldSizeKm
                     || model.ServerExtenderPort != serv.ServerExtenderPort))

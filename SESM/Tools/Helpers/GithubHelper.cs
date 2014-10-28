@@ -10,7 +10,7 @@ namespace SESM.Tools.Helpers
     {
         public static string UpdateIsAvailable()
         {
-            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender_*.zip",
+            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip",
                 SearchOption.TopDirectoryOnly);
             string data = GetGithubData();
             if (files.Length == 0)
@@ -145,7 +145,7 @@ namespace SESM.Tools.Helpers
         {
             WebClient client = new WebClient();
             client.Headers.Add("user-agent", "SESM V2");
-            return client.DownloadString("https://api.github.com/repos/SEModCommunity/SE-Community-Mod-API/releases");
+            return client.DownloadString(SESMConfigHelper.SESEUpdateURL);
         }
 
         public static void CleanupUpdate()

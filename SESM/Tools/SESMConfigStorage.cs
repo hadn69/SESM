@@ -41,6 +41,8 @@ namespace SESM.Tools
         public bool BlockDll { get; set; }
         public bool LowPriorityStart { get; set; }
 
+        public string SESEUpdateURL { get; set; }
+
         public SESMConfigStorage()
         {
             DBConnString = @"Server=.\SQLEXPRESS;Database=SESM;User Id=sa;Password=MyPassword;MultipleActiveResultSets=true;";
@@ -79,6 +81,8 @@ namespace SESM.Tools
 
             BlockDll = true;
             LowPriorityStart = false;
+
+            SESEUpdateURL = "https://api.github.com/repos/SEModCommunity/SE-Community-Mod-API/releases";
         }   
         protected override IConfigurationProvider OnCreateDefaultProvider(string sectionName, object configData)
         {
