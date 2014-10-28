@@ -288,48 +288,48 @@
             $('#newFolderModal').modal('show');
         });
         $('#upload').on("click", function () {
+            $('#uploadModal').modal('show');
             $("#uploadInput").val("");
             $("#uploadButton").off("click").on("click", function () {
-
-                var options = {
-                    beforeSend: function () {
-                        $("#progress").show();
-                        $("#progress > div").width('0%');
-                    },
-                    uploadProgress: function (event, position, total, percentComplete) {
-                        $("#progress > div").width(percentComplete + '%');
-
-                    },
-                    success: function () {
-                        $("#progress > div").width('100%');
-
-                    },
-                    complete: function (data) {
-                        console.log(data);
-                        var xmlDoc = $.parseXML(data);
-                        var xmlObj = $(xmlDoc);
-                        var root = xmlObj.find("Response");
-                        if (root.children("Type").first().text() == "Error") {
-                            alert(root.children("Content").text());
-                        }
-                        refresh();
-                        $('#jstree_div').jstree(true).refresh_node(currentNode);
-                    },
-                    error: function () {
-                        alert("Error while uploading");
-                    },
-                    data: {
-                        path: currentPath
-                    }
-                };
-
-                $("#myForm").ajaxForm(options);
-
-
-
+                $("#uploadForm").submit();
             });
         });
-        $('#uploadModal ').modal('show');
+
+        var options = {
+            beforeSend: function () {
+                $("#progress").show();
+                $("#progress > div").width('0%');
+            },
+            uploadProgress: function (event, position, total, percentComplete) {
+                $("#progress > div").width(percentComplete + '%');
+
+            },
+            success: function () {
+                $("#progress > div").width('100%');
+
+            },
+            complete: function (data) {
+                $('#uploadModal').modal('show');
+                console.log(data);
+                var xmlDoc = $.parseXML(data);
+                var xmlObj = $(xmlDoc);
+                var root = xmlObj.find("Response");
+                if (root.children("Type").first().text() == "Error") {
+                    alert(root.children("Content").text());
+                }
+                refresh();
+                $('#jstree_div').jstree(true).refresh_node(currentNode);
+            },
+            error: function () {
+                alert("Error while uploading");
+            },
+            data: {
+                path: currentPath
+            }
+        };
+
+        $("#uploadForm").ajaxForm(options);
+        
     });
 </script>
 <style>
@@ -418,12 +418,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="uploadModalLabel">Create Folder</h4>
+                <h4 class="modal-title" id="uploadModalLabel">Upload Zip</h4>
             </div>
             <div class="modal-body">
                 <form id="uploadForm" method="POST" action="/Explorer/Upload/@serverId" enctype="multipart/form-data">
                     Zip File :<br />
-                    <input id="uploadInput" type="text" class="form-control" />
+                    <input id="uploadInput" type="file" class="form-control" />
                     <div class="progress">
                         <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
                         </div>
@@ -433,7 +433,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="uploadButton">Create</button>
+                <button type="button" class="btn btn-primary" id="uploadButton">Upload</button>
             </div>
         </div>
     </div>

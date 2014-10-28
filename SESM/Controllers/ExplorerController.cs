@@ -384,5 +384,40 @@ namespace SESM.Controllers
                 return Content(new XmlResponse(XmlResponseType.Error, "An error occurend while creating the file (exception : " + ex.Message + ")").ToString());
             }
         }
+
+        public ActionResult Upload(int id)
+        {
+            ServerProvider srvPrv = new ServerProvider(_context);
+            EntityServer server = srvPrv.GetServer(id);
+
+            if(server == null)
+                return Content(new XmlResponse(XmlResponseType.Error, "The server doesn't exist").ToString());
+
+            if(!SecurityCheck(server))
+                return Content(new XmlResponse(XmlResponseType.Error, "You don't have access to this server").ToString());
+
+            string path = Request.Form["path"];
+
+            path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), path));
+
+            if(!path.Contains(PathHelper.GetInstancePath(server)))
+                return Content(new XmlResponse(XmlResponseType.Error, "The object isn't accessible for you, bad boy !").ToString());
+
+            if((Directory.Exists(path) || System.IO.File.Exists(path)))
+                return Content(new XmlResponse(XmlResponseType.Error, "An object with the same name already exist").ToString());
+
+            if(!Regex.IsMatch(PathHelper.GetLastLeaf(path), "^[^:/\\*?\"<>|]*$"))
+                return Content(new XmlResponse(XmlResponseType.Error, "Invalid name, the name of the file can't contain the folowing characters : \\ / : * ? \" < > |").ToString());
+
+            try
+            {
+                System.IO.File.Create(path);
+                return Content(new XmlResponse(XmlResponseType.Success, "File created").ToString());
+            }
+            catch(Exception ex)
+            {
+                return Content(new XmlResponse(XmlResponseType.Error, "An error occurend while creating the file (exception : " + ex.Message + ")").ToString());
+            }
+        }
     }
 }
