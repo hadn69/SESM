@@ -38,6 +38,11 @@ namespace SESM.Tools
         public string ABIntervalLvl3 { get; set; }
         public int ABNbToKeepLvl3 { get; set; }
 
+        public bool BlockDll { get; set; }
+        public bool LowPriorityStart { get; set; }
+
+        public string SESEUpdateURL { get; set; }
+
         public SESMConfigStorage()
         {
             DBConnString = @"Server=.\SQLEXPRESS;Database=SESM;User Id=sa;Password=MyPassword;MultipleActiveResultSets=true;";
@@ -73,6 +78,11 @@ namespace SESM.Tools
             AutoBackupLvl3 = false;
             ABIntervalLvl3 = "0 0 0 * * ?";
             ABNbToKeepLvl3 = 30;
+
+            BlockDll = true;
+            LowPriorityStart = false;
+
+            SESEUpdateURL = "https://api.github.com/repos/SEModCommunity/SE-Community-Mod-API/releases";
         }   
         protected override IConfigurationProvider OnCreateDefaultProvider(string sectionName, object configData)
         {

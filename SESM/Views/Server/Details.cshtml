@@ -86,7 +86,7 @@
                 <div class="form-group" data-toggle="popover" data-content="If enabled, The server will use SE Server Extender to run.">
                     @Html.LabelFor(m => m.UseServerExtender, labelClass)
                     <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.UseServerExtender, adminAccessClass)
+                        @Html.CheckBoxFor(m => m.UseServerExtender, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.UseServerExtender)
                     </div>
                 </div>

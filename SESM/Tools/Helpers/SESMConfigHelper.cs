@@ -458,6 +458,49 @@ namespace SESM.Tools.Helpers
             }
         }
 
+
+        public static bool BlockDll
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.BlockDll;
+            }
+            set
+            {
+                ConfigStorage.BlockDll = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool LowPriorityStart
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.LowPriorityStart;
+            }
+            set
+            {
+                ConfigStorage.LowPriorityStart = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string SESEUpdateURL
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.SESEUpdateURL;
+            }
+            set
+            {
+                ConfigStorage.SESEUpdateURL = value;
+                ConfigStorage.Write();
+            }
+        }
+
         public static ArchType Arch
         {
             get

@@ -439,6 +439,7 @@
     <Compile Include="Tools\Helpers\ServerConfigHelper.cs" />
     <Compile Include="Tools\Helpers\SESMConfigHelper.cs" />
     <Compile Include="Tools\Monitor\HourlyCrusher.cs" />
+    <Compile Include="Tools\ResetPriorityJob.cs" />
     <Compile Include="Tools\ServerInfoHelper.cs" />
     <Compile Include="Tools\SESMConfigStorage.cs" />
     <Compile Include="Tools\Helpers\SteamCMDHelper.cs" />
