@@ -168,7 +168,7 @@ namespace SESM.Tools.Helpers
 
         public static void ApplyUpdate()
         {
-            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender_*.zip", SearchOption.TopDirectoryOnly);
+            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
             if(files.Length != 1)
             {
                 // If multiple zip available or no zip, we don't risk an update 
