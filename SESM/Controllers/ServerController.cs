@@ -510,7 +510,6 @@ namespace SESM.Controllers
                     || model.IP != serverConfig.IP
                     || model.ServerPort != serverConfig.ServerPort
                     || model.SteamPort != serverConfig.SteamPort
-                    || model.GameMode != serverConfig.GameMode
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.RemoveTrash != serverConfig.RemoveTrash
@@ -685,7 +684,6 @@ namespace SESM.Controllers
                     || model.IP != serverConfig.IP
                     || model.ServerPort != serverConfig.ServerPort
                     || model.SteamPort != serverConfig.SteamPort
-                    || model.GameMode != serverConfig.GameMode
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.RemoveTrash != serverConfig.RemoveTrash

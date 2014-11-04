@@ -130,7 +130,7 @@
                     <strong>Creative :</strong><br />You can place every block without having to weld them.">
                     @Html.LabelFor(m => m.GameMode, labelClass)
                     <div class="@valueColumn">
-                        @Html.EnumDropDownListFor(m => m.GameMode, null, adminAccessClass)
+                        @Html.EnumDropDownListFor(m => m.GameMode, null, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.GameMode)
                     </div>
                 </div>
