@@ -143,6 +143,7 @@
     <Content Include="Content\img\panel-bg.jpg" />
     <Content Include="Content\js\bootstrap.min.js" />
     <Content Include="Content\js\jquery-2.1.1.min.js" />
+    <Content Include="Content\js\jquery.form.min.js" />
     <Content Include="Content\js\jquery.smooth-scroll.min.js" />
     <Content Include="Content\js\jstree.min.js" />
     <Content Include="Content\logo-small.png" />

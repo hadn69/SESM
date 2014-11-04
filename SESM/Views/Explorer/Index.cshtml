@@ -9,6 +9,7 @@
 }
 <script type="text/javascript" src="/Content/js/jstree.min.js"></script>
 <link rel="stylesheet" href="/Content/css/jstree.min.css" />
+<script type="text/javascript" src="/Content/js/jquery.form.min.js"></script>
 <script type="text/javascript">
     function fileSizeIEC(a, b, c, d, e) {
         return (b = Math, c = b.log, d = 1024, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2)
@@ -291,45 +292,39 @@
             $('#uploadModal').modal('show');
             $("#uploadInput").val("");
             $("#uploadButton").off("click").on("click", function () {
-                $("#uploadForm").submit();
+                var options = {
+                    beforeSend: function () {
+                        $("#progress").show();
+                        $("#progress > div").width('0%');
+                    },
+                    datatype: "xml",
+                    uploadProgress: function (event, position, total, percentComplete) {
+                        $("#progress > div").width(percentComplete + '%');
+
+                    },
+                    success: function () {
+                        $("#progress > div").width('100%');
+                    },
+                    complete: function (data) {
+                        $('#uploadModal').modal('hide');
+                        console.log(data);
+                        var xmlDoc = $.parseXML(data);
+                        var xmlObj = $(xmlDoc);
+                        var root = xmlObj.find("Response");
+                        if (root.children("Type").first().text() == "Error") {
+                            alert(root.children("Content").text());
+                        }
+                        refresh();
+                        $('#jstree_div').jstree(true).refresh_node(currentNode);
+                    },
+                    error: function () {
+                        alert("Error while uploading");
+                    },
+                };
+                $("#uploadPathInput").val(currentPath);
+                $("#uploadForm").ajaxSubmit(options);
             });
         });
-
-        var options = {
-            beforeSend: function () {
-                $("#progress").show();
-                $("#progress > div").width('0%');
-            },
-            uploadProgress: function (event, position, total, percentComplete) {
-                $("#progress > div").width(percentComplete + '%');
-
-            },
-            success: function () {
-                $("#progress > div").width('100%');
-
-            },
-            complete: function (data) {
-                $('#uploadModal').modal('show');
-                console.log(data);
-                var xmlDoc = $.parseXML(data);
-                var xmlObj = $(xmlDoc);
-                var root = xmlObj.find("Response");
-                if (root.children("Type").first().text() == "Error") {
-                    alert(root.children("Content").text());
-                }
-                refresh();
-                $('#jstree_div').jstree(true).refresh_node(currentNode);
-            },
-            error: function () {
-                alert("Error while uploading");
-            },
-            data: {
-                path: currentPath
-            }
-        };
-
-        $("#uploadForm").ajaxForm(options);
-        
     });
 </script>
 <style>
@@ -351,6 +346,10 @@
 
     #listBody tbody > tr > th {
         border-bottom: 1px solid #ddd;
+    }
+
+    .fa-stack:hover {
+        cursor: pointer;
     }
 </style>
 
@@ -423,7 +422,9 @@
             <div class="modal-body">
                 <form id="uploadForm" method="POST" action="/Explorer/Upload/@serverId" enctype="multipart/form-data">
                     Zip File :<br />
-                    <input id="uploadInput" type="file" class="form-control" />
+                    <input id="uploadFileInput" type="file" name="file" class="form-control" />
+                    <input type="checkbox" name="overwrite" /> Overwrite existing files
+                    <input id="uploadPathInput" type="hidden" name="path" value="" />
                     <div class="progress">
                         <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
                         </div>

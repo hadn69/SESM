@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
@@ -385,7 +386,7 @@ namespace SESM.Controllers
             }
         }
 
-        public ActionResult Upload(int id)
+        public ActionResult Upload(int id, HttpPostedFileBase file)
         {
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer server = srvPrv.GetServer(id);
@@ -397,26 +398,24 @@ namespace SESM.Controllers
                 return Content(new XmlResponse(XmlResponseType.Error, "You don't have access to this server").ToString());
 
             string path = Request.Form["path"];
-
             path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), path));
 
             if(!path.Contains(PathHelper.GetInstancePath(server)))
                 return Content(new XmlResponse(XmlResponseType.Error, "The object isn't accessible for you, bad boy !").ToString());
 
-            if((Directory.Exists(path) || System.IO.File.Exists(path)))
-                return Content(new XmlResponse(XmlResponseType.Error, "An object with the same name already exist").ToString());
-
-            if(!Regex.IsMatch(PathHelper.GetLastLeaf(path), "^[^:/\\*?\"<>|]*$"))
-                return Content(new XmlResponse(XmlResponseType.Error, "Invalid name, the name of the file can't contain the folowing characters : \\ / : * ? \" < > |").ToString());
+            bool overwriteFiles = Request.Form["overwrite"] == "on";
 
             try
             {
-                System.IO.File.Create(path);
-                return Content(new XmlResponse(XmlResponseType.Success, "File created").ToString());
+                using (ZipFile zip = ZipFile.Read(file.InputStream))
+                {
+                    zip.ExtractAll(path,overwriteFiles?ExtractExistingFileAction.OverwriteSilently : ExtractExistingFileAction.Throw);
+                }
+                return Content(new XmlResponse(XmlResponseType.Success, "File(s) extracted").ToString());
             }
             catch(Exception ex)
             {
-                return Content(new XmlResponse(XmlResponseType.Error, "An error occurend while creating the file (exception : " + ex.Message + ")").ToString());
+                return Content(new XmlResponse(XmlResponseType.Error, "An error occurend while extracting the zip (exception : " + ex.Message + ")").ToString());
             }
         }
     }
