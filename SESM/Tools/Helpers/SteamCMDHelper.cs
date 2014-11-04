@@ -322,6 +322,7 @@ namespace SESM.Tools.Helpers
 
                     foreach(EntityServer item in srvPrv.GetAllServers())
                     {
+                        logger.Info("Waiting for stop of " + item.Name);
                         ServiceHelper.WaitForStopped(item);
                     }
 

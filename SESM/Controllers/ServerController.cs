@@ -510,7 +510,6 @@ namespace SESM.Controllers
                     || model.IP != serverConfig.IP
                     || model.ServerPort != serverConfig.ServerPort
                     || model.SteamPort != serverConfig.SteamPort
-                    || model.GameMode != serverConfig.GameMode
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.RemoveTrash != serverConfig.RemoveTrash
@@ -559,6 +558,14 @@ namespace SESM.Controllers
 
                 if (errorFlag)
                     return View("Details", model);
+
+                if(accessLevel == AccessLevel.Manager && model.WorldSizeKm != serverConfig.WorldSizeKm)
+                {
+                    if (model.WorldSizeKm > 200)
+                        model.WorldSizeKm = 200;
+                    else if(model.WorldSizeKm <= 0)
+                        model.WorldSizeKm = 1;
+                }
 
                 serv.Ip = model.IP;
                 serv.Port = model.ServerPort;
@@ -685,7 +692,6 @@ namespace SESM.Controllers
                     || model.IP != serverConfig.IP
                     || model.ServerPort != serverConfig.ServerPort
                     || model.SteamPort != serverConfig.SteamPort
-                    || model.GameMode != serverConfig.GameMode
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.RemoveTrash != serverConfig.RemoveTrash
@@ -732,6 +738,14 @@ namespace SESM.Controllers
 
                 if (errorFlag)
                     return View("Details", model);
+
+                if(accessLevel == AccessLevel.Manager && model.WorldSizeKm != serverConfig.WorldSizeKm)
+                {
+                    if(model.WorldSizeKm > 200)
+                        model.WorldSizeKm = 200;
+                    else if(model.WorldSizeKm <= 0)
+                        model.WorldSizeKm = 1;
+                }
 
                 if ((srvPrv.GetState(serv) != ServiceState.Stopped && srvPrv.GetState(serv) != ServiceState.Unknow )
                     && (model.Name != serv.Name

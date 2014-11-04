@@ -54,7 +54,7 @@ namespace SESM.Tools
 
             Diagnosis = false;
             StatusAutoRefresh = true;
-            PerfMonitor = false;
+            PerfMonitor = true;
 
             AutoUpdate = false;
             AUUsername = "SteamUsername";

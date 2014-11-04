@@ -32,6 +32,9 @@ namespace SESM.Tools.Monitor
                             .ToList();
 
                     _logger.Info(perfEntries.Count + " perf entries to process");
+                    if (perfEntries.Count == 0)
+                        continue;
+
                     _logger.Debug("Summary Results : ");
                     EntityPerfEntry perfEntry = new EntityPerfEntry();
                     perfEntry.Timestamp = perfEntries[0].Timestamp;
@@ -82,7 +85,7 @@ namespace SESM.Tools.Monitor
             catch (Exception ex)
             {
                 Logger exceptionLogger = LogManager.GetLogger("GenericExceptionLogger");
-                exceptionLogger.Fatal("Caught Exception in Hourly Crusher Job", ex);
+                exceptionLogger.Fatal("Caught Exception in Hourly Crusher Job :", ex);
             }
         }
     }
