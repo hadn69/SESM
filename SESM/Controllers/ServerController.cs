@@ -559,6 +559,14 @@ namespace SESM.Controllers
                 if (errorFlag)
                     return View("Details", model);
 
+                if(accessLevel == AccessLevel.Manager && model.WorldSizeKm != serverConfig.WorldSizeKm)
+                {
+                    if (model.WorldSizeKm > 200)
+                        model.WorldSizeKm = 200;
+                    else if(model.WorldSizeKm <= 0)
+                        model.WorldSizeKm = 1;
+                }
+
                 serv.Ip = model.IP;
                 serv.Port = model.ServerPort;
                 serv.IsPublic = model.IsPublic;
@@ -730,6 +738,14 @@ namespace SESM.Controllers
 
                 if (errorFlag)
                     return View("Details", model);
+
+                if(accessLevel == AccessLevel.Manager && model.WorldSizeKm != serverConfig.WorldSizeKm)
+                {
+                    if(model.WorldSizeKm > 200)
+                        model.WorldSizeKm = 200;
+                    else if(model.WorldSizeKm <= 0)
+                        model.WorldSizeKm = 1;
+                }
 
                 if ((srvPrv.GetState(serv) != ServiceState.Stopped && srvPrv.GetState(serv) != ServiceState.Unknow )
                     && (model.Name != serv.Name
