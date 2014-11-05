@@ -422,7 +422,8 @@
             <div class="modal-body">
                 <form id="uploadForm" method="POST" action="/Explorer/Upload/@serverId" enctype="multipart/form-data">
                     Zip File :<br />
-                    <input id="uploadFileInput" type="file" name="file" class="form-control" />
+                    <input id="uploadFilesInput" type="file" name="files" class="form-control" multiple/>
+                    <input type="checkbox" name="extract" checked="checked" /> Extract Zip(s)<br />
                     <input type="checkbox" name="overwrite" /> Overwrite existing files
                     <input id="uploadPathInput" type="hidden" name="path" value="" />
                     <div class="progress">

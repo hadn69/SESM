@@ -59,8 +59,33 @@ namespace SESM.Tools.Helpers
                 Timestamp = info.LastWriteTime
             };
         }
+
+        public static void SaveStream(Stream stream, string path, bool overwrite)
+        {
+            if (!overwrite)
+            {
+                if (File.Exists(path))
+                    throw new Exception("File " + PathHelper.GetLastLeaf(path) + "already exist");
+                if(Directory.Exists(path))
+                    throw new Exception("Directory " + PathHelper.GetLastLeaf(path) + "already exist");
+            }
+            else
+            {
+                if(File.Exists(path))
+                    File.Delete(path);
+                if(Directory.Exists(path))
+                    Directory.Delete(path, true);
+            }
+
+            FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write);
+
+            stream.CopyTo(fileStream);
+
+
+            stream.Close();
+            fileStream.Close();
+        }
     }
-    
 
     public class NodeInfo
     {

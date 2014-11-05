@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
-using System.Xml;
 using System.Xml.Linq;
 using Ionic.Zip;
 using SESM.DAL;
@@ -386,7 +386,7 @@ namespace SESM.Controllers
             }
         }
 
-        public ActionResult Upload(int id, HttpPostedFileBase file)
+        public ActionResult Upload(int id, ICollection<HttpPostedFileBase> files)
         {
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer server = srvPrv.GetServer(id);
@@ -405,13 +405,25 @@ namespace SESM.Controllers
 
             bool overwriteFiles = Request.Form["overwrite"] == "on";
 
+            bool extractZip = Request.Form["extract"] == "on";
+            
             try
             {
-                using (ZipFile zip = ZipFile.Read(file.InputStream))
+                foreach(HttpPostedFileBase file in files)
                 {
-                    zip.ExtractAll(path,overwriteFiles?ExtractExistingFileAction.OverwriteSilently : ExtractExistingFileAction.Throw);
+                    if(extractZip && file.FileName.Split('.').Last().ToLower() == "zip")
+                    {
+                        using(ZipFile zip = ZipFile.Read(file.InputStream))
+                        {
+                            zip.ExtractAll(path, overwriteFiles? ExtractExistingFileAction.OverwriteSilently : ExtractExistingFileAction.Throw;);
+                        }
+                    }
+                    else
+                    {
+                        FSHelper.SaveStream(file.InputStream, path + "\\" + file.FileName, overwriteFiles);
+                    }
                 }
-                return Content(new XmlResponse(XmlResponseType.Success, "File(s) extracted").ToString());
+                return Content(new XmlResponse(XmlResponseType.Success, "File(s) uploaded").ToString());
             }
             catch(Exception ex)
             {
