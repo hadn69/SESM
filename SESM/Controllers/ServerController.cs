@@ -513,7 +513,6 @@ namespace SESM.Controllers
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.RemoveTrash != serverConfig.RemoveTrash
-                    || model.WorldSizeKm != serverConfig.WorldSizeKm
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
@@ -695,7 +694,6 @@ namespace SESM.Controllers
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.RemoveTrash != serverConfig.RemoveTrash
-                    || model.WorldSizeKm != serverConfig.WorldSizeKm
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");

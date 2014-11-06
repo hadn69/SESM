@@ -328,7 +328,7 @@
                 <div class="form-group" data-toggle="popover" data-content="The boundaries of your server. Any object, player or ship will be destroyed if they go past the limit.">
                     @Html.LabelFor(m => m.WorldSizeKm, labelClass)
                     <div class="@valueColumn">
-                        @Html.TextBoxFor(m => m.WorldSizeKm, adminAccessClass)
+                        @Html.TextBoxFor(m => m.WorldSizeKm, managerAccessClass)
                         @Html.ValidationMessageFor(m => m.WorldSizeKm)
                     </div>
                 </div>
