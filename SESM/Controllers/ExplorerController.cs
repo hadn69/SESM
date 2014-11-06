@@ -415,7 +415,10 @@ namespace SESM.Controllers
                     {
                         using(ZipFile zip = ZipFile.Read(file.InputStream))
                         {
-                            zip.ExtractAll(path, overwriteFiles? ExtractExistingFileAction.OverwriteSilently : ExtractExistingFileAction.Throw;);
+                            zip.ExtractAll(path,
+                                overwriteFiles
+                                    ? ExtractExistingFileAction.OverwriteSilently
+                                    : ExtractExistingFileAction.Throw);
                         }
                     }
                     else
@@ -429,6 +432,28 @@ namespace SESM.Controllers
             {
                 return Content(new XmlResponse(XmlResponseType.Error, "An error occurend while extracting the zip (exception : " + ex.Message + ")").ToString());
             }
+        }
+
+        public ActionResult GetFileContent(int id)
+        {
+            ServerProvider srvPrv = new ServerProvider(_context);
+            EntityServer server = srvPrv.GetServer(id);
+
+            if(server == null)
+                return Content(new XmlResponse(XmlResponseType.Error, "The server doesn't exist").ToString());
+
+            if(!SecurityCheck(server))
+                return Content(new XmlResponse(XmlResponseType.Error, "You don't have access to this server").ToString());
+
+            string path = Request.Form["path"];
+            path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), path));
+
+            if(!path.Contains(PathHelper.GetInstancePath(server)))
+                return Content(new XmlResponse(XmlResponseType.Error, "The object isn't accessible for you, bad boy !").ToString());
+
+            if (!System.IO.File.Exists(path))
+                return Content(new XmlResponse(XmlResponseType.Error, "File doesn't exist").ToString());
+
         }
     }
 }
