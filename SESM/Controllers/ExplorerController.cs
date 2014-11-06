@@ -27,13 +27,13 @@ namespace SESM.Controllers
         private bool SecurityCheck(EntityServer server)
         {
             EntityUser user = Session["User"] as EntityUser;
-            if (user == null || server == null)
+            if(user == null || server == null)
                 return false;
 
             ServerProvider srvPrv = new ServerProvider(_context);
 
             AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, server.Id);
-            if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+            if(accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
             {
                 return true;
             }
@@ -45,32 +45,32 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer server = srvPrv.GetServer(id);
 
-            if (server == null)
+            if(server == null)
                 return Content(new XmlResponse(XmlResponseType.Error, "The server doesn't exist").ToString());
 
-            if (!SecurityCheck(server))
+            if(!SecurityCheck(server))
                 return Content(new XmlResponse(XmlResponseType.Error, "You don't have access to this server").ToString());
 
             string path = Request.Form["path"];
-            if (string.IsNullOrWhiteSpace(path))
+            if(string.IsNullOrWhiteSpace(path))
                 path = string.Empty;
             path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), path));
-            if (path.Substring(path.Length - 1) != "\\")
+            if(path.Substring(path.Length - 1) != "\\")
             {
                 path += "\\";
             }
 
-            if (!path.Contains(PathHelper.GetInstancePath(server)))
+            if(!path.Contains(PathHelper.GetInstancePath(server)))
                 return Content(new XmlResponse(XmlResponseType.Error, "The directory isn't accessible for you, bad boy !").ToString());
 
-            if (!Directory.Exists(path))
+            if(!Directory.Exists(path))
                 return Content(new XmlResponse(XmlResponseType.Error, "The directory don't exist").ToString());
 
             XmlResponse resp = new XmlResponse();
 
             List<NodeInfo> directories = FSHelper.GetDirectories(path);
 
-            foreach (NodeInfo directory in directories)
+            foreach(NodeInfo directory in directories)
             {
                 resp.AddToContent(new XElement("Item", new XElement("Type", "Directory"),
                     new XElement("Name", directory.Name),
@@ -80,7 +80,7 @@ namespace SESM.Controllers
 
             List<NodeInfo> files = FSHelper.GetFiles(path);
 
-            foreach (NodeInfo file in files)
+            foreach(NodeInfo file in files)
             {
                 resp.AddToContent(new XElement("Item", new XElement("Type", "File"),
                     new XElement("Name", file.Name),
@@ -96,32 +96,32 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer server = srvPrv.GetServer(id);
 
-            if (server == null)
+            if(server == null)
                 return Content(new XmlResponse(XmlResponseType.Error, "The server doesn't exist").ToString());
 
-            if (!SecurityCheck(server))
+            if(!SecurityCheck(server))
                 return Content(new XmlResponse(XmlResponseType.Error, "You don't have access to this server").ToString());
 
             string path = Request.Form["path"];
-            if (string.IsNullOrWhiteSpace(path))
+            if(string.IsNullOrWhiteSpace(path))
                 path = string.Empty;
             path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), path));
-            if (path.Substring(path.Length - 1) != "\\")
+            if(path.Substring(path.Length - 1) != "\\")
             {
                 path += "\\";
             }
 
-            if (!path.Contains(PathHelper.GetInstancePath(server)))
+            if(!path.Contains(PathHelper.GetInstancePath(server)))
                 return Content(new XmlResponse(XmlResponseType.Error, "The directory isn't accessible for you, bad boy !").ToString());
 
-            if (!Directory.Exists(path))
+            if(!Directory.Exists(path))
                 return Content(new XmlResponse(XmlResponseType.Error, "The directory don't exist").ToString());
 
             XmlResponse resp = new XmlResponse();
 
             List<NodeInfo> directories = FSHelper.GetDirectories(path);
 
-            foreach (NodeInfo directory in directories)
+            foreach(NodeInfo directory in directories)
             {
                 resp.AddToContent(new XElement("Item", new XElement("Type", "Directory"),
                     new XElement("Name", directory.Name),
@@ -136,48 +136,48 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer server = srvPrv.GetServer(id);
 
-            if (server == null)
+            if(server == null)
                 return Content(new XmlResponse(XmlResponseType.Error, "The server doesn't exist").ToString());
 
-            if (!SecurityCheck(server))
+            if(!SecurityCheck(server))
                 return Content(new XmlResponse(XmlResponseType.Error, "You don't have access to this server").ToString());
 
             string pathsFull = Request.Form["paths"];
 
             string[] paths = pathsFull.Split(':');
 
-            for (int i = 0; i < paths.Length; i++)
+            for(int i = 0; i < paths.Length; i++)
             {
-                if (string.IsNullOrWhiteSpace(paths[i]))
+                if(string.IsNullOrWhiteSpace(paths[i]))
                     paths[i] = string.Empty;
                 paths[i] = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), paths[i]));
 
-                if (!paths[i].Contains(PathHelper.GetInstancePath(server)))
+                if(!paths[i].Contains(PathHelper.GetInstancePath(server)))
                     return
                         Content(new XmlResponse(XmlResponseType.Error, "The object isn't accessible for you, bad boy !").ToString());
 
-                if (!(Directory.Exists(paths[i]) || System.IO.File.Exists(paths[i])))
+                if(!(Directory.Exists(paths[i]) || System.IO.File.Exists(paths[i])))
                     return Content(new XmlResponse(XmlResponseType.Error, "The object don't exist").ToString());
             }
-            foreach (string item in paths)
+            foreach(string item in paths)
             {
-                if (Directory.Exists(item))
+                if(Directory.Exists(item))
                 {
                     try
                     {
                         Directory.Delete(item, true);
                     }
-                    catch (Exception)
+                    catch(Exception)
                     {
                     }
                 }
-                if (System.IO.File.Exists(item))
+                if(System.IO.File.Exists(item))
                 {
                     try
                     {
                         System.IO.File.Delete(item);
                     }
-                    catch (Exception)
+                    catch(Exception)
                     {
                     }
                 }
@@ -190,10 +190,10 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer server = srvPrv.GetServer(id);
 
-            if (server == null)
+            if(server == null)
                 return Content(new XmlResponse(XmlResponseType.Error, "The server doesn't exist").ToString());
 
-            if (!SecurityCheck(server))
+            if(!SecurityCheck(server))
                 return Content(new XmlResponse(XmlResponseType.Error, "You don't have access to this server").ToString());
 
             string sourcePath = Request.Form["sourcePath"];
@@ -202,45 +202,45 @@ namespace SESM.Controllers
 
             sourcePath = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), sourcePath));
 
-            if (!sourcePath.Contains(PathHelper.GetInstancePath(server)))
+            if(!sourcePath.Contains(PathHelper.GetInstancePath(server)))
                 return Content(new XmlResponse(XmlResponseType.Error, "The object isn't accessible for you, bad boy !").ToString());
 
-            if (!(Directory.Exists(sourcePath) || System.IO.File.Exists(sourcePath)))
+            if(!(Directory.Exists(sourcePath) || System.IO.File.Exists(sourcePath)))
                 return Content(new XmlResponse(XmlResponseType.Error, "The object don't exist").ToString());
 
-            if (!Regex.IsMatch(newName, "^[^:/\\*?\"<>|]*$"))
+            if(!Regex.IsMatch(newName, "^[^:/\\*?\"<>|]*$"))
                 return Content(new XmlResponse(XmlResponseType.Error, "Invalid new name, the new name of the object can't contain the folowing characters : \\ / : * ? \" < > |").ToString());
 
-            if (Directory.Exists(sourcePath))
+            if(Directory.Exists(sourcePath))
             {
                 DirectoryInfo di = new DirectoryInfo(sourcePath);
                 oldname = di.Name;
                 sourcePath = di.Parent.FullName;
-                if (Directory.Exists(sourcePath + "\\" + newName))
+                if(Directory.Exists(sourcePath + "\\" + newName))
                     return Content(new XmlResponse(XmlResponseType.Error, "Invalid new name, a directory with the same name already exist").ToString());
                 try
                 {
                     Directory.Move(sourcePath + "\\" + oldname, sourcePath + "\\" + newName);
                     return Content(new XmlResponse(XmlResponseType.Success, "Directory renamed successfuly").ToString());
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     return Content(new XmlResponse(XmlResponseType.Error, "Directory failed to be renamed (ex : " + ex.Message + ")").ToString());
                 }
             }
-            else if (System.IO.File.Exists(sourcePath))
+            else if(System.IO.File.Exists(sourcePath))
             {
                 FileInfo fi = new FileInfo(sourcePath);
                 oldname = fi.Name;
                 sourcePath = fi.DirectoryName;
-                if (System.IO.File.Exists(sourcePath + "\\" + newName))
+                if(System.IO.File.Exists(sourcePath + "\\" + newName))
                     return Content(new XmlResponse(XmlResponseType.Error, "Invalid new name, a file with the same name already exist").ToString());
                 try
                 {
                     System.IO.File.Move(sourcePath + "\\" + oldname, sourcePath + "\\" + newName);
                     return Content(new XmlResponse(XmlResponseType.Success, "File renamed successfuly").ToString());
                 }
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     return Content(new XmlResponse(XmlResponseType.Error, "File failed to be renamed (ex : " + ex.Message + ")").ToString());
                 }
@@ -253,36 +253,36 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer server = srvPrv.GetServer(id);
 
-            if (server == null)
+            if(server == null)
                 return Content(new XmlResponse(XmlResponseType.Error, "The server doesn't exist").ToString());
 
-            if (!SecurityCheck(server))
+            if(!SecurityCheck(server))
                 return Content(new XmlResponse(XmlResponseType.Error, "You don't have access to this server").ToString());
 
             string pathsFull = Request.Form["paths"];
 
             string[] paths = pathsFull.Split(':');
 
-            for (int i = 0; i < paths.Length; i++)
+            for(int i = 0; i < paths.Length; i++)
             {
-                if (string.IsNullOrWhiteSpace(paths[i]))
+                if(string.IsNullOrWhiteSpace(paths[i]))
                     paths[i] = string.Empty;
                 paths[i] = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), paths[i]));
 
-                if (!paths[i].Contains(PathHelper.GetInstancePath(server)))
+                if(!paths[i].Contains(PathHelper.GetInstancePath(server)))
                     return
                         Content(new XmlResponse(XmlResponseType.Error, "The object isn't accessible for you, bad boy !").ToString());
 
-                if (!(Directory.Exists(paths[i]) || System.IO.File.Exists(paths[i])))
+                if(!(Directory.Exists(paths[i]) || System.IO.File.Exists(paths[i])))
                     return Content(new XmlResponse(XmlResponseType.Error, "The object don't exist").ToString());
             }
 
 
             try
             {
-                using (ZipFile zip = new ZipFile())
+                using(ZipFile zip = new ZipFile())
                 {
-                    foreach (string item in paths)
+                    foreach(string item in paths)
                     {
                         if((Directory.Exists(item)))
                         {
@@ -297,9 +297,9 @@ namespace SESM.Controllers
                     Response.ContentType = "application/zip";
                     string zipName = string.Empty;
                     zipName = Directory.Exists(paths[0]) ? new DirectoryInfo(paths[0]).Parent.Name : new FileInfo(paths[0]).Directory.Name;
-                    if (zipName == PathHelper.GetFSDirName(server))
+                    if(zipName == PathHelper.GetFSDirName(server))
                     {
-                        Response.AddHeader("Content-Disposition", String.Format("attachment; filename={0}", server.Name + "-" +  DateTime.Now.ToString("yyyyMMddHHmm") + ".zip"));
+                        Response.AddHeader("Content-Disposition", String.Format("attachment; filename={0}", server.Name + "-" + DateTime.Now.ToString("yyyyMMddHHmm") + ".zip"));
                     }
                     else
                     {
@@ -310,7 +310,7 @@ namespace SESM.Controllers
                     return RedirectToAction("Index", new { id = id });
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 return Content(new XmlResponse(XmlResponseType.Error, "zip failed to be created (ex : " + ex.Message + ")").ToString());
             }
@@ -321,23 +321,23 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer server = srvPrv.GetServer(id);
 
-            if (server == null)
+            if(server == null)
                 return Content(new XmlResponse(XmlResponseType.Error, "The server doesn't exist").ToString());
 
-            if (!SecurityCheck(server))
+            if(!SecurityCheck(server))
                 return Content(new XmlResponse(XmlResponseType.Error, "You don't have access to this server").ToString());
 
             string path = Request.Form["path"];
 
             path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), path));
 
-            if (!path.Contains(PathHelper.GetInstancePath(server)))
+            if(!path.Contains(PathHelper.GetInstancePath(server)))
                 return Content(new XmlResponse(XmlResponseType.Error, "The object isn't accessible for you, bad boy !").ToString());
 
-            if ((Directory.Exists(path) || System.IO.File.Exists(path)))
+            if((Directory.Exists(path) || System.IO.File.Exists(path)))
                 return Content(new XmlResponse(XmlResponseType.Error, "An object with the same name already exist").ToString());
 
-            if (!Regex.IsMatch(PathHelper.GetLastLeaf(path), "^[^:/\\*?\"<>|]*$"))
+            if(!Regex.IsMatch(PathHelper.GetLastLeaf(path), "^[^:/\\*?\"<>|]*$"))
                 return Content(new XmlResponse(XmlResponseType.Error, "Invalid name, the name of the folder can't contain the folowing characters : \\ / : * ? \" < > |").ToString());
 
             try
@@ -345,7 +345,7 @@ namespace SESM.Controllers
                 Directory.CreateDirectory(path);
                 return Content(new XmlResponse(XmlResponseType.Success, "Folder created").ToString());
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 return Content(new XmlResponse(XmlResponseType.Error, "An error occurend while creating the folder (exception : " + ex.Message + ")").ToString());
             }
@@ -356,23 +356,23 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer server = srvPrv.GetServer(id);
 
-            if (server == null)
+            if(server == null)
                 return Content(new XmlResponse(XmlResponseType.Error, "The server doesn't exist").ToString());
 
-            if (!SecurityCheck(server))
+            if(!SecurityCheck(server))
                 return Content(new XmlResponse(XmlResponseType.Error, "You don't have access to this server").ToString());
 
             string path = Request.Form["path"];
 
             path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), path));
 
-            if (!path.Contains(PathHelper.GetInstancePath(server)))
+            if(!path.Contains(PathHelper.GetInstancePath(server)))
                 return Content(new XmlResponse(XmlResponseType.Error, "The object isn't accessible for you, bad boy !").ToString());
 
-            if ((Directory.Exists(path) || System.IO.File.Exists(path)))
+            if((Directory.Exists(path) || System.IO.File.Exists(path)))
                 return Content(new XmlResponse(XmlResponseType.Error, "An object with the same name already exist").ToString());
 
-            if (!Regex.IsMatch(PathHelper.GetLastLeaf(path), "^[^:/\\*?\"<>|]*$"))
+            if(!Regex.IsMatch(PathHelper.GetLastLeaf(path), "^[^:/\\*?\"<>|]*$"))
                 return Content(new XmlResponse(XmlResponseType.Error, "Invalid name, the name of the file can't contain the folowing characters : \\ / : * ? \" < > |").ToString());
 
             try
@@ -380,7 +380,7 @@ namespace SESM.Controllers
                 System.IO.File.Create(path);
                 return Content(new XmlResponse(XmlResponseType.Success, "File created").ToString());
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 return Content(new XmlResponse(XmlResponseType.Error, "An error occurend while creating the file (exception : " + ex.Message + ")").ToString());
             }
@@ -406,7 +406,7 @@ namespace SESM.Controllers
             bool overwriteFiles = Request.Form["overwrite"] == "on";
 
             bool extractZip = Request.Form["extract"] == "on";
-            
+
             try
             {
                 foreach(HttpPostedFileBase file in files)
@@ -451,9 +451,11 @@ namespace SESM.Controllers
             if(!path.Contains(PathHelper.GetInstancePath(server)))
                 return Content(new XmlResponse(XmlResponseType.Error, "The object isn't accessible for you, bad boy !").ToString());
 
-            if (!System.IO.File.Exists(path))
+            if(!System.IO.File.Exists(path))
                 return Content(new XmlResponse(XmlResponseType.Error, "File doesn't exist").ToString());
 
+            if(new FileInfo(path).Length >= (512 * 1024))
+                return Content(new XmlResponse(XmlResponseType.Error, "File is too big").ToString());
         }
     }
 }
