@@ -5,44 +5,35 @@ namespace SESM.Tools
 {
     public class DynaData : DynamicObject
     {
-        private Dictionary<string, DynaData> _children = new Dictionary<string, DynaData>();
+        private Dictionary<string, object> _children = new Dictionary<string, object>();
 
         public DynaData()
         {
 
         }
 
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
-        {
-            string name = binder.IgnoreCase? binder.Name.ToLower(): binder.Name;
-
-            if (_children.ContainsKey(name))
-            {
-                result = _children[name];
-                return true;
-            }
-            else
-            {
-                DynaData newObject = new DynaData();
-                _children.Add(name, newObject);
-                result = newObject;
-                return true;
-            }
-        }
-        public override bool TrySetMember(SetMemberBinder binder, object result)
+        public override bool TryGetMember(GetMemberBinder binder, out object member)
         {
             string name = binder.IgnoreCase ? binder.Name.ToLower() : binder.Name;
 
-            if (_children.ContainsKey(name))
+            member = _children.ContainsKey(name) ? _children[name] : null;
+
+            return true;
+        }
+        public override bool TrySetMember(SetMemberBinder binder, object member)
+        {
+            string name = binder.IgnoreCase ? binder.Name.ToLower() : binder.Name;
+
+            if(_children.ContainsKey(name))
             {
-                result = _children[name];
+                _children[name] = member;
                 return true;
             }
             else
             {
                 DynaData newObject = new DynaData();
                 _children.Add(name, newObject);
-                result = newObject;
+                member = newObject;
                 return true;
             }
         }
