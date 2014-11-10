@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.ServiceProcess;
-using System.Threading;
 using Quartz;
 using Quartz.Impl;
 using SESM.DTO;
