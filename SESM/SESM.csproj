@@ -4524,6 +4524,7 @@
     <Compile Include="Controllers\ActionFilters\GuestOnlyAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\ManagerAndAboveAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\SuperAdminAttribute.cs" />
+    <Compile Include="Controllers\APIServerController.cs" />
     <Compile Include="Controllers\BackupController.cs" />
     <Compile Include="Controllers\ExternalController.cs" />
     <Compile Include="Controllers\FlashMessageExtensions.cs" />
@@ -4600,6 +4601,7 @@
     <Compile Include="Models\Views\Map\UploadMapViewModel.cs" />
     <Compile Include="Models\Views\User\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\API\XMLMessage.cs" />
     <Compile Include="Tools\AutoRestartJob.cs" />
     <Compile Include="Tools\AutoStartJob.cs" />
     <Compile Include="Tools\AutoUpdate.cs" />
@@ -4659,6 +4661,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="assets\global\plugins\angularjs\plugins\angular-file-upload\uploads\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\php\files\thumbnail\" />
+    <Folder Include="Views\APIServer\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

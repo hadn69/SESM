@@ -1,0 +1,60 @@
+﻿using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Xml.Linq;
+
+namespace SESM.Tools.API
+{
+    public class XMLMessage
+    {
+        public XmlResponseType Type;
+        public object Content;
+        public XDocument xDoc;
+        public string Code;
+
+        public XMLMessage(string code = "UNKN")
+        {
+            Type = XmlResponseType.Success;
+            Content = new List<XElement>();
+            Code = code;
+        }
+
+        public XMLMessage(XmlResponseType type, string code, object content)
+        {
+            Type = type;
+            Code = code;
+            Content = content;
+            
+        }
+
+        public void AddToContent(XElement item)
+        {
+            ((List<XElement>)Content).Add(item);
+        }
+
+        public XMLMessage Build()
+        {
+            xDoc = new XDocument(new XDeclaration("1.0", "utf-8", "no"));
+            XElement resp = new XElement("Response");
+            xDoc.Add(resp);
+            resp.Add(new XElement("Type", Type.ToString()));
+            resp.Add(new XElement("Timestamp", DateTime.Now.ToString("O")));
+            resp.Add(new XElement("ReturnCode", Code));
+            resp.Add(new XElement("Content", Content));
+            return this;
+        }
+
+        public override string ToString()
+        {
+            Build();
+            return xDoc.Declaration + xDoc.ToString(SaveOptions.DisableFormatting);
+        }
+    }
+
+    public enum XmlResponseType
+    {
+        Success,
+        Warning,
+        Error
+    }
+}

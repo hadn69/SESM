@@ -21,11 +21,11 @@ namespace SESM.DAL
         {
             try
             {
-                if (_context.Servers.First(s => s.Port == port) != null)
+                if(_context.Servers.First(s => s.Port == port) != null)
                     return false;
                 return true;
             }
-            catch (Exception)
+            catch(Exception)
             {
                 return true;
             }
@@ -61,7 +61,7 @@ namespace SESM.DAL
             UserProvider usrPrv = new UserProvider(_context);
             server.Administrators = null;
 
-            foreach (string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Administrators.Contains(usrPrv.GetUser(item))))
+            foreach(string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Administrators.Contains(usrPrv.GetUser(item))))
             {
                 server.Administrators.Add(usrPrv.GetUser(item));
             }
@@ -93,7 +93,7 @@ namespace SESM.DAL
             {
                 return _context.Servers.First(s => s.Port == port);
             }
-            catch (Exception)
+            catch(Exception)
             {
                 return null;
             }
@@ -115,7 +115,7 @@ namespace SESM.DAL
             {
                 return _context.Servers.First(s => s.Id == id);
             }
-            catch (Exception)
+            catch(Exception)
             {
                 return null;
             }
@@ -129,21 +129,21 @@ namespace SESM.DAL
             {
                 service = services.First(x => x.ServiceName == ServiceHelper.GetServiceName(server));
             }
-            catch (Exception)
+            catch(Exception)
             {
                 service = null;
             }
-            if (service == null)
+            if(service == null)
                 return ServiceState.Unknow;
             else
             {
-                if (service.Status == ServiceControllerStatus.Running)
+                if(service.Status == ServiceControllerStatus.Running)
                     return ServiceState.Running;
-                if (service.Status == ServiceControllerStatus.StartPending)
+                if(service.Status == ServiceControllerStatus.StartPending)
                     return ServiceState.Starting;
-                if (service.Status == ServiceControllerStatus.StopPending)
+                if(service.Status == ServiceControllerStatus.StopPending)
                     return ServiceState.Stopping;
-                if (service.Status == ServiceControllerStatus.Stopped)
+                if(service.Status == ServiceControllerStatus.Stopped)
                     return ServiceState.Stopped;
                 return ServiceState.Unknow;
             }
@@ -189,11 +189,11 @@ namespace SESM.DAL
                 UserProvider usrPrv = new UserProvider(_context);
                 EntityUser usr = usrPrv.GetUser(idUser);
                 EntityServer srv = GetServer(idServer);
-                if (usr.IsAdmin || srv.IsPublic || srv.Administrators.Contains(usr) || srv.Managers.Contains(usr) || srv.Users.Contains(usr))
+                if(usr.IsAdmin || srv.IsPublic || srv.Administrators.Contains(usr) || srv.Managers.Contains(usr) || srv.Users.Contains(usr))
                     return true;
                 return false;
             }
-            catch (Exception)
+            catch(Exception)
             {
                 return false;
             }
@@ -206,54 +206,57 @@ namespace SESM.DAL
                 UserProvider usrPrv = new UserProvider(_context);
                 EntityUser usr = usrPrv.GetUser(idUser);
                 EntityServer srv = GetServer(idServer);
-                if (usr.IsAdmin)
+
+                if(usr == null)
+                    return srv.IsPublic ? AccessLevel.Guest : AccessLevel.None;
+           
+                if(usr.IsAdmin)
                     return AccessLevel.SuperAdmin;
 
-                if (srv.Administrators.Contains(usr))
+                if(srv.Administrators.Contains(usr))
                     return AccessLevel.Admin;
-                if (srv.Managers.Contains(usr))
+                if(srv.Managers.Contains(usr))
                     return AccessLevel.Manager;
-                if (srv.Users.Contains(usr))
+                if(srv.Users.Contains(usr))
                     return AccessLevel.User;
 
-                return AccessLevel.Guest;
-
+                return srv.IsPublic ? AccessLevel.Guest : AccessLevel.None;
             }
-            catch (Exception)
+            catch(Exception)
             {
-                return AccessLevel.Guest;
+                return AccessLevel.None;
             }
         }
 
         public AccessLevel GetHighestAccessLevel(List<EntityServer> servers, EntityUser user)
         {
-           
-            if (user == null)
+
+            if(user == null)
                 return AccessLevel.Guest;
             if(user.IsAdmin)
                 return AccessLevel.SuperAdmin;
             AccessLevel accessLevel = AccessLevel.Guest;
-           foreach (AccessLevel itemAccessLevel in servers.Select(item => GetAccessLevel(user.Id, item.Id)))
+            foreach(AccessLevel itemAccessLevel in servers.Select(item => GetAccessLevel(user.Id, item.Id)))
             {
-                if (accessLevel == AccessLevel.Guest 
+                if(accessLevel == AccessLevel.Guest
                     && itemAccessLevel != AccessLevel.Guest)
                 {
                     accessLevel = itemAccessLevel;
                 }
-                else if (accessLevel == AccessLevel.User
+                else if(accessLevel == AccessLevel.User
                     && itemAccessLevel != AccessLevel.Guest
                     && itemAccessLevel != AccessLevel.User)
                 {
                     accessLevel = itemAccessLevel;
                 }
-                else if (accessLevel == AccessLevel.Manager
+                else if(accessLevel == AccessLevel.Manager
                     && itemAccessLevel != AccessLevel.Guest
                     && itemAccessLevel != AccessLevel.User
                     && itemAccessLevel != AccessLevel.Manager)
                 {
                     accessLevel = itemAccessLevel;
                 }
-                else if (accessLevel == AccessLevel.Admin
+                else if(accessLevel == AccessLevel.Admin
                     && itemAccessLevel != AccessLevel.Guest
                     && itemAccessLevel != AccessLevel.User
                     && itemAccessLevel != AccessLevel.Manager
@@ -272,7 +275,7 @@ namespace SESM.DAL
 
         public List<EntityServer> GetServers(EntityUser user)
         {
-            if (user == null)
+            if(user == null)
             {
                 return _context.Servers.Where(item => item.IsPublic).ToList();
             }
@@ -280,7 +283,7 @@ namespace SESM.DAL
             {
                 UserProvider usrPrv = new UserProvider(_context);
                 EntityUser usr = usrPrv.GetUser(user.Id);
-                if (usr.IsAdmin)
+                if(usr.IsAdmin)
                 {
                     return _context.Servers.ToList();
                 }
@@ -290,14 +293,14 @@ namespace SESM.DAL
                     listServ.AddRange(usr.AdministratorOf);
                     listServ.AddRange(usr.ManagerOf);
                     listServ.AddRange(usr.UserOf);
-                    foreach (EntityServer item in _context.Servers.ToList().Where(item => item.IsPublic && !listServ.Contains(item)))
+                    foreach(EntityServer item in _context.Servers.ToList().Where(item => item.IsPublic && !listServ.Contains(item)))
                     {
                         listServ.Add(item);
                     }
                     return listServ;
                 }
             }
-            catch (Exception)
+            catch(Exception)
             {
                 return null;
             }
@@ -323,6 +326,7 @@ namespace SESM.DAL
         Admin,
         Manager,
         User,
-        Guest
+        Guest,
+        None
     }
 }

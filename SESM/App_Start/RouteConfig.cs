@@ -10,7 +10,11 @@ namespace SESM
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
 
-
+            routes.MapRoute(
+                name: "APIServer",
+                url: "API/Server/{action}/{id}",
+                defaults: new { controller = "APIServer", action = "Index", id = UrlParameter.Optional }
+            );
 
             routes.MapRoute(
                 name: "Default",
