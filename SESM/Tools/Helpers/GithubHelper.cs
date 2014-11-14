@@ -150,7 +150,7 @@ namespace SESM.Tools.Helpers
 
         public static void CleanupUpdate()
         {
-            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender_*.zip", SearchOption.TopDirectoryOnly);
+            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
             foreach(var item in files)
             {
                 File.Delete(item);

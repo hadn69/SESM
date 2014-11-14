@@ -745,7 +745,7 @@ namespace SESM.Controllers
                         model.WorldSizeKm = 1;
                 }
 
-                if ((srvPrv.GetState(serv) != ServiceState.Stopped && srvPrv.GetState(serv) != ServiceState.Unknow )
+                if ((srvPrv.GetState(serv) != ServiceState.Stopped)
                     && (model.Name != serv.Name
                     || model.UseServerExtender != serv.UseServerExtender
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
