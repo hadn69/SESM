@@ -295,14 +295,7 @@
                         @Html.ValidationMessageFor(m => m.WorldSizeKm)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="If enabled, it will save the map state every below interval.">
-                    @Html.LabelFor(m => m.AutoSave, labelClass)
-                    <div class="@valueColumn">
-                        @Html.CheckBoxFor(m => m.AutoSave, valueClass)
-                        @Html.ValidationMessageFor(m => m.AutoSave)
-                    </div>
-                </div>
-                <div class="form-group" data-toggle="popover" data-content="The interval in minutes at wich the auto save will fire.">
+                <div class="form-group" data-toggle="popover" data-content="The interval in minutes at wich the auto save will save the map.">
                     @Html.LabelFor(m => m.AutoSaveInMinutes, labelClass)
                     <div class="@valueColumn">
                         @Html.TextBoxFor(m => m.AutoSaveInMinutes, valueClass)

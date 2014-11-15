@@ -798,7 +798,7 @@ namespace SESM.Controllers
                 }
 
                 logger.Info("----End of SESEManualUpdate----");
-                return RedirectToAction("Index").Warning("SESE Update applyed");
+                return RedirectToAction("Index").Success("SESE Update applyed");
             }
             else
             {
@@ -806,8 +806,70 @@ namespace SESM.Controllers
                 logger.Info("----End of SESEManualUpdate----");
                 return RedirectToAction("Index").Warning("No SESE Update detected");
             }
-            
+        }
 
+        public ActionResult SESEManualUpdateForce()
+        {
+            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
+
+            logger.Info("----Starting SESEManualUpdateForce----");
+            logger.Info("Cleaning up SESE Zip");
+            GithubHelper.CleanupUpdate();
+            string SESEUrl = GithubHelper.UpdateIsAvailable();
+            if(!string.IsNullOrEmpty(SESEUrl))
+            {
+                logger.Info("SE Server Extender Update detected");
+                logger.Info("URL : " + SESEUrl);
+
+                logger.Info("Downloading New SESE Update Zip");
+                GithubHelper.DownloadUpdate(SESEUrl);
+                logger.Info("Initiating lockdown mode ...");
+                SESMConfigHelper.Lockdown = true;
+                logger.Info("Waiting 30 secs for all requests to end ...");
+                Thread.Sleep(30000);
+                DataContext context = new DataContext();
+                ServerProvider srvPrv = new ServerProvider(context);
+                List<EntityServer> listStartedServ = srvPrv.GetAllServers().Where(item => item.UseServerExtender && srvPrv.GetState(item) == ServiceState.Running).ToList();
+
+                logger.Info("Stopping SESE running server ...");
+                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+                foreach(EntityServer item in listStartedServ)
+                {
+                    logger.Info("Sending stop order to " + item.Name);
+                    serviceLogger.Info(item.Name + " stopped by SESEManualUpdate");
+                    ServiceHelper.StopService(item);
+                }
+                foreach(EntityServer item in listStartedServ)
+                {
+                    logger.Info("Waiting for stop of " + item.Name);
+                    ServiceHelper.WaitForStopped(item);
+                }
+                logger.Info("Killing ghosts processes");
+                // Killing some ghost processes that might still exists
+                ServiceHelper.KillAllSESEService();
+
+                logger.Info("Applying SESE Files");
+                GithubHelper.ApplyUpdate();
+
+                logger.Info("SESE Update finished, lifting lockdown");
+                SESMConfigHelper.Lockdown = false;
+
+                foreach(EntityServer item in listStartedServ)
+                {
+                    logger.Info("Restarting " + item.Name);
+                    serviceLogger.Info(item.Name + " stopped by SESEManualUpdate");
+                    ServiceHelper.StartService(item);
+                }
+
+                logger.Info("----End of SESEManualUpdateForce----");
+                return RedirectToAction("Index").Success("SESE Update applyed");
+            }
+            else
+            {
+                logger.Info("No SE Server Extender Update detected");
+                logger.Info("----End of SESEManualUpdateForce----");
+                return RedirectToAction("Index").Warning("No SESE Update detected");
+            }
         }
 
         protected override void Dispose(bool disposing)

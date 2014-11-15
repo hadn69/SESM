@@ -23,7 +23,6 @@ namespace SESM.Tools.Helpers
         public EnvironmentHostility EnvironmentHostility = EnvironmentHostility.SAFE;
         public bool AutoHealing = true;
         public bool EnableCopyPaste = true;
-        public bool AutoSave = true;
         public bool WeaponsEnabled = true;
         public bool ShowPlayerNamesOnHud = true;
         public bool ThrusterDamage = true;
@@ -74,7 +73,6 @@ namespace SESM.Tools.Helpers
             EnvironmentHostility = model.EnvironmentHostility;
             AutoHealing = model.AutoHealing;
             EnableCopyPaste = model.EnableCopyPaste;
-            AutoSave = model.AutoSave;
             WeaponsEnabled = model.WeaponsEnabled;
             ShowPlayerNamesOnHud = model.ShowPlayerNamesOnHud;
             ThrusterDamage = model.ThrusterDamage;
@@ -180,7 +178,6 @@ namespace SESM.Tools.Helpers
             EnvironmentHostility = model.EnvironmentHostility;
             AutoHealing = model.AutoHealing;
             EnableCopyPaste = model.EnableCopyPaste;
-            AutoSave = model.AutoSave;
             WeaponsEnabled = model.WeaponsEnabled;
             ShowPlayerNamesOnHud = model.ShowPlayerNamesOnHud;
             ThrusterDamage = model.ThrusterDamage;
@@ -286,7 +283,6 @@ namespace SESM.Tools.Helpers
             model.EnvironmentHostility = EnvironmentHostility;
             model.AutoHealing = AutoHealing;
             model.EnableCopyPaste = EnableCopyPaste;
-            model.AutoSave = AutoSave;
             model.WeaponsEnabled = WeaponsEnabled;
             model.ShowPlayerNamesOnHud = ShowPlayerNamesOnHud;
             model.ThrusterDamage = ThrusterDamage;
@@ -340,7 +336,6 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <EnvironmentHostility>" + EnvironmentHostility.ToString() + "</EnvironmentHostility>");
             sb.AppendLine("    <AutoHealing>" + AutoHealing.ToString().ToLower() + "</AutoHealing>");
             sb.AppendLine("    <EnableCopyPaste>" + EnableCopyPaste.ToString().ToLower() + "</EnableCopyPaste>");
-            sb.AppendLine("    <AutoSave>" + AutoSave.ToString().ToLower() + "</AutoSave>");
             sb.AppendLine("    <WeaponsEnabled>" + WeaponsEnabled.ToString().ToLower() + "</WeaponsEnabled>");
             sb.AppendLine("    <ShowPlayerNamesOnHud>" + ShowPlayerNamesOnHud.ToString().ToLower() + "</ShowPlayerNamesOnHud>");
             sb.AppendLine("    <ThrusterDamage>" + ThrusterDamage.ToString().ToLower() + "</ThrusterDamage>");
@@ -428,6 +423,11 @@ namespace SESM.Tools.Helpers
                 XmlNode settingsNode = root.SelectSingleNode("descendant::Settings");
                 XmlNode valueNode = null;
 
+                valueNode = settingsNode.SelectSingleNode("descendant::AutoSave");
+                if (valueNode != null)
+                    settingsNode.RemoveChild(valueNode);
+
+
                 valueNode = settingsNode.SelectSingleNode("descendant::GameMode");
                 if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "GameMode", null));
@@ -501,10 +501,6 @@ namespace SESM.Tools.Helpers
                     EnableCopyPaste.ToString().ToLower();
 
 
-                valueNode = settingsNode.SelectSingleNode("descendant::AutoSave");
-                if (valueNode == null)
-                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "AutoSave", null));
-                settingsNode.SelectSingleNode("descendant::AutoSave").InnerText = AutoSave.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::WeaponsEnabled");
@@ -624,7 +620,8 @@ namespace SESM.Tools.Helpers
 
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if (valueNode == null)
-                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "PermanentDeath", null));
+                    root.AppendChild(doc.CreateNode(XmlNodeType.Element, "Mods", null));
+                valueNode = root.SelectSingleNode("descendant::Mods");
                 valueNode.RemoveAll();
                 foreach (ulong item in Mods)
                 {
@@ -637,7 +634,20 @@ namespace SESM.Tools.Helpers
                     modItem.AppendChild(name);
                     modItem.AppendChild(publishedFileId);
                 }
+                
+                valueNode = root.SelectSingleNode("descendant::PreviousEnvironmentHostility");
+                if (valueNode == null)
+                {
+                    root.AppendChild(doc.CreateNode(XmlNodeType.Element, "PreviousEnvironmentHostility", null));
+                }
+
                 doc.Save(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc");
+
+                string text = File.ReadAllText(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc");
+                text = text.Replace("<PreviousEnvironmentHostility />", "<PreviousEnvironmentHostility xsi:nil=\"true\" />");
+                File.WriteAllText(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc", text);
+
+                //<PreviousEnvironmentHostility xsi:nil="true" />
             }
         }
 
@@ -679,8 +689,6 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(sessionSettings.Element("AutoHealing").Value, out AutoHealing);
             if (sessionSettings.Element("EnableCopyPaste") != null)
                 bool.TryParse(sessionSettings.Element("EnableCopyPaste").Value, out EnableCopyPaste);
-            if (sessionSettings.Element("AutoSave") != null)
-                bool.TryParse(sessionSettings.Element("AutoSave").Value, out AutoSave);
             if (sessionSettings.Element("WeaponsEnabled") != null)
                 bool.TryParse(sessionSettings.Element("WeaponsEnabled").Value, out WeaponsEnabled);
             if (sessionSettings.Element("ShowPlayerNamesOnHud") != null)
@@ -764,6 +772,8 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(root.Element("PauseGameWhenEmpty").Value, out PauseGameWhenEmpty);
             if(root.Element("IgnoreLastSession") != null)
                 bool.TryParse(root.Element("IgnoreLastSession").Value, out IgnoreLastSession);
+
+            
             return true;
         }
 
@@ -800,8 +810,6 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(settings.Element("AutoHealing").Value, out AutoHealing);
             if (settings.Element("EnableCopyPaste") != null)
                 bool.TryParse(settings.Element("EnableCopyPaste").Value, out EnableCopyPaste);
-            if (settings.Element("AutoSave") != null)
-                bool.TryParse(settings.Element("AutoSave").Value, out AutoSave);
             if (settings.Element("WeaponsEnabled") != null)
                 bool.TryParse(settings.Element("WeaponsEnabled").Value, out WeaponsEnabled);
             if (settings.Element("ShowPlayerNamesOnHud") != null)
@@ -853,6 +861,7 @@ namespace SESM.Tools.Helpers
                     }
                 }
             }
+
             return true;
         }
     }

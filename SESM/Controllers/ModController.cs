@@ -5,7 +5,6 @@ using Ionic.Zip;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
-using SESM.Models.Views.Map;
 using SESM.Models.Views.Mod;
 using SESM.Tools.Helpers;
 
