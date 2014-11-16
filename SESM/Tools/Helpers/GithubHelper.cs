@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Web.Helpers;
 using Ionic.Zip;
+using NLog;
 
 namespace SESM.Tools.Helpers
 {
@@ -10,12 +13,11 @@ namespace SESM.Tools.Helpers
     {
         public static string UpdateIsAvailable()
         {
-            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip",
-                SearchOption.TopDirectoryOnly);
+            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
             string data = GetGithubData();
-            if (files.Length == 0)
+            if(files.Length == 0)
             {
-                if (SESMConfigHelper.SESEDev)
+                if(SESMConfigHelper.SESEDev)
                 {
                     return GetLastetDevVersionURL(data);
                 }
@@ -26,13 +28,28 @@ namespace SESM.Tools.Helpers
             }
             if(files.Length != 1)
             {
-                return null;
+                List<FileInfo> fileInfos = files.Select(file => new FileInfo(file)).OrderBy(x => x.LastWriteTime).ToList();
+
+                for(int i = 1; i < fileInfos.Count; i++)
+                {
+                    try
+                    {
+                        File.Delete(fileInfos[i].FullName);
+                    }
+                    catch(Exception ex)
+                    {
+                        Logger exceptionLogger = LogManager.GetLogger("GenericExceptionLogger");
+                        exceptionLogger.Fatal("Caught Exception in UpdateIsAvailable when deleting " + fileInfos[i].Name, ex);
+                    }
+                }
+                files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
+
             }
 
             if(SESMConfigHelper.SESEDev)
             {
                 string last = GetLastetDevVersion(data);
-                if (string.IsNullOrEmpty(last) || last == PathHelper.GetLastLeaf(files[0]))
+                if(string.IsNullOrEmpty(last) || last == PathHelper.GetLastLeaf(files[0]))
                     return null;
                 return GetLastetDevVersionURL(data);
             }
@@ -150,10 +167,18 @@ namespace SESM.Tools.Helpers
 
         public static void CleanupUpdate()
         {
-            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender_*.zip", SearchOption.TopDirectoryOnly);
+            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
             foreach(var item in files)
             {
-                File.Delete(item);
+                try
+                {
+                    File.Delete(item);
+                }
+                catch(Exception ex)
+                {
+                    Logger exceptionLogger = LogManager.GetLogger("GenericExceptionLogger");
+                    exceptionLogger.Fatal("Caught Exception in CleanupUpdate when deleting " + item, ex);
+                }
             }
         }
 

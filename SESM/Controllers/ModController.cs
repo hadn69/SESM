@@ -5,7 +5,6 @@ using Ionic.Zip;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
-using SESM.Models.Views.Map;
 using SESM.Models.Views.Mod;
 using SESM.Tools.Helpers;
 
@@ -40,6 +39,16 @@ namespace SESM.Controllers
             List<SelectListItem> listSLI = new List<SelectListItem>();
 
             foreach (string item in listDir)
+            {
+                SelectListItem sli = new SelectListItem();
+                sli.Text = PathHelper.GetLastLeaf(item);
+                sli.Value = PathHelper.GetLastLeaf(item);
+                listSLI.Add(sli);
+            }
+
+            string[] listfile = Directory.GetFiles(PathHelper.GetModsPath(serv));
+
+            foreach(string item in listfile)
             {
                 SelectListItem sli = new SelectListItem();
                 sli.Text = PathHelper.GetLastLeaf(item);
@@ -95,14 +104,20 @@ namespace SESM.Controllers
 
         [HttpPost]
         [MultipleButton(Name = "action", Argument = "DeleteMod")]
-        public ActionResult Delete(int id, MapViewModel model)
+        public ActionResult Delete(int id, ModViewModel model)
         {
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 
-            if (ModelState.IsValid && Directory.Exists(PathHelper.GetModsPath(serv, model.MapName) + @"\"))
+            if (ModelState.IsValid && Directory.Exists(PathHelper.GetModsPath(serv, model.ModName) + @"\"))
             {
-                Directory.Delete(PathHelper.GetModsPath(serv, model.MapName) + @"\", true);
+                Directory.Delete(PathHelper.GetModsPath(serv, model.ModName) + @"\", true);
+                return RedirectToAction("Index", new { id = id }).Success("Mod Deleted");
+            }
+
+            if(ModelState.IsValid && System.IO.File.Exists(PathHelper.GetModsPath(serv, model.ModName)))
+            {
+                System.IO.File.Delete(PathHelper.GetModsPath(serv, model.ModName));
                 return RedirectToAction("Index", new { id = id }).Success("Mod Deleted");
             }
 

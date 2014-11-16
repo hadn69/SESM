@@ -95,10 +95,6 @@ namespace SESM.Models.Views.Server
         public bool EnableCopyPaste { get; set; }
 
         [Required]
-        [DisplayName("Enable Auto Save")]
-        public bool AutoSave { get; set; }
-
-        [Required]
         [DisplayName("Auto Save Interval In Minutes")]
         public int AutoSaveInMinutes { get; set; }
 
@@ -227,7 +223,6 @@ namespace SESM.Models.Views.Server
             EnvironmentHostility = EnvironmentHostility.SAFE;
             AutoHealing = true;
             EnableCopyPaste = true;
-            AutoSave = true;
             WeaponsEnabled = true;
             ShowPlayerNamesOnHud = true;
             ThrusterDamage = true;

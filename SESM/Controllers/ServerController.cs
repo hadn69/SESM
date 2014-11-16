@@ -122,9 +122,6 @@ namespace SESM.Controllers
                 srvPrv.AddManagers(webManagerSplitted, serv);
                 srvPrv.AddUsers(webUsersSplitted, serv);
 
-                if (model.UseServerExtender)
-                    model.AutoSave = false;
-
                 srvPrv.CreateServer(serv);
 
                 Directory.CreateDirectory(PathHelper.GetSavesPath(serv));
@@ -456,6 +453,9 @@ namespace SESM.Controllers
             serverView.ServerExtenderPort = serv.ServerExtenderPort;
             serverView.AutoStart = serv.IsAutoStartEnabled;
 
+            if (serv.AutoSaveInMinutes != null)
+                serverView.AutoSaveInMinutes = serv.AutoSaveInMinutes?? -42;
+
             serverView.WebAdministrators = string.Join("\r\n", serv.Administrators.Select(item => item.Login).ToList());
             serverView.WebManagers = string.Join("\r\n", serv.Managers.Select(item => item.Login).ToList());
             serverView.WebUsers = string.Join("\r\n", serv.Users.Select(item => item.Login).ToList());
@@ -581,6 +581,7 @@ namespace SESM.Controllers
                 serv.IsAutoRestartEnabled = model.AutoRestart;
                 serv.AutoRestartCron = model.AutoRestartCron;
                 serv.IsAutoStartEnabled = model.AutoStart;
+                serv.AutoSaveInMinutes = model.AutoSaveInMinutes;
 
                 IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
                 scheduler.DeleteJob(new JobKey("AutoRestart" + serv.Id + "Job", "AutoRestart"));
@@ -636,7 +637,7 @@ namespace SESM.Controllers
                 model.ScenarioType = serverConfig.ScenarioType;
 
                 if(model.UseServerExtender)
-                    model.AutoSave = false;
+                    model.AutoSaveInMinutes = 0;
 
                 serverConfig.ParseIn(model);
 
@@ -745,7 +746,7 @@ namespace SESM.Controllers
                         model.WorldSizeKm = 1;
                 }
 
-                if ((srvPrv.GetState(serv) != ServiceState.Stopped && srvPrv.GetState(serv) != ServiceState.Unknow )
+                if ((srvPrv.GetState(serv) != ServiceState.Stopped)
                     && (model.Name != serv.Name
                     || model.UseServerExtender != serv.UseServerExtender
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
@@ -768,6 +769,7 @@ namespace SESM.Controllers
                 serv.IsAutoRestartEnabled = model.AutoRestart;
                 serv.AutoRestartCron = model.AutoRestartCron;
                 serv.IsAutoStartEnabled = model.AutoStart;
+                serv.AutoSaveInMinutes = model.AutoSaveInMinutes;
 
                 IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
                 scheduler.DeleteJob(new JobKey("AutoRestart" + serv.Id + "Job", "AutoRestart"));
@@ -818,8 +820,9 @@ namespace SESM.Controllers
                 model.SaveName = serverConfig.SaveName;
                 model.ScenarioType = serverConfig.ScenarioType;
 
-                if(model.UseServerExtender)
-                    model.AutoSave = false;
+                if (model.UseServerExtender)
+                    model.AutoSaveInMinutes = 0;
+                
 
                 serverConfig.ParseIn(model);
 

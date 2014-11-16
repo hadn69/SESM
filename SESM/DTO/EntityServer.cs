@@ -17,6 +17,7 @@ namespace SESM.DTO
         public bool UseServerExtender { get; set; }
         public int ServerExtenderPort { get; set; }
         public bool IsAutoStartEnabled { get; set; }
+        public int? AutoSaveInMinutes { get; set; }
 
         private ICollection<EntityUser> _administrators;
         public virtual ICollection<EntityUser> Administrators

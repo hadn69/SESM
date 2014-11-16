@@ -71,8 +71,6 @@ namespace SESM.Tools.Helpers
             {
                 ServiceController svcController = new ServiceController(serviceName);
                 svcController.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 10));
-                //if (server.UseServerExtender)
-                //    Thread.Sleep(SESMConfigHelper.SESEDelay * 1000);
             }
             catch (Exception ex)
             {
@@ -94,13 +92,11 @@ namespace SESM.Tools.Helpers
                     }
                     else
                     {
-                        ServerConfigHelper serverConfig = new ServerConfigHelper();
-                        serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(server));
                         string[] argsStr = new string[6];
                         argsStr[0] = "nogui";
                         argsStr[1] = "noconsole";
                         argsStr[2] = "wcfport=" + server.ServerExtenderPort;
-                        argsStr[3] = "autosave=" + serverConfig.AutoSaveInMinutes;
+                        argsStr[3] = "autosave=" + server.AutoSaveInMinutes;
                         argsStr[4] = "instance=" + serviceName;
                         argsStr[5] = "gamepath=" + SESMConfigHelper.SEDataPath;
                         svcController.Start(argsStr);

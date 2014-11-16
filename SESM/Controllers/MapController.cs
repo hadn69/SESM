@@ -82,8 +82,12 @@ namespace SESM.Controllers
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.SaveName = model.MapName;
                 serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
-                if(serv.UseServerExtender)
-                    serverConfig.AutoSave = false;
+                serv.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
+                srvPrv.UpdateServer(serv);
+                if (serv.UseServerExtender)
+                {
+                    serverConfig.AutoSaveInMinutes = 0;
+                }
                 serverConfig.Save(serv);
                 return RedirectToAction("Status", "Server", new { id = id }).Success("Map Selected");
             }
@@ -111,9 +115,12 @@ namespace SESM.Controllers
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.SaveName = model.MapName;
-                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
+                serv.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
+                srvPrv.UpdateServer(serv);
                 if(serv.UseServerExtender)
-                    serverConfig.AutoSave = false;
+                {
+                    serverConfig.AutoSaveInMinutes = 0;
+                }
                 serverConfig.Save(serv);
                 
                 serviceLogger.Info(serv.Name + " started by " + user.Login + " by select and restart map button");
@@ -283,6 +290,12 @@ namespace SESM.Controllers
                 serverConfig.ScenarioType = model.MapType;
                 serverConfig.AsteroidAmount = model.AsteroidAmount;
                 serverConfig.SaveName = string.Empty;
+                serv.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
+                srvPrv.UpdateServer(serv);
+                if(serv.UseServerExtender)
+                {
+                    serverConfig.AutoSaveInMinutes = 0;
+                }
                 serverConfig.Save(serv);
                 serviceLogger.Info(serv.Name + " stopped by " + user.Login + " for new map");
                 ServiceHelper.StartService(serv);
