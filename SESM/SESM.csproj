@@ -399,6 +399,10 @@
     <Compile Include="Migrations\201410051651508_AutoStart.Designer.cs">
       <DependentUpon>201410051651508_AutoStart.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201411152236535_SESEAutoSave.cs" />
+    <Compile Include="Migrations\201411152236535_SESEAutoSave.Designer.cs">
+      <DependentUpon>201411152236535_SESEAutoSave.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Views\Account\LoginViewModel.cs" />
     <Compile Include="Models\Views\Account\ManageViewModel.cs" />
@@ -475,6 +479,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201410051651508_AutoStart.resx">
       <DependentUpon>201410051651508_AutoStart.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201411152236535_SESEAutoSave.resx">
+      <DependentUpon>201411152236535_SESEAutoSave.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

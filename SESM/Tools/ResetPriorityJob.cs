@@ -1,5 +1,4 @@
-﻿using NLog;
-using Quartz;
+﻿using Quartz;
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools.Helpers;
