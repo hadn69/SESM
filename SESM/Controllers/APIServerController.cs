@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using System.Xml.Linq;
+using NLog;
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools.API;
+using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {
@@ -102,7 +105,7 @@ namespace SESM.Controllers
                 }
                 serverIDs.Add(servID);
             }
-
+            List<EntityServer> servers = new List<EntityServer>();
             foreach (int item in serverIDs)
             {
                 EntityServer server = srvPrv.GetServer(item);
@@ -115,12 +118,19 @@ namespace SESM.Controllers
                       accessLevel != AccessLevel.Guest &&
                       accessLevel != AccessLevel.User))
                 {
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-STRS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + "(" + server.Id + ")").ToString());
+                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-STRS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
                 }
-
+                servers.Add(server);
+            }
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+            
+            foreach (EntityServer item in servers)
+            {
+                serviceLogger.Info(item.Name + " started by " + user.Login + " by API/Server/StartServers/");
+                ServiceHelper.StartService(item);
             }
 
-
+            return Content(new XMLMessage(XmlResponseType.Success, "SRV-STRS-OK", "The following server(s) have been started : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
         protected override void Dispose(bool disposing)

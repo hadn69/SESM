@@ -405,7 +405,7 @@ Page Footer
     /* Top menu */
   }
   .page-header-fixed-mobile .page-header.navbar .top-menu {
-    background-color1: white;
+    background-color: white;
   }
   .page-header.navbar .top-menu .navbar-nav > li.dropdown > .dropdown-toggle:hover {
     background-color: #eff1f6;
