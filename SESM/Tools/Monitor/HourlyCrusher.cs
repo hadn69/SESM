@@ -17,7 +17,7 @@ namespace SESM.Tools.Monitor
             {
                 _logger.Info("----Starting HourlyCrusherJob----");
                 DateTime timestamp = DateTime.Now;
-                timestamp = timestamp.AddHours(-2);
+                timestamp = timestamp.AddHours(-1);
                 _logger.Info("Getting untreated perf entries prior to " + timestamp.ToString("G"));
                 DataContext context = new DataContext();
                 ServerProvider srvPrv = new ServerProvider(context);
@@ -27,7 +27,7 @@ namespace SESM.Tools.Monitor
                 {
                     _logger.Info("Getting perf entries of " + item.Name);
                     List<EntityPerfEntry> perfEntries =
-                        item.PerfEntries.Where(x => x.Timestamp <= timestamp && x.CPUUsagePeak != null)
+                        item.PerfEntries.Where(x => x.Timestamp <= timestamp && x.CPUUsagePeak == null)
                             .OrderBy(x => x.Timestamp)
                             .ToList();
 
