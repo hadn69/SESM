@@ -56,9 +56,10 @@ namespace SESM.DAL
         {
             try
             {
-                if (_context.Users.First(u => u.Login == login) != null)
-                    return true;
-                return false;
+                EntityUser usr = _context.Users.First(u => u.Login == login);
+                if(usr.Login != login)
+                    return false;
+                return true;
             }
             catch (Exception)
             {

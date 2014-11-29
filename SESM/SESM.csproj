@@ -3756,7 +3756,6 @@
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\_HeaderLogin.cshtml" />
-    <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Server\Index.cshtml" />
     <Content Include="Views\Server\Create.cshtml" />
     <Content Include="Views\Server\Details.cshtml" />
@@ -3784,6 +3783,7 @@
     <Content Include="Views\Settings\SteamCMD.cshtml" />
     <Content Include="Views\Shared\_Flash.cshtml" />
     <Content Include="Views\External\SignGen.cshtml" />
+    <Content Include="Views\Shared\_BreadCrumb.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
