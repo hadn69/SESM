@@ -21,29 +21,26 @@
                 <a href="@data[data.Count - 1].Value">@data[data.Count - 1].Key</a>
             </li>
         </ul>
-        @if(ViewBag.ServerID != null)
-        {
-            <div class="page-toolbar">
-                <div class="btn-group pull-right">
-                    <button type="button" class="btn btn-fit-height blue-madison-stripe dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="1000" data-close-others="true">
-                        Quick Actions <i class="fa fa-angle-down"></i>
-                    </button>
-                    <ul class="dropdown-menu pull-right" role="menu">
-                        <li>
-                            <a href="#" class="bg-green"><i class="fa fa-play" style="color: white;"></i> Start Server</a>
-                        </li>
-                        <li>
-                            <a href="#" class="bg-purple"><i class="fa fa-stop" style="color: white;"></i> Stop Server</a>
-                        </li>
-                        <li>
-                            <a href="#" class="bg-yellow"><i class="fa fa-refresh" style="color: white;"></i> Restart Server</a>
-                        </li>
-                        <li>
-                            <a href="#" class="bg-red"><i class="fa fa-times" style="color: white;"></i> Kill Server</a>
-                        </li>
-                    </ul>
-                </div>
+        <div class="page-toolbar" id="QADiv" style="display: none;">
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-fit-height blue-madison-stripe dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="1000" data-close-others="true">
+                    Quick Actions <i class="fa fa-angle-down"></i>
+                </button>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li id="btnQAStart">
+                        <a href="#" class="bg-green"><i class="fa fa-play" style="color: white;"></i> Start Server</a>
+                    </li>
+                    <li id="btnQAStop">
+                        <a href="#" class="bg-purple"><i class="fa fa-stop" style="color: white;"></i> Stop Server</a>
+                    </li>
+                    <li id="btnQARestart">
+                        <a href="#" class="bg-yellow"><i class="fa fa-refresh" style="color: white;"></i> Restart Server</a>
+                    </li>
+                    <li id="btnQAKill">
+                        <a href="#" class="bg-red"><i class="fa fa-times" style="color: white;"></i> Kill Server</a>
+                    </li>
+                </ul>
             </div>
-        }
+        </div>
     </div>
 }

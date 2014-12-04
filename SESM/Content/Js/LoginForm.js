@@ -62,7 +62,7 @@
                     if (status != "success") {
                         $("#LoginErrorText").html("Error Occured (see console for more infos).");
                         $('#LoginError').show();
-                        Console.warn("Fail authenticating : ");
+                        Console.warn("Fatal Error : ");
                         Console.warn("Status : " + status);
                         Console.warn("Data : " + data);
                         return;
@@ -90,7 +90,7 @@
                             if (status != "success") {
                                 $("#LoginErrorText").html("Error Occured (see console for more infos).");
                                 $('#LoginError').show();
-                                Console.warn("Fail authenticating : ");
+                                Console.warn("Fatal Error : ");
                                 Console.warn("Status : " + status);
                                 Console.warn("Data : " + data);
                                 return;
@@ -194,7 +194,7 @@
                     if (status != "success") {
                         $("#RegisterErrorText").html("Error Occured (see console for more infos).");
                         $('#RegisterError').show();
-                        Console.warn("Fail authenticating : ");
+                        Console.warn("Fatal Error : ");
                         Console.warn("Status : " + status);
                         Console.warn("Data : " + data);
                         return;

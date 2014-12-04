@@ -88,7 +88,30 @@ namespace SESM.Controllers
             return Content(response.ToString());
         }
 
-        // GET: API/Server/StartServers/
+        // GET: API/Server/GetServerState/{ServerID}
+        [HttpGet]
+        public ActionResult GetServerState(int id)
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            EntityServer server = srvPrv.GetServer(id);
+
+            // ** ACCESS **
+            if(server == null)
+                return Content(new XMLMessage(XmlResponseType.Error, "SRV-GS-UKNSRV", "The server doesn't exist").ToString());
+
+            if(srvPrv.GetAccessLevel(userID, server.Id) == AccessLevel.None)
+                return Content(new XMLMessage(XmlResponseType.Error, "SRV-GS-NOACCESS", "You don't have access to this server").ToString());
+
+            // ** PROCESS **
+            return Content(new XMLMessage(XmlResponseType.Success, "SRV-GS-OK", srvPrv.GetState(server).ToString()).ToString());
+        }
+
+        // POST: API/Server/StartServers/
         [HttpPost]
         public ActionResult StartServers()
         {
@@ -144,7 +167,7 @@ namespace SESM.Controllers
             return Content(new XMLMessage(XmlResponseType.Success, "SRV-STRS-OK", "The following server(s) have been started : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
-        // GET: API/Server/StopServers/
+        // POST: API/Server/StopServers/
         [HttpPost]
         public ActionResult StopServers()
         {
@@ -200,7 +223,7 @@ namespace SESM.Controllers
             return Content(new XMLMessage(XmlResponseType.Success, "SRV-STRS-OK", "The following server(s) have been stopped : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
-        // GET: API/Server/RestartServers/
+        // POST: API/Server/RestartServers/
         [HttpPost]
         public ActionResult RestartServers()
         {
@@ -273,6 +296,62 @@ namespace SESM.Controllers
 
             return Content(new XMLMessage(XmlResponseType.Success, "SRV-RSTRS-OK", "The following server(s) have been restarted : "
                 + string.Join(", ", serversToRestart.Select(x => x.Name))).ToString());
+        }
+
+        // POST: API/Server/KillServers/
+        [HttpPost]
+        public ActionResult KillServers()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING **
+            string[] serverIDsString = Request.Form["ServerIDs"].Split(';');
+
+            List<int> serverIDs = new List<int>();
+
+            foreach(string item in serverIDsString)
+            {
+                int servID;
+                if(!int.TryParse(item, out servID))
+                {
+                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-KILS-INVALIDID", "The following ID is not a number : " + item).ToString());
+                }
+                serverIDs.Add(servID);
+            }
+
+            // ** ACCESS **
+            List<EntityServer> servers = new List<EntityServer>();
+            foreach(int item in serverIDs)
+            {
+                EntityServer server = srvPrv.GetServer(item);
+
+                if(server == null)
+                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-KILS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
+
+                AccessLevel accessLevel = srvPrv.GetAccessLevel(userID, server.Id);
+                if(accessLevel == AccessLevel.None
+                    || accessLevel == AccessLevel.Guest
+                    || accessLevel == AccessLevel.User)
+                {
+                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-KILS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
+                }
+                servers.Add(server);
+            }
+
+            // ** PROCESS **
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+
+            foreach(EntityServer item in servers)
+            {
+                serviceLogger.Info(item.Name + " stopped by " + user.Login + " by API/Server/StopServers/");
+                ServiceHelper.KillService(item);
+            }
+
+            return Content(new XMLMessage(XmlResponseType.Success, "SRV-KILS-OK", "The following server(s) have been stopped : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
         protected override void Dispose(bool disposing)

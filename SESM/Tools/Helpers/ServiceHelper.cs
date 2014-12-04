@@ -253,6 +253,11 @@ namespace SESM.Tools.Helpers
             si.Close();
         }
 
+        public static void KillService(EntityServer server)
+        {
+            KillService(GetServiceName(server));
+        }
+
         // Source : http://stackoverflow.com/a/566089
         public static void KillService(string serviceName)
         {

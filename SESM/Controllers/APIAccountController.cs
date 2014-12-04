@@ -22,7 +22,7 @@ namespace SESM.Controllers
             return Content(new XMLMessage(XmlResponseType.Success, "ACT-GC-OK", challenge).ToString());
         }
 
-        [HttpPost]
+        [HttpGet]
         // API/Account/LogOut
         public ActionResult LogOut()
         {
@@ -145,6 +145,7 @@ namespace SESM.Controllers
         }
 
         // API/Account/SetDetails
+        [HttpPost]
         public ActionResult SetDetails()
         {
             // ** INIT **
