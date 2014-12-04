@@ -371,6 +371,7 @@
     <Compile Include="DTO\EntityUser.cs" />
     <Compile Include="DTO\EnumInstancePerm.cs" />
     <Compile Include="DTO\EnumPermAccess.cs" />
+    <Compile Include="DTO\EnumProcessPriority.cs" />
     <Compile Include="DTO\EnumServerWidePerm.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -402,6 +403,10 @@
     <Compile Include="Migrations\201411152236535_SESEAutoSave.cs" />
     <Compile Include="Migrations\201411152236535_SESEAutoSave.Designer.cs">
       <DependentUpon>201411152236535_SESEAutoSave.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201412041630025_processPriority.cs" />
+    <Compile Include="Migrations\201412041630025_processPriority.Designer.cs">
+      <DependentUpon>201412041630025_processPriority.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Views\Account\LoginViewModel.cs" />
@@ -482,6 +487,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201411152236535_SESEAutoSave.resx">
       <DependentUpon>201411152236535_SESEAutoSave.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201412041630025_processPriority.resx">
+      <DependentUpon>201412041630025_processPriority.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

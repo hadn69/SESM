@@ -18,6 +18,7 @@ namespace SESM.DTO
         public int ServerExtenderPort { get; set; }
         public bool IsAutoStartEnabled { get; set; }
         public int? AutoSaveInMinutes { get; set; }
+        public EnumProcessPriority ProcessPriority { get; set; }
 
         private ICollection<EntityUser> _administrators;
         public virtual ICollection<EntityUser> Administrators
@@ -58,7 +59,7 @@ namespace SESM.DTO
             UseServerExtender = false;
             ServerExtenderPort = 26016;
             IsAutoStartEnabled = false;
-
+            ProcessPriority = EnumProcessPriority.Normal;
         }
     }
 }
