@@ -87,6 +87,7 @@ namespace SESM.Tools.Helpers
         public static SteamCMDResult Update(Logger logger, int duration)
         {
             Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+            MemoryStream original = null;
             try
             {
                 bool SEUpdate = false;
@@ -119,7 +120,7 @@ namespace SESM.Tools.Helpers
                 string dedicatedZipPath = SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip";
 
                 string md5Original = null;
-                MemoryStream original = null;
+
 
                 if(File.Exists(dedicatedZipPath))
                 {
@@ -226,7 +227,6 @@ namespace SESM.Tools.Helpers
                     }
                 }
 
-
                 // Checking DedicatedServer.zip exist 
                 if(!File.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
                     return SteamCMDResult.Fail_Unknow;
@@ -248,7 +248,6 @@ namespace SESM.Tools.Helpers
                     if(md5Original == md5New)
                     {
                         logger.Info("DedicatedServer.zip haven't changed, no SE Update Detected");
-
                     }
                     else
                     {
@@ -312,7 +311,7 @@ namespace SESM.Tools.Helpers
                 if(SEUpdate)
                 {
                     logger.Info("Stopping all running server ...");
-                    
+
                     foreach(EntityServer item in srvPrv.GetAllServers())
                     {
                         logger.Info("Sending stop order to " + item.Name);
@@ -345,21 +344,39 @@ namespace SESM.Tools.Helpers
                     // Killing some ghost processes that might still exists
                     ServiceHelper.KillAllSESEService();
                 }
+                logger.Info("Waiting 30 secs to clear minds");
+                Thread.Sleep(30000);
+                int tryCount = 3;
                 if(SEUpdate)
-                    using(ZipFile zip = ZipFile.Read(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
+                    for(int i = 0; i < tryCount; i++)
                     {
-                        logger.Info("Deleting old game files");
-                        if(!Directory.Exists(SESMConfigHelper.SEDataPath))
-                            Directory.CreateDirectory(SESMConfigHelper.SEDataPath);
-                        if(Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
-                            Directory.Delete(SESMConfigHelper.SEDataPath + @"Content\", true);
-                        if(Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
-                            Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
-                        if(Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
-                            Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
+                        try
+                        {
+                            using(ZipFile zip = ZipFile.Read(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
+                            {
+                                logger.Info("Deleting old game files (try " + i + " of " + tryCount + ")");
+                                if(!Directory.Exists(SESMConfigHelper.SEDataPath))
+                                    Directory.CreateDirectory(SESMConfigHelper.SEDataPath);
+                                if(Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
+                                    Directory.Delete(SESMConfigHelper.SEDataPath + @"Content\", true);
+                                if(Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
+                                    Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
+                                if(Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
+                                    Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
 
-                        logger.Info("Unzipping new game files");
-                        zip.ExtractAll(SESMConfigHelper.SEDataPath);
+                                logger.Info("Unzipping new game files");
+                                zip.ExtractAll(SESMConfigHelper.SEDataPath);
+                                break;
+                            }
+                        }
+                        catch(Exception exUnzip)
+                        {
+                            logger.Error("Fail Deleting/Unzipping new game files (Exception) : ", exUnzip);
+                            logger.Info("Waiting 30 secs");
+                            Thread.Sleep(30000);
+                            if (i == tryCount - 1)
+                                throw new Exception("Fail applying game files, aborting");
+                        }
                     }
 
                 logger.Info("Applying SESE Files if they exist");
@@ -379,6 +396,48 @@ namespace SESM.Tools.Helpers
             catch(Exception ex)
             {
                 logger.Fatal("AutoUpdate failed miserably ... (Exception)", ex);
+
+                if(original == null)
+                {
+                    logger.Info("No previous zip, deleting one if it exist");
+                    try
+                    {
+                        if(File.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
+                            File.Delete(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip");
+                    }
+                    catch(Exception ex2)
+                    {
+                        logger.Fatal("Fail in the fail ... (Exception)", ex2);
+                    }
+                }
+                else
+                {
+                    logger.Info("Restoring zip, deleting ...");
+                    try
+                    {
+                        if(File.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip"))
+                            File.Delete(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip");
+                    }
+                    catch(Exception ex2)
+                    {
+                        logger.Fatal("Fail in the fail ... (Exception)", ex2);
+                    }
+
+                    logger.Info("Saving zip");
+                    try
+                    {
+                        FileStream file = new FileStream(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\Tools\DedicatedServer.zip",
+                            FileMode.Create,
+                            FileAccess.ReadWrite,
+                            FileShare.None);
+                        original.Position = 0;
+                        original.CopyTo(file);
+                    }
+                    catch(Exception ex2)
+                    {
+                        logger.Fatal("Fail in the fail ... (Exception)", ex2);
+                    }
+                }
                 return SteamCMDResult.Fail_Unknow;
             }
         }
