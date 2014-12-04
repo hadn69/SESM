@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using SESM.DTO;
 
 namespace SESM.Models.Views.Server
 {
@@ -25,6 +26,10 @@ namespace SESM.Models.Views.Server
         [Required]
         [DisplayName("Backup LvL 3")]
         public bool IsLvl3BackupEnabled { get; set; }
+
+        [Required]
+        [DisplayName("Priority")]
+        public EnumProcessPriority ProcessPriority { get; set; }
 
         [Required]
         [DisplayName("Auto Restart")]
@@ -261,6 +266,8 @@ namespace SESM.Models.Views.Server
             IgnoreLastSession = false;
             WorldName = "SESM - MyMap";
             AutoSaveInMinutes = 5;
+
+            ProcessPriority = EnumProcessPriority.Normal;
         }
     }
 }

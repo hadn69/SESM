@@ -100,7 +100,7 @@ namespace SESM.Controllers
         {
             Session.Abandon();
 
-            return RedirectToAction("Index", "Home").Success("Logout Successfull").Danger("test danger").Warning("test warning").Information("test info");
+            return RedirectToAction("Index", "Home").Success("Logout Successfull");
         }
 
         //

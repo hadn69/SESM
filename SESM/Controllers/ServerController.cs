@@ -218,7 +218,11 @@ namespace SESM.Controllers
                 ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(serv));
                 if (Directory.Exists(PathHelper.GetInstancePath(serv)))
                     Directory.Delete(PathHelper.GetInstancePath(serv), true);
+                IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+                scheduler.DeleteJob(new JobKey("LowPriorityStart" + serv.Id + "Job", "LowPriorityStart"));
+                scheduler.DeleteJob(new JobKey("AutoRestart" + serv.Id + "Job", "AutoRestart"));
                 srvPrv.RemoveServer(serv);
+
                 return RedirectToAction("Index").Success("Server Deleted");
             }
 
@@ -452,6 +456,7 @@ namespace SESM.Controllers
             serverView.UseServerExtender = serv.UseServerExtender;
             serverView.ServerExtenderPort = serv.ServerExtenderPort;
             serverView.AutoStart = serv.IsAutoStartEnabled;
+            serverView.ProcessPriority = serv.ProcessPriority;
 
             if (serv.AutoSaveInMinutes != null)
                 serverView.AutoSaveInMinutes = serv.AutoSaveInMinutes?? -42;
@@ -513,6 +518,7 @@ namespace SESM.Controllers
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.RemoveTrash != serverConfig.RemoveTrash
+                    || model.ProcessPriority != serv.ProcessPriority
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
@@ -601,6 +607,8 @@ namespace SESM.Controllers
                     scheduler.ScheduleJob(autoRestartJob, autoRestartTrigger);
                 }
 
+                serv.ProcessPriority = model.ProcessPriority;
+
 
                 srvPrv.UpdateServer(serv);
                 Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
@@ -622,7 +630,9 @@ namespace SESM.Controllers
                     }
                     serv.UseServerExtender = model.UseServerExtender;
                     serv.ServerExtenderPort = model.ServerExtenderPort;
+                    
                     srvPrv.UpdateServer(serv);
+
                     if (model.UseServerExtender)
                     {
                         ServiceHelper.RegisterServerExtenderService(serv);
@@ -695,6 +705,7 @@ namespace SESM.Controllers
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.RemoveTrash != serverConfig.RemoveTrash
+                    || model.ProcessPriority != serv.ProcessPriority
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
@@ -788,8 +799,13 @@ namespace SESM.Controllers
 
                     scheduler.ScheduleJob(autoRestartJob, autoRestartTrigger);
                 }
-
+                serv.ProcessPriority = model.ProcessPriority;
                 srvPrv.UpdateServer(serv);
+
+                if (srvPrv.GetState(serv) != ServiceState.Stopped)
+                {
+                    ServiceHelper.SetPriority(serv);
+                }
 
                 if(model.Name != serv.Name
                     || model.UseServerExtender != serv.UseServerExtender
@@ -870,8 +886,5 @@ namespace SESM.Controllers
             }
             base.Dispose(disposing);
         }
-
-
-        
     }
 }
