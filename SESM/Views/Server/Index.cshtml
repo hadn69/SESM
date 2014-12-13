@@ -48,6 +48,9 @@
                     <th>
                         Status
                     </th>
+                    <th style="display:none;">
+                        Access Level
+                    </th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -64,13 +67,13 @@
                     "sortAscending": ": activate to sort column ascending",
                     "sortDescending": ": activate to sort column descending"
                 },
-                "emptyTable": "No data available in table",
+                "emptyTable": "No server available",
                 "info": "Showing _START_ to _END_ of _TOTAL_ entries",
                 "infoEmpty": "No entries found",
                 "infoFiltered": "(filtered1 from _MAX_ total entries)",
                 "lengthMenu": "Show _MENU_ entries",
                 "search": "Search:",
-                "zeroRecords": "No matching records found",
+                "zeroRecords": "No matching server found",
                 "paginate": {
                     "previous": "Prev",
                     "next": "Next",
@@ -82,11 +85,13 @@
             "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
 
             "columns": [{
-                "orderable": true
+                "orderable": false
             }, {
                 "orderable": true
             }, {
                 "orderable": true
+            }, {
+                "orderable": false
             }],
             "lengthMenu": [
                 [5, 10, 15, 20, -1],
@@ -98,14 +103,17 @@
             "columnDefs": [{
                 "searchable": false,
                 "targets": [0]
+            },{
+                "targets": [3],
+                "visible": false
             }],
-            "order": [[1, "asc"]] // set first column as a default sort by asc
+            "order": [[1, "asc"]] // set second column as a default sort by asc
         });
 
         table.find('.group-checkable').change(function () {
-            var set = jQuery(this).attr("data-set");
-            var checked = jQuery(this).is(":checked");
-            jQuery(set).each(function () {
+            var set = $(this).attr("data-set");
+            var checked = $(this).is(":checked");
+            $(set).each(function () {
                 if (checked) {
                     $(this).attr("checked", true);
                     $(this).parents('tr').addClass("active");
@@ -114,17 +122,31 @@
                     $(this).parents('tr').removeClass("active");
                 }
             });
-            jQuery.uniform.update(set);
+            $.uniform.update(set);
         });
 
         table.on('change', 'tbody tr .checkboxes', function () {
-            $(this).parents('tr').toggleClass("active");
+            var checked = $(this).is(":checked");
+            if (checked) {
+                $(this).parents('tr').addClass("active");
+            } else {
+                $(this).parents('tr').removeClass("active");
+            }
+
+            if ($('tbody tr input:checkbox:checked').length == 0) {
+                table.find('.group-checkable').attr("checked", false);
+            } else {
+                table.find('.group-checkable').attr("checked", true);
+            }
+            $.uniform.update($('.group-checkable'));
         });
 
         $(".dataTables_filter").addClass("pull-right");
-        function refereshList()
-        {
-            $.post("/API/Server/GetServers",
+
+
+        function refereshList() {
+            $("#btnRefreshList").children("i").addClass("fa-spin");
+            $.get("/API/Server/GetServers",
             {},
             function (data, status) {
                 if (status != "success") {
@@ -133,6 +155,7 @@
                     Console.warn("Fatal Error : ");
                     Console.warn("Status : " + status);
                     Console.warn("Data : " + data);
+                    $("#btnRefreshList").children("i").removeClass("fa-spin");
                     return;
                 }
 
@@ -143,29 +166,74 @@
                 if (root.children("Type").text() == "Error") {
                     $("#RegisterErrorText").html(root.children("Content").text());
                     $('#RegisterError').show();
+                    $("#btnRefreshList").children("i").removeClass("fa-spin");
                     return;
                 }
 
-                $("tbody").empty();
-                root.children("Content").children("Server").each(function(index) {
+                table.DataTable().clear();
+                root.children("Content").children("Server").each(function (index) {
                     var item = $(this);
+                    var Name = item.children("Name").text();
+                    var ID = item.children("ID").text();
+                    var Public = item.children("Public").text();
+                    var State = item.children("State").text();
+                    var AccessLevel = item.children("AccessLevel").text();
 
+                    var chkbField = "";
+                    var statusField = "";
 
-                    <tr class="odd gradeX">
-                        <td>
-                            <input type="checkbox" class="checkboxes" value="1" />
-                        </td>
-                        <td>
-                            shuxer
-                        </td>
-                        <td>
-                            <span class="label label-sm label-success">
-                                Approved
-                            </span>
-                        </td>
-                    </tr>
+                    if (AccessLevel != "None" && AccessLevel != "Guest" && AccessLevel != "User")
+                        chkbField += '<input type="checkbox" class="checkboxes" value="' + ID + '" />';
+
+                    switch (State) {
+                        case "Unknow":
+                            statusField = '<span class="label label-sm label-default">Unknow</span>';
+                            break;
+                        case "Stopped":
+                            statusField = '<span class="label label-sm label-danger">Stopped</span>';
+                            break;
+                        case "Starting":
+                            statusField = '<span class="label label-sm label-info">Starting</span>';
+                            break;
+                        case "Running":
+                            statusField = '<span class="label label-sm label-success">Running</span>';
+                            break;
+                        case "Stopping":
+                            statusField = '<span class="label label-sm label-primary">Stopping</span>';
+                            break;
+                    }
+
+                    $('#serverTable').DataTable().row.add([chkbField, Name, statusField, AccessLevel]);
                 });
+                $('#serverTable').DataTable().draw();
+                $("#btnRefreshList").children("i").removeClass("fa-spin");
+                $('#serverTable').find('input:checkbox').uniform();
+
+                console.log(table.DataTable().rows());
             });
         }
+
+        refereshList();
+        $("#btnRefreshList").click(function () {
+            var ids = getCheckedIds();
+            refereshList();
+            /*console.log(table.dataTable().rows());
+            table.dataTable().rows().each(function (index, item) {
+                console.log(item);
+            });*/
+            
+        });
+
+        function getCheckedIds() {
+            var oTable = table.dataTable();
+            var rowcollection = oTable.$(".checkboxes:checked", { "page": "all" });
+            var retArray = [];
+            rowcollection.each(function (index, item) {
+                retArray.push($(item).val());
+            });
+            return retArray;
+        }
+
+
     }
 </script>

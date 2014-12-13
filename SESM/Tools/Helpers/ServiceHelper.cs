@@ -189,6 +189,7 @@ namespace SESM.Tools.Helpers
 
         public static void RegisterService(string serviceName)
         {
+            return;
             if(DoesServiceExist(serviceName))
                 return;
 
@@ -233,6 +234,7 @@ namespace SESM.Tools.Helpers
 
         public static void RegisterServerExtenderService(EntityServer server)
         {
+            return;
             if(DoesServiceExist(server))
                 return;
 
