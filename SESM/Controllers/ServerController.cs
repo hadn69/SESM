@@ -465,7 +465,7 @@ namespace SESM.Controllers
             serverView.WebManagers = string.Join("\r\n", serv.Managers.Select(item => item.Login).ToList());
             serverView.WebUsers = string.Join("\r\n", serv.Users.Select(item => item.Login).ToList());
             if (!string.IsNullOrEmpty(serverView.SaveName))
-                serverView.AsteroidAmount = Directory.GetFiles(PathHelper.GetSavePath(serv, serverView.SaveName), "asteroid??.vox").Length;
+                serverView.AsteroidAmount = Directory.GetFiles(PathHelper.GetSavePath(serv, serverView.SaveName), "*steroid???.vx2").Length;
  
             return View(serverView);
         }
@@ -563,14 +563,6 @@ namespace SESM.Controllers
 
                 if (errorFlag)
                     return View("Details", model);
-
-                if(accessLevel == AccessLevel.Manager && model.WorldSizeKm != serverConfig.WorldSizeKm)
-                {
-                    if (model.WorldSizeKm > 200)
-                        model.WorldSizeKm = 200;
-                    else if(model.WorldSizeKm <= 0)
-                        model.WorldSizeKm = 1;
-                }
 
                 serv.Ip = model.IP;
                 serv.Port = model.ServerPort;
@@ -748,14 +740,6 @@ namespace SESM.Controllers
 
                 if (errorFlag)
                     return View("Details", model);
-
-                if(accessLevel == AccessLevel.Manager && model.WorldSizeKm != serverConfig.WorldSizeKm)
-                {
-                    if(model.WorldSizeKm > 200)
-                        model.WorldSizeKm = 200;
-                    else if(model.WorldSizeKm <= 0)
-                        model.WorldSizeKm = 1;
-                }
 
                 if ((srvPrv.GetState(serv) != ServiceState.Stopped)
                     && (model.Name != serv.Name

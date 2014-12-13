@@ -12,7 +12,7 @@ namespace SESM.Models.Views.Map
 
         [Required(ErrorMessage = "Asteroid Amount is required")]
         [Display(Name = "Asteroid Amount")]
-        [Range(0, 50, ErrorMessage = "Asteroid Amount must be between 0 and 50")]
+        [Range(0, 300, ErrorMessage = "Asteroid Amount must be between 0 and 300")]
         public int AsteroidAmount { get; set; }
 
         public NewMapViewModel()
