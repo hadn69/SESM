@@ -72,16 +72,23 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 
-
             if (ModelState.IsValid)
             {
                 if(srvPrv.GetState(serv) != ServiceState.Stopped)
                     return RedirectToAction("Index", new { id = id });
+                if (serv.UseServerExtender)
+                {
+                    ServerConfigHelper oldConfig = new ServerConfigHelper();
+                    oldConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+                    oldConfig.LoadFromSave(PathHelper.GetSavePath(serv, oldConfig.SaveName) + @"\Sandbox.sbc");
+                    oldConfig.AutoSaveInMinutes = serv.AutoSaveInMinutes??5;
+                    oldConfig.Save(serv);
+                }
 
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.SaveName = model.MapName;
-                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
+                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName) + @"\Sandbox.sbc");
                 serv.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
                 srvPrv.UpdateServer(serv);
                 if (serv.UseServerExtender)
@@ -112,9 +119,20 @@ namespace SESM.Controllers
 
                 serviceLogger.Info(serv.Name + " stopped by " + user.Login + " by select and restart map button");
                 ServiceHelper.StopServiceAndWait(serv);
+
+                if(serv.UseServerExtender)
+                {
+                    ServerConfigHelper oldConfig = new ServerConfigHelper();
+                    oldConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+                    oldConfig.LoadFromSave(PathHelper.GetSavePath(serv, oldConfig.SaveName) + @"\Sandbox.sbc");
+                    oldConfig.AutoSaveInMinutes = serv.AutoSaveInMinutes ?? 5;
+                    oldConfig.Save(serv);
+                }
+
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.SaveName = model.MapName;
+                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName) + @"\Sandbox.sbc");
                 serv.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
                 srvPrv.UpdateServer(serv);
                 if(serv.UseServerExtender)
