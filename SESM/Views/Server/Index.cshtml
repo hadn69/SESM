@@ -19,18 +19,18 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="btn-group pull-right">
-                        <button id="btnCreateServer" class="btn green">
-                            Start <i class="fa fa-plus"></i>
+                    <div class="btn-group pull-right" id="actionBtn" style="display:none;">
+                        <button id="btnStartServers" class="btn green">
+                            Start <i class="fa fa-play"></i>
                         </button>
-                        <button id="btnCreateServer" class="btn purple">
-                            Stop <i class="fa fa-plus"></i>
+                        <button id="btnStopServers" class="btn purple">
+                            Stop <i class="fa fa-stop"></i>
                         </button>
-                        <button id="btnCreateServer" class="btn yellow">
-                            Restart <i class="fa fa-plus"></i>
+                        <button id="btnRestartServers" class="btn yellow">
+                            Restart <i class="fa fa-repeat"></i>
                         </button>
-                        <button id="btnCreateServer" class="btn red">
-                            Kill <i class="fa fa-plus"></i>
+                        <button id="btnKillServers" class="btn red">
+                            Kill <i class="fa fa-times"></i>
                         </button>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                 "infoEmpty": "No entries found",
                 "infoFiltered": "(filtered1 from _MAX_ total entries)",
                 "lengthMenu": "Show _MENU_ entries",
-                "search": "Search:",
+                "search": "Search :",
                 "zeroRecords": "No matching server found",
                 "paginate": {
                     "previous": "Prev",
@@ -103,7 +103,7 @@
             "columnDefs": [{
                 "searchable": false,
                 "targets": [0]
-            },{
+            }, {
                 "targets": [3],
                 "visible": false
             }],
@@ -123,6 +123,11 @@
                 }
             });
             $.uniform.update(set);
+            if ($('tbody tr input:checkbox:checked').length == 0) {
+                $("#actionBtn").hide();
+            } else {
+                $("#actionBtn").show();
+            }
         });
 
         table.on('change', 'tbody tr .checkboxes', function () {
@@ -135,23 +140,23 @@
 
             if ($('tbody tr input:checkbox:checked').length == 0) {
                 table.find('.group-checkable').attr("checked", false);
+                $("#actionBtn").hide();
             } else {
                 table.find('.group-checkable').attr("checked", true);
+                $("#actionBtn").show();
             }
             $.uniform.update($('.group-checkable'));
         });
 
         $(".dataTables_filter").addClass("pull-right");
 
-
-        function refereshList() {
+        function refereshList(checkedIDs) {
             $("#btnRefreshList").children("i").addClass("fa-spin");
             $.get("/API/Server/GetServers",
             {},
             function (data, status) {
                 if (status != "success") {
-                    $("#RegisterErrorText").html("Error Occured (see console for more infos).");
-                    $('#RegisterError').show();
+                    toastr.error("See console for more infos", "Fatal Error");
                     Console.warn("Fatal Error : ");
                     Console.warn("Status : " + status);
                     Console.warn("Data : " + data);
@@ -164,8 +169,7 @@
                 var root = xmlObj.find("Response");
 
                 if (root.children("Type").text() == "Error") {
-                    $("#RegisterErrorText").html(root.children("Content").text());
-                    $('#RegisterError').show();
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
                     $("#btnRefreshList").children("i").removeClass("fa-spin");
                     return;
                 }
@@ -182,8 +186,14 @@
                     var chkbField = "";
                     var statusField = "";
 
-                    if (AccessLevel != "None" && AccessLevel != "Guest" && AccessLevel != "User")
-                        chkbField += '<input type="checkbox" class="checkboxes" value="' + ID + '" />';
+                    if (AccessLevel != "None" && AccessLevel != "Guest" && AccessLevel != "User") {
+                        if (checkedIDs != null && $.inArray(ID, checkedIDs) > -1) {
+                            chkbField = '<input type="checkbox" class="checkboxes" value="' + ID + '" checked />';
+                        }
+                        else {
+                            chkbField = '<input type="checkbox" class="checkboxes" value="' + ID + '" />';
+                        }
+                    }
 
                     switch (State) {
                         case "Unknow":
@@ -208,20 +218,17 @@
                 $('#serverTable').DataTable().draw();
                 $("#btnRefreshList").children("i").removeClass("fa-spin");
                 $('#serverTable').find('input:checkbox').uniform();
+                $("tbody input:checked").each(function () {
+                    $(this).parents('tr').addClass("active");
+                });
 
-                console.log(table.DataTable().rows());
             });
         }
 
         refereshList();
         $("#btnRefreshList").click(function () {
             var ids = getCheckedIds();
-            refereshList();
-            /*console.log(table.dataTable().rows());
-            table.dataTable().rows().each(function (index, item) {
-                console.log(item);
-            });*/
-            
+            refereshList(ids);
         });
 
         function getCheckedIds() {
@@ -234,6 +241,15 @@
             return retArray;
         }
 
-
+        $("#btnStartServers").click(function () {
+            var ids = getCheckedIds();
+            table.DataTable().rows(".active").nodes().each(function (value, index) {
+                var Name = $(this).children(":nth-child(2)").text();
+                var AccessLevel = $(this).children(":last-child").text();
+                if (AccessLevel == "None" || AccessLevel == "Guest" || AccessLevel == "User") {
+                    
+                }
+            });
+        });
     }
 </script>
