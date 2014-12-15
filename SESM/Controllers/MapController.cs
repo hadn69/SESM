@@ -87,8 +87,9 @@ namespace SESM.Controllers
 
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, serverConfig.SaveName) + @"\Sandbox.sbc");
                 serverConfig.SaveName = model.MapName;
-                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName) + @"\Sandbox.sbc");
+                serverConfig.LoadFromSaveManager(PathHelper.GetSavePath(serv, model.MapName) + @"\Sandbox.sbc");
                 serv.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
                 srvPrv.UpdateServer(serv);
                 if (serv.UseServerExtender)
@@ -131,8 +132,9 @@ namespace SESM.Controllers
 
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, serverConfig.SaveName) + @"\Sandbox.sbc");
                 serverConfig.SaveName = model.MapName;
-                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName) + @"\Sandbox.sbc");
+                serverConfig.LoadFromSaveManager(PathHelper.GetSavePath(serv, model.MapName) + @"\Sandbox.sbc");
                 serv.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
                 srvPrv.UpdateServer(serv);
                 if(serv.UseServerExtender)

@@ -864,5 +864,20 @@ namespace SESM.Tools.Helpers
 
             return true;
         }
+
+        public bool LoadFromSaveManager(string path)
+        {
+            int locMaxplayer = MaxPlayers;
+            int locMaxFloatingObjects = MaxFloatingObjects;
+            bool locRemoveTrash = RemoveTrash;
+
+            bool ret = LoadFromSave(path);
+
+            MaxPlayers = locMaxplayer;
+            MaxFloatingObjects = locMaxFloatingObjects;
+            RemoveTrash = locRemoveTrash;
+
+            return ret;
+        }
     }
 }

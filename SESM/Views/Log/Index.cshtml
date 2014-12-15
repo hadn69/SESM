@@ -19,6 +19,7 @@
                     <input type="submit" value="Download" name="action:DownloadLog" class="btn btn-success" />
                     <a class="btn btn-warning" href="@Url.Action("DownloadAll", new {id = id})">Download All</a>
                     <input type="submit" onclick="return confirm('This will delete this log. Are you sure you want to do this ?');" value="Delete" name="action:DeleteLog" class="btn btn-danger" />
+                    <a class="btn btn-primary" onclick="return confirm('This will delete all logs of this server. Are you sure you want to do this ?');" href="@Url.Action("DeleteAll", new {id = id})">Delete All</a>
                 </div>
             </div>
         }
