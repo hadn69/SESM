@@ -202,6 +202,10 @@ namespace SESM.Models.Views.Server
         public bool PauseGameWhenEmpty { get; set; }
 
         [Required]
+        [DisplayName("Destructible Blocks")]
+        public bool DestructibleBlocks { get; set; }
+
+        [Required]
         [DisplayName("Ignore Last Session")]
         public bool IgnoreLastSession { get; set; }
 
@@ -266,6 +270,7 @@ namespace SESM.Models.Views.Server
             IgnoreLastSession = false;
             WorldName = "SESM - MyMap";
             AutoSaveInMinutes = 5;
+            DestructibleBlocks = true;
 
             ProcessPriority = EnumProcessPriority.Normal;
         }

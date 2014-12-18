@@ -51,6 +51,7 @@ namespace SESM.Tools.Helpers
         public ulong GroupID = 0;
         public string ServerName = "SESM";
         public bool PauseGameWhenEmpty = false;
+        public bool DestructibleBlocks = true;
 
         public bool IgnoreLastSession = false;
         public string WorldName = string.Empty;
@@ -90,6 +91,7 @@ namespace SESM.Tools.Helpers
             PermanentDeath = model.PermanentDeath;
             AutoSaveInMinutes = model.AutoSaveInMinutes;
             SpawnShipTimeMultiplier = model.SpawnShipTimeMultiplier;
+            DestructibleBlocks = model.DestructibleBlocks;
 
             ScenarioType = model.ScenarioType;
             SaveName = model.SaveName;
@@ -195,6 +197,7 @@ namespace SESM.Tools.Helpers
             PermanentDeath = model.PermanentDeath;
             AutoSaveInMinutes = model.AutoSaveInMinutes;
             SpawnShipTimeMultiplier = model.SpawnShipTimeMultiplier;
+            DestructibleBlocks = model.DestructibleBlocks;
 
             IP = model.IP;
             SteamPort = model.SteamPort;
@@ -300,6 +303,7 @@ namespace SESM.Tools.Helpers
             model.PermanentDeath = PermanentDeath;
             model.AutoSaveInMinutes = AutoSaveInMinutes;
             model.SpawnShipTimeMultiplier = SpawnShipTimeMultiplier;
+            model.DestructibleBlocks = DestructibleBlocks;
 
             model.ScenarioType = ScenarioType;
             model.SaveName = SaveName;
@@ -353,6 +357,7 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <PermanentDeath>" + PermanentDeath.ToString().ToLower() + "</PermanentDeath>");
             sb.AppendLine("    <AutoSaveInMinutes>" + AutoSaveInMinutes + "</AutoSaveInMinutes>");
             sb.AppendLine("    <SpawnShipTimeMultiplier>" + SpawnShipTimeMultiplier + "</SpawnShipTimeMultiplier>");
+            sb.AppendLine("    <DestructibleBlocks>" + DestructibleBlocks.ToString().ToLower() + "</DestructibleBlocks>");
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
             sb.AppendLine("    <TypeId>MyObjectBuilder_ScenarioDefinition</TypeId>");
@@ -611,12 +616,21 @@ namespace SESM.Tools.Helpers
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "AutoSaveInMinutes", null));
                 settingsNode.SelectSingleNode("descendant::AutoSaveInMinutes").InnerText =
                     AutoSaveInMinutes.ToString();
+                
 
                 valueNode = settingsNode.SelectSingleNode("descendant::SpawnShipTimeMultiplier");
                 if(valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "SpawnShipTimeMultiplier", null));
                 settingsNode.SelectSingleNode("descendant::SpawnShipTimeMultiplier").InnerText =
                     SpawnShipTimeMultiplier.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::DestructibleBlocks");
+                if(valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "DestructibleBlocks", null));
+                settingsNode.SelectSingleNode("descendant::DestructibleBlocks").InnerText =
+                    DestructibleBlocks.ToString().ToLower();
+
 
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if (valueNode == null)
@@ -723,6 +737,8 @@ namespace SESM.Tools.Helpers
                 int.TryParse(sessionSettings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
             if(sessionSettings.Element("SpawnShipTimeMultiplier") != null)
                 int.TryParse(sessionSettings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
+            if(sessionSettings.Element("DestructibleBlocks") != null)
+                bool.TryParse(sessionSettings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
 
             if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                 Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
@@ -844,6 +860,8 @@ namespace SESM.Tools.Helpers
                 int.TryParse(settings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
             if(settings.Element("SpawnShipTimeMultiplier") != null)
                 int.TryParse(settings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
+            if(settings.Element("DestructibleBlocks") != null)
+                bool.TryParse(settings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
 
             Mods = new List<ulong>();
             if (root.Element("Mods") != null)
