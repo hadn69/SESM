@@ -58,6 +58,9 @@ namespace SESM.Tools.Helpers
         public int AutoSaveInMinutes = 5;
         public int SpawnShipTimeMultiplier = 1;
 
+        public float ProceduralDensity = 0;
+        public float ProceduralSeed = 0;
+
         /// <summary>
         /// Parse the View Model into the object
         /// </summary>
@@ -358,6 +361,11 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <AutoSaveInMinutes>" + AutoSaveInMinutes + "</AutoSaveInMinutes>");
             sb.AppendLine("    <SpawnShipTimeMultiplier>" + SpawnShipTimeMultiplier + "</SpawnShipTimeMultiplier>");
             sb.AppendLine("    <DestructibleBlocks>" + DestructibleBlocks.ToString().ToLower() + "</DestructibleBlocks>");
+            if (ProceduralDensity != 0)
+            {
+                sb.AppendLine("    <ProceduralDensity>" + ProceduralDensity + "</ProceduralDensity>");
+                sb.AppendLine("    <ProceduralSeed>" + ProceduralSeed + "</ProceduralSeed>");
+            }
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
             sb.AppendLine("    <TypeId>MyObjectBuilder_ScenarioDefinition</TypeId>");
@@ -739,6 +747,11 @@ namespace SESM.Tools.Helpers
                 int.TryParse(sessionSettings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
             if(sessionSettings.Element("DestructibleBlocks") != null)
                 bool.TryParse(sessionSettings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
+
+            if(sessionSettings.Element("ProceduralDensity") != null)
+                float.TryParse(sessionSettings.Element("ProceduralDensity").Value, out ProceduralDensity);
+            if(sessionSettings.Element("ProceduralSeed") != null)
+                float.TryParse(sessionSettings.Element("ProceduralSeed").Value, out ProceduralSeed);
 
             if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                 Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);

@@ -287,7 +287,19 @@ namespace SESM.Controllers
         public ActionResult New(int id)
         {
             ViewData["ID"] = id;
-            return View(new NewMapViewModel());
+            ServerProvider srvPrv = new ServerProvider(_context);
+            EntityServer serv = srvPrv.GetServer(id);
+            ServerConfigHelper serverConfig = new ServerConfigHelper();
+            serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+
+            NewMapViewModel view = new NewMapViewModel();
+
+            view.AsteroidAmount = serverConfig.AsteroidAmount;
+            view.MapType = serverConfig.ScenarioType;
+            view.ProceduralDensity = serverConfig.ProceduralDensity;
+            view.ProceduralSeed = serverConfig.ProceduralSeed;
+
+            return View(view);
         }
 
         //
@@ -309,6 +321,8 @@ namespace SESM.Controllers
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.ScenarioType = model.MapType;
                 serverConfig.AsteroidAmount = model.AsteroidAmount;
+                serverConfig.ProceduralDensity = model.ProceduralDensity;
+                serverConfig.ProceduralSeed = model.ProceduralSeed;
                 serverConfig.SaveName = string.Empty;
                 serv.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
                 srvPrv.UpdateServer(serv);
