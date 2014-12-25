@@ -275,7 +275,7 @@ namespace SESM.Controllers
                 ServiceState serviceState = srvPrv.GetState(item);
                 if(serviceState == ServiceState.Running)
                 {
-                    serviceLogger.Info(item.Name + " stopped by " + user.Login + " by API/Server/RestartServers/");
+                    serviceLogger.Info(item.Name + " restarted by " + user.Login + " by API/Server/RestartServers/");
                     ServiceHelper.StopService(item);
                     if(restartOnlyStarted)
                         serversToRestart.Add(item);
@@ -347,11 +347,63 @@ namespace SESM.Controllers
 
             foreach(EntityServer item in servers)
             {
-                serviceLogger.Info(item.Name + " stopped by " + user.Login + " by API/Server/StopServers/");
+                serviceLogger.Info(item.Name + " killed by " + user.Login + " by API/Server/KillServers/");
                 ServiceHelper.KillService(item);
             }
 
-            return Content(new XMLMessage(XmlResponseType.Success, "SRV-KILS-OK", "The following server(s) have been stopped : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
+            return Content(new XMLMessage(XmlResponseType.Success, "SRV-KILS-OK", "The following server(s) have been killed : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
+        }
+
+        // POST: API/Server/DeleteServers/
+        [HttpPost]
+        public ActionResult DeleteServers()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING **
+            string[] serverIDsString = Request.Form["ServerIDs"].Split(';');
+
+            List<int> serverIDs = new List<int>();
+
+            foreach(string item in serverIDsString)
+            {
+                int servID;
+                if(!int.TryParse(item, out servID))
+                {
+                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-DEL-INVALIDID", "The following ID is not a number : " + item).ToString());
+                }
+                serverIDs.Add(servID);
+            }
+
+            // ** ACCESS **
+            List<EntityServer> servers = new List<EntityServer>();
+            foreach(int item in serverIDs)
+            {
+                EntityServer server = srvPrv.GetServer(item);
+
+                if(server == null)
+                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-DEL-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
+
+                if(!user.IsAdmin)
+                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-DEL-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
+
+                servers.Add(server);
+            }
+
+            // ** PROCESS **
+            Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
+
+            foreach(EntityServer item in servers)
+            {
+                serviceLogger.Info(item.Name + " killed by " + user.Login + " by API/Server/DeleteServers/");
+                ServiceHelper.KillService(item);
+            }
+
+            return Content(new XMLMessage(XmlResponseType.Success, "SRV-KILS-OK", "The following server(s) have been killed : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
         protected override void Dispose(bool disposing)

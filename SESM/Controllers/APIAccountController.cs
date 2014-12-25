@@ -140,6 +140,7 @@ namespace SESM.Controllers
 
             response.AddToContent(new XElement("Login", user.Login));
             response.AddToContent(new XElement("Email", user.Email));
+            response.AddToContent(new XElement("IsSuperAdmin", user.IsAdmin.ToString()));
 
             return Content(response.ToString());
         }

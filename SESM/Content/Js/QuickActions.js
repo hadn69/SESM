@@ -12,9 +12,7 @@
                         Console.warn("Data : " + data);
                         return;
                     }
-                    var xmlDoc = $.parseXML(data);
-                    var xmlObj = $(xmlDoc);
-                    var root = xmlObj.find("Response");
+                    var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
                         toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
@@ -66,9 +64,7 @@
                         Console.warn("Data : " + data);
                         return;
                     }
-                    var xmlDoc = $.parseXML(data);
-                    var xmlObj = $(xmlDoc);
-                    var root = xmlObj.find("Response");
+                    var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
                         toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
@@ -91,9 +87,7 @@
                         Console.warn("Data : " + data);
                         return;
                     }
-                    var xmlDoc = $.parseXML(data);
-                    var xmlObj = $(xmlDoc);
-                    var root = xmlObj.find("Response");
+                    var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
                         toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
@@ -116,9 +110,7 @@
                         Console.warn("Data : " + data);
                         return;
                     }
-                    var xmlDoc = $.parseXML(data);
-                    var xmlObj = $(xmlDoc);
-                    var root = xmlObj.find("Response");
+                    var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
                         toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
@@ -141,9 +133,7 @@
                         Console.warn("Data : " + data);
                         return;
                     }
-                    var xmlDoc = $.parseXML(data);
-                    var xmlObj = $(xmlDoc);
-                    var root = xmlObj.find("Response");
+                    var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
                         toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());

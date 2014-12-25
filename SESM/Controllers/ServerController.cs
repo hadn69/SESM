@@ -29,17 +29,6 @@ namespace SESM.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            EntityUser user = Session["User"] as EntityUser;
-
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            List<EntityServer> serverList = srvPrv.GetServers(user);
-
-            ViewData["AccessLevel"] = srvPrv.GetHighestAccessLevel(serverList, user);
-            ViewData["ServerList"] = serverList;
-            ViewData["StateList"] = srvPrv.GetState(serverList);
-            
-            
             return View();
         }
 

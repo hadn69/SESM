@@ -255,12 +255,35 @@ namespace SESM.Tools.Helpers
             si.Close();
         }
 
+        /// <summary>
+        /// Kill a process, and all of its children, grandchildren, etc.
+        /// </summary>
+        /// <param name="pid">Process ID.</param>
+        private static void KillProcessAndChildren(int pid)
+        {
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher
+              ("Select * From Win32_Process Where ParentProcessID=" + pid);
+            ManagementObjectCollection moc = searcher.Get();
+            foreach(ManagementObject mo in moc)
+            {
+                KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
+            }
+            try
+            {
+                Process proc = Process.GetProcessById(pid);
+                proc.Kill();
+            }
+            catch(ArgumentException)
+            {
+                // Process already exited.
+            }
+        }
+
         public static void KillService(EntityServer server)
         {
             KillService(GetServiceName(server));
         }
 
-        // Source : http://stackoverflow.com/a/566089
         public static void KillService(string serviceName)
         {
             if(DoesServiceExist(serviceName))
@@ -268,24 +291,7 @@ namespace SESM.Tools.Helpers
                 uint? pid = GetServicePID(serviceName);
                 if(pid == null)
                     return;
-
-                Process process = Process.GetProcessById((int)pid);
-
-                try
-                {
-                    process.Kill();
-                }
-                catch(Win32Exception)
-                {
-                    // Thrown if process is already terminating,
-                    // the process is a Win16 exe or the process
-                    // could not be terminated.
-                }
-                catch(InvalidOperationException)
-                {
-                    // Thrown if the process has already terminated.
-                }
-
+                KillProcessAndChildren((int)pid);
             }
         }
 
@@ -295,31 +301,25 @@ namespace SESM.Tools.Helpers
             {
                 try
                 {
-                    proc.Kill();
+                    KillProcessAndChildren(proc.Id);
                 }
-                catch(Exception)
-                {
-
-                }
-
+                catch(Exception) { }
             }
             KillAllSESEService();
         }
+
         public static void KillAllSESEService()
         {
             foreach(Process proc in Process.GetProcessesByName("SEServerExtender"))
             {
                 try
                 {
-                    proc.Kill();
+                    KillProcessAndChildren(proc.Id);
                 }
-                catch(Exception)
-                {
-
-                }
-
+                catch(Exception) { }
             }
         }
+
         public static uint? GetServicePID(string serviceName)
         {
             if(!DoesServiceExist(serviceName))

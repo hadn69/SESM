@@ -439,6 +439,7 @@
     <Content Include="assets\admin\pages\scripts\ui-notific8.js" />
     <Content Include="assets\admin\pages\scripts\ui-toastr.js" />
     <Content Include="assets\admin\pages\scripts\ui-tree.js" />
+    <Content Include="assets\global\css\components-rounded.css" />
     <Content Include="assets\global\css\components.css" />
     <Content Include="assets\global\css\plugins.css" />
     <Content Include="assets\global\img\accordion-plusminus.png" />

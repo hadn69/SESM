@@ -68,9 +68,7 @@
                         return;
                     }
 
-                    var xmlDoc = $.parseXML(data);
-                    var xmlObj = $(xmlDoc);
-                    var root = xmlObj.find("Response");
+                    var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
                         $("#LoginErrorText").html(root.children("Content").text());
@@ -95,9 +93,7 @@
                                 Console.warn("Data : " + data);
                                 return;
                             }
-                            var xmlDoc = $.parseXML(data);
-                            var xmlObj = $(xmlDoc);
-                            var root = xmlObj.find("Response");
+                            var root = $($.parseXML(data)).find("Response");
                             if (root.children("Type").text() == "Error") {
                                 $("#LoginErrorText").html(root.children("Content").text());
                                 $('#LoginError').show();
@@ -200,9 +196,7 @@
                         return;
                     }
 
-                    var xmlDoc = $.parseXML(data);
-                    var xmlObj = $(xmlDoc);
-                    var root = xmlObj.find("Response");
+                    var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
                         $("#RegisterErrorText").html(root.children("Content").text());
