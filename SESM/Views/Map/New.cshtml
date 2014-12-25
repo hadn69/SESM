@@ -5,7 +5,7 @@
 }
 <div class="row">
     <div class="col-md-6">
-        @using (Html.BeginForm("New", "Map", null, FormMethod.Post, new { @class = "form-horizontal well", role = "form" }))
+        @using(Html.BeginForm("New", "Map", null, FormMethod.Post, new { @class = "form-horizontal well", role = "form" }))
         {
             @Html.ValidationSummary()
             <div class="form-group">
@@ -22,7 +22,20 @@
                     @Html.ValidationMessageFor(m => m.AsteroidAmount)
                 </div>
             </div>
-
+            <div class="form-group">
+                @Html.LabelFor(m => m.ProceduralDensity, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.ProceduralDensity, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ProceduralDensity)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ProceduralSeed, new { @class = "col-md-4 control-label" })
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.ProceduralSeed, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ProceduralSeed)
+                </div>
+            </div>
             <div class="form-group">
                 <div class="col-md-offset-4 col-md-8">
                     <input type="submit" value="Create" onclick="return confirm('This will (re)start this server. Are you sure you want to do this ?');" class="btn btn-primary" />
