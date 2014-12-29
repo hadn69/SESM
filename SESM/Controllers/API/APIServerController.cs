@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web.Mvc;
 using System.Xml.Linq;
 using NLog;
@@ -13,22 +16,6 @@ namespace SESM.Controllers
     public class APIServerController : Controller
     {
         private readonly DataContext _context = new DataContext();
-
-        private bool SecurityCheck(EntityServer server)
-        {
-            EntityUser user = Session["User"] as EntityUser;
-            if(user == null || server == null)
-                return false;
-
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, server.Id);
-            if(accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-            {
-                return true;
-            }
-            return false;
-        }
 
         // GET: API/Server/GetServers
         [HttpGet]
@@ -86,29 +73,6 @@ namespace SESM.Controllers
             response.AddToContent(new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id)));
 
             return Content(response.ToString());
-        }
-
-        // GET: API/Server/GetServerState/{ServerID}
-        [HttpGet]
-        public ActionResult GetServerState(int id)
-        {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            EntityServer server = srvPrv.GetServer(id);
-
-            // ** ACCESS **
-            if(server == null)
-                return Content(new XMLMessage(XmlResponseType.Error, "SRV-GS-UKNSRV", "The server doesn't exist").ToString());
-
-            if(srvPrv.GetAccessLevel(userID, server.Id) == AccessLevel.None)
-                return Content(new XMLMessage(XmlResponseType.Error, "SRV-GS-NOACCESS", "You don't have access to this server").ToString());
-
-            // ** PROCESS **
-            return Content(new XMLMessage(XmlResponseType.Success, "SRV-GS-OK", srvPrv.GetState(server).ToString()).ToString());
         }
 
         // POST: API/Server/StartServers/
@@ -401,9 +365,18 @@ namespace SESM.Controllers
             {
                 serviceLogger.Info(item.Name + " killed by " + user.Login + " by API/Server/DeleteServers/");
                 ServiceHelper.KillService(item);
+                Thread.Sleep(200);
+                ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(item));
+                try
+                {
+                    Directory.Delete(PathHelper.GetInstancePath(item), true);
+                }
+                catch (Exception)
+                {
+                }
             }
 
-            return Content(new XMLMessage(XmlResponseType.Success, "SRV-KILS-OK", "The following server(s) have been killed : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
+            return Content(new XMLMessage(XmlResponseType.Success, "SRV-DEL-OK", "The following server(s) have been deleted : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
         protected override void Dispose(bool disposing)

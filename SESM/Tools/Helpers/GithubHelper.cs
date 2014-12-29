@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Web.Helpers;
 using Ionic.Zip;
 using NLog;
@@ -17,14 +18,7 @@ namespace SESM.Tools.Helpers
             string data = GetGithubData();
             if(files.Length == 0)
             {
-                if(SESMConfigHelper.SESEDev)
-                {
-                    return GetLastetDevVersionURL(data);
-                }
-                else
-                {
-                    return GetLastetVersionURL(data);
-                }
+                return GetLastURL(data, SESMConfigHelper.SESEDev).ToString();
             }
             if(files.Length != 1)
             {
@@ -46,23 +40,13 @@ namespace SESM.Tools.Helpers
 
             }
 
-            if(SESMConfigHelper.SESEDev)
-            {
-                string last = GetLastetDevVersion(data);
-                if(string.IsNullOrEmpty(last) || last == PathHelper.GetLastLeaf(files[0]))
-                    return null;
-                return GetLastetDevVersionURL(data);
-            }
-            else
-            {
-                string last = GetLastetVersion(data);
-                if(string.IsNullOrEmpty(last) || last == PathHelper.GetLastLeaf(files[0]))
-                    return null;
-                return GetLastetVersionURL(data);
-            }
+            string last = GetLastVersion(data, SESMConfigHelper.SESEDev).ToString();
+            if(string.IsNullOrEmpty(last) || last == PathHelper.GetLastLeaf(files[0]))
+                return null;
+            return GetLastURL(data, SESMConfigHelper.SESEDev);
         }
 
-        public static string GetLastetVersion(string data)
+        public static string GetLastURL(string data, bool useDev)
         {
             dynamic result;
             try
@@ -75,34 +59,7 @@ namespace SESM.Tools.Helpers
             }
             foreach(dynamic item in result)
             {
-                if(!item.prerelease)
-                {
-                    return item.assets[0].name;
-                }
-            }
-            return null;
-        }
-
-        public static string GetLastetVersion()
-        {
-            string data = GetGithubData();
-            return GetLastetVersion(data);
-        }
-
-        public static string GetLastetVersionURL(string data)
-        {
-            dynamic result;
-            try
-            {
-                result = Json.Decode(data);
-            }
-            catch(Exception)
-            {
-                return null;
-            }
-            foreach(dynamic item in result)
-            {
-                if(!item.prerelease)
+                if((useDev && item.prerelease) || (!useDev && !item.prerelease))
                 {
                     return item.assets[0].browser_download_url;
                 }
@@ -110,7 +67,7 @@ namespace SESM.Tools.Helpers
             return null;
         }
 
-        public static string GetLastetDevVersion(string data)
+        public static Version GetLastVersion(string data, bool useDev)
         {
             dynamic result;
             try
@@ -123,46 +80,30 @@ namespace SESM.Tools.Helpers
             }
             foreach(dynamic item in result)
             {
-                if(item.prerelease)
+                if((useDev && item.prerelease) || (!useDev && !item.prerelease))
                 {
-                    return item.assets[0].name;
+                    Match extract = Regex.Match(item.assets[0].name, "^.*v(.*)-.*$");
+                    if (extract.Groups.Count != 2)
+                        return null;
+                    return new Version("0." + extract.Groups[1].Value);
                 }
             }
             return null;
         }
 
-        public static string GetLastetDevVersion()
-        {
-            string data = GetGithubData();
-            return GetLastetDevVersion(data);
-        }
-
-        public static string GetLastetDevVersionURL(string data)
-        {
-            dynamic result;
-            try
-            {
-                result = Json.Decode(data);
-            }
-            catch(Exception)
-            {
-                return null;
-            }
-            foreach(dynamic item in result)
-            {
-                if(item.prerelease)
-                {
-                    return item.assets[0].browser_download_url;
-                }
-            }
-            return null;
-        }
-
-        private static string GetGithubData()
+        public static string GetGithubData()
         {
             WebClient client = new WebClient();
             client.Headers.Add("user-agent", "SESM V2");
-            return client.DownloadString(SESMConfigHelper.SESEUpdateURL);
+            try
+            {
+                string response = client.DownloadString(SESMConfigHelper.SESEUpdateURL);
+                return string.IsNullOrWhiteSpace(response) ? null : response;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public static void CleanupUpdate()

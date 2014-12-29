@@ -3757,7 +3757,6 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Shared\_HeaderLogin.cshtml" />
     <Content Include="Views\Server\Index.cshtml" />
     <Content Include="Views\Server\Create.cshtml" />
     <Content Include="Views\Server\Details.cshtml" />
@@ -3786,6 +3785,7 @@
     <Content Include="Views\Shared\_Flash.cshtml" />
     <Content Include="Views\External\SignGen.cshtml" />
     <Content Include="Views\Shared\_BreadCrumb.cshtml" />
+    <Content Include="Views\Shared\_SideBar.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -3813,8 +3813,9 @@
     <Compile Include="Controllers\ActionFilters\GuestOnlyAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\ManagerAndAboveAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\SuperAdminAttribute.cs" />
-    <Compile Include="Controllers\APIAccountController.cs" />
-    <Compile Include="Controllers\APIServerController.cs" />
+    <Compile Include="Controllers\API\APIAccountController.cs" />
+    <Compile Include="Controllers\API\APIServerController.cs" />
+    <Compile Include="Controllers\API\APISettingsController.cs" />
     <Compile Include="Controllers\BackupController.cs" />
     <Compile Include="Controllers\ExternalController.cs" />
     <Compile Include="Controllers\FlashMessageExtensions.cs" />
@@ -3960,6 +3961,7 @@
     <Folder Include="assets\global\plugins\jquery-file-upload\server\node\public\files\thumbnail\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\php\files\thumbnail\" />
     <Folder Include="Views\APIServer\" />
+    <Folder Include="Views\APISettings\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
