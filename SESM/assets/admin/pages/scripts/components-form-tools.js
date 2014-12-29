@@ -521,6 +521,9 @@ var ComponentsFormTools = function () {
             var input = $(this);
 
             if (input.val() === "") {
+                input.closest('.form-group').removeClass('has-error').removeClass('has-success');
+                $('.fa-check, fa-warning', input.closest('.form-group')).remove();
+
                 return;
             }
 
@@ -538,13 +541,13 @@ var ComponentsFormTools = function () {
                 // change popover font color based on the result
                 if (res.status == 'OK') {
                     input.closest('.form-group').removeClass('has-error').addClass('has-success');
-                    $('.icon-exclamation-sign', input.closest('.form-group')).remove();
-                    input.before('<i class="icon-ok"></i>');
+                    $('.fa-warning', input.closest('.form-group')).remove();
+                    input.before('<i class="fa fa-check"></i>');
                     input.data('bs.popover').tip().removeClass('error').addClass('success');
                 } else {
                     input.closest('.form-group').removeClass('has-success').addClass('has-error');
-                    $('.icon-ok', input.closest('.form-group')).remove();
-                    input.before('<i class="icon-exclamation-sign"></i>');
+                    $('.fa-check', input.closest('.form-group')).remove();
+                    input.before('<i class="fa fa-warning"></i>');
 
                     input.popover('destroy');
                     input.popover({

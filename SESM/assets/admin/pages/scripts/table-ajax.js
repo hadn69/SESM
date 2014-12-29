@@ -20,6 +20,9 @@ var TableAjax = function () {
             onError: function (grid) {
                 // execute some code on network or other general error  
             },
+            onDataLoad: function(grid) {
+                // execute some code on ajax data load
+            },
             loadingMessage: 'Loading...',
             dataTable: { // here you can define a typical datatable settings from http://datatables.net/usage/options 
 
@@ -40,7 +43,7 @@ var TableAjax = function () {
                 },
                 "order": [
                     [1, "asc"]
-                ] // set first column as a default sort by asc
+                ]// set first column as a default sort by asc
             }
         });
 

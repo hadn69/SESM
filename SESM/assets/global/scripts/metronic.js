@@ -17,6 +17,8 @@ var Metronic = function() {
 
     var globalPluginsPath = 'global/plugins/';
 
+    var globalCssPath = 'global/css/';
+
     // theme layout color set
 
     var brandColors = {
@@ -242,6 +244,14 @@ var Metronic = function() {
         $('.make-switch').bootstrapSwitch();
     };
 
+    // Handles Bootstrap confirmations
+    var handleBootstrapConfirmation = function() {
+        if (!$().confirmation) {
+            return;
+        }
+        $('[data-toggle=confirmation]').confirmation({ container: 'body', btnOkClass: 'btn-xs btn-success', btnCancelClass: 'btn-xs btn-danger'});
+    }
+    
     // Handles Bootstrap Accordions.
     var handleAccordions = function() {
         $('body').on('shown.bs.collapse', '.accordion.scrollable', function(e) {
@@ -462,6 +472,7 @@ var Metronic = function() {
             handlePopovers(); // handles bootstrap popovers
             handleAccordions(); //handles accordions 
             handleModals(); // handle modals
+            handleBootstrapConfirmation(); // handle bootstrap confirmations
 
             // Hacks
             handleFixInputPlaceholderForIE(); //IE8 & IE9 input placeholder issue fix
@@ -480,6 +491,7 @@ var Metronic = function() {
             handleTooltips(); // handle bootstrap tooltips
             handlePopovers(); // handles bootstrap popovers
             handleAccordions(); //handles accordions 
+            handleBootstrapConfirmation(); // handle bootstrap confirmations
         },
 
         //init main components 
@@ -849,6 +861,10 @@ var Metronic = function() {
             return assetsPath + globalPluginsPath;
         },
 
+        getGlobalCssPath: function() {
+            return assetsPath + globalCssPath;
+        },
+
         // get layout color code by color name
         getBrandColor: function(name) {
             if (brandColors[name]) {
@@ -856,6 +872,18 @@ var Metronic = function() {
             } else {
                 return '';
             }
+        },
+
+        getResponsiveBreakpoint: function(size) {
+            // bootstrap responsive breakpoints
+            var sizes = {
+                'xs' : 480,     // extra small
+                'sm' : 768,     // small
+                'md' : 992,     // medium
+                'lg' : 1200     // large
+            };
+
+            return sizes[size] ? sizes[size] : 0; 
         }
     };
 

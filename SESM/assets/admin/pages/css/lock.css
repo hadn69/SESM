@@ -2,7 +2,7 @@
 Lock Page
 ***/
 body {
-  background-color: #364150 !important;
+  background-color: #465568 !important;
   padding: 0;
   margin: 0;
 }
@@ -21,6 +21,11 @@ body {
   width: 100%;
   margin-top: 50px;
   background-color: #3a4554;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  -ms-border-radius: 7px;
+  -o-border-radius: 7px;
+  border-radius: 7px;
 }
 
 .lock-head {
@@ -32,6 +37,11 @@ body {
   font-size: 22px;
   font-weight: 400;
   color: #4db3a5;
+  -webkit-border-radius: 7px 7px 0 0;
+  -moz-border-radius: 7px 7px 0 0;
+  -ms-border-radius: 7px 7px 0 0;
+  -o-border-radius: 7px 7px 0 0;
+  border-radius: 7px 7px 0 0;
 }
 
 .lock-body {
@@ -66,8 +76,8 @@ body {
 .lock-form .form-group .form-control {
   background-color: #303a48;
   border: none;
-  padding: 20px 20px;
   width: 220px;
+  height: 40px;
   color: #697687;
 }
 
@@ -109,6 +119,11 @@ body {
   text-align: center;
   padding-top: 20px;
   padding-bottom: 20px;
+  -webkit-border-radius: 0 0 7px 7px;
+  -moz-border-radius: 0 0 7px 7px;
+  -ms-border-radius: 0 0 7px 7px;
+  -o-border-radius: 0 0 7px 7px;
+  border-radius: 0 0 7px 7px;
 }
 
 .lock-bottom a {

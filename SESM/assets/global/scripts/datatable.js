@@ -145,6 +145,11 @@ var Datatable = function() {
                         }
                         Metronic.initUniform($('input[type="checkbox"]', table)); // reinitialize uniform checkboxes on each table reload
                         countSelectedRecords(); // reset selected records indicator
+
+                        // callback for ajax data load
+                        if (tableOptions.onDataLoad) {
+                            tableOptions.onDataLoad.call(undefined, the);
+                        }
                     }
                 }
             }, options);

@@ -1044,11 +1044,11 @@ Page sidebar
 }
 .page-container-bg-solid .page-sidebar .page-sidebar-menu > li.active > a > .selected, .page-container-bg-solid
 .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li.active > a > .selected {
-  border-color: transparent #f1f3fa transparent transparent;
+  border-color: transparent #F1F3FA transparent transparent;
 }
 .page-container-bg-solid.page-sidebar-reversed .page-sidebar .page-sidebar-menu > li.active > a > .selected, .page-container-bg-solid.page-sidebar-reversed
 .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li.active > a > .selected {
-  border-color: transparent transparent transparent #f1f3fa;
+  border-color: transparent transparent transparent #F1F3FA;
 }
 .page-sidebar .page-sidebar-menu li > a > .arrow:before,
 .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu li > a > .arrow:before {
@@ -1273,6 +1273,9 @@ Page sidebar
   }
   .page-sidebar-fixed .page-sidebar-menu > li.last {
     margin-bottom: 15px !important;
+  }
+  .page-sidebar-fixed .page-sidebar-menu .sub-menu {
+    height: auto !important;
   }
 
   /* Sidebar Closed */
@@ -2198,7 +2201,7 @@ Page content
   background-color: #fff;
 }
 .page-container-bg-solid .page-content {
-  background: #f1f3fa;
+  background: #F1F3FA;
 }
 .page-full-width .page-content {
   margin-left: 0px !important;
@@ -2584,14 +2587,14 @@ Theme Panel
   right: 0;
 }
 .page-container-bg-solid .theme-panel > .toggler {
-  background: #bfcad1 url(../img/icon-color.png) center no-repeat;
+  background: #BFCAD1 url(../img/icon-color.png) center no-repeat;
 }
 .page-container-bg-solid.page-sidebar-reversed .theme-panel {
   margin-right: 255px;
 }
 
 /***  
-Page Loading    
+Page Loading       
 ***/
 .page-on-load {
   background: #fefefe;

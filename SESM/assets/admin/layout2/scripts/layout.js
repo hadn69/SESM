@@ -7,6 +7,8 @@ var Layout = function() {
 
     var layoutCssPath = 'admin/layout2/css/';
 
+    var resBreakpointMd = Metronic.getResponsiveBreakpoint('md');
+
     //* BEGIN:CORE HANDLERS *//
     // this function handles responsive layout on screen size resize or mobile device rotate.
 
@@ -32,7 +34,7 @@ var Layout = function() {
                 var headerHeight = $('.page-header').outerHeight();
                 var footerHeight = $('.page-footer').outerHeight();
 
-                if (Metronic.getViewPort().width < 992) {
+                if (Metronic.getViewPort().width < resBreakpointMd) {
                     height = Metronic.getViewPort().height - headerHeight - footerHeight;
                 } else {
                     height = sidebar.outerHeight() + 10;
@@ -105,7 +107,7 @@ var Layout = function() {
         });
 
         if (mode === 'click') {
-            if (Metronic.getViewPort().width < 992 && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
+            if (Metronic.getViewPort().width < resBreakpointMd && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
                 $('.page-header .responsive-toggler').click();
             }
         }
@@ -115,12 +117,12 @@ var Layout = function() {
     var handleSidebarMenu = function() {
         $('.page-sidebar').on('click', 'li > a', function(e) {
 
-            if (Metronic.getViewPort().width >= 992 && $(this).parents('.page-sidebar-menu-hover-submenu').size() === 1) { // exit of hover sidebar menu
+            if (Metronic.getViewPort().width >= resBreakpointMd && $(this).parents('.page-sidebar-menu-hover-submenu').size() === 1) { // exit of hover sidebar menu
                 return;
             }
 
             if ($(this).next().hasClass('sub-menu') === false) {
-                if (Metronic.getViewPort().width < 992 && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
+                if (Metronic.getViewPort().width < resBreakpointMd && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
                     $('.page-header .responsive-toggler').click();
                 }
                 return;
@@ -201,7 +203,7 @@ var Layout = function() {
             });
             $(this).parents('li').addClass('active');
 
-            if (Metronic.getViewPort().width < 992 && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
+            if (Metronic.getViewPort().width < resBreakpointMd && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
                 $('.page-header .responsive-toggler').click();
             }
 
@@ -243,7 +245,7 @@ var Layout = function() {
 
             Metronic.startPageLoading();
 
-            if (Metronic.getViewPort().width < 992 && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
+            if (Metronic.getViewPort().width < resBreakpointMd && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
                 $('.page-header .responsive-toggler').click();
             }
 
@@ -264,6 +266,11 @@ var Layout = function() {
                 }
             });
         });
+
+        // handle scrolling to top on responsive menu toggler click when header is fixed for mobile view
+        $(document).on('click', '.page-header-fixed-mobile .page-header .responsive-toggler', function(){
+            Metronic.scrollTop();
+        });      
     };
 
     // Helper function to calculate sidebar height for fixed sidebar layout.
@@ -287,7 +294,7 @@ var Layout = function() {
             return;
         }
 
-        if (Metronic.getViewPort().width >= 992) {
+        if (Metronic.getViewPort().width >= resBreakpointMd) {
             menu.attr("data-height", _calculateFixedSidebarViewportHeight());
             Metronic.initSlimScroll(menu);
             handleSidebarAndContentHeight();
@@ -313,7 +320,7 @@ var Layout = function() {
     // Hanles sidebar toggler
     var handleSidebarToggler = function() {
         var body = $('body');
-        if ($.cookie && $.cookie('sidebar_closed') === '1' && Metronic.getViewPort().width >= 992) {
+        if ($.cookie && $.cookie('sidebar_closed') === '1' && Metronic.getViewPort().width >= resBreakpointMd) {
             $('body').addClass('page-sidebar-closed');
             $('.page-sidebar-menu').addClass('page-sidebar-menu-closed');
         }
@@ -482,7 +489,7 @@ var Layout = function() {
 
         var portletBody = target.find('.portlet-body');
 
-        if (Metronic.getViewPort().width < 992) {
+        if (Metronic.getViewPort().width < resBreakpointMd) {
             Metronic.destroySlimScroll(portletBody.find('.full-height-content-body')); // destroy slimscroll 
             return;
         }

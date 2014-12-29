@@ -15,7 +15,11 @@ Login page
 
 .login .content {
   background-color: #eceef1;
-  border-radius: 7px !important;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  -ms-border-radius: 7px;
+  -o-border-radius: 7px;
+  border-radius: 7px;
   width: 400px;
   margin: 40px auto 10px auto;
   padding: 30px;
@@ -178,6 +182,11 @@ Login page
   padding: 15px 0 17px 0;
   text-align: center;
   background-color: #6c7a8d;
+  -webkit-border-radius: 0 0 7px 7px;
+  -moz-border-radius: 0 0 7px 7px;
+  -ms-border-radius: 0 0 7px 7px;
+  -o-border-radius: 0 0 7px 7px;
+  border-radius: 0 0 7px 7px;
 }
 
 .login .content .create-account p a {

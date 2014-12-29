@@ -20,9 +20,14 @@ body {
 }
 
 .page-lock .page-body {
-  width: 500px;
-  padding: 10px;
+  width: 510px;
+  padding: 15px;
   background: url(../img/bg-white-lock.png) repeat;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  -ms-border-radius: 7px;
+  -o-border-radius: 7px;
+  border-radius: 7px;
 }
 
 .page-lock .page-body:after,
@@ -105,7 +110,7 @@ body {
   }
 
   .page-lock .page-body {
-    padding: 10px;
+    padding: 20px 10px;
     text-align: center;
     width: 280px;
   }

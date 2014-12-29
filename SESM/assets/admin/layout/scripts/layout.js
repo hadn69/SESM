@@ -7,6 +7,8 @@ var Layout = function () {
 
     var layoutCssPath = 'admin/layout/css/';
 
+    var resBreakpointMd = Metronic.getResponsiveBreakpoint('md');
+
     //* BEGIN:CORE HANDLERS *//
     // this function handles responsive layout on screen size resize or mobile device rotate.
 
@@ -32,7 +34,7 @@ var Layout = function () {
                 var headerHeight = $('.page-header').outerHeight();
                 var footerHeight = $('.page-footer').outerHeight();
 
-                if (Metronic.getViewPort().width < 992) {
+                if (Metronic.getViewPort().width < resBreakpointMd) {
                     height = Metronic.getViewPort().height - headerHeight - footerHeight;
                 } else {
                     height = sidebar.height() + 20;
@@ -105,7 +107,7 @@ var Layout = function () {
         });
 
         if (mode === 'click') {
-            if (Metronic.getViewPort().width < 992 && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
+            if (Metronic.getViewPort().width < resBreakpointMd && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
                 $('.page-header .responsive-toggler').click();
             }
         }
@@ -114,15 +116,15 @@ var Layout = function () {
     // Handle sidebar menu
     var handleSidebarMenu = function () {
         // handle sidebar link click
-        jQuery('.page-sidebar').on('click', 'li > a', function (e) {
+        $('.page-sidebar').on('click', 'li > a', function (e) {
             var hasSubMenu = $(this).next().hasClass('sub-menu');
 
-            if (Metronic.getViewPort().width >= 992 && $(this).parents('.page-sidebar-menu-hover-submenu').size() === 1) { // exit of hover sidebar menu
+            if (Metronic.getViewPort().width >= resBreakpointMd && $(this).parents('.page-sidebar-menu-hover-submenu').size() === 1) { // exit of hover sidebar menu
                 return;
             }
 
             if (hasSubMenu === false) {
-                if (Metronic.getViewPort().width < 992 && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
+                if (Metronic.getViewPort().width < resBreakpointMd && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
                     $('.page-header .responsive-toggler').click();
                 }
                 return;
@@ -135,7 +137,7 @@ var Layout = function () {
             var parent = $(this).parent().parent();
             var the = $(this);
             var menu = $('.page-sidebar-menu');
-            var sub = jQuery(this).next();
+            var sub = $(this).next();
 
             var autoScroll = menu.data("auto-scroll");
             var slideSpeed = parseInt(menu.data("slide-speed"));
@@ -150,8 +152,8 @@ var Layout = function () {
             var slideOffeset = -200;
 
             if (sub.is(":visible")) {
-                jQuery('.arrow', jQuery(this)).removeClass("open");
-                jQuery(this).parent().removeClass("open");
+                $('.arrow', $(this)).removeClass("open");
+                $(this).parent().removeClass("open");
                 sub.slideUp(slideSpeed, function () {
                     if (autoScroll === true && $('body').hasClass('page-sidebar-closed') === false) {
                         if ($('body').hasClass('page-sidebar-fixed')) {
@@ -165,8 +167,8 @@ var Layout = function () {
                     handleSidebarAndContentHeight();
                 });
             } else if (hasSubMenu) {
-                jQuery('.arrow', jQuery(this)).addClass("open");
-                jQuery(this).parent().addClass("open");
+                $('.arrow', $(this)).addClass("open");
+                $(this).parent().addClass("open");
                 sub.slideDown(slideSpeed, function () {
                     if (autoScroll === true && $('body').hasClass('page-sidebar-closed') === false) {
                         if ($('body').hasClass('page-sidebar-fixed')) {
@@ -185,12 +187,12 @@ var Layout = function () {
         });
 
         // handle ajax links within sidebar menu
-        jQuery('.page-sidebar').on('click', ' li > a.ajaxify', function (e) {
+        $('.page-sidebar').on('click', ' li > a.ajaxify', function (e) {
             e.preventDefault();
             Metronic.scrollTop();
 
             var url = $(this).attr("href");
-            var menuContainer = jQuery('.page-sidebar ul');
+            var menuContainer = $('.page-sidebar ul');
             var pageContent = $('.page-content');
             var pageContentBody = $('.page-content .page-content-body');
 
@@ -203,7 +205,7 @@ var Layout = function () {
             });
             $(this).parents('li').addClass('active');
 
-            if (Metronic.getViewPort().width < 992 && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
+            if (Metronic.getViewPort().width < resBreakpointMd && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
                 $('.page-header .responsive-toggler').click();
             }
 
@@ -234,7 +236,7 @@ var Layout = function () {
         });
 
         // handle ajax link within main content
-        jQuery('.page-content').on('click', '.ajaxify', function (e) {
+        $('.page-content').on('click', '.ajaxify', function (e) {
             e.preventDefault();
             Metronic.scrollTop();
 
@@ -244,7 +246,7 @@ var Layout = function () {
 
             Metronic.startPageLoading();
 
-            if (Metronic.getViewPort().width < 992 && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
+            if (Metronic.getViewPort().width < resBreakpointMd && $('.page-sidebar').hasClass("in")) { // close the menu on mobile view while laoding a page 
                 $('.page-header .responsive-toggler').click();
             }
 
@@ -265,6 +267,11 @@ var Layout = function () {
                 }
             });
         });
+
+        // handle scrolling to top on responsive menu toggler click when header is fixed for mobile view
+        $(document).on('click', '.page-header-fixed-mobile .page-header .responsive-toggler', function(){
+            Metronic.scrollTop(); 
+        });      
      
         // handle sidebar hover effect        
         handleFixedSidebarHoverEffect();
@@ -335,7 +342,7 @@ var Layout = function () {
             return;
         }
 
-        if (Metronic.getViewPort().width >= 992) {
+        if (Metronic.getViewPort().width >= resBreakpointMd) {
             menu.attr("data-height", _calculateFixedSidebarViewportHeight());
             Metronic.initSlimScroll(menu);
             handleSidebarAndContentHeight();
@@ -361,7 +368,7 @@ var Layout = function () {
     // Hanles sidebar toggler
     var handleSidebarToggler = function () {
         var body = $('body');
-        if ($.cookie && $.cookie('sidebar_closed') === '1' && Metronic.getViewPort().width >= 992) {
+        if ($.cookie && $.cookie('sidebar_closed') === '1' && Metronic.getViewPort().width >= resBreakpointMd) {
             $('body').addClass('page-sidebar-closed');
             $('.page-sidebar-menu').addClass('page-sidebar-menu-closed');
         }
@@ -497,7 +504,7 @@ var Layout = function () {
         if (target.hasClass('portlet')) {
             var portletBody = target.find('.portlet-body');
             
-            if (Metronic.getViewPort().width < 992) {
+            if (Metronic.getViewPort().width < resBreakpointMd) {
                 Metronic.destroySlimScroll(portletBody.find('.full-height-content-body')); // destroy slimscroll 
                 return;
             }
@@ -515,7 +522,7 @@ var Layout = function () {
                 portletBody.css('min-height', height);
             }
         } else {
-            if (Metronic.getViewPort().width < 992) {
+            if (Metronic.getViewPort().width < resBreakpointMd) {
                 Metronic.destroySlimScroll(target.find('.full-height-content-body')); // destroy slimscroll 
                 return;
             }

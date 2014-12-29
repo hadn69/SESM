@@ -3253,8 +3253,13 @@ Notes
   color: #333333, 80%;
 }
 .note.note-default.note-bordered {
-  background-color: #c9c9c9;
-  border-color: #a5a5a5;
+  background-color: #c3c3c3;
+  border-color: #a0a0a0;
+}
+.note.note-default.note-shadow {
+  background-color: #c6c6c6;
+  border-color: #a0a0a0;
+  box-shadow: 5px 5px rgba(162, 162, 162, 0.2);
 }
 .note.note-primary {
   background-color: #5697d0;
@@ -3262,8 +3267,13 @@ Notes
   color: #D8E3F2, 80%;
 }
 .note.note-primary.note-bordered {
-  background-color: #468dcb;
-  border-color: #2c7c9e;
+  background-color: #3e89c9;
+  border-color: #2a7696;
+}
+.note.note-primary.note-shadow {
+  background-color: #428bca;
+  border-color: #2a7696;
+  box-shadow: 5px 5px rgba(43, 121, 154, 0.2);
 }
 .note.note-success {
   background-color: #eef7ea;
@@ -3271,8 +3281,13 @@ Notes
   color: #3c763d, 80%;
 }
 .note.note-success.note-bordered {
-  background-color: #e2f1dc;
-  border-color: #c1dea8;
+  background-color: #dcefd4;
+  border-color: #bbdba1;
+}
+.note.note-success.note-shadow {
+  background-color: #dff0d8;
+  border-color: #bbdba1;
+  box-shadow: 5px 5px rgba(190, 220, 164, 0.2);
 }
 .note.note-info {
   background-color: #eef7fb;
@@ -3280,8 +3295,13 @@ Notes
   color: #31708f, 80%;
 }
 .note.note-info.note-bordered {
-  background-color: #ddeff8;
-  border-color: #9adcea;
+  background-color: #d5ebf6;
+  border-color: #91d9e8;
+}
+.note.note-info.note-shadow {
+  background-color: #d9edf7;
+  border-color: #91d9e8;
+  box-shadow: 5px 5px rgba(150, 219, 233, 0.2);
 }
 .note.note-warning {
   background-color: #fcf8e3;
@@ -3289,8 +3309,13 @@ Notes
   color: #8a6d3b, 80%;
 }
 .note.note-warning.note-bordered {
-  background-color: #faf3d1;
-  border-color: #f3d390;
+  background-color: #f9f1c7;
+  border-color: #f2cf87;
+}
+.note.note-warning.note-shadow {
+  background-color: #faf2cc;
+  border-color: #f2cf87;
+  box-shadow: 5px 5px rgba(243, 209, 139, 0.2);
 }
 .note.note-danger {
   background-color: #f9f0f0;
@@ -3298,8 +3323,13 @@ Notes
   color: #a94442, 80%;
 }
 .note.note-danger.note-bordered {
-  background-color: #f3e2e2;
-  border-color: #dfaeb7;
+  background-color: #f1dada;
+  border-color: #dca7b0;
+}
+.note.note-danger.note-shadow {
+  background-color: #f2dede;
+  border-color: #dca7b0;
+  box-shadow: 5px 5px rgba(222, 171, 179, 0.2);
 }
 
 /***
@@ -5133,7 +5163,7 @@ Custom tabs
   position: relative;
 }
 .tabbable-custom > .nav-tabs > li.active > a {
-  border-top: none;
+  border-top: none !important;
   font-weight: 400;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;

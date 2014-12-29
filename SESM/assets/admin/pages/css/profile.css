@@ -150,7 +150,7 @@ New Profile Page
   /* 991px */
   .profile-sidebar {
     float: none;
-    width: 100%;
+    width: 100% !important;
     margin: 0;
   }
 
