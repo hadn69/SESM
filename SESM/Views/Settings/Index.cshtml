@@ -1,82 +1,21 @@
-﻿@model SESM.Models.Views.Settings.SettingsViewModel
-@{
-    ViewBag.Title = "Settings";
-}
-<div class="row">
-    <div class="col-md-6">
-        @using(Html.BeginForm("Index", "Settings", null, FormMethod.Post, new { @class = "form-horizontal well", role = "form" }))
-        {
-            @Html.ValidationSummary()
-            <div class="form-group">
-                @Html.LabelFor(m => m.Prefix, new { @class = "col-md-4 control-label" })
-                <div class="col-md-8">
-                    @Html.TextBoxFor(m => m.Prefix, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.Prefix)
-                </div>
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.SESavePath, new { @class = "col-md-4 control-label" })
-                <div class="col-md-8">
-                    @Html.TextBoxFor(m => m.SESavePath, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.SESavePath)
-                </div>
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.SEDataPath, new { @class = "col-md-4 control-label" })
-                <div class="col-md-8">
-                    @Html.TextBoxFor(m => m.SEDataPath, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.SEDataPath)
-                </div>
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.Arch, new { @class = "col-md-4 control-label" })
-                <div class="col-md-8">
-                    @Html.EnumDropDownListFor(m => m.Arch, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.Arch)
-                </div>
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.AddDateToLog, new { @class = "col-md-4 control-label" })
-                <div class="col-md-8">
-                    @Html.CheckBoxFor(m => m.AddDateToLog, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.AddDateToLog)
-                </div>
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.SendLogToKeen, new { @class = "col-md-4 control-label" })
-                <div class="col-md-8">
-                    @Html.CheckBoxFor(m => m.SendLogToKeen, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(m => m.SendLogToKeen)
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-offset-4 col-md-8">
-                    <div class="btn-group">
-                        <input type="submit" value="Save" onclick="return confirm('This will restart all running servers, are you sure you want to save?');" class="btn btn-primary" />
-                    </div>
-                </div>
-            </div>
-            <div class="btn-group btn-group-justified">
-                <a class="btn btn-success" href="@(Url.Action("UploadBin", "Settings"))">Upload Game Files</a>
-                <a class="btn btn-info" href="@(Url.Action("Backups", "Settings"))">Configure Backups</a>
-            </div>
-            <div class="btn-group btn-group-justified">
-                <a class="btn btn-primary" href="@(Url.Action("SteamCMD", "Settings"))">Configure SteamCMD</a>
-                <a class="btn btn-warning" href="@(Url.Action("ManualUpdate", "Settings"))">Manual-Update</a>
-            </div>
-            <div class="btn-group btn-group-justified">
-                <a class="btn btn-warning" href="@(Url.Action("ManualUpdateForce", "Settings"))">Force Manual-Update</a>
-                <a class="btn btn-info" href="@(Url.Action("AutoUpdate", "Settings"))">Configure Auto-Update</a>
+﻿@{
+    ViewBag.Title = "Global Settings";
 
+    List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
+    breadCrumb.Add(new KeyValuePair<string, string>("Global Setting", "/Settings/"));
+    ViewBag.Breadcrumb = breadCrumb;
+}
+
+<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <div class="dashboard-stat blue-madison">
+        <div class="visual">
+            <i class="icon-rocket"></i>
+        </div>
+        <div class="details">
+            <div class="number">
+               SE Server Extender
             </div>
-            <div class="btn-group btn-group-justified">
-                <a class="btn btn-danger" href="@(Url.Action("CleanPerf", "Settings"))">Clean Perf Data</a>
-                <a class="btn btn-primary" href="@(Url.Action("CleanSteamCMD", "Settings"))">Clean Auto/Manual Update Data</a>
-            </div>
-            <div class="btn-group btn-group-justified">
-                <a class="btn btn-warning" href="@(Url.Action("SESEManualUpdate", "Settings"))">SESE Manual Update</a>
-                <a class="btn btn-info" href="@(Url.Action("SESEManualUpdateForce", "Settings"))">SESE Manual Update Force</a>
-            </div>
-        }
+        </div>
+
     </div>
 </div>

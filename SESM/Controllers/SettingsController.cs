@@ -22,6 +22,25 @@ namespace SESM.Controllers
     {
         private readonly DataContext _context = new DataContext();
 
+        [HttpGet]
+        [SuperAdmin]
+        public ActionResult Index()
+        {
+
+            return View();
+        }
+
+        [HttpGet]
+        [SuperAdmin]
+        public ActionResult SESE()
+        {
+
+            return View();
+        }
+
+        /*
+
+
         //
         // GET: Settings
         [HttpGet]
@@ -42,7 +61,7 @@ namespace SESM.Controllers
 
             return View(model);
         }
-
+        */
         //
         // POST: Settings
         [HttpPost]
