@@ -215,6 +215,10 @@ namespace SESM.Models.Views.Server
         public bool DestructibleBlocks { get; set; }
 
         [Required]
+        [DisplayName("Allow In-game Programming")]
+        public bool EnableIngameScripts { get; set; }
+
+        [Required]
         [DisplayName("Ignore Last Session")]
         public bool IgnoreLastSession { get; set; }
 

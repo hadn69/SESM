@@ -295,6 +295,13 @@
                         @Html.ValidationMessageFor(m => m.RealisticSound)
                     </div>
                 </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, it will allow players to use in-game scripting">
+                    @Html.LabelFor(m => m.EnableIngameScripts, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.EnableIngameScripts, valueClass)
+                        @Html.ValidationMessageFor(m => m.EnableIngameScripts)
+                    </div>
+                </div>
             </section>
         </div>
     </div>
