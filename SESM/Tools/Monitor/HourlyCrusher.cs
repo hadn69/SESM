@@ -78,6 +78,9 @@ namespace SESM.Tools.Monitor
                     _logger.Info("Deleting the perf entries");
                     prfPrv.RemoveEntries(perfEntries);
 
+                    prfPrv.RemoveEntries(item.PerfEntries.Where(x => x.Timestamp <= timestamp.AddDays(-14))
+                        .ToList());
+
                     _logger.Info("Adding the summary perf entry");
                     item.PerfEntries.Add(perfEntry);
                     srvPrv.UpdateServer(item);

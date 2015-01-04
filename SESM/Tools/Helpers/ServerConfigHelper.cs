@@ -52,6 +52,7 @@ namespace SESM.Tools.Helpers
         public string ServerName = "SESM";
         public bool PauseGameWhenEmpty = false;
         public bool DestructibleBlocks = true;
+        public bool EnableIngameScripts = true;
 
         public bool IgnoreLastSession = false;
         public string WorldName = string.Empty;
@@ -95,6 +96,7 @@ namespace SESM.Tools.Helpers
             AutoSaveInMinutes = model.AutoSaveInMinutes;
             SpawnShipTimeMultiplier = model.SpawnShipTimeMultiplier;
             DestructibleBlocks = model.DestructibleBlocks;
+            EnableIngameScripts = model.EnableIngameScripts;
 
             ScenarioType = model.ScenarioType;
             SaveName = model.SaveName;
@@ -201,6 +203,7 @@ namespace SESM.Tools.Helpers
             AutoSaveInMinutes = model.AutoSaveInMinutes;
             SpawnShipTimeMultiplier = model.SpawnShipTimeMultiplier;
             DestructibleBlocks = model.DestructibleBlocks;
+            EnableIngameScripts = model.EnableIngameScripts;
 
             IP = model.IP;
             SteamPort = model.SteamPort;
@@ -307,6 +310,7 @@ namespace SESM.Tools.Helpers
             model.AutoSaveInMinutes = AutoSaveInMinutes;
             model.SpawnShipTimeMultiplier = SpawnShipTimeMultiplier;
             model.DestructibleBlocks = DestructibleBlocks;
+            model.EnableIngameScripts = EnableIngameScripts;
 
             model.ScenarioType = ScenarioType;
             model.SaveName = SaveName;
@@ -361,6 +365,7 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <AutoSaveInMinutes>" + AutoSaveInMinutes + "</AutoSaveInMinutes>");
             sb.AppendLine("    <SpawnShipTimeMultiplier>" + SpawnShipTimeMultiplier + "</SpawnShipTimeMultiplier>");
             sb.AppendLine("    <DestructibleBlocks>" + DestructibleBlocks.ToString().ToLower() + "</DestructibleBlocks>");
+            sb.AppendLine("    <EnableIngameScripts>" + EnableIngameScripts.ToString().ToLower() + "</EnableIngameScripts>");
             if (ProceduralDensity != 0)
             {
                 sb.AppendLine("    <ProceduralDensity>" + ProceduralDensity + "</ProceduralDensity>");
@@ -640,6 +645,13 @@ namespace SESM.Tools.Helpers
                     DestructibleBlocks.ToString().ToLower();
 
 
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableIngameScripts");
+                if(valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableIngameScripts", null));
+                settingsNode.SelectSingleNode("descendant::EnableIngameScripts").InnerText =
+                    EnableIngameScripts.ToString().ToLower();
+
+
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if (valueNode == null)
                     root.AppendChild(doc.CreateNode(XmlNodeType.Element, "Mods", null));
@@ -747,6 +759,8 @@ namespace SESM.Tools.Helpers
                 int.TryParse(sessionSettings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
             if(sessionSettings.Element("DestructibleBlocks") != null)
                 bool.TryParse(sessionSettings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
+            if(sessionSettings.Element("EnableIngameScripts") != null)
+                bool.TryParse(sessionSettings.Element("EnableIngameScripts").Value, out EnableIngameScripts);
 
             if(sessionSettings.Element("ProceduralDensity") != null)
                 float.TryParse(sessionSettings.Element("ProceduralDensity").Value, out ProceduralDensity);
@@ -875,6 +889,8 @@ namespace SESM.Tools.Helpers
                 int.TryParse(settings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
             if(settings.Element("DestructibleBlocks") != null)
                 bool.TryParse(settings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
+            if(settings.Element("EnableIngameScripts") != null)
+                bool.TryParse(settings.Element("EnableIngameScripts").Value, out EnableIngameScripts);
 
             Mods = new List<ulong>();
             if (root.Element("Mods") != null)
