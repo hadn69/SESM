@@ -433,7 +433,7 @@ namespace SESM.Tools.Helpers
             File.WriteAllText(PathHelper.GetConfigurationFilePath(serv), sb.ToString());
 
             // Saving the parameters also to the save file
-            if (!String.IsNullOrEmpty(SaveName))
+            if(!String.IsNullOrEmpty(SaveName) && File.Exists(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc"))
             {
                 XmlDocument doc = new XmlDocument();
                 doc.Load(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc");
