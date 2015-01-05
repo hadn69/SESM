@@ -464,7 +464,7 @@ namespace SESM.Controllers
             serverView.WebAdministrators = string.Join("\r\n", serv.Administrators.Select(item => item.Login).ToList());
             serverView.WebManagers = string.Join("\r\n", serv.Managers.Select(item => item.Login).ToList());
             serverView.WebUsers = string.Join("\r\n", serv.Users.Select(item => item.Login).ToList());
-            if (!string.IsNullOrEmpty(serverView.SaveName))
+            if(!string.IsNullOrEmpty(serverView.SaveName) && Directory.Exists(PathHelper.GetSavePath(serv, serverView.SaveName)))
                 serverView.AsteroidAmount = Directory.GetFiles(PathHelper.GetSavePath(serv, serverView.SaveName), "*steroid???.vx2").Length;
  
             return View(serverView);
