@@ -270,7 +270,7 @@ namespace SESM.Controllers
         [HttpGet]
         public ActionResult Diagnosis()
         {
-            if (!SESMConfigHelper.Diagnosis)
+            if (!SESMConfigHelper.DiagnosisEnabled)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -445,8 +445,8 @@ namespace SESM.Controllers
         public ActionResult AutoUpdate()
         {
             AutoUpdateViewModel model = new AutoUpdateViewModel();
-            model.AutoUpdate = SESMConfigHelper.AutoUpdate;
-            model.CronInterval = SESMConfigHelper.AUInterval;
+            model.AutoUpdate = SESMConfigHelper.AutoUpdateEnabled;
+            model.CronInterval = SESMConfigHelper.AutoUpdateCron;
 
             return View(model);
         }
@@ -460,8 +460,8 @@ namespace SESM.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            SESMConfigHelper.AutoUpdate = model.AutoUpdate;
-            SESMConfigHelper.AUInterval = model.CronInterval;
+            SESMConfigHelper.AutoUpdateEnabled = model.AutoUpdate;
+            SESMConfigHelper.AutoUpdateCron = model.CronInterval;
 
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
 
@@ -496,7 +496,7 @@ namespace SESM.Controllers
             logger.Info("----Starting ManualUpdate----");
             SteamCMDHelper.SteamCMDResult result = SteamCMDHelper.Update(logger, 300);
             logger.Info("----End of ManualUpdate----");
-
+            /*
             switch (result)
             {
                 case SteamCMDHelper.SteamCMDResult.Fail_Credentials:
@@ -530,7 +530,8 @@ namespace SESM.Controllers
                     return RedirectToAction("Index").Danger("Manual Update : Unknow Error");
                     break;
 
-            }
+            }*/
+            return null;
         }
 
         [HttpGet]
@@ -540,79 +541,10 @@ namespace SESM.Controllers
         public ActionResult SteamCMD()
         {
             SteamCMDViewModel model = new SteamCMDViewModel();
-            model.UserName = SESMConfigHelper.AUUsername;
             return View(model);
         }
 
-        [HttpPost]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        [MultipleButton(Name = "action", Argument = "SaveSteamCMD")]
-        public ActionResult SteamCMD(SteamCMDViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            SESMConfigHelper.AUUsername = model.UserName;
-            if (!string.IsNullOrEmpty(model.Password))
-            {
-                SESMConfigHelper.AUPassword = model.Password;
-            }
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-            logger.Info("----Stating SteamCMD Initialisation----");
-            SteamCMDHelper.Initialise(logger, model.UserName, model.Password, model.SteamGuard);
-            logger.Info("----End of SteamCMD Initialisation----");
-
-            return RedirectToAction("Index", "Settings").Success("SteamCMD Initialized");
-        }
-
-        [HttpPost]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        [MultipleButton(Name = "action", Argument = "FireSteamGuard")]
-        public ActionResult FireSteamGuard(SteamCMDViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View("SteamCMD", model);
-
-            SESMConfigHelper.AUUsername = model.UserName;
-            if (!string.IsNullOrEmpty(model.Password))
-            {
-                SESMConfigHelper.AUPassword = model.Password;
-            }
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-            logger.Info("----Stating SteamCMD SteamGuard Firering----");
-            SteamCMDHelper.Initialise(logger, model.UserName, model.Password, string.Empty);
-            logger.Info("----End of SteamCMD SteamGuard Firering----");
-
-            return
-                RedirectToAction("SteamCMD", "Settings")
-                    .Information("Steam Guard Fired, please check your Inbox and input the Steam Guard code below");
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult Backups()
-        {
-            BackupsViewModel model = new BackupsViewModel();
-            model.EnableLvl1 = SESMConfigHelper.AutoBackupLvl1;
-            model.EnableLvl2 = SESMConfigHelper.AutoBackupLvl2;
-            model.EnableLvl3 = SESMConfigHelper.AutoBackupLvl3;
-
-            model.NbToKeepLvl1 = SESMConfigHelper.ABNbToKeepLvl1;
-            model.NbToKeepLvl2 = SESMConfigHelper.ABNbToKeepLvl2;
-            model.NbToKeepLvl3 = SESMConfigHelper.ABNbToKeepLvl3;
-
-            model.CronIntervalLvl1 = SESMConfigHelper.ABIntervalLvl1;
-            model.CronIntervalLvl2 = SESMConfigHelper.ABIntervalLvl2;
-            model.CronIntervalLvl3 = SESMConfigHelper.ABIntervalLvl3;
-
-            return View(model);
-        }
+ 
 
         [HttpPost]
         [LoggedOnly]
@@ -676,18 +608,6 @@ namespace SESM.Controllers
                 scheduler.ScheduleJob(BackupJob, BackupTrigger);
             }
 
-            SESMConfigHelper.AutoBackupLvl1 = model.EnableLvl1;
-            SESMConfigHelper.AutoBackupLvl2 = model.EnableLvl2;
-            SESMConfigHelper.AutoBackupLvl3 = model.EnableLvl3;
-
-            SESMConfigHelper.ABNbToKeepLvl1 = model.NbToKeepLvl1;
-            SESMConfigHelper.ABNbToKeepLvl2 = model.NbToKeepLvl2;
-            SESMConfigHelper.ABNbToKeepLvl3 = model.NbToKeepLvl3;
-
-            SESMConfigHelper.ABIntervalLvl1 = model.CronIntervalLvl1;
-            SESMConfigHelper.ABIntervalLvl2 = model.CronIntervalLvl2;
-            SESMConfigHelper.ABIntervalLvl3 = model.CronIntervalLvl3;
-
             return RedirectToAction("Index", "Server");
         }
 
@@ -714,50 +634,6 @@ namespace SESM.Controllers
         {
             _context.Database.ExecuteSqlCommand("truncate table SESM.dbo.EntityPerfEntries");
             return RedirectToAction("Index", "Home").Success("Perf Data Cleaned Up");
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        public ActionResult ManualUpdateForce()
-        {
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-
-            logger.Info("----Starting ManualUpdateForce----");
-            SteamCMDHelper.SteamCMDResult result = SteamCMDHelper.ForceUpdate(logger, 300);
-            logger.Info("----End of ManualUpdateForce----");
-
-            switch (result)
-            {
-                case SteamCMDHelper.SteamCMDResult.Fail_Credentials:
-                    return RedirectToAction("Index").Danger("Wrong credentials, please check and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardMissing:
-                    return
-                        RedirectToAction("Index")
-                            .Danger(
-                                "Steam Guard active on your account, please input the code in SteamCMD Configuration page and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardBadCode:
-                    return
-                        RedirectToAction("Index")
-                            .Danger(
-                                "Wrong Steam Guard code, please input the right code in SteamCMD Configuration page and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_TooLong:
-                    return RedirectToAction("Index")
-                            .Warning("Update took too long. If it's the first update and you don't have a server-grade connection, please try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Success_NothingToDo:
-                    return RedirectToAction("Index").Success("There are no updates available :-(");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Success_UpdateInstalled:
-                    return RedirectToAction("Index").Success("Manual Update Successful");
-                    break;
-                default:
-                    return RedirectToAction("Index").Danger("Manual Update : Unknow Error");
-                    break;
-            }
         }
 
         [HttpGet]

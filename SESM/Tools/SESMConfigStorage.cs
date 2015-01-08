@@ -4,85 +4,61 @@ namespace SESM.Tools
 {
     public class SESMConfigStorage : AppConfiguration
     {
+        // Server Settings
         public string DBConnString { get; set; }
         public string Prefix { get; set; }
         public string SESavePath { get; set; }
         public string SEDataPath { get; set; }
         public string Arch { get; set; }
+
+        // Running Vars
         public bool Lockdown { get; set; }
+        public bool AutoUpdateRunning { get; set; }
 
-        public bool Diagnosis { get; set; }
-        public bool StatusAutoRefresh { get; set; }
-        public bool PerfMonitor { get; set; }
+        // Auto-Update Settings
+        public bool AutoUpdateEnabled { get; set; }
+        public string AutoUpdateCron { get; set; }
+        public string AutoUpdateBetaPassword { get; set; }
 
-        public bool AutoUpdate { get; set; }
-        public string AUUsername { get; set; }
-        public string AUPassword { get; set; }
-        public string AUInterval { get; set; }
-        public string AUBetaName { get; set; }
-        public string AUBetaPassword { get; set; }
+        // SESE Auto-Update Settings
+        public string SESEUpdateURL { get; set; }
+        public bool SESEAutoUpdateEnabled { get; set; }
+        public bool SESEAutoUpdateUseDev { get; set; }
+        public string SESEAutoUpdateCron { get; set; }
 
-        public int SESEDelay { get; set; }
-        public bool UseSESE { get; set; }
-        public bool SESEDev { get; set; }
-
-        public bool AutoBackupLvl1 { get; set; }
-        public string ABIntervalLvl1 { get; set; }
-        public int ABNbToKeepLvl1 { get; set; }
-
-        public bool AutoBackupLvl2 { get; set; }
-        public string ABIntervalLvl2 { get; set; }
-        public int ABNbToKeepLvl2 { get; set; }
-        
-        public bool AutoBackupLvl3 { get; set; }
-        public string ABIntervalLvl3 { get; set; }
-        public int ABNbToKeepLvl3 { get; set; }
-
+        // Misc
+        public bool DiagnosisEnabled { get; set; }
         public bool BlockDll { get; set; }
         public bool LowPriorityStart { get; set; }
 
-        public string SESEUpdateURL { get; set; }
-
         public SESMConfigStorage()
         {
+            // Server Settings
             DBConnString = @"Server=.\SQLEXPRESS;Database=SESM;User Id=sa;Password=MyPassword;MultipleActiveResultSets=true;";
             Prefix = "SESM";
             SESavePath = @"C:\ProgramData\SpaceEngineersDedicated\";
             SEDataPath = @"C:\SpaceEngineers\";
             Arch = "x64";
+
+            // Running Vars
             Lockdown = false;
+            AutoUpdateRunning = false;
 
-            Diagnosis = false;
-            StatusAutoRefresh = true;
-            PerfMonitor = true;
+            // Auto-Update Settings
+            AutoUpdateEnabled = true;
+            AutoUpdateCron = "0 0/10 * * * ?";
+            AutoUpdateBetaPassword = string.Empty;
 
-            AutoUpdate = false;
-            AUUsername = "SteamUsername";
-            AUPassword = "";
-            AUInterval = "0 0/10 * * * ?";
-            AUBetaName = "";
-            AUBetaPassword = "";
+            // SESEAuto-Update Settings
+            SESEUpdateURL = "https://api.github.com/repos/Tyrsis/SE-Community-Mod-API/releases";
+            SESEAutoUpdateEnabled = false;
+            SESEAutoUpdateUseDev = true;
+            SESEAutoUpdateCron = "0 5/10 * * * ?";
 
-            SESEDelay = 8;
-            UseSESE = false;
-            SESEDev = true;
-
-            AutoBackupLvl1 = false;
-            ABIntervalLvl1 = "0 0/10 * * * ?";
-            ABNbToKeepLvl1 = 12;
-
-            AutoBackupLvl2 = false;
-            ABIntervalLvl2 = "0 0 * * * ?";
-            ABNbToKeepLvl2 = 48;
-
-            AutoBackupLvl3 = false;
-            ABIntervalLvl3 = "0 0 0 * * ?";
-            ABNbToKeepLvl3 = 30;
-
+            // Misc
+            DiagnosisEnabled = false;
             BlockDll = true;
             LowPriorityStart = false;
-
-            SESEUpdateURL = "https://api.github.com/repos/Tyrsis/SE-Community-Mod-API/releases";
         }   
         protected override IConfigurationProvider OnCreateDefaultProvider(string sectionName, object configData)
         {

@@ -349,7 +349,10 @@
     <Content Include="assets\admin\pages\media\invoice\walmart.png" />
     <Content Include="assets\admin\pages\media\pages\2.jpg" />
     <Content Include="assets\admin\pages\media\pages\3.jpg" />
+    <Content Include="assets\admin\pages\media\pages\asteroid.png" />
+    <Content Include="assets\admin\pages\media\pages\atronaute.png" />
     <Content Include="assets\admin\pages\media\pages\earth.jpg" />
+    <Content Include="assets\admin\pages\media\pages\earth.png" />
     <Content Include="assets\admin\pages\media\pages\img.png" />
     <Content Include="assets\admin\pages\media\pages\img1.png" />
     <Content Include="assets\admin\pages\media\pages\img1_2.png" />
@@ -357,6 +360,7 @@
     <Content Include="assets\admin\pages\media\pages\img3.jpg" />
     <Content Include="assets\admin\pages\media\pages\img3.png" />
     <Content Include="assets\admin\pages\media\pages\img4.png" />
+    <Content Include="assets\admin\pages\media\pages\StarBackground.jpg" />
     <Content Include="assets\admin\pages\media\profile\avatar.png" />
     <Content Include="assets\admin\pages\media\profile\avatar1.jpg" />
     <Content Include="assets\admin\pages\media\profile\avatar1_small.jpg" />
@@ -3817,6 +3821,7 @@
     <Compile Include="Controllers\API\APIAccountController.cs" />
     <Compile Include="Controllers\API\APIServerController.cs" />
     <Compile Include="Controllers\API\APISettingsController.cs" />
+    <Compile Include="Controllers\API\APIMiscController.cs" />
     <Compile Include="Controllers\BackupController.cs" />
     <Compile Include="Controllers\ExternalController.cs" />
     <Compile Include="Controllers\FlashMessageExtensions.cs" />
@@ -3961,8 +3966,7 @@
     <Folder Include="assets\global\plugins\angularjs\plugins\angular-file-upload\uploads\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\node\public\files\thumbnail\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\php\files\thumbnail\" />
-    <Folder Include="Views\APIServer\" />
-    <Folder Include="Views\APISettings\" />
+    <Folder Include="Views\Misc\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

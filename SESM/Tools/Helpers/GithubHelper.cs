@@ -18,7 +18,7 @@ namespace SESM.Tools.Helpers
             string data = GetGithubData();
             if(files.Length == 0)
             {
-                return GetLastURL(data, SESMConfigHelper.SESEDev).ToString();
+                return GetLastURL(data, SESMConfigHelper.SESEAutoUpdateUseDev).ToString();
             }
             if(files.Length != 1)
             {
@@ -40,10 +40,10 @@ namespace SESM.Tools.Helpers
 
             }
 
-            string last = GetLastVersion(data, SESMConfigHelper.SESEDev).ToString();
+            string last = GetLastVersion(data, SESMConfigHelper.SESEAutoUpdateUseDev).ToString();
             if(string.IsNullOrEmpty(last) || last == PathHelper.GetLastLeaf(files[0]))
                 return null;
-            return GetLastURL(data, SESMConfigHelper.SESEDev);
+            return GetLastURL(data, SESMConfigHelper.SESEAutoUpdateUseDev);
         }
 
         public static string GetLastURL(string data, bool useDev)

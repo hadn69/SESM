@@ -6,7 +6,7 @@ using SESM.DTO;
 using SESM.Tools.API;
 using SESM.Tools.Helpers;
 
-namespace SESM.Controllers
+namespace SESM.Controllers.API
 {
     public class APIAccountController : Controller
     {

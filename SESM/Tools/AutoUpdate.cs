@@ -10,7 +10,7 @@ namespace SESM.Tools
         public void Execute(IJobExecutionContext jobContext)
         {
             // Checking auto update is enable
-            if (!SESMConfigHelper.AutoUpdate)
+            if (!SESMConfigHelper.AutoUpdateEnabled)
                 return;
 
             _logger.Info("----Starting AutoUpdateJob----");

@@ -17,7 +17,7 @@ namespace SESM.Tools
             JobDataMap dataMap = jobContext.JobDetail.JobDataMap;
 
             int backupLvl = dataMap.GetInt("lvl");
-
+            /*
             switch (backupLvl)
             {
                 case 1:
@@ -35,7 +35,7 @@ namespace SESM.Tools
                 default:
                     return;
                     break;
-            }
+            }*/
             Logger logger = LogManager.GetLogger("Backuplvl" + backupLvl + "Logger");
             DataContext context = new DataContext();
             ServerProvider srvPrv = new ServerProvider(context);
@@ -48,7 +48,7 @@ namespace SESM.Tools
                     logger.Info("Server  " + item.Name + " is not stopped, eligible for backup");
                     bool enabled = false;
                     int nbToKeep = 0;
-
+                    /*
                     switch (backupLvl)
                     {
                         case 1:
@@ -66,7 +66,7 @@ namespace SESM.Tools
                                 enabled = true;
                             nbToKeep = SESMConfigHelper.ABNbToKeepLvl3;
                             break;
-                    }
+                    }*/
                     if (enabled)
                     {
                         try

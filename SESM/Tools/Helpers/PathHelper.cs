@@ -27,6 +27,15 @@ namespace SESM.Tools.Helpers
         {
             return SESMConfigHelper.Prefix;
         }
+
+        public static string GetSteamCMDPath()
+        {
+            return SESMConfigHelper.SEDataPath + @"SteamCMD\";
+        }
+        public static string GetSyncDirPath()
+        {
+            return SESMConfigHelper.SEDataPath + @"SyncData\";
+        }
         public static string GetInstancePath(EntityServer server)
         {
             return SESMConfigHelper.SESavePath + GetPrefix() + "_" + server.Id + "_" + server.Name + @"\";

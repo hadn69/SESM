@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 using System.Web.Routing;
+using NLog;
 using Quartz;
 using Quartz.Impl;
 using SESM.DAL;
@@ -20,10 +21,21 @@ namespace SESM
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
+            Logger exceptionLogger = LogManager.GetLogger("ManualUpdateLogger");
+
+            int LocalVersion = SteamCMDHelper.GetInstalledVersion(exceptionLogger);
+            int remoteVersion = SteamCMDHelper.GetAvailableVersion(exceptionLogger, false);
+
+
+
+
+
+
+
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.Start();
 
-
+            /*
             if(SESMConfigHelper.PerfMonitor)
             {
                 IJobDetail collectorJob = JobBuilder.Create<Collector>()
@@ -154,7 +166,7 @@ namespace SESM
                 .Build();
 
             scheduler.ScheduleJob(autoStartJob, autoStartTrigger);
-
+            */
             /*
             // Font for the signature generator
             GraphHelper.privateFontCollection = new PrivateFontCollection();

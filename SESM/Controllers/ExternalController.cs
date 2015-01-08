@@ -24,7 +24,7 @@ namespace SESM.Controllers
         // GET: External
         public ActionResult RandomRGB(int id = 10)
         {
-            if (SESMConfigHelper.Diagnosis)
+            if (SESMConfigHelper.DiagnosisEnabled)
             {
                 int size = id;
                 Bitmap myBitmap = new Bitmap(size, size);
@@ -52,7 +52,7 @@ namespace SESM.Controllers
         }
         public ActionResult RandomBW(int id = 10)
         {
-            if (SESMConfigHelper.Diagnosis)
+            if (SESMConfigHelper.DiagnosisEnabled)
             {
                 int size = id;
                 Bitmap myBitmap = new Bitmap(size, size);

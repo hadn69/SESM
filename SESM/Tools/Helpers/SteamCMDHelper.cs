@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Ionic.Zip;
 using NLog;
-using SESM.DAL;
-using SESM.DTO;
 
 namespace SESM.Tools.Helpers
 {
     public class SteamCMDHelper
     {
+        private const int AppId = 298740;
+        private const int GetInfoDuration = 30;
+
+        /*
         public static SteamCMDResult Initialise(Logger logger, string login, string password, string steamGuardCode)
         {
             // Checking if steamCMD.exe exist in the right location
@@ -412,41 +412,167 @@ namespace SESM.Tools.Helpers
             }
             return Update(logger, duration);
         }
+        */
 
         private static void CheckSteamCMD(Logger logger)
         {
-            if(!File.Exists(SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe"))
+            if(!File.Exists(PathHelper.GetSteamCMDPath() + @"steamcmd.exe"))
             {
                 logger.Info("SteamCMD.exe not present, downloading it...");
-                if(!Directory.Exists(SESMConfigHelper.SEDataPath + @"\SteamCMD\"))
-                    Directory.CreateDirectory(SESMConfigHelper.SEDataPath + @"\SteamCMD\");
+                if(!Directory.Exists(PathHelper.GetSteamCMDPath()))
+                    Directory.CreateDirectory(PathHelper.GetSteamCMDPath());
 
-                if(!Directory.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\"))
-                    Directory.CreateDirectory(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\");
-
-                WebRequest objRequest = HttpWebRequest.Create("http://media.steampowered.com/installer/steamcmd.zip");
-                WebResponse objResponse = objRequest.GetResponse();
-                MemoryStream memoryStream = new MemoryStream();
-                objResponse.GetResponseStream().CopyTo(memoryStream);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                using(Stream input = memoryStream)
+                if(!Directory.Exists(PathHelper.GetSyncDirPath()))
+                    Directory.CreateDirectory(PathHelper.GetSyncDirPath());
+                try
                 {
-                    using(ZipFile zip = ZipFile.Read(input))
+                    WebRequest objRequest = HttpWebRequest.Create("http://media.steampowered.com/installer/steamcmd.zip");
+                    WebResponse objResponse = objRequest.GetResponse();
+                    MemoryStream memoryStream = new MemoryStream();
+                    objResponse.GetResponseStream().CopyTo(memoryStream);
+                    memoryStream.Seek(0, SeekOrigin.Begin);
+                    using(Stream input = memoryStream)
                     {
-                        zip.ExtractAll(SESMConfigHelper.SEDataPath + @"\SteamCMD\");
+                        using(ZipFile zip = ZipFile.Read(input))
+                        {
+                            zip.ExtractAll(SESMConfigHelper.SEDataPath + @"\SteamCMD\");
+                        }
                     }
+                    logger.Info("SteamCMD.exe Downloaded !");
                 }
-                logger.Info("SteamCMD.exe Downloaded !");
+                catch(Exception ex)
+                {
+                    logger.Error("Error while downloadin/unzipping !", ex);
+                }
             }
         }
+
+        private static string ExecuteSteamCMD(Logger logger, string arguments)
+        {
+            // Check and DL SteamCMD
+            CheckSteamCMD(logger);
+
+            // Getting Info
+            Process si = new Process();
+            si.StartInfo.WorkingDirectory = PathHelper.GetSteamCMDPath();
+            si.StartInfo.UseShellExecute = false;
+            si.StartInfo.FileName = SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe";
+            si.StartInfo.Arguments = arguments;
+            si.StartInfo.CreateNoWindow = false;
+            si.StartInfo.RedirectStandardInput = true;
+            si.StartInfo.RedirectStandardOutput = true;
+            si.StartInfo.RedirectStandardError = false;
+
+            logger.Info("Starting SteamCMD (" + GetInfoDuration + " secs Max)");
+            logger.Info("Arguments : " + si.StartInfo.Arguments);
+            si.Start();
+
+            DateTime endTime = DateTime.Now.AddSeconds(GetInfoDuration);
+            string output = string.Empty;
+
+            logger.Info("Start of SteamCMD output :");
+            while(!si.HasExited && DateTime.Now <= endTime)
+            {
+                string val = si.StandardOutput.ReadLine();
+                if(val == null)
+                    continue;
+                output += val + "\n";
+                logger.Info("    " + val);
+            }
+            logger.Info("End of SteamCMD output");
+
+            if(si.HasExited)
+                logger.Info("Process closed itself gracefully");
+            else
+            {
+                logger.Warn("Process execution timeout");
+                try
+                {
+                    si.Kill();
+                    logger.Info("Killing process sucessful");
+                    Thread.Sleep(2000);
+                }
+                catch(Exception ex)
+                {
+                    logger.Error("Error while killing process", ex);
+                }
+            }
+            return output;
+        }
+
+        public static int GetInstalledVersion(Logger logger)
+        {
+            string output = ExecuteSteamCMD(logger, " +login Anonymous"
+                                                    + " +force_install_dir " + PathHelper.GetSyncDirPath()
+                                                    + " +app_status " + AppId
+                                                    + " +quit");
+
+            if(output.Contains("install state:"))
+            {
+                if(output.Contains("install state: uninstalled"))
+                    return 0;
+                Regex regex = new Regex(@"BuildID (\d+)");
+                Match match = regex.Match(output);
+                if(match.Success)
+                {
+                    try
+                    {
+                        return int.Parse(match.Groups[1].Value);
+                    }
+                    catch(Exception ex)
+                    {
+                        logger.Error("Failed parsing int :", ex);
+                        return 0;
+                    }
+                }
+                logger.Error("Missing keyword !");
+                return 0;
+            }
+            logger.Error("Missing keyword !");
+            return 0;
+        }
+
+        public static int GetAvailableVersion(Logger logger, bool dev)
+        {
+            string output = ExecuteSteamCMD(logger, " +login Anonymous"
+                                                    + " +force_install_dir " + PathHelper.GetSyncDirPath()
+                                                    + " +app_info_print " + AppId
+                                                    + " +quit");
+
+            if(output.Contains("\"branches\""))
+            {
+                Regex regex = dev ?
+                    new Regex("development\"\\s*{\\s*\"buildid\"\\s*\"(\\d+)") : 
+                    new Regex("public\"\\s*{\\s*\"buildid\"\\s*\"(\\d+)");
+                Match match = regex.Match(output);
+                if(match.Success)
+                {
+                    try
+                    {
+                        return int.Parse(match.Groups[1].Value);
+                    }
+                    catch(Exception ex)
+                    {
+                        logger.Error("Failed parsing int :", ex);
+                        return 0;
+                    }
+                }
+            }
+            logger.Error("Missing keyword !");
+            return 0;
+        }
+
+        public static SteamCMDResult Update(Logger logger, int duration)
+        {
+            CheckSteamCMD(logger);
+            return SteamCMDResult.Fail_Unknow;
+        }
+
 
         public enum SteamCMDResult
         {
             Fail_Unknow,
             Fail_TooLong,
-            Fail_Credentials,
-            Fail_SteamGuardMissing,
-            Fail_SteamGuardBadCode,
             Success_UpdateInstalled,
             Success_NothingToDo
 
