@@ -219,6 +219,10 @@ namespace SESM.Models.Views.Server
         public bool EnableIngameScripts { get; set; }
 
         [Required]
+        [DisplayName("View Distance")]
+        public int ViewDistance { get; set; }
+
+        [Required]
         [DisplayName("Ignore Last Session")]
         public bool IgnoreLastSession { get; set; }
 
@@ -287,6 +291,8 @@ namespace SESM.Models.Views.Server
             //WorldName = "SESM - MyMap";
             AutoSaveInMinutes = 5;
             DestructibleBlocks = true;
+            EnableIngameScripts = true;
+            ViewDistance = 20000;
 
             ProcessPriority = EnumProcessPriority.Normal;
         }

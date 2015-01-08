@@ -53,6 +53,7 @@ namespace SESM.Tools.Helpers
         public bool PauseGameWhenEmpty = false;
         public bool DestructibleBlocks = true;
         public bool EnableIngameScripts = true;
+        public int ViewDistance = 20000;
 
         public bool IgnoreLastSession = false;
         public string WorldName = string.Empty;
@@ -97,6 +98,7 @@ namespace SESM.Tools.Helpers
             SpawnShipTimeMultiplier = model.SpawnShipTimeMultiplier;
             DestructibleBlocks = model.DestructibleBlocks;
             EnableIngameScripts = model.EnableIngameScripts;
+            ViewDistance = model.ViewDistance;
 
             ScenarioType = model.ScenarioType;
             SaveName = model.SaveName;
@@ -204,6 +206,7 @@ namespace SESM.Tools.Helpers
             SpawnShipTimeMultiplier = model.SpawnShipTimeMultiplier;
             DestructibleBlocks = model.DestructibleBlocks;
             EnableIngameScripts = model.EnableIngameScripts;
+            ViewDistance = model.ViewDistance;
 
             IP = model.IP;
             SteamPort = model.SteamPort;
@@ -311,6 +314,7 @@ namespace SESM.Tools.Helpers
             model.SpawnShipTimeMultiplier = SpawnShipTimeMultiplier;
             model.DestructibleBlocks = DestructibleBlocks;
             model.EnableIngameScripts = EnableIngameScripts;
+            model.ViewDistance = ViewDistance;
 
             model.ScenarioType = ScenarioType;
             model.SaveName = SaveName;
@@ -366,6 +370,7 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <SpawnShipTimeMultiplier>" + SpawnShipTimeMultiplier + "</SpawnShipTimeMultiplier>");
             sb.AppendLine("    <DestructibleBlocks>" + DestructibleBlocks.ToString().ToLower() + "</DestructibleBlocks>");
             sb.AppendLine("    <EnableIngameScripts>" + EnableIngameScripts.ToString().ToLower() + "</EnableIngameScripts>");
+            sb.AppendLine("    <ViewDistance>" + ViewDistance + "</ViewDistance>");
             if (ProceduralDensity != 0)
             {
                 sb.AppendLine("    <ProceduralDensity>" + ProceduralDensity + "</ProceduralDensity>");
@@ -433,7 +438,7 @@ namespace SESM.Tools.Helpers
             File.WriteAllText(PathHelper.GetConfigurationFilePath(serv), sb.ToString());
 
             // Saving the parameters also to the save file
-            if (!String.IsNullOrEmpty(SaveName))
+            if(!String.IsNullOrEmpty(SaveName) && File.Exists(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc"))
             {
                 XmlDocument doc = new XmlDocument();
                 doc.Load(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc");
@@ -651,6 +656,11 @@ namespace SESM.Tools.Helpers
                 settingsNode.SelectSingleNode("descendant::EnableIngameScripts").InnerText =
                     EnableIngameScripts.ToString().ToLower();
 
+                valueNode = settingsNode.SelectSingleNode("descendant::ViewDistance");
+                if(valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ViewDistance", null));
+                settingsNode.SelectSingleNode("descendant::ViewDistance").InnerText =
+                    ViewDistance.ToString();
 
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if (valueNode == null)
@@ -761,6 +771,8 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(sessionSettings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
             if(sessionSettings.Element("EnableIngameScripts") != null)
                 bool.TryParse(sessionSettings.Element("EnableIngameScripts").Value, out EnableIngameScripts);
+            if(sessionSettings.Element("ViewDistance") != null)
+                int.TryParse(sessionSettings.Element("ViewDistance").Value, out ViewDistance);
 
             if(sessionSettings.Element("ProceduralDensity") != null)
                 float.TryParse(sessionSettings.Element("ProceduralDensity").Value, out ProceduralDensity);
@@ -891,6 +903,8 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(settings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
             if(settings.Element("EnableIngameScripts") != null)
                 bool.TryParse(settings.Element("EnableIngameScripts").Value, out EnableIngameScripts);
+            if(settings.Element("ViewDistance") != null)
+                int.TryParse(settings.Element("ViewDistance").Value, out ViewDistance);
 
             Mods = new List<ulong>();
             if (root.Element("Mods") != null)
