@@ -34,9 +34,31 @@ namespace SESM
             );
 
             routes.MapRoute(
-                name: "Default",
+                name: "Home",
+                url: "",
+                defaults: new { controller = "Home", action = "Index" }
+            );
+
+            routes.MapRoute(
+                name: "Views",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                defaults: new { action = "Index", id = UrlParameter.Optional },
+                constraints: new { controller = "Home|Account|Server|Settings" }
+            );
+
+
+            // Show a 404 error page for API.
+            routes.MapRoute(
+                name: "404API",
+                url: "API/{*url}",
+                defaults: new { controller = "Error", action = "404API"}
+            );
+
+            // Show a 404 error page for anything else.
+            routes.MapRoute(
+                name: "404",
+                url: "{*url}",
+                defaults: new { controller = "Error", action = "404"}
             );
         }
     }

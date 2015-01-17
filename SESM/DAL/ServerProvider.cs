@@ -273,6 +273,11 @@ namespace SESM.DAL
             return _context.Servers.ToList();
         }
 
+        public List<EntityServer> GetAllSESEServers()
+        {
+            return _context.Servers.Where(item => item.UseServerExtender).ToList();
+        }
+
         public List<EntityServer> GetServers(EntityUser user)
         {
             if(user == null)

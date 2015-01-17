@@ -37,7 +37,7 @@ namespace SESM.Tools.API
             XElement resp = new XElement("Response");
             xDoc.Add(resp);
             resp.Add(new XElement("Type", Type.ToString()));
-            resp.Add(new XElement("Timestamp", DateTime.Now.ToString("O")));
+            resp.Add(new XElement("Timestamp", DateTime.Now.ToString("o")));
             resp.Add(new XElement("ReturnCode", Code));
             resp.Add(new XElement("Content", Content));
             return this;
@@ -47,6 +47,28 @@ namespace SESM.Tools.API
         {
             Build();
             return xDoc.Declaration + xDoc.ToString(SaveOptions.DisableFormatting);
+        }
+
+        public static XMLMessage Error(string code, string message)
+        {
+            return new XMLMessage(
+                XmlResponseType.Error,
+                code,
+                message);
+        }
+        public static XMLMessage Warning(string code, string message)
+        {
+            return new XMLMessage(
+                XmlResponseType.Warning,
+                code,
+                message);
+        }
+        public static XMLMessage Success(string code, string message)
+        {
+            return new XMLMessage(
+                XmlResponseType.Success,
+                code,
+                message);
         }
     }
 

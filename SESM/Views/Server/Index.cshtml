@@ -261,7 +261,7 @@
                             return;
                         }
 
-                        if (root.children("Content").children("IsSuperAdmin").text().toLowerCase() == "true") {
+                        if (root.children("Content").children("IsSuperAdmin").text() == "True") {
                             $("#btnCreateServer").show();
                             isSuperAdmin = true;
                         }

@@ -78,6 +78,8 @@
       <HintPath>..\packages\Microsoft.SqlServer.Compact.4.0.8876.1\lib\net40\System.Data.SqlServerCe.dll</HintPath>
     </Reference>
     <Reference Include="System.Management" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.ServiceProcess" />
@@ -126,6 +128,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="404.html" />
     <Content Include="assets\admin\layout2\css\custom.css" />
     <Content Include="assets\admin\layout2\css\layout.css" />
     <Content Include="assets\admin\layout2\css\themes\blue.css" />
@@ -360,7 +363,9 @@
     <Content Include="assets\admin\pages\media\pages\img3.jpg" />
     <Content Include="assets\admin\pages\media\pages\img3.png" />
     <Content Include="assets\admin\pages\media\pages\img4.png" />
+    <Content Include="assets\admin\pages\media\pages\server.png" />
     <Content Include="assets\admin\pages\media\pages\StarBackground.jpg" />
+    <Content Include="assets\admin\pages\media\pages\teapot.png" />
     <Content Include="assets\admin\pages\media\profile\avatar.png" />
     <Content Include="assets\admin\pages\media\profile\avatar1.jpg" />
     <Content Include="assets\admin\pages\media\profile\avatar1_small.jpg" />
@@ -3394,6 +3399,7 @@
     <Content Include="Content\Js\LoginForm.js" />
     <Content Include="Content\Js\md5-min.js" />
     <Content Include="Content\Js\QuickActions.js" />
+    <Content Include="Content\Js\RNG.js" />
     <Content Include="Content\Js\sha1-min.js" />
     <Content Include="Content\logo-small.png" />
     <Content Include="Content\logo.png" />
@@ -3791,6 +3797,7 @@
     <Content Include="Views\Shared\_BreadCrumb.cshtml" />
     <Content Include="Views\Shared\_SideBar.cshtml" />
     <Content Include="Views\Settings\SESE.cshtml" />
+    <Content Include="Views\Error\404.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -3823,6 +3830,7 @@
     <Compile Include="Controllers\API\APISettingsController.cs" />
     <Compile Include="Controllers\API\APIMiscController.cs" />
     <Compile Include="Controllers\BackupController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\ExternalController.cs" />
     <Compile Include="Controllers\FlashMessageExtensions.cs" />
     <Compile Include="Controllers\LogController.cs" />
@@ -3911,10 +3919,12 @@
     <Compile Include="Tools\DynaData.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
     <Compile Include="Tools\GraphHelper.cs" />
-    <Compile Include="Tools\Helpers\GithubHelper.cs" />
+    <Compile Include="Tools\Helpers\SESEHelper.cs" />
     <Compile Include="Tools\Helpers\HashHelper.cs" />
     <Compile Include="Tools\Helpers\PathHelper.cs" />
     <Compile Include="Tools\Helpers\SignParams.cs" />
+    <Compile Include="Tools\Jobs\ReturnEnum.cs" />
+    <Compile Include="Tools\Jobs\SESEAutoUpdateJob.cs" />
     <Compile Include="Tools\Monitor\Collector.cs" />
     <Compile Include="Tools\Helpers\ServiceHelper.cs" />
     <Compile Include="Tools\Helpers\ServerConfigHelper.cs" />
@@ -3924,6 +3934,7 @@
     <Compile Include="Tools\ServerInfoHelper.cs" />
     <Compile Include="Tools\SESMConfigStorage.cs" />
     <Compile Include="Tools\Helpers\SteamCMDHelper.cs" />
+    <Compile Include="Tools\SESMRunningVarsStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config">

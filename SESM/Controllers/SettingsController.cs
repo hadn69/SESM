@@ -644,16 +644,16 @@ namespace SESM.Controllers
             Logger logger = LogManager.GetLogger("ManualUpdateLogger");
 
             logger.Info("----Starting SESEManualUpdate----");
-            
-            string SESEUrl = GithubHelper.UpdateIsAvailable();
+
+            string SESEUrl = ""; //SESEHelper.UpdateIsAvailable();
             if(!string.IsNullOrEmpty(SESEUrl))
             {
                 logger.Info("SE Server Extender Update detected");
                 logger.Info("URL : " + SESEUrl);
                 logger.Info("Cleaning up SESE Zip");
-                GithubHelper.CleanupUpdate();
+                SESEHelper.CleanupUpdate();
                 logger.Info("Downloading New SESE Update Zip");
-                GithubHelper.DownloadUpdate(SESEUrl);
+                SESEHelper.DownloadUpdate(SESEUrl);
                 logger.Info("Initiating lockdown mode ...");
                 SESMConfigHelper.Lockdown = true;
                 logger.Info("Waiting 30 secs for all requests to end ...");
@@ -680,7 +680,7 @@ namespace SESM.Controllers
                 ServiceHelper.KillAllSESEService();
 
                 logger.Info("Applying SESE Files");
-                GithubHelper.ApplyUpdate();
+                SESEHelper.ApplyUpdate();
 
                 logger.Info("SESE Update finished, lifting lockdown");
                 SESMConfigHelper.Lockdown = false;
@@ -709,15 +709,15 @@ namespace SESM.Controllers
 
             logger.Info("----Starting SESEManualUpdateForce----");
             logger.Info("Cleaning up SESE Zip");
-            GithubHelper.CleanupUpdate();
-            string SESEUrl = GithubHelper.UpdateIsAvailable();
+            SESEHelper.CleanupUpdate();
+            string SESEUrl = "";//SESEHelper.UpdateIsAvailable();
             if(!string.IsNullOrEmpty(SESEUrl))
             {
                 logger.Info("SE Server Extender Update detected");
                 logger.Info("URL : " + SESEUrl);
 
                 logger.Info("Downloading New SESE Update Zip");
-                GithubHelper.DownloadUpdate(SESEUrl);
+                SESEHelper.DownloadUpdate(SESEUrl);
                 logger.Info("Initiating lockdown mode ...");
                 SESMConfigHelper.Lockdown = true;
                 logger.Info("Waiting 30 secs for all requests to end ...");
@@ -744,7 +744,7 @@ namespace SESM.Controllers
                 ServiceHelper.KillAllSESEService();
 
                 logger.Info("Applying SESE Files");
-                GithubHelper.ApplyUpdate();
+                SESEHelper.ApplyUpdate();
 
                 logger.Info("SESE Update finished, lifting lockdown");
                 SESMConfigHelper.Lockdown = false;

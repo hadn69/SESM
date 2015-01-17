@@ -58,10 +58,10 @@ namespace SESM.Controllers.API
 
             // ** ACCESS **
             if(server == null)
-                return Content(new XMLMessage(XmlResponseType.Error, "SRV-GS-UKNSRV", "The server doesn't exist").ToString());
+                return Content(XMLMessage.Error("SRV-GS-UKNSRV", "The server doesn't exist").ToString());
 
             if(srvPrv.GetAccessLevel(userID, server.Id) == AccessLevel.None)
-                return Content(new XMLMessage(XmlResponseType.Error, "SRV-GS-NOACCESS", "You don't have access to this server").ToString());
+                return Content(XMLMessage.Error("SRV-GS-NOACCESS", "You don't have access to this server").ToString());
 
             // ** PROCESS **
             XMLMessage response = new XMLMessage("SRV-GS-OK");
@@ -95,7 +95,7 @@ namespace SESM.Controllers.API
                 int servID;
                 if(!int.TryParse(item, out servID))
                 {
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-STRS-INVALIDID", "The following ID is not a number : " + item).ToString());
+                    return Content(XMLMessage.Error("SRV-STRS-INVALIDID", "The following ID is not a number : " + item).ToString());
                 }
                 serverIDs.Add(servID);
             }
@@ -107,14 +107,14 @@ namespace SESM.Controllers.API
                 EntityServer server = srvPrv.GetServer(item);
 
                 if(server == null)
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-STRS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
+                    return Content(XMLMessage.Error("SRV-STRS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
 
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(userID, server.Id);
                 if(accessLevel == AccessLevel.None
                     || accessLevel == AccessLevel.Guest
                     || accessLevel == AccessLevel.User)
                 {
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-STRS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
+                    return Content(XMLMessage.Error("SRV-STRS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
                 }
                 servers.Add(server);
             }
@@ -128,7 +128,7 @@ namespace SESM.Controllers.API
                 ServiceHelper.StartService(item);
             }
 
-            return Content(new XMLMessage(XmlResponseType.Success, "SRV-STRS-OK", "The following server(s) have been started : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
+            return Content(XMLMessage.Success("SRV-STRS-OK", "The following server(s) have been started : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
         // POST: API/Server/StopServers/
@@ -151,7 +151,7 @@ namespace SESM.Controllers.API
                 int servID;
                 if(!int.TryParse(item, out servID))
                 {
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-STPS-INVALIDID", "The following ID is not a number : " + item).ToString());
+                    return Content(XMLMessage.Error("SRV-STPS-INVALIDID", "The following ID is not a number : " + item).ToString());
                 }
                 serverIDs.Add(servID);
             }
@@ -163,14 +163,14 @@ namespace SESM.Controllers.API
                 EntityServer server = srvPrv.GetServer(item);
 
                 if(server == null)
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-STPS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
+                    return Content(XMLMessage.Error("SRV-STPS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
 
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(userID, server.Id);
                 if(accessLevel == AccessLevel.None
                     || accessLevel == AccessLevel.Guest
                     || accessLevel == AccessLevel.User)
                 {
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-STPS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
+                    return Content(XMLMessage.Error("SRV-STPS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
                 }
                 servers.Add(server);
             }
@@ -184,7 +184,7 @@ namespace SESM.Controllers.API
                 ServiceHelper.StopService(item);
             }
 
-            return Content(new XMLMessage(XmlResponseType.Success, "SRV-STRS-OK", "The following server(s) have been stopped : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
+            return Content(XMLMessage.Success("SRV-STRS-OK", "The following server(s) have been stopped : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
         // POST: API/Server/RestartServers/
@@ -207,7 +207,7 @@ namespace SESM.Controllers.API
                 int servID;
                 if(!int.TryParse(item, out servID))
                 {
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-RSTRS-INVALIDID", "The following ID is not a number : " + item).ToString());
+                    return Content(XMLMessage.Error("SRV-RSTRS-INVALIDID", "The following ID is not a number : " + item).ToString());
                 }
                 serverIDs.Add(servID);
             }
@@ -219,14 +219,14 @@ namespace SESM.Controllers.API
                 EntityServer server = srvPrv.GetServer(item);
 
                 if(server == null)
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-RSTRS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
+                    return Content(XMLMessage.Error("SRV-RSTRS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
 
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(userID, server.Id);
                 if(accessLevel == AccessLevel.None
                     || accessLevel == AccessLevel.Guest
                     || accessLevel == AccessLevel.User)
                 {
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-RSTRS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
+                    return Content(XMLMessage.Error("SRV-RSTRS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
                 }
                 servers.Add(server);
             }
@@ -258,7 +258,7 @@ namespace SESM.Controllers.API
                 ServiceHelper.StartService(item);
             }
 
-            return Content(new XMLMessage(XmlResponseType.Success, "SRV-RSTRS-OK", "The following server(s) have been restarted : "
+            return Content(XMLMessage.Success("SRV-RSTRS-OK", "The following server(s) have been restarted : "
                 + string.Join(", ", serversToRestart.Select(x => x.Name))).ToString());
         }
 
@@ -282,7 +282,7 @@ namespace SESM.Controllers.API
                 int servID;
                 if(!int.TryParse(item, out servID))
                 {
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-KILS-INVALIDID", "The following ID is not a number : " + item).ToString());
+                    return Content(XMLMessage.Error("SRV-KILS-INVALIDID", "The following ID is not a number : " + item).ToString());
                 }
                 serverIDs.Add(servID);
             }
@@ -294,14 +294,14 @@ namespace SESM.Controllers.API
                 EntityServer server = srvPrv.GetServer(item);
 
                 if(server == null)
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-KILS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
+                    return Content(XMLMessage.Error("SRV-KILS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
 
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(userID, server.Id);
                 if(accessLevel == AccessLevel.None
                     || accessLevel == AccessLevel.Guest
                     || accessLevel == AccessLevel.User)
                 {
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-KILS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
+                    return Content(XMLMessage.Error("SRV-KILS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
                 }
                 servers.Add(server);
             }
@@ -315,7 +315,7 @@ namespace SESM.Controllers.API
                 ServiceHelper.KillService(item);
             }
 
-            return Content(new XMLMessage(XmlResponseType.Success, "SRV-KILS-OK", "The following server(s) have been killed : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
+            return Content(XMLMessage.Success("SRV-KILS-OK", "The following server(s) have been killed : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
         // POST: API/Server/DeleteServers/
@@ -338,7 +338,7 @@ namespace SESM.Controllers.API
                 int servID;
                 if(!int.TryParse(item, out servID))
                 {
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-DEL-INVALIDID", "The following ID is not a number : " + item).ToString());
+                    return Content(XMLMessage.Error("SRV-DEL-INVALIDID", "The following ID is not a number : " + item).ToString());
                 }
                 serverIDs.Add(servID);
             }
@@ -350,10 +350,10 @@ namespace SESM.Controllers.API
                 EntityServer server = srvPrv.GetServer(item);
 
                 if(server == null)
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-DEL-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
+                    return Content(XMLMessage.Error("SRV-DEL-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
 
                 if(!user.IsAdmin)
-                    return Content(new XMLMessage(XmlResponseType.Error, "SRV-DEL-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
+                    return Content(XMLMessage.Error("SRV-DEL-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
 
                 servers.Add(server);
             }
@@ -376,7 +376,7 @@ namespace SESM.Controllers.API
                 }
             }
 
-            return Content(new XMLMessage(XmlResponseType.Success, "SRV-DEL-OK", "The following server(s) have been deleted : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
+            return Content(XMLMessage.Success("SRV-DEL-OK", "The following server(s) have been deleted : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
         protected override void Dispose(bool disposing)

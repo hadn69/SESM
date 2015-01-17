@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Web.Helpers;
 using Ionic.Zip;
@@ -10,9 +9,9 @@ using NLog;
 
 namespace SESM.Tools.Helpers
 {
-    public class GithubHelper
+    public class SESEHelper
     {
-        public static string UpdateIsAvailable()
+        /*public static string UpdateIsAvailable()
         {
             string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
             string data = GetGithubData();
@@ -44,9 +43,9 @@ namespace SESM.Tools.Helpers
             if(string.IsNullOrEmpty(last) || last == PathHelper.GetLastLeaf(files[0]))
                 return null;
             return GetLastURL(data, SESMConfigHelper.SESEAutoUpdateUseDev);
-        }
+        }*/
 
-        public static string GetLastURL(string data, bool useDev)
+        public static string GetLastRemoteURL(string data, bool useDev)
         {
             dynamic result;
             try
@@ -67,7 +66,13 @@ namespace SESM.Tools.Helpers
             return null;
         }
 
-        public static Version GetLastVersion(string data, bool useDev)
+        public static Version GetLastRemoteVersion(bool useDev)
+        {
+            string githubData = SESEHelper.GetGithubData();
+            return GetLastRemoteVersion(githubData, useDev);
+        }
+
+        public static Version GetLastRemoteVersion(string data, bool useDev)
         {
             dynamic result;
             try
@@ -94,7 +99,7 @@ namespace SESM.Tools.Helpers
         public static string GetGithubData()
         {
             WebClient client = new WebClient();
-            client.Headers.Add("user-agent", "SESM V2");
+            client.Headers.Add("user-agent", "SESM V3");
             try
             {
                 string response = client.DownloadString(SESMConfigHelper.SESEUpdateURL);
@@ -104,6 +109,14 @@ namespace SESM.Tools.Helpers
             {
                 return null;
             }
+        }
+
+        public static Version GetLocalVersion()
+        {
+            string SESELocPath = SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe";
+            if(System.IO.File.Exists(SESELocPath))
+                return AssemblyName.GetAssemblyName(SESELocPath).Version;
+            return new Version(0,0,0,0);
         }
 
         public static void CleanupUpdate()

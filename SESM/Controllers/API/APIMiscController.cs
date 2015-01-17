@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Xml.Linq;
 using Quartz;
-using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools.API;
 
@@ -22,15 +18,15 @@ namespace SESM.Controllers.API
 
             // ** PARSING **
             if(user == null)
-                return Content(new XMLMessage(XmlResponseType.Error, "MIS-ICV-NOTLOG", "No user is logged in.").ToString());
+                return Content(XMLMessage.Error("MIS-ICV-NOTLOG", "No user is logged in.").ToString());
 
             string cron = Request.Form["Cron"];
 
             if(string.IsNullOrWhiteSpace(cron))
-                return Content(new XMLMessage(XmlResponseType.Error, "MIS-ICV-MISCRON", "The Cron field must be provided").ToString());
+                return Content(XMLMessage.Error("MIS-ICV-MISCRON", "The Cron field must be provided").ToString());
 
             // ** PROCESS **
-            XMLMessage response = new XMLMessage(XmlResponseType.Success, "MIS-ICV-OK", CronExpression.IsValidExpression(cron).ToString());
+            XMLMessage response = XMLMessage.Success("MIS-ICV-OK", CronExpression.IsValidExpression(cron).ToString());
 
             return Content(response.ToString());
         }
@@ -44,15 +40,15 @@ namespace SESM.Controllers.API
 
             // ** PARSING **
             if(user == null)
-                return Content(new XMLMessage(XmlResponseType.Error, "MIS-GETDAT-NOTLOG", "No user is logged in.").ToString());
+                return Content(XMLMessage.Error("MIS-GETDAT-NOTLOG", "No user is logged in.").ToString());
 
             string cron = Request.Form["Cron"];
 
             if(string.IsNullOrWhiteSpace(cron))
-                return Content(new XMLMessage(XmlResponseType.Error, "MIS-GETDAT-MISCRON", "The Cron field must be provided").ToString());
+                return Content(XMLMessage.Error("MIS-GETDAT-MISCRON", "The Cron field must be provided").ToString());
 
             if(!CronExpression.IsValidExpression(cron))
-                return Content(new XMLMessage(XmlResponseType.Error, "MIS-GETDAT-BADCRON", "The Cron field is invalid").ToString());
+                return Content(XMLMessage.Error("MIS-GETDAT-BADCRON", "The Cron field is invalid").ToString());
 
             // ** PROCESS **
             CronExpression expr = new CronExpression(cron);
@@ -70,7 +66,7 @@ namespace SESM.Controllers.API
                     break;
                 date = date.Value.ToOffset(offset);
 
-                response.AddToContent(new XElement("Date", date.Value.ToString("O")));
+                response.AddToContent(new XElement("Date", date.Value.ToString("o")));
             }
 
             return Content(response.ToString());

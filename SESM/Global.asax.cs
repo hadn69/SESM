@@ -1,14 +1,10 @@
-﻿using System;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 using NLog;
 using Quartz;
 using Quartz.Impl;
-using SESM.DAL;
-using SESM.DTO;
 using SESM.Tools;
 using SESM.Tools.Helpers;
-using SESM.Tools.Monitor;
 
 namespace SESM
 {
@@ -20,17 +16,6 @@ namespace SESM
 
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-
-            Logger exceptionLogger = LogManager.GetLogger("ManualUpdateLogger");
-
-            int LocalVersion = SteamCMDHelper.GetInstalledVersion(exceptionLogger);
-            int remoteVersion = SteamCMDHelper.GetAvailableVersion(exceptionLogger, false);
-
-
-
-
-
-
 
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.Start();
@@ -182,5 +167,22 @@ namespace SESM
             GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-LightItalic.ttf");
             GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Regular.ttf");*/
         }
+
+        /*protected void Application_Error(object sender, EventArgs e)
+        {
+            // An error has occured on a .Net page.
+            var serverError = Server.GetLastError() as HttpException;
+
+            if(null != serverError)
+            {
+                int errorCode = serverError.GetHttpCode();
+
+                if(404 == errorCode)
+                {
+                    Server.ClearError();
+                    Response.Redirect("/Error/404/");
+                }
+            }
+        }*/
     }
 }
