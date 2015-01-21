@@ -741,7 +741,7 @@ namespace SESM.Controllers
                 if (errorFlag)
                     return View("Details", model);
 
-                if ((srvPrv.GetState(serv) != ServiceState.Stopped)
+                if((!(srvPrv.GetState(serv) == ServiceState.Stopped || srvPrv.GetState(serv) == ServiceState.Unknow))
                     && (model.Name != serv.Name
                     || model.UseServerExtender != serv.UseServerExtender
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
@@ -833,7 +833,7 @@ namespace SESM.Controllers
         }
 
         //
-        // GET: Server/StatsHourly/5
+        // GET: Server/HourlyStats/5
         [HttpGet]
         [LoggedOnly]
         [CheckAuth]
@@ -856,7 +856,7 @@ namespace SESM.Controllers
         {
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
-
+            ViewData["ID"] = id;
             List<EntityPerfEntry> perfEntries = serv.PerfEntries.Where(x => x.CPUUsagePeak != null).OrderBy(x => x.Timestamp).ToList();
             ViewData["perfEntries"] = perfEntries;
             return View();
