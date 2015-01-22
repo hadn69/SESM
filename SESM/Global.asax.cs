@@ -15,7 +15,7 @@ namespace SESM
     {
         protected void Application_Start()
         {
-            Constants.SetVersion(2, 9, 14);
+            Constants.SetVersion(2, 9, 15);
 
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
