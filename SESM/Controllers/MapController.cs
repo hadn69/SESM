@@ -273,6 +273,15 @@ namespace SESM.Controllers
                     using (ZipFile zip = new ZipFile())
                     {
                         zip.AddSelectedFiles("*", sourceFolderPath, string.Empty, true);
+                        if (serv.UseServerExtender)
+                        {
+                            zip.RemoveEntry("Sandbox.sbc");
+                            string text = System.IO.File.ReadAllText(sourceFolderPath + "Sandbox.sbc");
+                            text = text.Replace("<AutoSaveInMinutes>0</AutoSaveInMinutes>",
+                                "<AutoSaveInMinutes>" + serv.AutoSaveInMinutes + "</AutoSaveInMinutes>");
+                            zip.AddEntry("Sandbox.sbc", text);
+                        }
+
                         zip.Save(Response.OutputStream);
                     }
                     Response.End();

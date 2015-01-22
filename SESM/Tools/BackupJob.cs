@@ -104,6 +104,16 @@ namespace SESM.Tools
                                                         ".zip");
                                             zip.AddSelectedFiles("*", PathHelper.GetSavePath(item, config.SaveName),
                                                 string.Empty, true);
+
+                                            if(item.UseServerExtender)
+                                            {
+                                                zip.RemoveEntry("Sandbox.sbc");
+                                                string text = System.IO.File.ReadAllText(PathHelper.GetSavePath(item, config.SaveName) + "Sandbox.sbc");
+                                                text = text.Replace("<AutoSaveInMinutes>0</AutoSaveInMinutes>",
+                                                    "<AutoSaveInMinutes>" + item.AutoSaveInMinutes + "</AutoSaveInMinutes>");
+                                                zip.AddEntry("Sandbox.sbc", text);
+                                            }
+
                                             zip.Save(PathHelper.GetBackupsPath(item) + "AutoBackupLvl" + backupLvl + "_" +
                                                      DateTime.Now.ToString("yyyyMMddHHmmss") + "_" + config.SaveName +
                                                      ".zip");
