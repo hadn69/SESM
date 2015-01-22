@@ -872,6 +872,32 @@ namespace SESM.Controllers
             }
         }
 
+        [HttpGet]
+        [LoggedOnly]
+        [SuperAdmin]
+        public ActionResult HourlyStats()
+        {
+            ServerProvider srvPrv = new ServerProvider(_context);
+            List<EntityServer> serv = srvPrv.GetAllServers();
+            Dictionary<string, List<EntityPerfEntry>> perfEntries = serv.ToDictionary(server => server.Name, server => server.PerfEntries.Where(x => x.Timestamp >= DateTime.Now.AddHours(-2)).OrderBy(x => x.Timestamp).ToList());
+
+            ViewData["perfEntries"] = perfEntries;
+            return View();
+        }
+
+        [HttpGet]
+        [LoggedOnly]
+        [SuperAdmin]
+        public ActionResult GlobalStats()
+        {
+            ServerProvider srvPrv = new ServerProvider(_context);
+            List<EntityServer> serv = srvPrv.GetAllServers();
+            Dictionary<string, List<EntityPerfEntry>> perfEntries = serv.ToDictionary(server => server.Name, server => server.PerfEntries.Where(x => x.CPUUsagePeak != null).OrderBy(x => x.Timestamp).ToList());
+
+            ViewData["perfEntries"] = perfEntries;
+            return View();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

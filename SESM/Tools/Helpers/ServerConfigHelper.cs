@@ -61,7 +61,7 @@ namespace SESM.Tools.Helpers
         public int SpawnShipTimeMultiplier = 1;
 
         public float ProceduralDensity = 0;
-        public float ProceduralSeed = 0;
+        public int ProceduralSeed = 0;
 
         /// <summary>
         /// Parse the View Model into the object
@@ -374,7 +374,7 @@ namespace SESM.Tools.Helpers
             if (ProceduralDensity != 0)
             {
                 sb.AppendLine("    <ProceduralDensity>" + ProceduralDensity + "</ProceduralDensity>");
-                sb.AppendLine("    <ProceduralSeed>" + ProceduralSeed + "</ProceduralSeed>");
+                sb.AppendLine("    <ProceduralSeed>" + ProceduralSeed.ToString("f") + "</ProceduralSeed>");
             }
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
@@ -777,7 +777,7 @@ namespace SESM.Tools.Helpers
             if(sessionSettings.Element("ProceduralDensity") != null)
                 float.TryParse(sessionSettings.Element("ProceduralDensity").Value, out ProceduralDensity);
             if(sessionSettings.Element("ProceduralSeed") != null)
-                float.TryParse(sessionSettings.Element("ProceduralSeed").Value, out ProceduralSeed);
+                int.TryParse(sessionSettings.Element("ProceduralSeed").Value, out ProceduralSeed);
 
             if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                 Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);

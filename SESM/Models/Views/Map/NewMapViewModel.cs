@@ -22,7 +22,7 @@ namespace SESM.Models.Views.Map
 
         [Required(ErrorMessage = "Procedural Seed is required")]
         [Display(Name = "Procedural Seed")]
-        public float ProceduralSeed { get; set; }
+        public int ProceduralSeed { get; set; }
 
         public NewMapViewModel()
         {
