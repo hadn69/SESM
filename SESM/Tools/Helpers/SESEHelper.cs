@@ -114,7 +114,7 @@ namespace SESM.Tools.Helpers
         public static Version GetLocalVersion()
         {
             string SESELocPath = SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe";
-            if(System.IO.File.Exists(SESELocPath))
+            if(File.Exists(SESELocPath))
                 return AssemblyName.GetAssemblyName(SESELocPath).Version;
             return new Version(0,0,0,0);
         }
@@ -145,7 +145,7 @@ namespace SESM.Tools.Helpers
             fileStream.Close();
         }
 
-        public static void ApplyUpdate()
+        public static void ApplyUpdate(Logger logger = null)
         {
             string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
             if(files.Length != 1)
@@ -153,6 +153,10 @@ namespace SESM.Tools.Helpers
                 // If multiple zip available or no zip, we don't risk an update 
                 return;
             }
+
+            if(logger!= null)
+                logger.Info("Extracting " + PathHelper.GetLastLeaf(files[0]));
+
             using(ZipFile zip = new ZipFile(files[0]))
             {
                 zip.ExtractAll(SESMConfigHelper.SEDataPath + "DedicatedServer64",

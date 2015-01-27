@@ -70,7 +70,7 @@ namespace SESM.Tools.Helpers
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
-                svcController.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 10));
+                svcController.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 30));
             }
             catch(Exception ex)
             {

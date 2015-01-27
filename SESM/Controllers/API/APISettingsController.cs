@@ -10,10 +10,12 @@ using System.Xml.Linq;
 using Ionic.Zip;
 using NLog;
 using Quartz;
+using Quartz.Impl;
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools.API;
 using SESM.Tools.Helpers;
+using SESM.Tools.Jobs;
 
 namespace SESM.Controllers.API
 {
@@ -74,7 +76,6 @@ namespace SESM.Controllers.API
         [HttpPost]
         public ActionResult SetSESESettings()
         {
-            // TODO
             // ** INIT **
             EntityUser user = Session["User"] as EntityUser;
 
@@ -121,78 +122,126 @@ namespace SESM.Controllers.API
             SESMConfigHelper.SESEAutoUpdateCron = autoUpdateCron;
 
             // Deleting the Job
+            IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+            scheduler.DeleteJob(SESEAutoUpdateJob.GetJobKey());
 
-            // Instatiating the job
+            if (SESMConfigHelper.SESEAutoUpdateEnabled)
+            {
+                // Instantiating the job
+                IJobDetail SESEAutoUpdateJobDetail = JobBuilder.Create<SESEAutoUpdateJob>()
+                    .WithIdentity(SESEAutoUpdateJob.GetJobKey())
+                    .Build();
 
+                ITrigger SESEAutoUpdateJobTrigger = TriggerBuilder.Create()
+                    .WithIdentity(SESEAutoUpdateJob.GetTriggerKey())
+                    .WithCronSchedule(SESMConfigHelper.SESEAutoUpdateCron)
+                    .Build();
 
+                scheduler.ScheduleJob(SESEAutoUpdateJobDetail, SESEAutoUpdateJobTrigger);
+            }
 
             return Content(XMLMessage.Success("SET-GSESES-OK", "The SESE Settings has been updated").ToString());
         }
 
         // POST: API/Settings/UploadSESE        
         [HttpPost]
-        public ActionResult UploadSESE(HttpPostedFileBase zipFile)
+        public ActionResult UploadSESE(HttpPostedFileBase ZipFile)
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** PARSING **
+            if(ZipFile == null)
+                return Content(XMLMessage.Error("SET-UPSESE-MISZIP", "The zipFile parameter must be provided").ToString());
+
+            if(!Ionic.Zip.ZipFile.IsZipFile(ZipFile.InputStream, false))
+                return Content(XMLMessage.Error("SET-UPSESE-BADZIP", "The provided file in not a zip file").ToString());
+
+            ZipFile.InputStream.Seek(0, SeekOrigin.Begin);
+            using (Ionic.Zip.ZipFile zip = Ionic.Zip.ZipFile.Read(ZipFile.InputStream))
+            {
+                if (!zip.ContainsEntry("SEServerExtender.exe"))
+                    return
+                        Content(XMLMessage.Error("SET-UPSESE-NOTSESE", "The provided zip don't contain SESE").ToString());
+            }
+            // ** ACCESS **
+            if(user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-UPSESE-NOACCESS","The current user don't have enough right for this action").ToString());
+
+            SESEHelper.CleanupUpdate();
+
+            string zipName = ZipFile.FileName;
+            if (!(zipName.StartsWith("SEServerExtender") && zipName.EndsWith(".zip")))
+                zipName = "SEServerExtender_Uploaded.zip";
+
+            ZipFile.SaveAs(SESMConfigHelper.SEDataPath + zipName);
+
+            Logger logger = LogManager.GetLogger("SESEAutoUpdateLogger");
+            ReturnEnum result = SESEAutoUpdateJob.Run(logger, true, true);
+
+            if(result != ReturnEnum.Success)
+                return Content(XMLMessage.Warning("SET-UPSESE-NOK", "An error occured : " + result.ToString()).ToString());
+                
+
+            return Content(XMLMessage.Success("SET-UPSESE-OK", "SESE Update applied").ToString());
+        }
+
+        // POST: API/Settings/UpdateSESE        
+        [HttpPost]
+        public ActionResult UpdateSESE()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** PARSING **
+            bool force = Request.Form["Force"] == "True";
+
+            // ** ACCESS **
+            if(user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-UPDSESE-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PROCESS **
+            Logger logger = LogManager.GetLogger("SESEAutoUpdateLogger");
+            ReturnEnum result = SESEAutoUpdateJob.Run(logger, true, false, force);
+            
+            if(result != ReturnEnum.Success)
+                return Content(XMLMessage.Warning("SET-UPDSESE-NOK", "An error occured : " + result.ToString()).ToString());
+
+            return Content(XMLMessage.Success("SET-UPDSESE-OK", "SESE Update applied").ToString());
+        }
+
+        // GET: API/Settings/DeleteSESE        
+        [HttpGet]
+        public ActionResult DeleteSESE()
         {
             // ** INIT **
             EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
 
-            // ** PARSING **
-            if(zipFile == null)
-                return Content(XMLMessage.Error("SET-UPSESE-MISZIP", "The zipFile parameter must be provided").ToString());
+            // ** ACCESS **
+            if(user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-DELSESE-NOACCESS", "The current user don't have enough right for this action").ToString());
 
-            if(!ZipFile.IsZipFile(zipFile.InputStream, false))
-                return Content(XMLMessage.Error("SET-UPSESE-BADZIP", "The provided file in not a zip file").ToString());
+            // ** PROCESS **
+            List<EntityServer> serverList = srvPrv.GetAllSESEServers();
 
-            zipFile.InputStream.Seek(0, SeekOrigin.Begin);
-            using(ZipFile zip = ZipFile.Read(zipFile.InputStream))
+            foreach (EntityServer server in serverList)
             {
-                if(!zip.ContainsEntry("SEServerExtender.exe"))
-                    return Content(XMLMessage.Error("SET-UPSESE-NOTSESE", "The provided zip don't contain SESE").ToString());
-
-                // ** ACCESS **
-                if(user == null || !user.IsAdmin)
-                    return Content(XMLMessage.Error("SET-UPSESE-NOACCESS","The current user don't have enough right for this action").ToString());
-
-                // ** PROCESS **
-                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
-
-                List<EntityServer> serverList =
-                    srvPrv.GetAllSESEServers().Where(item => srvPrv.GetState(item) != ServiceState.Stopped).ToList();
-
-                foreach(EntityServer item in serverList)
-                {
-                    serviceLogger.Info(item.Name + " stopped by " + user.Login + " by API/Settings/UploadSESE");
-                    ServiceHelper.StopService(item);
-                }
-
-                foreach(EntityServer item in serverList)
-                {
-                    ServiceHelper.WaitForStopped(item);
-                }
-
-                Thread.Sleep(2000);
-                ServiceHelper.KillAllSESEService();
-
-                try
-                {
-                    zip.ExtractAll(SESMConfigHelper.SEDataPath + "DedicatedServer64/",ExtractExistingFileAction.OverwriteSilently);
-                }
-                catch (Exception)
-                {
-                    return Content(XMLMessage.Error("SET-UPSESE-FAILEXTR", "An error occurred while extracting the zip file").ToString());
-                }
-
-                foreach(EntityServer item in serverList)
-                {
-                    serviceLogger.Info(item.Name + " started by " + user.Login + " by API/Settings/UploadSESE");
-                    ServiceHelper.StartService(item);
-                }
-
-                return Content(XMLMessage.Success("SET-UPSESE-OK", "The following server(s) have been restarted : " + string.Join(", ", serverList.Select(x => x.Name))).ToString());
+                ServiceHelper.StopService(server);
             }
-        }
 
+            foreach(EntityServer server in serverList)
+            {
+                ServiceHelper.WaitForStopped(server);
+            }
+            Thread.Sleep(10000);
+            ServiceHelper.KillAllSESEService();
+            Thread.Sleep(2000);
+            if(System.IO.File.Exists(SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe"))
+                System.IO.File.Delete(SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe");
+
+            return Content(XMLMessage.Success("SET-DELSESE-OK", "SESE deleted").ToString());
+        }
 
         protected override void Dispose(bool disposing)
         {

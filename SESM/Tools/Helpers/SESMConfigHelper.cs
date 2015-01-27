@@ -7,11 +7,15 @@ namespace SESM.Tools.Helpers
     public class SESMConfigHelper
     {
         private static readonly SESMConfigStorage ConfigStorage;
+        private static readonly SESMRunningVarsStorage RunningVars;
 
         static SESMConfigHelper()
         {
             ConfigStorage = new SESMConfigStorage();
             ConfigStorage.Initialize();
+
+            RunningVars = new SESMRunningVarsStorage();
+            RunningVars.Initialize();
         }
 
         // Registry Settings
@@ -182,27 +186,41 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
-                return ConfigStorage.Lockdown;
+                RunningVars.Read();
+                return RunningVars.Lockdown;
             }
             set
             {
-                ConfigStorage.Lockdown = value;
-                ConfigStorage.Write();
+                RunningVars.Lockdown = value;
+                RunningVars.Write();
             }
         }
 
-        public static bool AutoUpdateRunning
+        public static bool SEUpdating
         {
             get
             {
-                ConfigStorage.Read();
-                return ConfigStorage.AutoUpdateRunning;
+                RunningVars.Read();
+                return RunningVars.SEUpdating;
             }
             set
             {
-                ConfigStorage.AutoUpdateRunning = value;
-                ConfigStorage.Write();
+                RunningVars.SEUpdating = value;
+                RunningVars.Write();
+            }
+        }
+
+        public static bool SESEUpdating
+        {
+            get
+            {
+                RunningVars.Read();
+                return RunningVars.SESEUpdating;
+            }
+            set
+            {
+                RunningVars.SESEUpdating = value;
+                RunningVars.Write();
             }
         }
 

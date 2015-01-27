@@ -68,7 +68,7 @@
         <div class="portlet-body form">
             <form action="/API/Settings/UploadSESE" class="dropzone" id="uploadDropzone">
                 <div class="fallback">
-                    <input name="zipFile" type="file" />
+                    <input name="ZipFile" type="file" />
                 </div>
             </form>
         </div>
@@ -153,7 +153,7 @@
         Dropzone.options.uploadDropzone = {
             maxFiles: 1,
             maxFilesize: 5,
-            paramName: "zipFile",
+            paramName: "ZipFile",
             clickable: true,
             acceptedFiles: ".zip",
             accept: function (file, done) {
@@ -175,6 +175,10 @@
                     uploadZone.removeAllFiles(true);
                     if (root.children("Type").text() == "Error") {
                         toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        return;
+                    }
+                    if (root.children("Type").text() == "Warning") {
+                        toastr.warning(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
                         return;
                     }
                     toastr.success(root.children("Content").text(), "SESE Updated");

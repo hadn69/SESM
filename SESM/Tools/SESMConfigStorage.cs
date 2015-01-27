@@ -11,10 +11,6 @@ namespace SESM.Tools
         public string SEDataPath { get; set; }
         public string Arch { get; set; }
 
-        // Running Vars
-        public bool Lockdown { get; set; }
-        public bool AutoUpdateRunning { get; set; }
-
         // Auto-Update Settings
         public bool AutoUpdateEnabled { get; set; }
         public string AutoUpdateCron { get; set; }
@@ -39,10 +35,6 @@ namespace SESM.Tools
             SESavePath = @"C:\ProgramData\SpaceEngineersDedicated\";
             SEDataPath = @"C:\SpaceEngineers\";
             Arch = "x64";
-
-            // Running Vars
-            Lockdown = false;
-            AutoUpdateRunning = false;
 
             // Auto-Update Settings
             AutoUpdateEnabled = true;

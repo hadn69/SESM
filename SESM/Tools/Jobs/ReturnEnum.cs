@@ -4,6 +4,7 @@
     {
         Success = 0,
         NothingToDo = 1,
-        Exception = 2
+        UpdateAlreadyRunning = 2,
+        Exception = 3,
     }
 }

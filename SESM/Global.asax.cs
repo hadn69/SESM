@@ -1,10 +1,10 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.IO;
+using System.Web.Mvc;
 using System.Web.Routing;
-using NLog;
 using Quartz;
 using Quartz.Impl;
 using SESM.Tools;
-using SESM.Tools.Helpers;
 
 namespace SESM
 {
@@ -12,10 +12,35 @@ namespace SESM
     {
         protected void Application_Start()
         {
+            // Resetting Run Vars
+            if(File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar"))
+                File.Delete(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar");
+
+            // Settings Version deadlock
             Constants.SetVersion(2, 9, 7);
 
+            // Registering routes
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.Start();
