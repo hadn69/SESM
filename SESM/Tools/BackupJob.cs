@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Threading;
 using Ionic.Zip;
 using NLog;
@@ -108,10 +109,10 @@ namespace SESM.Tools
                                             if(item.UseServerExtender)
                                             {
                                                 zip.RemoveEntry("Sandbox.sbc");
-                                                string text = System.IO.File.ReadAllText(PathHelper.GetSavePath(item, config.SaveName) + "Sandbox.sbc");
+                                                string text = File.ReadAllText(PathHelper.GetSavePath(item, config.SaveName) + "Sandbox.sbc", new UTF8Encoding(false));
                                                 text = text.Replace("<AutoSaveInMinutes>0</AutoSaveInMinutes>",
                                                     "<AutoSaveInMinutes>" + item.AutoSaveInMinutes + "</AutoSaveInMinutes>");
-                                                zip.AddEntry("Sandbox.sbc", text);
+                                                zip.AddEntry("Sandbox.sbc", text, new UTF8Encoding(false));
                                             }
 
                                             zip.Save(PathHelper.GetBackupsPath(item) + "AutoBackupLvl" + backupLvl + "_" +
