@@ -1,4 +1,4 @@
-
+if %1 == acceptEULA goto :deploy
 start "" notepad "%~dp0\SESM EULA.txt"
 set /p accept=Do you accept the SESM End User Licese Agreement (EULA) ? [Y/N] %=%
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web.Mvc;
 using System.Xml;
 using Ionic.Zip;
@@ -276,10 +277,10 @@ namespace SESM.Controllers
                         if (serv.UseServerExtender)
                         {
                             zip.RemoveEntry("Sandbox.sbc");
-                            string text = System.IO.File.ReadAllText(sourceFolderPath + "Sandbox.sbc");
+                            string text = System.IO.File.ReadAllText(sourceFolderPath + "Sandbox.sbc", new UTF8Encoding(false));
                             text = text.Replace("<AutoSaveInMinutes>0</AutoSaveInMinutes>",
                                 "<AutoSaveInMinutes>" + serv.AutoSaveInMinutes + "</AutoSaveInMinutes>");
-                            zip.AddEntry("Sandbox.sbc", text);
+                            zip.AddEntry("Sandbox.sbc", text, new UTF8Encoding(false));
                         }
 
                         zip.Save(Response.OutputStream);
