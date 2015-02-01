@@ -65,5 +65,10 @@ namespace SESM.Tools.Helpers
         {
             return GetInstancePath(server) + @"Backups\";
         }
+
+        internal static string GetFSDirName(EntityServer server)
+        {
+            return GetPrefix() + "_" + server.Id + "_" + server.Name;
+        }
     }
 }

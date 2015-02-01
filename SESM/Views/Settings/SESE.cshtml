@@ -17,7 +17,15 @@
         </div>
     </div>
 </div>
-<div class="col-md-6" style="display:none;" id="StatusPanel">
+<div class="col-md-12" style="display:none;" id="state-SESE">
+    <div class="portlet light">
+        <div class="portlet-body text-center">
+            <h4>SESE is actualy installed on <span id="nbSESE"></span> server(s)</h4>
+            <h4 id="isRunning">An SESE Upate is running</h4>
+        </div>
+    </div>
+</div>
+<div class="col-md-6" style="display:none;" id="VersionPanel">
     <div class="row">
         <div class="col-md-12" id="Status-SESE">
             <div class="alert alert-danger text-center">
@@ -56,6 +64,22 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-group btn-group btn-group-justified">
+                <a href="#" class="btn blue" id="btnUpdate">
+                    Update
+                </a>
+                <a href="#" class="btn yellow" id="btnForceUpdate">
+                    Force Update
+                </a>
+                <a href="#" class="btn red" id="btnDelete">
+                    Delete SESE
+                </a>
+            </div>
+            <br />
         </div>
     </div>
     <div class="portlet light bordered">
@@ -123,6 +147,13 @@
                         </div>
                     </div>
                 </div>
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-offset-4 col-md-8">
+                            <button type="button" class="btn blue" id="btnUpdateSESE">Save Settings</button>
+                        </div>
+                    </div>
+                </div>
                 <div class="form-actions" style="display:none;" id="CronDetails">
                     <div class="row">
                         <div class="col-md-12">
@@ -131,13 +162,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-actions">
-                    <div class="row">
-                        <div class="col-md-offset-4 col-md-8">
-                            <button type="button" class="btn blue" id="btnUpdate">Update</button>
-                        </div>
-                    </div>
-                </div>
+
             </form>
             <!-- END FORM-->
         </div>
@@ -147,6 +172,7 @@
     function initPage() {
         var animationDelay = 0;
         var statusLoaded = false;
+        var versionLoaded = false;
         var settingsLoaded = false;
         var uploadZone;
 
@@ -170,7 +196,7 @@
             },
             init: function () {
                 uploadZone = this;
-                this.on("success", function(file, response) {
+                this.on("success", function (file, response) {
                     var root = $($.parseXML(response)).find("Response");
                     uploadZone.removeAllFiles(true);
                     if (root.children("Type").text() == "Error") {
@@ -184,7 +210,7 @@
                     toastr.success(root.children("Content").text(), "SESE Updated");
                 });
             }
-    };
+        };
 
         var isCronValid = true;
         $.validator.addMethod("cron", function (value, element) {
@@ -239,18 +265,20 @@
         });
 
         function showViewSESE() {
-            if (statusLoaded && settingsLoaded) {
+            if (statusLoaded && versionLoaded && settingsLoaded) {
                 $("#loading-SESE").hide(animationDelay);
-                $("#StatusPanel").show(animationDelay);
+                $("#state-SESE").show(animationDelay);
+                $("#VersionPanel").show(animationDelay);
                 $("#SettingsPanel").show(animationDelay);
             }
         }
         function refresh() {
             $("#loading-SESE").show(animationDelay);
-            $("#StatusPanel").hide(animationDelay);
+            $("#state-SESE").hide(animationDelay);
+            $("#VersionPanel").hide(animationDelay);
             $("#SettingsPanel").hide(animationDelay);
 
-            $.get("/API/Settings/GetSESEVersion",
+            $.get("/API/Settings/GetSESEStatus",
                 {},
                 function (data, status) {
                     statusLoaded = true;
@@ -270,23 +298,65 @@
                         showViewSESE();
                         return;
                     }
+
+                    $("#isRunning").hide(0);
+                    if (root.children("Content").children("UpdateRunning").text() == "True") {
+                        $("#isRunning").show(0);
+                    }
+
+                    $("#nbSESE").text(root.children("Content").children("NbServer").text());
+
+                    showViewSESE();
+                    return;
+                });
+
+            $.get("/API/Settings/GetSESEVersion",
+                {},
+                function (data, status) {
+                    versionLoaded = true;
+                    if (status != "success") {
+                        toastr.error("See console for more infos", "Fatal Error");
+                        Console.warn("Fatal Error : ");
+                        Console.warn("Status : " + status);
+                        Console.warn("Data : " + data);
+                        showViewSESE();
+                        return;
+                    }
+
+                    var root = $($.parseXML(data)).find("Response");
+
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        showViewSESE();
+                        return;
+                    }
+
+                    $("#btnUpdate").hide(0);
+                    $("#btnDelete").hide(0);
+
                     $("#Status-SESE").children(".alert")
                         .removeClass("alert-success")
                         .removeClass("alert-info")
                         .removeClass("alert-danger")
                         .removeClass("alert-warning");
+
                     $("#Local-SESE").find(".number").last().html(root.children("Content").children("Local").text());
                     $("#remote-SESE").find(".number").last().html(root.children("Content").children("Remote").text());
+
                     if (root.children("Content").children("Local").text() == "0.0.0.0") {
                         $("#Status-SESE").find("h3").html("SE Server Extender is not installed");
                         $("#Status-SESE").find(".alert").addClass("alert-info");
                         $("#Local-SESE").find(".number").last().html("N/A");
+                        $("#btnUpdate").show(0);
+
                         showViewSESE();
                         return;
                     }
+                    $("#btnDelete").show(0);
                     if (root.children("Content").children("Diff").text() < 0) {
                         $("#Status-SESE").find("h3").html("An update is available !");
                         $("#Status-SESE").children(".alert").addClass("alert-warning");
+                        $("#btnUpdate").show(0);
                     }
                     else if (root.children("Content").children("Diff").text() == 0) {
                         $("#Status-SESE").find("h3").html("SE Server Extender is up to date !");
@@ -323,8 +393,8 @@
                     }
 
                     $("#inpGithubURL").val(root.children("Content").children("GithubURL").text());
-                    $("#inpDev").prop('checked', root.children("Content").children("Dev").text() == "True");
-                    $("#inpAutoUpdateEnabled").prop('checked', root.children("Content").children("AutoUpdateEnabled").text() == "True");
+                    $("#inpDev").bootstrapSwitch('state', root.children("Content").children("Dev").text() == "True");
+                    $("#inpAutoUpdateEnabled").bootstrapSwitch('state', root.children("Content").children("AutoUpdateEnabled").text() == "True");
                     $("#inpAutoUpdateCron").val(root.children("Content").children("AutoUpdateCron").text());
 
                     showViewSESE();
@@ -404,8 +474,39 @@
             TestCron();
         });
 
-        $("#btnUpdate").click(function () {
+        $("#btnUpdateSESE").click(function () {
+            var aaa = $("form").valid();
+            if ($("form").valid()) {
+                $("#btnUpdate").prop('disabled', true);
+                $.post("/API/Settings/SetSESESettings",
+                {
+                    GithubURL: $("#inpGithubURL").val(),
+                    Dev: $("#inpDev").is(':checked'),
+                    AutoUpdateEnabled: $("#inpAutoUpdateEnabled").is(':checked'),
+                    AutoUpdateCron: $("#inpAutoUpdateCron").val()
+                },
+                    function (data, status) {
+                        $("#btnUpdate").prop('disabled', false);
+                        if (status != "success") {
+                            toastr.error("See console for more infos", "Fatal Error");
+                            Console.warn("Fatal Error : ");
+                            Console.warn("Status : " + status);
+                            Console.warn("Data : " + data);
+                            return;
+                        }
 
+                        var root = $($.parseXML(data)).find("Response");
+
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            showViewSESE();
+                            return;
+                        }
+
+                        toastr.success(root.children("Content").text(), "Settings Updated");
+                    });
+
+            }
         });
 
     }

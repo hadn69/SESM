@@ -164,6 +164,11 @@
                 $.uniform.update($('.group-checkable'));
             });
 
+            table.on('click', 'tbody tr td:nth-child(2)', function () {
+                var id = $(this).parent().children().first().find('input').val();
+                window.location.href = "/Server/Dashboard/" + id;
+            });
+
             $(".dataTables_filter").addClass("pull-right");
 
             function refereshList(checkedIDs) {

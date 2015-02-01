@@ -30,6 +30,7 @@ namespace SESM.DAL
                 return true;
             }
         }
+
         public bool CheckSESEPortAvailability(int port)
         {
             try
@@ -43,6 +44,7 @@ namespace SESM.DAL
                 return true;
             }
         }
+
         public bool CheckSESEPortAvailabilityActive(int port)
         {
             try
@@ -56,6 +58,7 @@ namespace SESM.DAL
                 return true;
             }
         }
+
         public void AddAdministrator(string[] listUsers, EntityServer server)
         {
             UserProvider usrPrv = new UserProvider(_context);
@@ -66,6 +69,7 @@ namespace SESM.DAL
                 server.Administrators.Add(usrPrv.GetUser(item));
             }
         }
+
         public void AddManagers(string[] listUsers, EntityServer server)
         {
             UserProvider usrPrv = new UserProvider(_context);
@@ -87,6 +91,7 @@ namespace SESM.DAL
                 server.Users.Add(usrPrv.GetUser(item));
             }
         }
+
         public EntityServer GetServerByPort(int port)
         {
             try
@@ -98,6 +103,7 @@ namespace SESM.DAL
                 return null;
             }
         }
+
         public EntityServer GetServerBySESEPort(int port)
         {
             try
@@ -109,6 +115,7 @@ namespace SESM.DAL
                 return null;
             }
         }
+
         public EntityServer GetServer(int id)
         {
             try
@@ -310,6 +317,7 @@ namespace SESM.DAL
                 return null;
             }
         }
+
         public void RemoveServer(EntityServer server)
         {
             try
@@ -322,6 +330,19 @@ namespace SESM.DAL
             {
                 throw;
             }
+        }
+
+        public bool SecurityCheck(EntityServer server, EntityUser user)
+        {
+            if(user == null || server == null)
+                return false;
+
+            AccessLevel accessLevel = GetAccessLevel(user.Id, server.Id);
+            if(accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+            {
+                return true;
+            }
+            return false;
         }
     }
 

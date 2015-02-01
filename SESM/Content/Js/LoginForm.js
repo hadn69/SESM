@@ -56,7 +56,7 @@
         });
 
         function requestAuth() {
-            $.post("/API/Account/GetChallenge",
+            $.get("/API/Account/GetChallenge",
                 {},
                 function (data, status) {
                     if (status != "success") {

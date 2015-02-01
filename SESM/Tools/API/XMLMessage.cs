@@ -14,7 +14,7 @@ namespace SESM.Tools.API
         public XMLMessage(string code = "UNKN")
         {
             Type = XmlResponseType.Success;
-            Content = new List<XElement>();
+            Content = new List<XNode>();
             Code = code;
         }
 
@@ -26,9 +26,9 @@ namespace SESM.Tools.API
             
         }
 
-        public void AddToContent(XElement item)
+        public void AddToContent(XNode item)
         {
-            ((List<XElement>)Content).Add(item);
+            ((List<XNode>)Content).Add(item);
         }
 
         public XMLMessage Build()

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml.Linq;
-using Ionic.Zip;
 using NLog;
 using Quartz;
 using Quartz.Impl;
@@ -22,6 +20,26 @@ namespace SESM.Controllers.API
     public class APISettingsController : Controller
     {
         private readonly DataContext _context = new DataContext();
+
+        // GET: API/Settings/GetSESEStatus        
+        [HttpGet]
+        public ActionResult GetSESEStatus()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            // ** ACCESS **
+            if(user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-GSESES-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PROCESS **
+            XMLMessage response = new XMLMessage("SET-GSESES-OK");
+
+            response.AddToContent(new XElement("UpdateRunning", SESMConfigHelper.SESEUpdating.ToString()));
+            response.AddToContent(new XElement("NbServer", srvPrv.GetAllSESEServers().Count));
+            return Content(response.ToString());
+        }
 
         // GET: API/Settings/GetSESEVersion        
         [HttpGet]
