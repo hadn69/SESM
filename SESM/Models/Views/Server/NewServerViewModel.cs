@@ -214,6 +214,10 @@ namespace SESM.Models.Views.Server
         public int ViewDistance { get; set; }
 
         [Required]
+        [DisplayName("Enable Permanent Death")]
+        public bool EnableToolShake { get; set; }
+
+        [Required]
         [DisplayName("Ignore Last Session")]
         public bool IgnoreLastSession { get; set; }
 
@@ -281,6 +285,7 @@ namespace SESM.Models.Views.Server
             DestructibleBlocks = true;
             EnableIngameScripts = true;
             ViewDistance = 20000;
+            EnableToolShake = false;
 
             ProcessPriority = EnumProcessPriority.Normal;
         }

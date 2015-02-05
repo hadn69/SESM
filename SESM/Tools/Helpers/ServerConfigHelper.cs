@@ -54,6 +54,7 @@ namespace SESM.Tools.Helpers
         public bool DestructibleBlocks = true;
         public bool EnableIngameScripts = true;
         public int ViewDistance = 20000;
+        public bool EnableToolShake = false;
 
         public bool IgnoreLastSession = false;
         public string WorldName = string.Empty;
@@ -99,6 +100,7 @@ namespace SESM.Tools.Helpers
             DestructibleBlocks = model.DestructibleBlocks;
             EnableIngameScripts = model.EnableIngameScripts;
             ViewDistance = model.ViewDistance;
+            EnableToolShake = model.EnableToolShake;
 
             ScenarioType = model.ScenarioType;
             SaveName = model.SaveName;
@@ -207,6 +209,7 @@ namespace SESM.Tools.Helpers
             DestructibleBlocks = model.DestructibleBlocks;
             EnableIngameScripts = model.EnableIngameScripts;
             ViewDistance = model.ViewDistance;
+            EnableToolShake = model.EnableToolShake;
 
             IP = model.IP;
             SteamPort = model.SteamPort;
@@ -315,6 +318,7 @@ namespace SESM.Tools.Helpers
             model.DestructibleBlocks = DestructibleBlocks;
             model.EnableIngameScripts = EnableIngameScripts;
             model.ViewDistance = ViewDistance;
+            model.EnableToolShake = EnableToolShake;
 
             model.ScenarioType = ScenarioType;
             model.SaveName = SaveName;
@@ -371,6 +375,7 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <DestructibleBlocks>" + DestructibleBlocks.ToString().ToLower() + "</DestructibleBlocks>");
             sb.AppendLine("    <EnableIngameScripts>" + EnableIngameScripts.ToString().ToLower() + "</EnableIngameScripts>");
             sb.AppendLine("    <ViewDistance>" + ViewDistance + "</ViewDistance>");
+            sb.AppendLine("    <EnableToolShake>" + EnableToolShake.ToString().ToLower() + "</EnableToolShake>");
             if(ProceduralDensity != 0)
             {
                 sb.AppendLine("    <ProceduralDensity>" + ProceduralDensity + "</ProceduralDensity>");
@@ -656,11 +661,20 @@ namespace SESM.Tools.Helpers
                 settingsNode.SelectSingleNode("descendant::EnableIngameScripts").InnerText =
                     EnableIngameScripts.ToString().ToLower();
 
+
                 valueNode = settingsNode.SelectSingleNode("descendant::ViewDistance");
                 if(valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ViewDistance", null));
                 settingsNode.SelectSingleNode("descendant::ViewDistance").InnerText =
                     ViewDistance.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableToolShake");
+                if(valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableToolShake", null));
+                settingsNode.SelectSingleNode("descendant::EnableToolShake").InnerText =
+                    EnableToolShake.ToString().ToLower();
+
 
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if(valueNode == null)
@@ -773,6 +787,8 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(sessionSettings.Element("EnableIngameScripts").Value, out EnableIngameScripts);
             if(sessionSettings.Element("ViewDistance") != null)
                 int.TryParse(sessionSettings.Element("ViewDistance").Value, out ViewDistance);
+            if(sessionSettings.Element("EnableToolShake") != null)
+                bool.TryParse(sessionSettings.Element("EnableToolShake").Value, out EnableToolShake);
 
             if(sessionSettings.Element("ProceduralDensity") != null)
                 float.TryParse(sessionSettings.Element("ProceduralDensity").Value, out ProceduralDensity);
@@ -910,6 +926,8 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(settings.Element("EnableIngameScripts").Value, out EnableIngameScripts);
             if(settings.Element("ViewDistance") != null)
                 int.TryParse(settings.Element("ViewDistance").Value, out ViewDistance);
+            if(settings.Element("EnableToolShake") != null)
+                bool.TryParse(settings.Element("EnableToolShake").Value, out EnableToolShake);
 
             Mods = new List<ulong>();
             if(root.Element("Mods") != null)
