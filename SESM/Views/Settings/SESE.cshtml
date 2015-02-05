@@ -282,14 +282,6 @@
                 {},
                 function (data, status) {
                     statusLoaded = true;
-                    if (status != "success") {
-                        toastr.error("See console for more infos", "Fatal Error");
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        showViewSESE();
-                        return;
-                    }
 
                     var root = $($.parseXML(data)).find("Response");
 
@@ -314,14 +306,6 @@
                 {},
                 function (data, status) {
                     versionLoaded = true;
-                    if (status != "success") {
-                        toastr.error("See console for more infos", "Fatal Error");
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        showViewSESE();
-                        return;
-                    }
 
                     var root = $($.parseXML(data)).find("Response");
 
@@ -375,14 +359,6 @@
                 {},
                 function (data, status) {
                     settingsLoaded = true;
-                    if (status != "success") {
-                        toastr.error("See console for more infos", "Fatal Error");
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        showViewSESE();
-                        return;
-                    }
 
                     var root = $($.parseXML(data)).find("Response");
 
@@ -417,15 +393,6 @@
                 function (data, status) {
                     isCronValid = false;
 
-                    if (status != "success") {
-                        toastr.error("See console for more infos", "Fatal Error");
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        $("form").valid();
-                        return;
-                    }
-
                     var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
@@ -442,13 +409,6 @@
                                 Cron: $("#inpAutoUpdateCron").val()
                             },
                             function (data, status) {
-                                if (status != "success") {
-                                    toastr.error("See console for more infos", "Fatal Error");
-                                    Console.warn("Fatal Error : ");
-                                    Console.warn("Status : " + status);
-                                    Console.warn("Data : " + data);
-                                    return;
-                                }
 
                                 var root = $($.parseXML(data)).find("Response");
 
@@ -487,13 +447,6 @@
                 },
                     function (data, status) {
                         $("#btnUpdate").prop('disabled', false);
-                        if (status != "success") {
-                            toastr.error("See console for more infos", "Fatal Error");
-                            Console.warn("Fatal Error : ");
-                            Console.warn("Status : " + status);
-                            Console.warn("Data : " + data);
-                            return;
-                        }
 
                         var root = $($.parseXML(data)).find("Response");
 

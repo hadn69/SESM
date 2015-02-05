@@ -2,16 +2,11 @@
     if ($("#QADiv") != null) {
         var serverName = "";
         function updateQA() {
-            $.get("/API/Server/GetServer/" + serverID,
-                {},
+            $.post("/API/Server/GetServer",
+                {
+                    ServerID: serverID
+                },
                 function(data, status) {
-                    if (status != "success") {
-                        toastr.error("See console for more infos", "Fatal Error");
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        return;
-                    }
                     var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
@@ -48,7 +43,7 @@
                 });
         }
 
-        setInterval("updateQA()", 10000);
+        setInterval(updateQA, 10000);
         updateQA();
 
         $("#btnQAStart").click(function() {
@@ -57,13 +52,6 @@
                     ServerIDs: serverID
                 },
                 function(data, status) {
-                    if (status != "success") {
-                        toastr.error("See console for more infos", "Fatal Error");
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        return;
-                    }
                     var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
@@ -80,13 +68,6 @@
                     ServerIDs: serverID
                 },
                 function (data, status) {
-                    if (status != "success") {
-                        toastr.error("See console for more infos", "Fatal Error");
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        return;
-                    }
                     var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
@@ -103,13 +84,6 @@
                     ServerIDs: serverID
                 },
                 function (data, status) {
-                    if (status != "success") {
-                        toastr.error("See console for more infos", "Fatal Error");
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        return;
-                    }
                     var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
@@ -126,13 +100,6 @@
                     ServerIDs: serverID
                 },
                 function (data, status) {
-                    if (status != "success") {
-                        toastr.error("See console for more infos", "Fatal Error");
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        return;
-                    }
                     var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {

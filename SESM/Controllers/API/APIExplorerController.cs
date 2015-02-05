@@ -14,7 +14,7 @@ using SESM.Tools.Helpers;
 
 namespace SESM.Controllers.API
 {
-    public class APIExplorer : Controller
+    public class APIExplorerController : Controller
     {
         private readonly DataContext _context = new DataContext();
 

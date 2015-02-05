@@ -44,9 +44,9 @@ namespace SESM.Controllers.API
             return Content(response.ToString());
         }
 
-        // GET: API/Server/GetServer/{ServerID}
-        [HttpGet]
-        public ActionResult GetServer(int id)
+        // POST: API/Server/GetServer
+        [HttpPost]
+        public ActionResult GetServer()
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -54,9 +54,16 @@ namespace SESM.Controllers.API
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
 
-            EntityServer server = srvPrv.GetServer(id);
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if(string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-GS-MISID", "The ServerID field must be provided").ToString());
 
-            // ** ACCESS **
+            if(!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-GS-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
             if(server == null)
                 return Content(XMLMessage.Error("SRV-GS-UKNSRV", "The server doesn't exist").ToString());
 

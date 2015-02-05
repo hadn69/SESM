@@ -1,10 +1,10 @@
 ﻿@{
     ViewBag.Title = "Server list";
 }
+<script src="/assets/global/plugins/select2/select2.min.js" type="text/javascript"></script>
+<script src="/assets/global/plugins/datatables/media/js/jquery.dataTables.min.js" type="text/javascript"></script>
+<script src="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" type="text/javascript"></script>
 <div class="col-md-12">
-    <script src="/assets/global/plugins/select2/select2.min.js" type="text/javascript"></script>
-    <script src="/assets/global/plugins/datatables/media/js/jquery.dataTables.min.js" type="text/javascript"></script>
-    <script src="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" type="text/javascript"></script>
     <div class="portlet light bordered">
         <div class="portlet-body">
             <div class="table-toolbar">
@@ -176,15 +176,6 @@
                 $.get("/API/Server/GetServers",
                 {},
                 function (data, status) {
-                    if (status != "success") {
-                        toastr.error("See console for more infos", "Fatal Error");
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        $("#btnRefreshList").children("i").removeClass("fa-spin");
-                        return;
-                    }
-
                     var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
@@ -245,14 +236,6 @@
                 $.get("/API/Account/GetDetails",
                     {},
                     function (data, status) {
-                        if (status != "success") {
-                            toastr.error("See console for more infos", "Fatal Error");
-                            Console.warn("Fatal Error : ");
-                            Console.warn("Status : " + status);
-                            Console.warn("Data : " + data);
-                            $("#btnRefreshList").children("i").removeClass("fa-spin");
-                            return;
-                        }
 
                         var root = $($.parseXML(data)).find("Response");
 
@@ -327,14 +310,6 @@
                                             ServerIDs: ids.join(";")
                                         },
                                         function (data, status) {
-                                            if (status != "success") {
-                                                toastr.error("See console for more infos", "Fatal Error");
-                                                Console.warn("Fatal Error : ");
-                                                Console.warn("Status : " + status);
-                                                Console.warn("Data : " + data);
-                                                return;
-                                            }
-
                                             var root = $($.parseXML(data)).find("Response");
 
                                             if (root.children("Type").text() == "Error") {
@@ -370,14 +345,6 @@
                                 ServerIDs: ids.join(";")
                             },
                             function (data, status) {
-                                if (status != "success") {
-                                    toastr.error("See console for more infos", "Fatal Error");
-                                    Console.warn("Fatal Error : ");
-                                    Console.warn("Status : " + status);
-                                    Console.warn("Data : " + data);
-                                    return;
-                                }
-
                                 var root = $($.parseXML(data)).find("Response");
 
                                 if (root.children("Type").text() == "Error") {
@@ -411,14 +378,6 @@
                                 ServerIDs: ids.join(";")
                             },
                             function (data, status) {
-                                if (status != "success") {
-                                    toastr.error("See console for more infos", "Fatal Error");
-                                    Console.warn("Fatal Error : ");
-                                    Console.warn("Status : " + status);
-                                    Console.warn("Data : " + data);
-                                    return;
-                                }
-
                                 var root = $($.parseXML(data)).find("Response");
 
                                 if (root.children("Type").text() == "Error") {
@@ -456,15 +415,6 @@
                                 OnlyStarted: $("#chkbxRestart").is(":checked").toString()
                             },
                             function (data, status) {
-                                if (status != "success") {
-                                    toastr.error("See console for more infos", "Fatal Error");
-                                    Console.warn("Fatal Error : ");
-                                    Console.warn("Status : " + status);
-                                    Console.warn("Data : " + data);
-                                    $("#btnRestartServers").children("i").removeClass("fa-spin");
-                                    return;
-                                }
-
                                 var root = $($.parseXML(data)).find("Response");
 
                                 if (root.children("Type").text() == "Error") {
@@ -505,14 +455,6 @@
                                 ServerIDs: ids.join(";")
                             },
                             function (data, status) {
-                                if (status != "success") {
-                                    toastr.error("See console for more infos", "Fatal Error");
-                                    Console.warn("Fatal Error : ");
-                                    Console.warn("Status : " + status);
-                                    Console.warn("Data : " + data);
-                                    return;
-                                }
-
                                 var root = $($.parseXML(data)).find("Response");
 
                                 if (root.children("Type").text() == "Error") {

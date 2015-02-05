@@ -3773,7 +3773,6 @@
     <Content Include="Views\Server\Status.cshtml" />
     <Content Include="Views\Map\Index.cshtml" />
     <Content Include="Views\Map\New.cshtml" />
-    <Content Include="Views\Shared\_Header.cshtml" />
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Map\Upload.cshtml" />
@@ -3792,12 +3791,12 @@
     <Content Include="Views\Settings\Backups.cshtml" />
     <Content Include="Views\Backup\Index.cshtml" />
     <Content Include="Views\Settings\SteamCMD.cshtml" />
-    <Content Include="Views\Shared\_Flash.cshtml" />
     <Content Include="Views\External\SignGen.cshtml" />
     <Content Include="Views\Shared\_BreadCrumb.cshtml" />
     <Content Include="Views\Shared\_SideBar.cshtml" />
     <Content Include="Views\Settings\SESE.cshtml" />
     <Content Include="Views\Error\404.cshtml" />
+    <Content Include="Views\Explorer\Browse.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -3826,11 +3825,13 @@
     <Compile Include="Controllers\ActionFilters\ManagerAndAboveAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\SuperAdminAttribute.cs" />
     <Compile Include="Controllers\API\APIAccountController.cs" />
+    <Compile Include="Controllers\API\APIExplorerController.cs" />
     <Compile Include="Controllers\API\APIServerController.cs" />
     <Compile Include="Controllers\API\APISettingsController.cs" />
     <Compile Include="Controllers\API\APIMiscController.cs" />
     <Compile Include="Controllers\BackupController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
+    <Compile Include="Controllers\ExplorerController.cs" />
     <Compile Include="Controllers\ExternalController.cs" />
     <Compile Include="Controllers\FlashMessageExtensions.cs" />
     <Compile Include="Controllers\LogController.cs" />
@@ -3918,6 +3919,7 @@
     <Compile Include="Tools\Constants.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
     <Compile Include="Tools\GraphHelper.cs" />
+    <Compile Include="Tools\Helpers\FSHelper.cs" />
     <Compile Include="Tools\Helpers\SESEHelper.cs" />
     <Compile Include="Tools\Helpers\HashHelper.cs" />
     <Compile Include="Tools\Helpers\PathHelper.cs" />
@@ -3976,7 +3978,6 @@
     <Folder Include="assets\global\plugins\angularjs\plugins\angular-file-upload\uploads\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\node\public\files\thumbnail\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\php\files\thumbnail\" />
-    <Folder Include="Views\Misc\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

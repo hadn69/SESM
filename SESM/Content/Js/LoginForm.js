@@ -59,15 +59,6 @@
             $.get("/API/Account/GetChallenge",
                 {},
                 function (data, status) {
-                    if (status != "success") {
-                        $("#LoginErrorText").html("Error Occured (see console for more infos).");
-                        $('#LoginError').show();
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        return;
-                    }
-
                     var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
@@ -85,14 +76,6 @@
                             password: password.toString()
                         },
                         function (data, status) {
-                            if (status != "success") {
-                                $("#LoginErrorText").html("Error Occured (see console for more infos).");
-                                $('#LoginError').show();
-                                Console.warn("Fatal Error : ");
-                                Console.warn("Status : " + status);
-                                Console.warn("Data : " + data);
-                                return;
-                            }
                             var root = $($.parseXML(data)).find("Response");
                             if (root.children("Type").text() == "Error") {
                                 $("#LoginErrorText").html(root.children("Content").text());
@@ -187,15 +170,6 @@
                 Email: $("#RegisterEMail").val()
             },
                 function (data, status) {
-                    if (status != "success") {
-                        $("#RegisterErrorText").html("Error Occured (see console for more infos).");
-                        $('#RegisterError').show();
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        return;
-                    }
-
                     var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {

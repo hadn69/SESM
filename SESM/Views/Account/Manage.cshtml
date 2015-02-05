@@ -95,16 +95,9 @@
                 $("#inpEMail").val(defEMail);
             });
 
-            $.post("/API/Account/GetDetails",
+            $.get("/API/Account/GetDetails",
                 {},
                 function (data, status) {
-                    if (status != "success") {
-                        toastr.error("See console for more infos", "Fatal Error");
-                        Console.warn("Fatal Error : ");
-                        Console.warn("Status : " + status);
-                        Console.warn("Data : " + data);
-                        return;
-                    }
                     var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
@@ -138,13 +131,6 @@
                         postData,
                     function (data, status) {
                         $("#btnUpdate").prop('disabled', false);
-                        if (status != "success") {
-                            toastr.error("See console for more infos", "Fatal Error");
-                            Console.warn("Fatal Error : ");
-                            Console.warn("Status : " + status);
-                            Console.warn("Data : " + data);
-                            return;
-                        }
                         var root = $($.parseXML(data)).find("Response");
 
                         if (root.children("Type").text() == "Error") {

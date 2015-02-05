@@ -33,7 +33,7 @@
     <link rel="shortcut icon" href="/Content/logo-small.png" />
     <script src="/assets/global/plugins/pace/pace.min.js" type="text/javascript"></script>
     <link href="/assets/global/plugins/pace/themes/pace-theme-flash.css" rel="stylesheet" type="text/css">
-    <link href="../../assets/global/plugins/bootstrap-toastr/toastr.min.css" rel="stylesheet" type="text/css"/>
+    <link href="../../assets/global/plugins/bootstrap-toastr/toastr.min.css" rel="stylesheet" type="text/css" />
     <script src="/assets/global/plugins/jquery.min.js" type="text/javascript"></script>
     <script src="/assets/global/plugins/jquery-migrate.min.js" type="text/javascript"></script>
 </head>
@@ -150,7 +150,7 @@
                     <!-- END PAGE HEADER-->
                     <!-- BEGIN PAGE CONTENT-->
                     <div class="row">
-                            @RenderBody()
+                        @RenderBody()
                     </div>
                     <!-- END PAGE CONTENT-->
                 </div>
@@ -196,15 +196,20 @@
     <script src="/Content/Js/QuickActions.js" type="text/javascript"></script>
     <script>
         jQuery(document).ready(function () {
-
+            function FatalError(status, data)
+            {
+                toastr.error("See console for more infos", "Fatal Error");
+                Console.warn("Fatal Error : ");
+                Console.warn("Status : " + status);
+                Console.warn("Data : " + data);
+            }
 
             Metronic.init(); // init metronic core components
             Layout.init(); // init current layout
 
             @if (ViewBag.ServerID != null)
             {
-             
-                @:var serverID = @ViewBag.ServerID;
+                @:serverID = @ViewBag.ServerID;
                 @:initQA(serverID);
             }
             toastr.options = {
