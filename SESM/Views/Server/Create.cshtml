@@ -353,6 +353,13 @@
                         @Html.ValidationMessageFor(m => m.EnableCopyPaste)
                     </div>
                 </div>
+                <div class="form-group" data-toggle="popover" data-content="If enabled, the tools (eg : ship drills) will shake when in use.">
+                    @Html.LabelFor(m => m.EnableToolShake, labelClass)
+                    <div class="@valueColumn">
+                        @Html.CheckBoxFor(m => m.EnableToolShake, valueClass)
+                        @Html.ValidationMessageFor(m => m.EnableToolShake)
+                    </div>
+                </div>
                 <div class="form-group" data-toggle="popover" data-content="If enabled, players will be able to go into spectator mode.">
                     @Html.LabelFor(m => m.EnableSpectator, labelClass)
                     <div class="@valueColumn">

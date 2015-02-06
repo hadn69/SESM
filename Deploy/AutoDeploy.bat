@@ -1,4 +1,7 @@
+@echo off
+if "%1"=="" goto :question
 if %1 == acceptEULA goto :deploy
+:question
 start "" notepad "%~dp0\SESM EULA.txt"
 set /p accept=Do you accept the SESM End User Licese Agreement (EULA) ? [Y/N] %=%
 
