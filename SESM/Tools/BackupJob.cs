@@ -109,7 +109,7 @@ namespace SESM.Tools
                                             if(item.UseServerExtender)
                                             {
                                                 zip.RemoveEntry("Sandbox.sbc");
-                                                string text = File.ReadAllText(PathHelper.GetSavePath(item, config.SaveName) + "Sandbox.sbc", new UTF8Encoding(false));
+                                                string text = File.ReadAllText(PathHelper.GetSavePath(item, config.SaveName) + @"\Sandbox.sbc", new UTF8Encoding(false));
                                                 text = text.Replace("<AutoSaveInMinutes>0</AutoSaveInMinutes>",
                                                     "<AutoSaveInMinutes>" + item.AutoSaveInMinutes + "</AutoSaveInMinutes>");
                                                 zip.AddEntry("Sandbox.sbc", text, new UTF8Encoding(false));
