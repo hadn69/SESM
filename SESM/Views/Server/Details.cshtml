@@ -468,7 +468,7 @@
                         @Html.ValidationMessageFor(m => m.IgnoreLastSession)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="The list of the administrators' steam's ids.
+                <div class="form-group" data-toggle="popover" data-content="The list of the administrators' steam ids.
                     <br />One per line.">
                     @Html.LabelFor(m => m.Administrators, labelClass)
                     <div class="@valueColumn">
@@ -476,7 +476,7 @@
                         @Html.ValidationMessageFor(m => m.Administrators)
                     </div>
                 </div>
-                <div class="form-group" data-toggle="popover" data-content="The list of the banneds' steam's ids.
+                <div class="form-group" data-toggle="popover" data-content="The list of the banneds' steam ids.
                     <br />One per line.">
                     @Html.LabelFor(m => m.Banned, labelClass)
                     <div class="@valueColumn">
@@ -493,7 +493,7 @@
                     </div>
                 </div>
                 <div class="form-group" data-toggle="popover" data-content="The authorised steam group.
-                    <br />If other than 0, only the players who are part of this steam groupp will be allowed to connect.">
+                    <br />If other than 0, only the players who are part of this steam group will be allowed to connect.">
                     @Html.LabelFor(m => m.GroupID, labelClass)
                     <div class="@valueColumn">
                         @Html.TextBoxFor(m => m.GroupID, null, managerAccessClass)
