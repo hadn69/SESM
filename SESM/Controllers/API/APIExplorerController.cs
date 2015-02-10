@@ -69,7 +69,7 @@ namespace SESM.Controllers.API
                     new XElement("Type", "Directory"),
                     new XElement("Name", directory.Name),
                     new XElement("Size", directory.Size),
-                    new XElement("Timestamp", directory.Timestamp.ToString("yyyy/MM/dd-HH:mm:ss"))));
+                    new XElement("Date", directory.Timestamp.ToString("yyyy/MM/dd-HH:mm:ss"))));
             }
 
             IEnumerable<NodeInfo> files = FSHelper.GetFiles(path);
@@ -80,7 +80,7 @@ namespace SESM.Controllers.API
                     new XElement("Type", "File"),
                     new XElement("Name", file.Name),
                     new XElement("Size", file.Size),
-                    new XElement("Timestamp", file.Timestamp.ToString("yyyy/MM/dd-HH:mm:ss"))));
+                    new XElement("Date", file.Timestamp.ToString("yyyy/MM/dd-HH:mm:ss"))));
             }
 
             return Content(response.ToString());
@@ -138,7 +138,7 @@ namespace SESM.Controllers.API
                     new XElement("Type", "Directory"),
                     new XElement("Name", directory.Name),
                     new XElement("Size", directory.Size),
-                    new XElement("Timestamp", directory.Timestamp.ToString("yyyy/MM/dd-HH:mm:ss"))));
+                    new XElement("Date", directory.Timestamp.ToString("o"))));
             }
             return Content(response.ToString());
         }

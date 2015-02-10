@@ -235,8 +235,7 @@
                 });
                 $.get("/API/Account/GetDetails",
                     {},
-                    function (data, status) {
-
+                    function (data) {
                         var root = $($.parseXML(data)).find("Response");
 
                         if (root.children("ReturnCode").text() == "ACT-GTD-NOTLOG") {
