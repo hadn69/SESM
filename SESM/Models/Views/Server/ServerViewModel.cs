@@ -223,7 +223,7 @@ namespace SESM.Models.Views.Server
         public int ViewDistance { get; set; }
 
         [Required]
-        [DisplayName("Enable Permanent Death")]
+        [DisplayName("Enable Tools Shake")]
         public bool EnableToolShake { get; set; }
 
         [Required]
