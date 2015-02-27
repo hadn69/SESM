@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web.Mvc;
 using System.Xml;
 using Ionic.Zip;
@@ -72,16 +73,24 @@ namespace SESM.Controllers
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
 
-
             if (ModelState.IsValid)
             {
                 if(srvPrv.GetState(serv) != ServiceState.Stopped)
                     return RedirectToAction("Index", new { id = id });
+                if (serv.UseServerExtender)
+                {
+                    ServerConfigHelper oldConfig = new ServerConfigHelper();
+                    oldConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+                    oldConfig.LoadFromSave(PathHelper.GetSavePath(serv, oldConfig.SaveName) + @"\Sandbox.sbc");
+                    oldConfig.AutoSaveInMinutes = serv.AutoSaveInMinutes??5;
+                    oldConfig.Save(serv);
+                }
 
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, serverConfig.SaveName) + @"\Sandbox.sbc");
                 serverConfig.SaveName = model.MapName;
-                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, model.MapName));
+                serverConfig.LoadFromSaveManager(PathHelper.GetSavePath(serv, model.MapName) + @"\Sandbox.sbc");
                 serv.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
                 srvPrv.UpdateServer(serv);
                 if (serv.UseServerExtender)
@@ -112,9 +121,21 @@ namespace SESM.Controllers
 
                 serviceLogger.Info(serv.Name + " stopped by " + user.Login + " by select and restart map button");
                 ServiceHelper.StopServiceAndWait(serv);
+
+                if(serv.UseServerExtender)
+                {
+                    ServerConfigHelper oldConfig = new ServerConfigHelper();
+                    oldConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+                    oldConfig.LoadFromSave(PathHelper.GetSavePath(serv, oldConfig.SaveName) + @"\Sandbox.sbc");
+                    oldConfig.AutoSaveInMinutes = serv.AutoSaveInMinutes ?? 5;
+                    oldConfig.Save(serv);
+                }
+
                 ServerConfigHelper serverConfig = new ServerConfigHelper();
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+                serverConfig.LoadFromSave(PathHelper.GetSavePath(serv, serverConfig.SaveName) + @"\Sandbox.sbc");
                 serverConfig.SaveName = model.MapName;
+                serverConfig.LoadFromSaveManager(PathHelper.GetSavePath(serv, model.MapName) + @"\Sandbox.sbc");
                 serv.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
                 srvPrv.UpdateServer(serv);
                 if(serv.UseServerExtender)
@@ -253,6 +274,15 @@ namespace SESM.Controllers
                     using (ZipFile zip = new ZipFile())
                     {
                         zip.AddSelectedFiles("*", sourceFolderPath, string.Empty, true);
+                        if (serv.UseServerExtender)
+                        {
+                            zip.RemoveEntry("Sandbox.sbc");
+                            string text = System.IO.File.ReadAllText(sourceFolderPath + "Sandbox.sbc", new UTF8Encoding(false));
+                            text = text.Replace("<AutoSaveInMinutes>0</AutoSaveInMinutes>",
+                                "<AutoSaveInMinutes>" + serv.AutoSaveInMinutes + "</AutoSaveInMinutes>");
+                            zip.AddEntry("Sandbox.sbc", text, new UTF8Encoding(false));
+                        }
+
                         zip.Save(Response.OutputStream);
                     }
                     Response.End();
@@ -267,7 +297,19 @@ namespace SESM.Controllers
         public ActionResult New(int id)
         {
             ViewData["ID"] = id;
-            return View(new NewMapViewModel());
+            ServerProvider srvPrv = new ServerProvider(_context);
+            EntityServer serv = srvPrv.GetServer(id);
+            ServerConfigHelper serverConfig = new ServerConfigHelper();
+            serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
+
+            NewMapViewModel view = new NewMapViewModel();
+
+            view.AsteroidAmount = serverConfig.AsteroidAmount;
+            view.MapType = serverConfig.ScenarioType;
+            view.ProceduralDensity = serverConfig.ProceduralDensity;
+            view.ProceduralSeed = serverConfig.ProceduralSeed;
+
+            return View(view);
         }
 
         //
@@ -289,6 +331,8 @@ namespace SESM.Controllers
                 serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
                 serverConfig.ScenarioType = model.MapType;
                 serverConfig.AsteroidAmount = model.AsteroidAmount;
+                serverConfig.ProceduralDensity = model.ProceduralDensity;
+                serverConfig.ProceduralSeed = model.ProceduralSeed;
                 serverConfig.SaveName = string.Empty;
                 serv.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
                 srvPrv.UpdateServer(serv);

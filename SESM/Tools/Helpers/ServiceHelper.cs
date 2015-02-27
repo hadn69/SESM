@@ -104,7 +104,7 @@ namespace SESM.Tools.Helpers
 
                     if(SESMConfigHelper.LowPriorityStart)
                     {
-                        SetBelowNormalPriority(serviceName);
+                        SetLowPriority(serviceName);
                         IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
                         scheduler.DeleteJob(new JobKey("LowPriorityStart" + server.Id + "Job", "LowPriorityStart"));
                         IJobDetail lowPriorityStartJob = JobBuilder.Create<ResetPriorityJob>()
@@ -118,6 +118,10 @@ namespace SESM.Tools.Helpers
                             .Build();
 
                         scheduler.ScheduleJob(lowPriorityStartJob, lowPriorityStartTrigger);
+                    }
+                    else
+                    {
+                        SetPriority(server);
                     }
                 }
             }
@@ -146,7 +150,7 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public static void SetBelowNormalPriority(string serviceName)
+        public static void SetLowPriority(string serviceName)
         {
             try
             {
@@ -183,6 +187,44 @@ namespace SESM.Tools.Helpers
             catch(Exception)
             {
 
+            }
+        }
+
+        public static void SetHighPriority(string serviceName)
+        {
+            try
+            {
+                if(DoesServiceExist(serviceName))
+                {
+                    uint? pid = GetServicePID(serviceName);
+                    if(pid == null)
+                        return;
+
+                    Process process = Process.GetProcessById((int)pid);
+                    process.PriorityClass = ProcessPriorityClass.High;
+                }
+            }
+            catch(Exception)
+            {
+
+            }
+        }
+
+        public static void SetPriority(EntityServer server)
+        {
+            string serviceName = ServiceHelper.GetServiceName(server);
+
+            switch (server.ProcessPriority)
+            {
+                case EnumProcessPriority.Low :
+                    SetLowPriority(serviceName);
+                    break;
+                case EnumProcessPriority.Normal:
+                    SetNormalPriority(serviceName);
+                    break;
+                case EnumProcessPriority.High:
+                    SetHighPriority(serviceName);
+                    break;
             }
         }
 

@@ -16,7 +16,8 @@ namespace SESM.Tools
             ServerProvider srvPrv = new ServerProvider(context);
 
             EntityServer server = srvPrv.GetServer(serverId);
-            ServiceHelper.SetNormalPriority(ServiceHelper.GetServiceName(server));
+
+            ServiceHelper.SetPriority(server);
         }
     }
 }

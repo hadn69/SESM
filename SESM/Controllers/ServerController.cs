@@ -204,7 +204,11 @@ namespace SESM.Controllers
                 ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(serv));
                 if (Directory.Exists(PathHelper.GetInstancePath(serv)))
                     Directory.Delete(PathHelper.GetInstancePath(serv), true);
+                IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+                scheduler.DeleteJob(new JobKey("LowPriorityStart" + serv.Id + "Job", "LowPriorityStart"));
+                scheduler.DeleteJob(new JobKey("AutoRestart" + serv.Id + "Job", "AutoRestart"));
                 srvPrv.RemoveServer(serv);
+
                 return RedirectToAction("Index").Success("Server Deleted");
             }
 
@@ -438,6 +442,7 @@ namespace SESM.Controllers
             serverView.UseServerExtender = serv.UseServerExtender;
             serverView.ServerExtenderPort = serv.ServerExtenderPort;
             serverView.AutoStart = serv.IsAutoStartEnabled;
+            serverView.ProcessPriority = serv.ProcessPriority;
 
             if (serv.AutoSaveInMinutes != null)
                 serverView.AutoSaveInMinutes = serv.AutoSaveInMinutes?? -42;
@@ -445,8 +450,8 @@ namespace SESM.Controllers
             serverView.WebAdministrators = string.Join("\r\n", serv.Administrators.Select(item => item.Login).ToList());
             serverView.WebManagers = string.Join("\r\n", serv.Managers.Select(item => item.Login).ToList());
             serverView.WebUsers = string.Join("\r\n", serv.Users.Select(item => item.Login).ToList());
-            if (!string.IsNullOrEmpty(serverView.SaveName))
-                serverView.AsteroidAmount = Directory.GetFiles(PathHelper.GetSavePath(serv, serverView.SaveName), "asteroid??.vox").Length;
+            if(!string.IsNullOrEmpty(serverView.SaveName) && Directory.Exists(PathHelper.GetSavePath(serv, serverView.SaveName)))
+                serverView.AsteroidAmount = Directory.GetFiles(PathHelper.GetSavePath(serv, serverView.SaveName), "*steroid???.vx2").Length;
  
             return View(serverView);
         }
@@ -499,6 +504,7 @@ namespace SESM.Controllers
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.RemoveTrash != serverConfig.RemoveTrash
+                    || model.ProcessPriority != serv.ProcessPriority
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
@@ -544,14 +550,6 @@ namespace SESM.Controllers
                 if (errorFlag)
                     return View("Details", model);
 
-                if(accessLevel == AccessLevel.Manager && model.WorldSizeKm != serverConfig.WorldSizeKm)
-                {
-                    if (model.WorldSizeKm > 200)
-                        model.WorldSizeKm = 200;
-                    else if(model.WorldSizeKm <= 0)
-                        model.WorldSizeKm = 1;
-                }
-
                 serv.Ip = model.IP;
                 serv.Port = model.ServerPort;
                 serv.IsPublic = model.IsPublic;
@@ -587,6 +585,8 @@ namespace SESM.Controllers
                     scheduler.ScheduleJob(autoRestartJob, autoRestartTrigger);
                 }
 
+                serv.ProcessPriority = model.ProcessPriority;
+
 
                 srvPrv.UpdateServer(serv);
                 Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
@@ -608,7 +608,9 @@ namespace SESM.Controllers
                     }
                     serv.UseServerExtender = model.UseServerExtender;
                     serv.ServerExtenderPort = model.ServerExtenderPort;
+                    
                     srvPrv.UpdateServer(serv);
+
                     if (model.UseServerExtender)
                     {
                         ServiceHelper.RegisterServerExtenderService(serv);
@@ -682,6 +684,7 @@ namespace SESM.Controllers
                     || model.MaxPlayers != serverConfig.MaxPlayers
                     || model.MaxFloatingObjects != serverConfig.MaxFloatingObjects
                     || model.RemoveTrash != serverConfig.RemoveTrash
+                    || model.ProcessPriority != serv.ProcessPriority
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
                 {
                     ModelState.AddModelError("ManagerModified", "You can't modify the greyed fields, bad boy !");
@@ -725,15 +728,7 @@ namespace SESM.Controllers
                 if (errorFlag)
                     return View("Details", model);
 
-                if(accessLevel == AccessLevel.Manager && model.WorldSizeKm != serverConfig.WorldSizeKm)
-                {
-                    if(model.WorldSizeKm > 200)
-                        model.WorldSizeKm = 200;
-                    else if(model.WorldSizeKm <= 0)
-                        model.WorldSizeKm = 1;
-                }
-
-                if ((srvPrv.GetState(serv) != ServiceState.Stopped)
+                if((!(srvPrv.GetState(serv) == ServiceState.Stopped || srvPrv.GetState(serv) == ServiceState.Unknow))
                     && (model.Name != serv.Name
                     || model.UseServerExtender != serv.UseServerExtender
                     || model.ServerExtenderPort != serv.ServerExtenderPort))
@@ -775,8 +770,13 @@ namespace SESM.Controllers
 
                     scheduler.ScheduleJob(autoRestartJob, autoRestartTrigger);
                 }
-
+                serv.ProcessPriority = model.ProcessPriority;
                 srvPrv.UpdateServer(serv);
+
+                if (srvPrv.GetState(serv) != ServiceState.Stopped)
+                {
+                    ServiceHelper.SetPriority(serv);
+                }
 
                 if(model.Name != serv.Name
                     || model.UseServerExtender != serv.UseServerExtender
@@ -820,7 +820,7 @@ namespace SESM.Controllers
         }
         */
         //
-        // GET: Server/StatsHourly/5
+        // GET: Server/HourlyStats/5
         [HttpGet]
         [LoggedOnly]
         [CheckAuth]
@@ -843,7 +843,7 @@ namespace SESM.Controllers
         {
             ServerProvider srvPrv = new ServerProvider(_context);
             EntityServer serv = srvPrv.GetServer(id);
-
+            ViewData["ID"] = id;
             List<EntityPerfEntry> perfEntries = serv.PerfEntries.Where(x => x.CPUUsagePeak != null).OrderBy(x => x.Timestamp).ToList();
             ViewData["perfEntries"] = perfEntries;
             return View();
@@ -857,8 +857,5 @@ namespace SESM.Controllers
             }
             base.Dispose(disposing);
         }
-
-
-        
     }
 }

@@ -26,14 +26,17 @@ namespace SESM.Tools.Monitor
                 foreach (EntityServer item in listServer)
                 {
                     _logger.Info("Getting perf entries of " + item.Name);
+
+                    _logger.Info(item.PerfEntries.Count + " total perf entries");
+                    if(item.PerfEntries.Count == 0)
+                        continue;
+
                     List<EntityPerfEntry> perfEntries =
                         item.PerfEntries.Where(x => x.Timestamp <= timestamp && x.CPUUsagePeak == null)
                             .OrderBy(x => x.Timestamp)
                             .ToList();
 
-                    _logger.Info(perfEntries.Count + " perf entries to process");
-                    if (perfEntries.Count == 0)
-                        continue;
+                    _logger.Info(perfEntries.Count + " to process");
 
                     _logger.Debug("Summary Results : ");
                     EntityPerfEntry perfEntry = new EntityPerfEntry();
@@ -74,6 +77,9 @@ namespace SESM.Tools.Monitor
 
                     _logger.Info("Deleting the perf entries");
                     prfPrv.RemoveEntries(perfEntries);
+
+                    prfPrv.RemoveEntries(item.PerfEntries.Where(x => x.Timestamp <= timestamp.AddDays(-14))
+                        .ToList());
 
                     _logger.Info("Adding the summary perf entry");
                     item.PerfEntries.Add(perfEntry);

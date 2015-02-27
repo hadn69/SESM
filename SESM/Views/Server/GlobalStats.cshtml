@@ -18,7 +18,7 @@
                             string outStr = String.Empty;
                             outStr += "{";
                             outStr += "date:new Date(" + item.Timestamp.Year + ", "
-                                      + item.Timestamp.Month + ","
+                                      + item.Timestamp.Month + ", "
                                       + item.Timestamp.Day + ", "
                                       + item.Timestamp.Hour + ", "
                                       + item.Timestamp.Minute + ", "
@@ -29,7 +29,7 @@
                             outStr += "CPUQ1:" + item.CPUUsageQ1 + ",";
                             outStr += "CPUQ3:" + item.CPUUsageQ3 + ",";
 
-                            outStr += "RAMAvg:" + item.RamUsage;
+                            outStr += "RAMAvg:" + item.RamUsage + ",";
                             outStr += "RAMPeak:" + item.RamUsagePeak + ",";
                             outStr += "RAMTrough:" + item.RamUsageTrough + ",";
                             outStr += "RAMQ1:" + item.RamUsageQ1 + ",";
@@ -66,6 +66,8 @@
                         "position": "right",
                         "title": "RAM Usage (in MB)"
                     }],
+
+
                     "graphs": [{
                         "valueAxis": "cpuAxis",
                         "connect": false,
@@ -74,9 +76,100 @@
                         "fillAlphas": 0.4,
                         "lineThickness": 2,
                         "bullet": "none",
-                        "title": "Average CPU Usage",
+                        "title": "CPU Average Usage",
                         "valueField": "CPUAvg"
+                    }, {
+                        "valueAxis": "cpuAxis",
+                        "connect": false,
+                        "lineColor": "#ffb9f7",
+                        "fillColor": "#ffb9f7",
+                        "fillAlphas": 0.4,
+                        "lineThickness": 2,
+                        "bullet": "none",
+                        "title": "CPU Peak Usage",
+                        "valueField": "CPUPeak"
+                    }, {
+                        "valueAxis": "cpuAxis",
+                        "connect": false,
+                        "lineColor": "#ffb9f7",
+                        "fillColor": "#ffb9f7",
+                        "fillAlphas": 0.4,
+                        "lineThickness": 2,
+                        "bullet": "none",
+                        "title": "CPU Trough Usage",
+                        "valueField": "CPUTrough"
+                    }, {
+                        "valueAxis": "cpuAxis",
+                        "connect": false,
+                        "lineColor": "#ffb9f7",
+                        "fillColor": "#ffb9f7",
+                        "fillAlphas": 0.4,
+                        "lineThickness": 2,
+                        "bullet": "none",
+                        "title": "CPU First Quartil Usage",
+                        "valueField": "CPUQ1"
+                    }, {
+                        "valueAxis": "cpuAxis",
+                        "connect": false,
+                        "lineColor": "#ffb9f7",
+                        "fillColor": "#ffb9f7",
+                        "fillAlphas": 0.4,
+                        "lineThickness": 2,
+                        "bullet": "none",
+                        "title": "CPU Third Quartil Usage",
+                        "valueField": "CPUQ3"
+                    }, {
+                        "valueAxis": "ramAxis",
+                        "connect": false,
+                        "lineColor": "#00b9f7",
+                        "fillColor": "#00b9f7",
+                        "fillAlphas": 0.4,
+                        "lineThickness": 2,
+                        "bullet": "none",
+                        "title": "RAM Average Usage",
+                        "valueField": "RAMAvg"
+                    }, {
+                        "valueAxis": "ramAxis",
+                        "connect": false,
+                        "lineColor": "#00b9f7",
+                        "fillColor": "#00b9f7",
+                        "fillAlphas": 0.4,
+                        "lineThickness": 2,
+                        "bullet": "none",
+                        "title": "RAM Peak Usage",
+                        "valueField": "RAMPeak"
+                    }, {
+                        "valueAxis": "ramAxis",
+                        "connect": false,
+                        "lineColor": "#00b9f7",
+                        "fillColor": "#00b9f7",
+                        "fillAlphas": 0.4,
+                        "lineThickness": 2,
+                        "bullet": "none",
+                        "title": "RAM Trough Usage",
+                        "valueField": "RAMTrough"
+                    }, {
+                        "valueAxis": "ramAxis",
+                        "connect": false,
+                        "lineColor": "#00b9f7",
+                        "fillColor": "#00b9f7",
+                        "fillAlphas": 0.4,
+                        "lineThickness": 2,
+                        "bullet": "none",
+                        "title": "RAM First Quartil Usage",
+                        "valueField": "RAMQ1"
+                    }, {
+                        "valueAxis": "ramAxis",
+                        "connect": false,
+                        "lineColor": "#00b9f7",
+                        "fillColor": "#00b9f7",
+                        "fillAlphas": 0.4,
+                        "lineThickness": 2,
+                        "bullet": "none",
+                        "title": "RAM Third Quartil Usage",
+                        "valueField": "RAMQ3"
                     }],
+
                     "chartScrollbar": {},
                     "chartCursor": {
                         "categoryBalloonDateFormat": "JJ:NN, DD/MM",
