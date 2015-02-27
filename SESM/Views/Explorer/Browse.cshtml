@@ -2,7 +2,7 @@
     ViewBag.Title = "File Explorer";
 
     List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
-    breadCrumb.Add(new KeyValuePair<string, string>("Servers", "/Servers/"));
+    breadCrumb.Add(new KeyValuePair<string, string>("Server", "/Server/"));
     breadCrumb.Add(new KeyValuePair<string, string>(ViewBag.Server.Name, "/Servers/Dashboard/" + ViewBag.ServerID));
     breadCrumb.Add(new KeyValuePair<string, string>("File Explorer", "/Explorer/Browse/" + ViewBag.ServerID));
     ViewBag.Breadcrumb = breadCrumb;
