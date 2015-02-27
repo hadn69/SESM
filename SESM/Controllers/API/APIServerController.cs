@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Mvc;
 using System.Xml.Linq;
 using NLog;
 using SESM.DAL;
 using SESM.DTO;
+using SESM.Tools;
 using SESM.Tools.API;
 using SESM.Tools.Helpers;
 
@@ -80,6 +82,48 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id)));
 
             return Content(response.ToString());
+        }
+
+        // POST: API/Server/CreateServer
+        [HttpPost]
+        public ActionResult CreateServer()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            string serverName = Request.Form["ServerName"];
+
+            if (string.IsNullOrWhiteSpace(serverName))
+                return Content(XMLMessage.Error("SRV-CRS-MISNAME", "The ServerName field must be provided").ToString());
+
+            if (!Regex.IsMatch(serverName, @"^[a-zA-Z0-9_.-]+$"))
+                return Content(XMLMessage.Error("SRV-CRS-BADNAME", "The Name must be only composed of letters, numbers, dots, dashs and underscores").ToString());
+
+            // ** PROCESS **
+            EntityServer server = new EntityServer
+            {
+                Name = serverName,
+                Ip = Default.IP,
+                IsPublic = Default.IsPublic,
+                Port = srvPrv.GetNextAvailablePort(),
+                ServerExtenderPort = srvPrv.GetNextAvailableSESEPort()
+            };
+            srvPrv.CreateServer(server);
+
+            Directory.CreateDirectory(PathHelper.GetSavesPath(server));
+            Directory.CreateDirectory(PathHelper.GetInstancePath(server) + @"Mods");
+            Directory.CreateDirectory(PathHelper.GetInstancePath(server) + @"Backups");
+
+            ServerConfigHelper configHelper = new ServerConfigHelper();
+
+            configHelper.Save(server);
+            ServiceHelper.RegisterService(server);
+
+            return Content(XMLMessage.Success("SRV-CRS-OK", "The server " + serverName + " was created").ToString());
         }
 
         // POST: API/Server/StartServers/

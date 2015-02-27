@@ -3917,6 +3917,7 @@
     <Compile Include="Tools\AutoUpdate.cs" />
     <Compile Include="Tools\BackupJob.cs" />
     <Compile Include="Tools\Constants.cs" />
+    <Compile Include="Tools\Default.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
     <Compile Include="Tools\GraphHelper.cs" />
     <Compile Include="Tools\Helpers\FSHelper.cs" />

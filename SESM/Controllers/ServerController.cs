@@ -45,7 +45,7 @@ namespace SESM.Controllers
             NewServerViewModel model = new NewServerViewModel();
             return View(model);
         }
-
+        /*
         //
         // POST: Server/Create
         [HttpPost]
@@ -145,7 +145,7 @@ namespace SESM.Controllers
             }
             return View(model);
         }
-
+        */
         #endregion
 
         #region Status
@@ -450,7 +450,7 @@ namespace SESM.Controllers
  
             return View(serverView);
         }
-
+        /*
         //
         // POST: Server/Details/5
         [HttpPost]
@@ -634,7 +634,8 @@ namespace SESM.Controllers
             }
             return View("Details", model);
         }
-
+        */
+        /*
         //
         // POST: Server/Details/5
         [HttpPost]
@@ -817,7 +818,7 @@ namespace SESM.Controllers
             }
             return View("Details", model);
         }
-
+        */
         //
         // GET: Server/StatsHourly/5
         [HttpGet]

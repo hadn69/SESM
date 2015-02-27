@@ -273,6 +273,36 @@
                 return retArray;
             }
 
+            $("#btnCreateServer").click(function () {
+                bootbox.dialog({
+                    title: "New Server",
+                    message: "<form class=\"bootbox-form\"><input id=\"impNewServ\" class=\"bootbox-input bootbox-input-text form-control\" autocomplete=\"off\" type=\"text\" placeholder=\"Server_Name\"></form>",
+                    buttons: {
+                        success: {
+                            label: "Create",
+                            className: "btn-success",
+                            callback: function () {
+                                var name = $('#impNewServ').val();
+                                $.post("/API/Server/CreateServer",
+                                {
+                                    ServerName: name
+                                },
+                                function (data) {
+                                    var root = $($.parseXML(data)).find("Response");
+
+                                    if (root.children("Type").text() == "Error") {
+                                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                        return;
+                                    }
+                                    toastr.success(root.children("Content").text(), "Server Created");
+                                    refereshList();
+                                });
+                            }
+                        }
+                    }
+                });
+            });
+
             $("#btnDeleteServers").click(function () {
                 var ids = getCheckedIds();
                 var names = [];
@@ -343,7 +373,7 @@
                             {
                                 ServerIDs: ids.join(";")
                             },
-                            function (data, status) {
+                            function (data) {
                                 var root = $($.parseXML(data)).find("Response");
 
                                 if (root.children("Type").text() == "Error") {
@@ -466,6 +496,7 @@
                         }
                     });
             });
+
         }
     </script>
 </div>

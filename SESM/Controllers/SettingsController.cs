@@ -177,7 +177,7 @@ namespace SESM.Controllers
 
                     foreach (EntityServer item in srvPrv.GetAllServers())
                     {
-                        ServiceHelper.RegisterService(ServiceHelper.GetServiceName(item));
+                        ServiceHelper.RegisterService(item);
                     }
 
                     foreach (EntityServer item in listStartedServ)
@@ -352,7 +352,7 @@ namespace SESM.Controllers
             }
 
 
-            ServiceHelper.RegisterService("SESMDiagTest");
+            /*ServiceHelper.RegisterService("SESMDiagTest");
             if (ServiceHelper.DoesServiceExist("SESMDiagTest"))
             {
                 model.ServiceCreation.State = true;
@@ -380,7 +380,7 @@ namespace SESM.Controllers
                 model.ServiceDeletion.State = null;
                 model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" irrelevant";
             }
-
+            */
             try
             {
                 FileStream stream = System.IO.File.Create(@"C:\SESMDiagTest.bin");

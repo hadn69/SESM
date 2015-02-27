@@ -65,9 +65,9 @@ namespace SESM.Tools.Helpers
             if(!overwrite)
             {
                 if(File.Exists(path))
-                    throw new Exception("File " + PathHelper.GetLastLeaf(path) + "already exist");
+                    throw new Exception("File " + PathHelper.GetLastLeaf(path) + " already exist");
                 if(Directory.Exists(path))
-                    throw new Exception("Directory " + PathHelper.GetLastLeaf(path) + "already exist");
+                    throw new Exception("Directory " + PathHelper.GetLastLeaf(path) + " already exist");
             }
             else
             {

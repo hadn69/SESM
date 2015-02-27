@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.ServiceProcess;
 using SESM.DTO;
+using SESM.Tools;
 using SESM.Tools.Helpers;
 
 namespace SESM.DAL
@@ -21,7 +22,7 @@ namespace SESM.DAL
         {
             try
             {
-                if(_context.Servers.First(s => s.Port == port) != null)
+                if(_context.Servers.First(server => server.Port == port || server.ServerExtenderPort == port) != null)
                     return false;
                 return true;
             }
@@ -31,32 +32,24 @@ namespace SESM.DAL
             }
         }
 
-        public bool CheckSESEPortAvailability(int port)
+        public int GetNextAvailablePort(string ip = "")
         {
-            try
-            {
-                if(_context.Servers.First(s => s.ServerExtenderPort == port) != null)
-                    return false;
-                return true;
-            }
-            catch(Exception)
-            {
-                return true;
-            }
+            if (string.IsNullOrWhiteSpace(ip))
+                ip = Default.IP;
+
+            if (!_context.Servers.Any(server => server.Ip == ip))
+                return Default.ServerPort;
+            return _context.Servers.Where(server => server.Ip == ip).Select(server => server.Port).Max() + 1;
         }
 
-        public bool CheckSESEPortAvailabilityActive(int port)
+        public int GetNextAvailableSESEPort(string ip = "")
         {
-            try
-            {
-                if(_context.Servers.First(s => s.ServerExtenderPort == port && s.UseServerExtender) != null)
-                    return false;
-                return true;
-            }
-            catch(Exception)
-            {
-                return true;
-            }
+            if (string.IsNullOrWhiteSpace(ip))
+                ip = Default.IP;
+
+            if (!_context.Servers.Any(server => server.Ip == ip))
+                return Default.ServerExtenderPort;
+            return _context.Servers.Where(server => server.Ip == ip).Select(server => server.ServerExtenderPort).Max() + 1;
         }
 
         public void AddAdministrator(string[] listUsers, EntityServer server)

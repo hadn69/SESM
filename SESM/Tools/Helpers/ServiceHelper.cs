@@ -186,10 +186,9 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public static void RegisterService(string serviceName)
+        public static void RegisterService(EntityServer server)
         {
-            return;
-            if(DoesServiceExist(serviceName))
+            if(DoesServiceExist(server))
                 return;
 
             string dataPath = SESMConfigHelper.SEDataPath;
@@ -202,7 +201,7 @@ namespace SESM.Tools.Helpers
             si.StartInfo.WorkingDirectory = @"c:\";
             si.StartInfo.UseShellExecute = false;
             si.StartInfo.FileName = "cmd.exe";
-            si.StartInfo.Arguments = "/c \"sc create " + serviceName + " start= auto binPath= \\\"" + dataPath + "\\\"\"";
+            si.StartInfo.Arguments = "/c \"sc create " + GetServiceName(server) + " start= auto binPath= \\\"" + dataPath + "\\\"\"";
             si.StartInfo.CreateNoWindow = true;
             si.StartInfo.RedirectStandardInput = true;
             si.StartInfo.RedirectStandardOutput = true;
@@ -212,28 +211,9 @@ namespace SESM.Tools.Helpers
             si.Close();
         }
 
-        public static void UnRegisterService(string serviceName)
-        {
-            if(DoesServiceExist(serviceName))
-            {
-                Process si = new Process();
-                si.StartInfo.WorkingDirectory = @"c:\";
-                si.StartInfo.UseShellExecute = false;
-                si.StartInfo.FileName = "cmd.exe";
-                si.StartInfo.Arguments = "/c \"sc delete " + serviceName + "\"";
-                si.StartInfo.CreateNoWindow = true;
-                si.StartInfo.RedirectStandardInput = true;
-                si.StartInfo.RedirectStandardOutput = true;
-                si.StartInfo.RedirectStandardError = true;
-                si.Start();
-                string output = si.StandardOutput.ReadToEnd();
-                si.Close();
-            }
-        }
 
         public static void RegisterServerExtenderService(EntityServer server)
         {
-            return;
             if(DoesServiceExist(server))
                 return;
 
@@ -253,6 +233,26 @@ namespace SESM.Tools.Helpers
             string output = si.StandardOutput.ReadToEnd();
             si.Close();
         }
+
+        public static void UnRegisterService(string serviceName)
+        {
+            if (DoesServiceExist(serviceName))
+            {
+                Process si = new Process();
+                si.StartInfo.WorkingDirectory = @"c:\";
+                si.StartInfo.UseShellExecute = false;
+                si.StartInfo.FileName = "cmd.exe";
+                si.StartInfo.Arguments = "/c \"sc delete " + serviceName + "\"";
+                si.StartInfo.CreateNoWindow = true;
+                si.StartInfo.RedirectStandardInput = true;
+                si.StartInfo.RedirectStandardOutput = true;
+                si.StartInfo.RedirectStandardError = true;
+                si.Start();
+                string output = si.StandardOutput.ReadToEnd();
+                si.Close();
+            }
+        }
+
 
         /// <summary>
         /// Kill a process, and all of its children, grandchildren, etc.

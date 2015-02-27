@@ -12,50 +12,50 @@ namespace SESM.Tools.Helpers
 {
     public class ServerConfigHelper
     {
-        public GameMode GameMode = GameMode.Survival;
-        public int InventorySizeMultiplier = 1;
-        public int AssemblerSpeedMultiplier = 1;
-        public int AssemblerEfficiencyMultiplier = 1;
-        public int RefinerySpeedMultiplier = 1;
-        public OnlineMode OnlineMode = OnlineMode.PUBLIC;
-        public int MaxPlayers = 4;
-        public int MaxFloatingObjects = 256;
-        public EnvironmentHostility EnvironmentHostility = EnvironmentHostility.SAFE;
-        public bool AutoHealing = true;
-        public bool EnableCopyPaste = true;
-        public bool WeaponsEnabled = true;
-        public bool ShowPlayerNamesOnHud = true;
-        public bool ThrusterDamage = true;
-        public bool CargoShipsEnabled = false;
-        public bool EnableSpectator = false;
-        public bool RemoveTrash = false;
-        public int WorldSizeKm = 20;
-        public bool RespawnShipDelete = true;
-        public bool ResetOwnership = false;
-        public double WelderSpeedMultiplier = 1;
-        public double GrinderSpeedMultiplier = 1;
-        public bool RealisticSound = false;
-        public bool ClientCanSave = false;
-        public double HackSpeedMultiplier = 0.33;
-        public bool PermanentDeath = false;
+        public GameMode GameMode = Default.GameMode;
+        public int InventorySizeMultiplier = Default.InventorySizeMultiplier;
+        public int AssemblerSpeedMultiplier = Default.AssemblerSpeedMultiplier;
+        public int AssemblerEfficiencyMultiplier = Default.AssemblerEfficiencyMultiplier;
+        public int RefinerySpeedMultiplier = Default.RefinerySpeedMultiplier;
+        public OnlineMode OnlineMode = Default.OnlineMode;
+        public int MaxPlayers = Default.MaxPlayers;
+        public int MaxFloatingObjects = Default.MaxFloatingObjects;
+        public EnvironmentHostility EnvironmentHostility = Default.EnvironmentHostility;
+        public bool AutoHealing = Default.AutoHealing;
+        public bool EnableCopyPaste = Default.EnableCopyPaste;
+        public bool WeaponsEnabled = Default.WeaponsEnabled;
+        public bool ShowPlayerNamesOnHud = Default.ShowPlayerNamesOnHud;
+        public bool ThrusterDamage = Default.ThrusterDamage;
+        public bool CargoShipsEnabled = Default.CargoShipsEnabled;
+        public bool EnableSpectator = Default.EnableSpectator;
+        public bool RemoveTrash = Default.RemoveTrash;
+        public int WorldSizeKm = Default.WorldSizeKm;
+        public bool RespawnShipDelete = Default.RespawnShipDelete;
+        public bool ResetOwnership = Default.ResetOwnership;
+        public double WelderSpeedMultiplier = Default.WelderSpeedMultiplier;
+        public double GrinderSpeedMultiplier = Default.GrinderSpeedMultiplier;
+        public bool RealisticSound = Default.RealisticSound;
+        public bool ClientCanSave = Default.ClientCanSave;
+        public double HackSpeedMultiplier = Default.HackSpeedMultiplier;
+        public bool PermanentDeath = Default.PermanentDeath;
 
-        public SubTypeId ScenarioType = SubTypeId.LoneSurvivor;
-        public string SaveName = string.Empty;
-        public string IP = "0.0.0.0";
-        public int SteamPort = 8766;
-        public int ServerPort = 27016;
-        public int AsteroidAmount = 4;
+        public SubTypeId ScenarioType = Default.ScenarioType;
+        public string SaveName = Default.SaveName;
+        public string IP = Default.IP;
+        public int SteamPort = Default.SteamPort;
+        public int ServerPort = Default.ServerPort;
+        public int AsteroidAmount = Default.AsteroidAmount;
         public List<ulong> Administrators = new List<ulong>();
         public List<ulong> Banned = new List<ulong>();
         public List<ulong> Mods = new List<ulong>();
-        public ulong GroupID = 0;
-        public string ServerName = "SESM";
-        public bool PauseGameWhenEmpty = false;
+        public ulong GroupID = Default.GroupID;
+        public string ServerName = Default.ServerName;
+        public bool PauseGameWhenEmpty = Default.PauseGameWhenEmpty;
 
-        public bool IgnoreLastSession = false;
+        public bool IgnoreLastSession = Default.IgnoreLastSession;
         public string WorldName = string.Empty;
-        public int AutoSaveInMinutes = 5;
-        public int SpawnShipTimeMultiplier = 1;
+        public int AutoSaveInMinutes = Default.AutoSaveInMinutes;
+        public int SpawnShipTimeMultiplier = Default.SpawnShipTimeMultiplier;
 
         /// <summary>
         /// Parse the View Model into the object

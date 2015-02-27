@@ -14,11 +14,64 @@
 <script src="/assets/global/plugins/datatables/media/js/jquery.dataTables.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
+<link href="/assets/global/plugins/dropzone/css/dropzone.css" rel="stylesheet">
+<script src="/assets/global/plugins/dropzone/dropzone.js"></script>
 <style type="text/css">
     table td:nth-child(4) {
         text-align: right;
     }
+
+    table td:nth-child(2):hover, table td:nth-child(3):hover {
+        cursor: pointer;
+    }
 </style>
+<!-- --- DOWNLOAD --- -->
+<div style="display: none">
+    <form id="downloadForm" method="POST" target="download_frame" action="/API/Explorer/Download/">
+        <input id="downloadFormPaths" type="hidden" name="Paths" value="" />
+        <input id="downloadFormServerID" type="hidden" name="ServerID" value="" />
+    </form>
+</div>
+<iframe id="download_frame" name="download_frame" style="display: none"></iframe>
+<!-- --- UPLOAD --- -->
+<div class="modal fade" id="uploadModal" tabindex="-1" role="basic" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Upload Files</h4>
+            </div>
+            <div class="modal-body">
+                <div class="portlet-body form">
+                    <form action="/API/Explorer/Upload" class="dropzone" id="uploadDropzone" style="min-height:225px">
+                        <div class="fallback">
+                            <input name="Files" type="file" multiple />
+                        </div>
+                    </form>
+                    <div class="form-body form-horizontal">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Extract Zip Files</label>
+                            <div class="col-md-8 center-block">
+                                <input type="checkbox" id="inpExtract" name="Extract" class="make-switch" data-on-text="&nbsp;Yes&nbsp;&nbsp;" data-off-text="&nbsp;No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Overwrite Existing Files</label>
+                            <div class="col-md-8 center-block">
+                                <input type="checkbox" id="inpOverwrite" name="Overwrite" class="make-switch" data-on-text="&nbsp;Yes&nbsp;&nbsp;" data-off-text="&nbsp;No&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnClearUpload" class="btn yellow">Clear</button>
+                <button type="button" class="btn default" data-dismiss="modal">Close</button>
+                <button type="button" id="btnStartUpload" class="btn green">Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="col-md-4 col-sm-12">
     <div class="portlet light" style="height: 400px;">
         <div class="portlet-body" style="height: 100%;">
@@ -29,29 +82,64 @@
 </div>
 <div class="col-md-8 col-sm-12">
     <div class="portlet light" style="height: 400px;">
-        <div class="portlet-body" style="overflow-y:auto;overflow-x:hidden; height:100%;">
-            <table class="table table-striped table-bordered table-hover" id="tableDiv">
+        <div class="portlet-body" style="overflow-y: auto; overflow-x: hidden; height: 100%;">
+            <div class="">
+                <div class="btn-group btn-group-solid">
+                    <button type="button" class="btn green dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-plus"></i> New <i class="fa fa-angle-down"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="#" id="btnNewFile">
+                                <i class="fa fa-file"></i>&nbsp;New File
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="btnNewFolder">
+                                <i class="fa fa-folder"></i>&nbsp;New Folder
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button type="button" class="btn blue" id="btnUpload">
+                    <i class="fa fa-upload"></i> Upload
+                </button>
+                <div class="pull-right" id="selectedBtn" style="display:none">
+                    <button type="button" class="btn yellow " id="btnDownloadAll">
+                        <i class="fa fa-download"></i> Download
+                    </button>
+                    <button type="button" class="btn red pull-right" id="btnDeleteAll">
+                        <i class="fa fa-trash"></i> Delete
+                    </button>
+                    &nbsp;
+                </div>
+
+            </div>
+            <table class="table table-striped table-hover" id="tableDiv">
                 <thead>
-                    <tr>
-                        <th class="table-checkbox">
-                            <input type="checkbox" class="group-checkable" data-set="#tableDiv .checkboxes" />
-                        </th>
-                        <th>
-                        </th>
-                        <th>
-                            Name
-                        </th>
-                        <th>
-                            Size
-                        </th>
-                        <th>
-                            Last Edit
-                        </th>
-                        <th></th>
-                    </tr>
+                <tr>
+                    <th class="table-checkbox">
+                        <input type="checkbox" class="group-checkable" data-set="#tableDiv .checkboxes"/>
+                    </th>
+                    <th>
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Size
+                    </th>
+                    <th>
+                        Last Edit
+                    </th>
+                    <th></th>
+                </tr>
                 </thead>
                 <tbody></tbody>
             </table>
+            <br/>
+            <br/>
+            <br />
         </div>
     </div>
 </div>
@@ -80,17 +168,55 @@
 
         var table = $('#tableDiv');
 
+        $.extend($.fn.dataTableExt.oSort, {
+            "itemtype-asc": function (a, b) {
+                if (a == b)
+                    return 0;
+
+                if (a == '<span class="glyphicon glyphicon-arrow-up"></span>')
+                    return -1;
+
+                if (b == '<span class="glyphicon glyphicon-arrow-up"></span>')
+                    return 1;
+
+                if (a == '<i class="fa fa-folder"></i>' && b == '<i class="fa fa-file"></i>') {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+        });
+
         table.dataTable({
+            "language": {
+                "emptyTable": "Loading ..."
+            },
             "paging": false,
             "searching": false,
             "info": false,
-            "columns": [{ "orderable": false },
-                        { "orderable": false },
-                        { "orderable": true },
-                        { "orderable": true },
-                        { "orderable": true },
-                        { "orderable": false }],
-            "order": [[3, "asc"]]
+            "orderFixed": [1, 'asc'],
+            "columns": [
+            {
+                "orderable": false,
+                "width": "5%"
+            }, {
+                "orderable": false,
+                "type": "itemtype",
+                "width": "5%"
+            }, {
+                "orderable": true,
+                "width": "40%"
+            }, {
+                "orderable": true,
+                "width": "15%"
+            }, {
+                "orderable": true,
+                "width": "23%"
+            }, {
+                "orderable": false,
+                "width": "5%"
+            }],
+            "order": [[2, "asc"]]
         });
 
         table.find('.group-checkable').change(function () {
@@ -106,13 +232,29 @@
                 }
             });
             $.uniform.update(set);
+
+            var activeCount = table.find("tr.active").length;
+            if (activeCount == 0) {
+                $("#selectedBtn").stop(true).fadeOut("slow");
+            } else {
+                $("#selectedBtn").stop(true).fadeIn("slow");
+            }
         });
 
         table.on('change', 'tbody tr .checkboxes', function () {
             $(this).parents('tr').toggleClass("active");
+
+            var activeCount = table.find("tr.active").length;
+            if (activeCount == 0) {
+                $("#selectedBtn").stop(true).fadeOut("slow");
+            } else {
+                $("#selectedBtn").stop(true).fadeIn("slow");
+            }
         });
 
         function loadList() {
+            table.DataTable().clear();
+            table.DataTable().draw();
             $.post("/API/Explorer/GetDirectoryContent/",
                 {
                     ServerID: serverID,
@@ -127,10 +269,12 @@
                     }
 
                     table.DataTable().clear();
-                    if (currentPath == "") {
+                    if (currentPath != "") {
                         table.DataTable().row.add([null, "<span class=\"glyphicon glyphicon-arrow-up\"></span>",
                             "Parent Folder", null, null, null]);
                     }
+
+                    var total = root.children("Content").children("Item").length;
 
                     root.children("Content").children("Item").each(function (index) {
                         var item = $(this);
@@ -148,11 +292,16 @@
                         var displaySize = "";
                         var actions = "";
 
-                        actions += '<div class="btn-group">' +
-                                    '<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">' +
+                        if (index > total - 4 || total < 6) {
+                            actions += '<div class="btn-group dropup">';
+                        } else {
+                            actions += '<div class="btn-group dropdown">';
+                        }
+
+                        actions += '<button type="button" class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown">' +
                                         '<span class="fa fa-cog"></span>' +
                                     '</button>' +
-                                    '<ul class="dropdown-menu dropdown-menu-right" role="menu">';
+                                    '<ul class="dropdown-menu pull-right" role="menu">';
 
                         if (Type == "Directory") {
                             icon = '<i class="fa fa-folder"></i>';
@@ -160,12 +309,12 @@
                         if (Type == "File") {
                             icon = '<i class="fa fa-file"></i>';
                             if (Size < 1024 * 512) {
-                                actions += '<li><a href="#"><i class="fa fa-edit"></i>Edit</a></li>';
+                                actions += '<li><a href="#" class="btnEdit"><i class="fa fa-edit"></i>&nbsp;Edit</a></li>';
                             }
-
                         }
-                        actions += '<li><a href="#"><i class="fa fa-font"></i>Rename</a></li>';
-                        actions += '<li><a href="#"><i class="fa fa-trash"></i>Delete</a></li>';
+                        actions += '<li><a href="#" class="btnRename"><i class="fa fa-font"></i>&nbsp;Rename</a></li>';
+                        actions += '<li><a href="#" class="btnDownload"><i class="fa fa-download"></i>&nbsp;Download</a></li>';
+                        actions += '<li><a href="#" class="btnDelete"><i class="fa fa-trash"></i>&nbsp;Delete</a></li>';
                         actions += '</ul>';
                         actions += '</div>';
 
@@ -183,6 +332,401 @@
                 });
         }
 
+        table.on('click', 'tbody tr td:nth-child(2), tbody tr td:nth-child(3)', function () {
+            var type = "file";
+            if ($(this).parents('tr').children(':nth-child(2)').find('i, span').hasClass("fa-folder")) {
+                type = "dir";
+            } else if ($(this).parents('tr').children(':nth-child(2)').find('i, span').hasClass("glyphicon-arrow-up")) {
+                type = "up";
+            }
+
+            console.log(currentNode);
+            if (type == "up" || type == "dir") {
+                table.DataTable().clear();
+                table.DataTable().draw();
+                $('#treeDiv').jstree(true).deselect_node(currentNode.id);
+            }
+            if (type == "up") {
+                $('#treeDiv').jstree(true).select_node(currentNode.parent);
+            }
+            else if (type == "dir") {
+                if (currentPath == "") {
+                    $('#treeDiv').jstree(true).select_node($(this).text());
+                }
+                else {
+                    $('#treeDiv').jstree(true).select_node(currentPath + "\\" + $(this).text());
+                }
+            }
+        });
+
+        $(".bootbox-form").submit(function (e) {
+            e.preventDefault();
+        });
+
+        // -- Global Actions --
+
+        $("#btnNewFile").click(function () {
+            bootbox.dialog({
+                title: "New File",
+                message: "<form class=\"bootbox-form\" action=\"#\"><input id=\"impNewFile\" class=\"bootbox-input bootbox-input-text form-control\" autocomplete=\"off\" type=\"text\" placeholder=\"New File Name\"></form>",
+                buttons: {
+                    success: {
+                        label: "Create",
+                        className: "btn-success",
+                        callback: function () {
+                            var name = $('#impNewFile').val();
+                            var path = "";
+                            if (isEmptyOrSpaces(currentPath)) {
+                                path = name;
+                            } else {
+                                path = currentPath + "\\" + name;
+                            }
+                            $.post("/API/Explorer/NewFile",
+                            {
+                                ServerID: serverID,
+                                Path: path
+                            },
+                            function (data) {
+                                var root = $($.parseXML(data)).find("Response");
+
+                                if (root.children("Type").text() == "Error") {
+                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                    return;
+                                }
+                                toastr.success(root.children("Content").text(), "File Created");
+                                loadList();
+                            });
+                        }
+                    }
+                }
+            });
+        });
+
+        $("#btnNewFolder").click(function () {
+            bootbox.dialog({
+                title: "New Folder",
+                message: "<form class=\"bootbox-form\" action=\"#\"><input id=\"impNewFolder\" class=\"bootbox-input bootbox-input-text form-control\" autocomplete=\"off\" type=\"text\" placeholder=\"New Folder Name\"></form>",
+                buttons: {
+                    success: {
+                        label: "Create",
+                        className: "btn-success",
+                        callback: function () {
+                            var name = $('#impNewFolder').val();
+                            var path = "";
+                            if (isEmptyOrSpaces(currentPath)) {
+                                path = name;
+                            } else {
+                                path = currentPath + "\\" + name;
+                            }
+                            $.post("/API/Explorer/NewFolder",
+                            {
+                                ServerID: serverID,
+                                Path: path
+                            },
+                            function (data) {
+                                var root = $($.parseXML(data)).find("Response");
+
+                                if (root.children("Type").text() == "Error") {
+                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                    return;
+                                }
+                                toastr.success(root.children("Content").text(), "Folder Created");
+                                $('#treeDiv').jstree(true).refresh_node(currentNode.id);
+                                loadList();
+                            });
+                        }
+                    }
+                }
+            });
+        });
+
+        var uploadZone;
+
+        Dropzone.options.uploadDropzone = {
+            paramName: "Files",
+            clickable: true,
+            uploadMultiple: true,
+            autoProcessQueue: false,
+            maxFiles: 128,
+            init: function () {
+                uploadZone = this;
+                this.on("successmultiple", function (file, response) {
+                    var root = $($.parseXML(response)).find("Response");
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        return;
+                    }
+                    if (root.children("Type").text() == "Warning") {
+                        toastr.warning(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        return;
+                    }
+                    toastr.success(root.children("Content").text(), "File(s) Uploaded");
+                    $("#uploadModal").modal('hide');
+                    $('#treeDiv').jstree(true).refresh_node(currentNode.id);
+                    loadList();
+
+                });
+                this.on("sendingmultiple", function (file, xhr, formData) {
+                    formData.append("ServerID", serverID);
+                    formData.append("Path", currentPath);
+                    formData.append("Extract", $("#inpExtract").is(':checked').toString());
+                    formData.append("Overwrite", $("#inpOverwrite").is(':checked').toString());
+                });
+            }
+        };
+
+        $("#btnUpload").click(function () {
+            $("#uploadModal").modal('show');
+        });
+
+        $("#btnStartUpload").click(function () {
+            console.log(uploadZone);
+            uploadZone.options.parallelUploads = uploadZone.getQueuedFiles().length;
+            uploadZone.processQueue();
+            console.log(uploadZone);
+        });
+
+        $("#btnClearUpload").click(function () {
+            uploadZone.removeAllFiles(true);
+        });
+
+        function getselectedPath() {
+            var retArray = [];
+            $("tbody").find("tr.active").each(function (index, item) {
+                var item = $(this);
+                var name = item.children("td:nth-child(3)").text();
+                var path = "";
+                if (isEmptyOrSpaces(currentPath)) {
+                    retArray.push(name);
+                } else {
+                    retArray.push(currentPath + "\\" + name);
+                }
+            });
+            return retArray;
+        }
+
+        $("#btnDownloadAll").click(function () {
+            var paths = getselectedPath();
+            $("#downloadFormPaths").val(paths.join(":"));
+            $("#downloadForm").submit();
+        });
+
+        $("#btnDeleteAll").click(function () {
+            var paths = getselectedPath();
+
+            bootbox.dialog({
+                title: "Delete Item : " + name,
+                message: "Are you sure you want to delete those items ? This action can't be reversed !!<br/>" +
+                    "Item List :<br/>" +
+                    "<ul>" +
+                    "<li>" + paths.join("</li><li>") + "</li>" +
+                    "</ul>",
+                buttons: {
+                    cancel: {
+                        label: "Cancel",
+                        className: "btn-default"
+                    },
+                    success: {
+                        label: "Delete",
+                        className: "btn-danger",
+                        callback: function () {
+                            $.post("/API/Explorer/Delete",
+                            {
+                                ServerID: serverID,
+                                Paths: paths.join(":")
+                            },
+                            function (data) {
+                                var root = $($.parseXML(data)).find("Response");
+
+                                if (root.children("Type").text() == "Error") {
+                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                    return;
+                                }
+                                toastr.success(root.children("Content").text(), "Items Deleted");
+                                $('#treeDiv').jstree(true).refresh_node(currentNode.id);
+                                loadList();
+                            });
+                        }
+                    }
+                }
+            });
+        });
+
+        // -- Specific Actions --
+
+        $("#downloadFormServerID").val(serverID);
+
+        table.on('click', ".btnDownload", function (event) {
+            event.preventDefault();
+            var name = $(this).parents('tr').children('td:nth-child(3)').text();
+            var path = "";
+            if (isEmptyOrSpaces(currentPath)) {
+                path = name;
+            } else {
+                path = currentPath + "\\" + name;
+            }
+            $("#downloadFormPaths").val(path);
+            $("#downloadForm").submit();
+        });
+
+        table.on('click', ".btnEdit", function () {
+            event.preventDefault();
+            var name = $(this).parents('tr').children('td:nth-child(3)').text();
+            var path = "";
+            if (isEmptyOrSpaces(currentPath)) {
+                path = name;
+            } else {
+                path = currentPath + "\\" + name;
+            }
+
+            $.post("/API/Explorer/GetFileContent",
+            {
+                ServerID: serverID,
+                Path: path
+            },
+            function (data) {
+                var root = $($.parseXML(data)).find("Response");
+
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    return;
+                }
+                bootbox.dialog({
+                    title: "Edit File : " + name,
+                    message: "<form class=\"bootbox-form\" action=\"#\">" +
+                        "<textarea rows=\"15\" id=\"impEditFile\" class=\"bootbox-input bootbox-input-text form-control\">" +
+                        root.children("Content").text() +
+                        "</textarea>" +
+                        "</form>",
+                    buttons: {
+                        cancel: {
+                            label: "Cancel",
+                            className: "btn-default"
+                        },
+                        success: {
+                            label: "Save",
+                            className: "btn-success",
+                            callback: function () {
+                                $.post("/API/Explorer/SetFileContent",
+                                {
+                                    ServerID: serverID,
+                                    Path: path,
+                                    Data: $("#impEditFile").val()
+                                },
+                                function (data) {
+                                    var root = $($.parseXML(data)).find("Response");
+
+                                    if (root.children("Type").text() == "Error") {
+                                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                        return;
+                                    }
+                                    toastr.success(root.children("Content").text(), "File Edited");
+                                    loadList();
+                                });
+                            }
+                        }
+                    }
+                });
+
+            });
+        });
+
+        table.on('click', ".btnRename", function (event) {
+            event.preventDefault();
+            var name = $(this).parents('tr').children('td:nth-child(3)').text();
+
+            var path = "";
+            if (isEmptyOrSpaces(currentPath)) {
+                path = name;
+            } else {
+                path = currentPath + "\\" + name;
+            }
+
+            bootbox.dialog({
+                title: "Rename Item : " + name,
+                message: "<form class=\"bootbox-form\" action=\"#\">" +
+                    "<input id=\"impRename\" value=\"" + name + "\" class=\"bootbox-input bootbox-input-text form-control\" autocomplete=\"off\" type=\"text\">" +
+                    "</form>",
+                buttons: {
+                    cancel: {
+                        label: "Cancel",
+                        className: "btn-default"
+                    },
+                    success: {
+                        label: "Rename",
+                        className: "btn-success",
+                        callback: function () {
+                            var newName = $('#impRename').val();
+
+                            if (name != newName) {
+                                $.post("/API/Explorer/Rename",
+                                    {
+                                        ServerID: serverID,
+                                        Path: path,
+                                        NewName: newName
+                                    },
+                                    function (data) {
+                                        var root = $($.parseXML(data)).find("Response");
+
+                                        if (root.children("Type").text() == "Error") {
+                                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                            return;
+                                        }
+
+                                        toastr.success(root.children("Content").text(), "Item Renamed");
+                                        loadList();
+                                    });
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        table.on('click', ".btnDelete", function (event) {
+            event.preventDefault();
+            var name = $(this).parents('tr').children('td:nth-child(3)').text();
+
+            var path = "";
+            if (isEmptyOrSpaces(currentPath)) {
+                path = name;
+            } else {
+                path = currentPath + "\\" + name;
+            }
+            bootbox.dialog({
+                title: "Delete Item : " + name,
+                message: "Are you sure you want to delete this item ? This action can't be reversed !!",
+                buttons: {
+                    cancel: {
+                        label: "Cancel",
+                        className: "btn-default"
+                    },
+                    success: {
+                        label: "Delete",
+                        className: "btn-danger",
+                        callback: function () {
+                            $.post("/API/Explorer/Delete",
+                                {
+                                    ServerID: serverID,
+                                    Paths: path
+                                },
+                                function (data) {
+                                    var root = $($.parseXML(data)).find("Response");
+
+                                    if (root.children("Type").text() == "Error") {
+                                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                        return;
+                                    }
+
+                                    toastr.success(root.children("Content").text(), "Item Deleted");
+                                    loadList();
+                                });
+                        }
+                    }
+                }
+            });
+        });
+
         // -- Tree --
 
         $("#treeDiv").jstree({
@@ -191,6 +735,7 @@
                 "themes": {
                     "responsive": false
                 },
+                "multiple": false,
                 "check_callback": true,
                 'data': function (obj, cb) {
                     // Root case
@@ -220,7 +765,15 @@
                         }
                         var dirArray = new Array();
                         root.children("Content").first().children("Item").each(function (index) {
-                            dirArray.push({ text: $(this).children("Name").first().text(), children: true });
+                            var dirName = $(this).children("Name").first().text();
+                            var nodeId = "";
+                            if (currentPath == "") {
+                                nodeId = dirName;
+                            }
+                            else {
+                                nodeId = currentPath + "\\" + dirName;
+                            }
+                            dirArray.push({ text: dirName, id: nodeId, children: true });
                         });
                         cb.call(this, dirArray);
                     });
@@ -239,9 +792,17 @@
         });
 
         $('#treeDiv').on('select_node.jstree', function (e, data) {
+            table.DataTable().clear();
+            table.DataTable().draw();
             var path = $('#treeDiv').jstree(true).get_path(data.node, "\\").substring(2);
             currentPath = path;
             currentNode = data.node;
+            $('#treeDiv').jstree(true).open_node(currentNode.id);
+            loadList();
+        });
+
+        $("#btnRefresh").click(function () {
+            $('#treeDiv').jstree(true).refresh_node(currentNode.id);
             loadList();
         });
     }

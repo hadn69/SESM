@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
@@ -135,10 +136,7 @@ namespace SESM.Controllers.API
             foreach(NodeInfo directory in directories)
             {
                 response.AddToContent(new XElement("Item",
-                    new XElement("Type", "Directory"),
-                    new XElement("Name", directory.Name),
-                    new XElement("Size", directory.Size),
-                    new XElement("Date", directory.Timestamp.ToString("o"))));
+                    new XElement("Name", directory.Name)));
             }
             return Content(response.ToString());
         }
@@ -275,6 +273,9 @@ namespace SESM.Controllers.API
                     return Content(XMLMessage.Error("XXX-XXX-XXX", "Invalid new name, a file with the same name already exist").ToString());
                 try
                 {
+                    if(SESMConfigHelper.BlockDll && newName.Split('.').Last().ToLower() == "dll" && path.Contains(PathHelper.GetInstancePath(server) + @"Mods"))
+                        return Content(XMLMessage.Error("XXX-XXX-XXX", "Invalid new name, you can't rename a file to a .dll one").ToString());
+
                     System.IO.File.Move(path + "\\" + oldname, path + "\\" + newName);
                     
                 }
@@ -313,7 +314,10 @@ namespace SESM.Controllers.API
 
             string[] paths = Request.Form["Paths"].Split(':');
 
-            for(int i = 0; i < paths.Length; i++)
+            if (paths.Length == 1 && String.IsNullOrWhiteSpace(paths[0]))
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "The Paths field must be provided").ToString());
+
+            for (int i = 0; i < paths.Length; i++)
             {
                 if(string.IsNullOrWhiteSpace(paths[i]))
                     paths[i] = string.Empty;
@@ -329,37 +333,76 @@ namespace SESM.Controllers.API
             // ** PROCESS **
             try
             {
-                using(ZipFile zip = new ZipFile())
+                Response.Clear();
+                if (paths.Length == 1)
                 {
-                    foreach(string item in paths)
+
+                    if (System.IO.File.Exists(paths[0])) // File
                     {
-                        if((Directory.Exists(item)))
-                            zip.AddDirectory(item, new DirectoryInfo(item).Name);
+                        Response.ContentType = MimeMapping.GetMimeMapping(PathHelper.GetLastLeaf(paths[0]));
+                        Response.AddHeader("Content-Disposition",
+                            String.Format("attachment; filename={0}", PathHelper.GetLastLeaf(paths[0])));
+
+                        Response.TransmitFile(paths[0]);
+                        Response.End();
+                        return null;
+                    }
+                    else // Directory
+                    {
+                        Response.ContentType = "application/zip";
+
+                        Response.AddHeader("Content-Disposition",
+                            String.Format("attachment; filename={0}", server.Name + "-" + PathHelper.GetLastLeaf(paths[0]) + "-"
+                                                                      + DateTime.Now.ToString("yyyyMMddHHmm") + ".zip"));
+                        using (ZipFile zip = new ZipFile())
+                        {
+                            zip.AddDirectory(paths[0]);
+
+                            zip.Save(Response.OutputStream);
+                            Response.End();
+                            return null;
+                        }
+                    }
+                }
+                else
+                {
+                    using (ZipFile zip = new ZipFile())
+                    {
+                        foreach (string item in paths)
+                        {
+                            if ((Directory.Exists(item))) // Folder
+                                zip.AddDirectory(item, new DirectoryInfo(item).Name);
+                            else // File
+                                zip.AddFile(item, string.Empty);
+                        }
+                        Response.ContentType = "application/zip";
+                        string zipName = string.Empty;
+                        zipName = Directory.Exists(paths[0])
+                            ? new DirectoryInfo(paths[0]).Parent.Name
+                            : new FileInfo(paths[0]).Directory.Name;
+                        if (zipName == PathHelper.GetFSDirName(server))
+                        {
+                            Response.AddHeader("Content-Disposition",
+                                String.Format("attachment; filename={0}", server.Name + "-"
+                                                                          + DateTime.Now.ToString("yyyyMMddHHmm") +
+                                                                          ".zip"));
+                        }
                         else
-                            zip.AddFile(item, string.Empty);
+                        {
+                            Response.AddHeader("Content-Disposition",
+                                String.Format("attachment; filename={0}", server.Name + "-" + zipName + "-"
+                                                                          + DateTime.Now.ToString("yyyyMMddHHmm") +
+                                                                          ".zip"));
+                        }
+                        zip.Save(Response.OutputStream);
+                        Response.End();
+                        return null;
                     }
-                    Response.Clear();
-                    Response.ContentType = "application/zip";
-                    string zipName = string.Empty;
-                    zipName = Directory.Exists(paths[0]) ? new DirectoryInfo(paths[0]).Parent.Name : new FileInfo(paths[0]).Directory.Name;
-                    if(zipName == PathHelper.GetFSDirName(server))
-                    {
-                        Response.AddHeader("Content-Disposition", String.Format("attachment; filename={0}", server.Name + "-" 
-                            + DateTime.Now.ToString("yyyyMMddHHmm") + ".zip"));
-                    }
-                    else
-                    {
-                        Response.AddHeader("Content-Disposition", String.Format("attachment; filename={0}", server.Name + "-" + zipName + "-"
-                            + DateTime.Now.ToString("yyyyMMddHHmm") + ".zip"));
-                    }
-                    zip.Save(Response.OutputStream);
-                    Response.End();
-                    return null;
                 }
             }
             catch(Exception ex)
             {
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "zip failed to be created (ex : " + ex.Message + ")").ToString());
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "Error Occured (ex : " + ex.Message + ")").ToString());
             }
         }
 
@@ -453,7 +496,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Explorer/Upload
         [HttpPost]
-        public ActionResult Upload(IEnumerable<HttpPostedFileBase> files)
+        public ActionResult Upload(IEnumerable<HttpPostedFileBase> Files)
         {
             // ** INIT **
             EntityUser user = Session["User"] as EntityUser;
@@ -467,6 +510,8 @@ namespace SESM.Controllers.API
             if(!int.TryParse(Request.Form["ServerID"], out serverId))
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID is invalid").ToString());
 
+            // TODO: check path present
+
             EntityServer server = srvPrv.GetServer(serverId);
 
             string path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), Request.Form["Path"]));
@@ -474,18 +519,36 @@ namespace SESM.Controllers.API
             if(!path.Contains(PathHelper.GetInstancePath(server)))
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "The object isn't accessible for you, bad boy !").ToString());
 
-            bool overwriteFiles = Request.Form["overwrite"] == "True";
-            bool extractZip = Request.Form["extract"] == "True";
+            bool overwriteFiles = Request.Form["Overwrite"].ToLower() == "true";
+            bool extractZip = Request.Form["Extract"].ToLower() == "true";
+
+            bool blockDll = (SESMConfigHelper.BlockDll && !user.IsAdmin);
 
             // ** PROCESS **
             try
             {
-                foreach(HttpPostedFileBase file in files)
+                foreach(HttpPostedFileBase file in Files)
                 {
                     if(extractZip && file.FileName.Split('.').Last().ToLower() == "zip")
                     {
                         using(ZipFile zip = ZipFile.Read(file.InputStream))
                         {
+                            if (blockDll)
+                            {
+                                bool testDll = false;
+                                foreach (ZipEntry item in zip)
+                                {
+                                    if ((path + item.FileName.Replace("/",@"\")).Contains(PathHelper.GetInstancePath(server) + @"Mods")
+                                        && item.FileName.Split('.').Last().ToLower() == "dll")
+                                    {
+                                        testDll = true;
+                                        break;
+                                    }
+                                }
+                                if (testDll)
+                                    continue;
+                            }
+
                             zip.ExtractAll(path,
                                 overwriteFiles
                                     ? ExtractExistingFileAction.OverwriteSilently
@@ -494,13 +557,15 @@ namespace SESM.Controllers.API
                     }
                     else
                     {
+                        if(blockDll && file.FileName.Split('.').Last().ToLower() == "dll" && path.Contains(PathHelper.GetInstancePath(server) + @"Mods"))
+                            continue;
                         FSHelper.SaveStream(file.InputStream, path + "\\" + file.FileName, overwriteFiles);
                     }
                 }
             }
             catch(Exception ex)
             {
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "An error occurend while extracting the zip (exception : " + ex.Message + ")").ToString());
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "An error occurend while writing file (exception : " + ex.Message + ")").ToString());
             }
             return Content(XMLMessage.Success("XXX-XXX-XXX", "File(s) uploaded").ToString());
         }
@@ -538,9 +603,51 @@ namespace SESM.Controllers.API
             string content = System.IO.File.ReadAllText(path);
 
             XMLMessage response = new XMLMessage("XXX-XXX-XXX");
+            try
+            {
+                response.AddToContent(new XCData(content));
+                return Content(response.ToString());
+            }
+            catch (Exception)
+            {
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "Failed to read file").ToString());
+            }
+        }
 
-            response.AddToContent(new XCData(content));
-            return Content(response.ToString());
+        // POST: API/Explorer/SetFileContent
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult SetFileContent()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            string path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), Request.Form["Path"]));
+
+            if (!path.Contains(PathHelper.GetInstancePath(server)))
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "The object isn't accessible for you, bad boy !").ToString());
+
+            if (!System.IO.File.Exists(path))
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "File doesn't exist").ToString());
+
+            //System.Collections.Specialized.NameValueCollection qs = Request.Unvalidated.QueryString;
+            string data = Request.Form["Data"];
+
+            // ** PROCESS **
+            System.IO.File.WriteAllText(path, data, new UTF8Encoding(false));
+
+            return Content(XMLMessage.Success("XXX-XXX-XXX", "Data writed").ToString());
         }
     }
 }
