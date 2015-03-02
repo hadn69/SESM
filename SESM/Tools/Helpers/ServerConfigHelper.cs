@@ -51,22 +51,22 @@ namespace SESM.Tools.Helpers
         public int MaxFloatingObjects = Default.MaxFloatingObjects;
 
         // -- Maps
-        public string WorldName = string.Empty;
+        public string WorldName = Default.WorldName;
         public EnvironmentHostility EnvironmentHostility = Default.EnvironmentHostility;
         public int WorldSizeKm = Default.WorldSizeKm;
         public bool PermanentDeath = Default.PermanentDeath;
         public bool CargoShipsEnabled = Default.CargoShipsEnabled;
         public bool RemoveTrash = Default.RemoveTrash;
         public bool ClientCanSave = Default.ClientCanSave;
-        public List<ulong> Mods = new List<ulong>();
+        public List<ulong> Mods = Default.Mods;
         public int ViewDistance = Default.ViewDistance;
-
+        
         // -- Access
         public OnlineMode OnlineMode = Default.OnlineMode;
         public bool ResetOwnership = Default.ResetOwnership;
         public ulong GroupID = Default.GroupID;
-        public List<ulong> Administrators = new List<ulong>();
-        public List<ulong> Banned = new List<ulong>();
+        public List<ulong> Administrators = Default.Administrators;
+        public List<ulong> Banned = Default.Banned;
 
         // -- Gameplay
         public bool AutoHealing = Default.AutoHealing;
@@ -442,6 +442,16 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public bool Load(EntityServer server)
+        {
+            bool confLoad = LoadFromServConf(PathHelper.GetConfigurationFilePath(server));
+            bool saveLoad = false;
+            if (confLoad)
+                saveLoad = LoadFromSave(PathHelper.GetSavePath(server, SaveName) + @"\Sandbox.sbc");
+
+            return confLoad && saveLoad;
+        }
+
         /// <summary>
         /// Load the config file located at "path"
         /// </summary>
@@ -592,9 +602,7 @@ namespace SESM.Tools.Helpers
                 return false;
             XDocument doc = XDocument.Load(path);
             XElement root = doc.Element("MyObjectBuilder_Checkpoint");
-            if(root == null)
-                return false;
-            XElement settings = root.Element("Settings");
+            XElement settings = root?.Element("Settings");
             if(settings == null)
                 return false;
             if(settings.Element("GameMode") != null)

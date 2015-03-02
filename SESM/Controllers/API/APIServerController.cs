@@ -224,13 +224,68 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-GC-NOACCESS", "You don't have access to this server").ToString());
 
             // ** PROCESS **
+            // Loading the server config
+            ServerConfigHelper serverConfig = new ServerConfigHelper();
+            serverConfig.Load(server);
+
             XMLMessage response = new XMLMessage("SRV-GC-OK");
 
-            response.AddToContent(new XElement("Name", server.Name));
-            response.AddToContent(new XElement("ID", server.Id));
-            response.AddToContent(new XElement("Public", server.IsPublic.ToString()));
-            response.AddToContent(new XElement("State", srvPrv.GetState(server).ToString()));
-            response.AddToContent(new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id)));
+            response.AddToContent(new XElement("IP", serverConfig.IP));
+            response.AddToContent(new XElement("SteamPort", serverConfig.SteamPort));
+            response.AddToContent(new XElement("ServerPort", serverConfig.ServerPort));
+            response.AddToContent(new XElement("ServerName", serverConfig.ServerName));
+            response.AddToContent(new XElement("IgnoreLastSession", serverConfig.IgnoreLastSession));
+            response.AddToContent(new XElement("PauseGameWhenEmpty", serverConfig.PauseGameWhenEmpty));
+            response.AddToContent(new XElement("EnableSpectator", serverConfig.EnableSpectator));
+            response.AddToContent(new XElement("RealisticSound", serverConfig.RealisticSound));
+            response.AddToContent(new XElement("AutoSaveInMinutes", serverConfig.AutoSaveInMinutes));
+            response.AddToContent(new XElement("InventorySizeMultiplier", serverConfig.InventorySizeMultiplier));
+            response.AddToContent(new XElement("AssemblerSpeedMultiplier", serverConfig.AssemblerSpeedMultiplier));
+            response.AddToContent(new XElement("AssemblerEfficiencyMultiplier", serverConfig.AssemblerEfficiencyMultiplier));
+            response.AddToContent(new XElement("RefinerySpeedMultiplier", serverConfig.RefinerySpeedMultiplier));
+            response.AddToContent(new XElement("GameMode", serverConfig.GameMode));
+            response.AddToContent(new XElement("EnableCopyPaste", serverConfig.EnableCopyPaste));
+            response.AddToContent(new XElement("WelderSpeedMultiplier", serverConfig.WelderSpeedMultiplier));
+            response.AddToContent(new XElement("GrinderSpeedMultiplier", serverConfig.GrinderSpeedMultiplier));
+            response.AddToContent(new XElement("HackSpeedMultiplier", serverConfig.HackSpeedMultiplier));
+            response.AddToContent(new XElement("DestructibleBlocks", serverConfig.DestructibleBlocks));
+            response.AddToContent(new XElement("MaxPlayers", serverConfig.MaxPlayers));
+            response.AddToContent(new XElement("MaxFloatingObjects", serverConfig.MaxFloatingObjects));
+            response.AddToContent(new XElement("WorldName", serverConfig.WorldName));
+            response.AddToContent(new XElement("EnvironmentHostility", serverConfig.EnvironmentHostility));
+            response.AddToContent(new XElement("WorldSizeKm", serverConfig.WorldSizeKm));
+            response.AddToContent(new XElement("PermanentDeath", serverConfig.PermanentDeath));
+            response.AddToContent(new XElement("CargoShipsEnabled", serverConfig.CargoShipsEnabled));
+            response.AddToContent(new XElement("RemoveTrash", serverConfig.RemoveTrash));
+            response.AddToContent(new XElement("ClientCanSave", serverConfig.ClientCanSave));
+
+            XElement mods = new XElement("Mods");
+            foreach (ulong mod in serverConfig.Mods)
+                mods.Add(new XElement("Mod", mod));
+            response.AddToContent(mods);
+
+            response.AddToContent(new XElement("ViewDistance", serverConfig.ViewDistance));
+            response.AddToContent(new XElement("OnlineMode", serverConfig.OnlineMode));
+            response.AddToContent(new XElement("ResetOwnership", serverConfig.ResetOwnership));
+
+            XElement administrators = new XElement("Administrators");
+            foreach (ulong adminitrator in serverConfig.Administrators)
+                administrators.Add(new XElement("Adminitrator", adminitrator));
+            response.AddToContent(administrators);
+
+            XElement banned = new XElement("Banned");
+            foreach (ulong ban in serverConfig.Banned)
+                banned.Add(new XElement("Ban", ban));
+            response.AddToContent(banned);
+
+            response.AddToContent(new XElement("AutoHealing", serverConfig.AutoHealing));
+            response.AddToContent(new XElement("WeaponsEnabled", serverConfig.WeaponsEnabled));
+            response.AddToContent(new XElement("ShowPlayerNamesOnHud", serverConfig.ShowPlayerNamesOnHud));
+            response.AddToContent(new XElement("ThrusterDamage", serverConfig.ThrusterDamage));
+            response.AddToContent(new XElement("SpawnShipTimeMultiplier", serverConfig.SpawnShipTimeMultiplier));
+            response.AddToContent(new XElement("RespawnShipDelete", serverConfig.RespawnShipDelete));
+            response.AddToContent(new XElement("EnableToolShake", serverConfig.EnableToolShake));
+            response.AddToContent(new XElement("EnableIngameScripts", serverConfig.EnableIngameScripts));
 
             return Content(response.ToString());
         }

@@ -149,7 +149,7 @@ namespace SESM.Controllers
         #endregion
 
         #region Status
-            
+
         //
         // GET: Server/Status/5
         [HttpGet]
@@ -180,10 +180,10 @@ namespace SESM.Controllers
 
             return View(serverView);
         }
-        
+
         #endregion
 
-        
+
 
         // GET: Server/Delete/5
         [HttpGet]
@@ -277,7 +277,7 @@ namespace SESM.Controllers
             serviceLogger.Info(serv.Name + " stopped by " + user.Login + " by stop button");
             ServiceHelper.StopService(serv);
 
-            return RedirectToAction("Status", new {id = id});
+            return RedirectToAction("Status", new { id = id });
         }
 
         //
@@ -424,12 +424,12 @@ namespace SESM.Controllers
             ViewData["ID"] = id;
             EntityServer serv = srvPrv.GetServer(id);
             AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, serv.Id);
-            
+
             ViewData["AccessLevel"] = accessLevel;
 
             ServerConfigHelper serverConfig = new ServerConfigHelper();
             serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
-            
+
             ServerViewModel serverView = new ServerViewModel();
             //serverView = serverConfig.ParseOut(serverView);
             serverView.Name = serv.Name;
@@ -445,14 +445,14 @@ namespace SESM.Controllers
             serverView.ProcessPriority = serv.ProcessPriority;
 
             if (serv.AutoSaveInMinutes != null)
-                serverView.AutoSaveInMinutes = serv.AutoSaveInMinutes?? -42;
+                serverView.AutoSaveInMinutes = serv.AutoSaveInMinutes ?? -42;
 
             serverView.WebAdministrators = string.Join("\r\n", serv.Administrators.Select(item => item.Login).ToList());
             serverView.WebManagers = string.Join("\r\n", serv.Managers.Select(item => item.Login).ToList());
             serverView.WebUsers = string.Join("\r\n", serv.Users.Select(item => item.Login).ToList());
-            if(!string.IsNullOrEmpty(serverView.SaveName) && Directory.Exists(PathHelper.GetSavePath(serv, serverView.SaveName)))
+            if (!string.IsNullOrEmpty(serverView.SaveName) && Directory.Exists(PathHelper.GetSavePath(serv, serverView.SaveName)))
                 serverView.AsteroidAmount = Directory.GetFiles(PathHelper.GetSavePath(serv, serverView.SaveName), "*steroid???.vx2").Length;
- 
+
             return View(serverView);
         }
         /*
