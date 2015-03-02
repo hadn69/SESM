@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using SESM.DTO;
@@ -12,337 +11,78 @@ namespace SESM.Tools.Helpers
 {
     public class ServerConfigHelper
     {
-        public GameMode GameMode = Default.GameMode;
-        public int InventorySizeMultiplier = Default.InventorySizeMultiplier;
-        public int AssemblerSpeedMultiplier = Default.AssemblerSpeedMultiplier;
-        public int AssemblerEfficiencyMultiplier = Default.AssemblerEfficiencyMultiplier;
-        public int RefinerySpeedMultiplier = Default.RefinerySpeedMultiplier;
-        public OnlineMode OnlineMode = Default.OnlineMode;
-        public int MaxPlayers = Default.MaxPlayers;
-        public int MaxFloatingObjects = Default.MaxFloatingObjects;
-        public EnvironmentHostility EnvironmentHostility = Default.EnvironmentHostility;
-        public bool AutoHealing = Default.AutoHealing;
-        public bool EnableCopyPaste = Default.EnableCopyPaste;
-        public bool WeaponsEnabled = Default.WeaponsEnabled;
-        public bool ShowPlayerNamesOnHud = Default.ShowPlayerNamesOnHud;
-        public bool ThrusterDamage = Default.ThrusterDamage;
-        public bool CargoShipsEnabled = Default.CargoShipsEnabled;
-        public bool EnableSpectator = Default.EnableSpectator;
-        public bool RemoveTrash = Default.RemoveTrash;
-        public int WorldSizeKm = Default.WorldSizeKm;
-        public bool RespawnShipDelete = Default.RespawnShipDelete;
-        public bool ResetOwnership = Default.ResetOwnership;
-        public double WelderSpeedMultiplier = Default.WelderSpeedMultiplier;
-        public double GrinderSpeedMultiplier = Default.GrinderSpeedMultiplier;
-        public bool RealisticSound = Default.RealisticSound;
-        public bool ClientCanSave = Default.ClientCanSave;
-        public double HackSpeedMultiplier = Default.HackSpeedMultiplier;
-        public bool PermanentDeath = Default.PermanentDeath;
-
-        public SubTypeId ScenarioType = Default.ScenarioType;
+        // Server Grade
         public string SaveName = Default.SaveName;
         public string IP = Default.IP;
         public int SteamPort = Default.SteamPort;
         public int ServerPort = Default.ServerPort;
+        public string ServerName = Default.ServerName;
+        public bool IgnoreLastSession = Default.IgnoreLastSession;
+        public bool PauseGameWhenEmpty = Default.PauseGameWhenEmpty;
+
+        // New Map Grade
         public int AsteroidAmount = Default.AsteroidAmount;
+        public SubTypeId ScenarioType = Default.ScenarioType;
+        public float ProceduralDensity = Default.ProceduralDensity;
+        public int ProceduralSeed = Default.ProceduralSeed;
+
+        // Map Grade
+        // -- Misc
+        public bool EnableSpectator = Default.EnableSpectator;
+        public bool RealisticSound = Default.RealisticSound;
+        public int AutoSaveInMinutes = Default.AutoSaveInMinutes;
+
+        // -- Production
+        public int InventorySizeMultiplier = Default.InventorySizeMultiplier;
+        public int AssemblerSpeedMultiplier = Default.AssemblerSpeedMultiplier;
+        public int AssemblerEfficiencyMultiplier = Default.AssemblerEfficiencyMultiplier;
+        public int RefinerySpeedMultiplier = Default.RefinerySpeedMultiplier;
+
+        // -- Building
+        public GameMode GameMode = Default.GameMode;
+        public bool EnableCopyPaste = Default.EnableCopyPaste;
+        public double WelderSpeedMultiplier = Default.WelderSpeedMultiplier;
+        public double GrinderSpeedMultiplier = Default.GrinderSpeedMultiplier;
+        public double HackSpeedMultiplier = Default.HackSpeedMultiplier;
+        public bool DestructibleBlocks = Default.DestructibleBlocks;
+
+        // -- Caps
+        public int MaxPlayers = Default.MaxPlayers;
+        public int MaxFloatingObjects = Default.MaxFloatingObjects;
+
+        // -- Maps
+        public string WorldName = string.Empty;
+        public EnvironmentHostility EnvironmentHostility = Default.EnvironmentHostility;
+        public int WorldSizeKm = Default.WorldSizeKm;
+        public bool PermanentDeath = Default.PermanentDeath;
+        public bool CargoShipsEnabled = Default.CargoShipsEnabled;
+        public bool RemoveTrash = Default.RemoveTrash;
+        public bool ClientCanSave = Default.ClientCanSave;
+        public List<ulong> Mods = new List<ulong>();
+        public int ViewDistance = Default.ViewDistance;
+
+        // -- Access
+        public OnlineMode OnlineMode = Default.OnlineMode;
+        public bool ResetOwnership = Default.ResetOwnership;
+        public ulong GroupID = Default.GroupID;
         public List<ulong> Administrators = new List<ulong>();
         public List<ulong> Banned = new List<ulong>();
-        public List<ulong> Mods = new List<ulong>();
-        public ulong GroupID = Default.GroupID;
-        public string ServerName = Default.ServerName;
-        public bool PauseGameWhenEmpty = Default.PauseGameWhenEmpty;
-        public bool DestructibleBlocks = true;
-        public bool EnableIngameScripts = true;
-        public int ViewDistance = 20000;
-        public bool EnableToolShake = false;
 
-        public bool IgnoreLastSession = Default.IgnoreLastSession;
-        public string WorldName = string.Empty;
-        public int AutoSaveInMinutes = Default.AutoSaveInMinutes;
+        // -- Gameplay
+        public bool AutoHealing = Default.AutoHealing;
+        public bool WeaponsEnabled = Default.WeaponsEnabled;
+        public bool ShowPlayerNamesOnHud = Default.ShowPlayerNamesOnHud;
+        public bool ThrusterDamage = Default.ThrusterDamage;
         public int SpawnShipTimeMultiplier = Default.SpawnShipTimeMultiplier;
-
-        public float ProceduralDensity = 0;
-        public int ProceduralSeed = 0;
-
-        /// <summary>
-        /// Parse the View Model into the object
-        /// </summary>
-        public void ParseIn(ServerViewModel model)
-        {
-            GameMode = model.GameMode;
-            InventorySizeMultiplier = model.InventorySizeMultiplier;
-            AssemblerSpeedMultiplier = model.AssemblerSpeedMultiplier;
-            AssemblerEfficiencyMultiplier = model.AssemblerEfficiencyMultiplier;
-            RefinerySpeedMultiplier = model.RefinerySpeedMultiplier;
-            OnlineMode = model.OnlineMode;
-            MaxPlayers = model.MaxPlayers;
-            MaxFloatingObjects = model.MaxFloatingObjects;
-            EnvironmentHostility = model.EnvironmentHostility;
-            AutoHealing = model.AutoHealing;
-            EnableCopyPaste = model.EnableCopyPaste;
-            WeaponsEnabled = model.WeaponsEnabled;
-            ShowPlayerNamesOnHud = model.ShowPlayerNamesOnHud;
-            ThrusterDamage = model.ThrusterDamage;
-            CargoShipsEnabled = model.CargoShipsEnabled;
-            EnableSpectator = model.EnableSpectator;
-            RemoveTrash = model.RemoveTrash;
-            WorldSizeKm = model.WorldSizeKm;
-            RespawnShipDelete = model.RespawnShipDelete;
-            ResetOwnership = model.ResetOwnership;
-            WelderSpeedMultiplier = model.WelderSpeedMultiplier;
-            GrinderSpeedMultiplier = model.GrinderSpeedMultiplier;
-            RealisticSound = model.RealisticSound;
-            ClientCanSave = model.ClientCanSave;
-            HackSpeedMultiplier = model.HackSpeedMultiplier;
-            PermanentDeath = model.PermanentDeath;
-            AutoSaveInMinutes = model.AutoSaveInMinutes;
-            SpawnShipTimeMultiplier = model.SpawnShipTimeMultiplier;
-            DestructibleBlocks = model.DestructibleBlocks;
-            EnableIngameScripts = model.EnableIngameScripts;
-            ViewDistance = model.ViewDistance;
-            EnableToolShake = model.EnableToolShake;
-
-            ScenarioType = model.ScenarioType;
-            SaveName = model.SaveName;
-            IP = model.IP;
-            SteamPort = model.SteamPort;
-            ServerPort = model.ServerPort;
-            AsteroidAmount = model.AsteroidAmount;
-
-            Administrators = new List<ulong>();
-            if(!string.IsNullOrWhiteSpace(model.Administrators))
-            {
-                string[] splittedAdmins = Regex.Split(model.Administrators, "\r\n");
-
-
-                foreach(string item in splittedAdmins)
-                {
-                    if(!string.IsNullOrWhiteSpace(item))
-                    {
-                        try
-                        {
-                            Administrators.Add(ulong.Parse(item));
-                        }
-                        catch(Exception)
-                        {
-                        }
-                    }
-                }
-            }
-
-            Banned = new List<ulong>();
-            if(!string.IsNullOrWhiteSpace(model.Banned))
-            {
-                string[] splittedBanned = Regex.Split(model.Banned, "\r\n");
-
-                foreach(string item in splittedBanned)
-                {
-                    if(!string.IsNullOrWhiteSpace(item))
-                    {
-                        try
-                        {
-                            Banned.Add(ulong.Parse(item));
-                        }
-                        catch(Exception)
-                        {
-                        }
-                    }
-                }
-            }
-
-            Mods = new List<ulong>();
-            if(!string.IsNullOrWhiteSpace(model.Mods))
-            {
-                string[] splittedMod = Regex.Split(model.Mods, "\r\n");
-
-                foreach(string item in splittedMod)
-                {
-                    if(!string.IsNullOrWhiteSpace(item))
-                    {
-                        try
-                        {
-                            Mods.Add(ulong.Parse(item));
-                        }
-                        catch(Exception)
-                        {
-                        }
-                    }
-                }
-            }
-            GroupID = model.GroupID;
-            ServerName = model.ServerName;
-            WorldName = model.WorldName;
-            PauseGameWhenEmpty = model.PauseGameWhenEmpty;
-            IgnoreLastSession = model.IgnoreLastSession;
-        }
-
-        public void ParseIn(NewServerViewModel model)
-        {
-            GameMode = model.GameMode;
-            InventorySizeMultiplier = model.InventorySizeMultiplier;
-            AssemblerSpeedMultiplier = model.AssemblerSpeedMultiplier;
-            AssemblerEfficiencyMultiplier = model.AssemblerEfficiencyMultiplier;
-            RefinerySpeedMultiplier = model.RefinerySpeedMultiplier;
-            OnlineMode = model.OnlineMode;
-            MaxPlayers = model.MaxPlayers;
-            MaxFloatingObjects = model.MaxFloatingObjects;
-            EnvironmentHostility = model.EnvironmentHostility;
-            AutoHealing = model.AutoHealing;
-            EnableCopyPaste = model.EnableCopyPaste;
-            WeaponsEnabled = model.WeaponsEnabled;
-            ShowPlayerNamesOnHud = model.ShowPlayerNamesOnHud;
-            ThrusterDamage = model.ThrusterDamage;
-            CargoShipsEnabled = model.CargoShipsEnabled;
-            EnableSpectator = model.EnableSpectator;
-            RemoveTrash = model.RemoveTrash;
-            WorldSizeKm = model.WorldSizeKm;
-            RespawnShipDelete = model.RespawnShipDelete;
-            ResetOwnership = model.ResetOwnership;
-            WelderSpeedMultiplier = model.WelderSpeedMultiplier;
-            GrinderSpeedMultiplier = model.GrinderSpeedMultiplier;
-            RealisticSound = model.RealisticSound;
-            ClientCanSave = model.ClientCanSave;
-            HackSpeedMultiplier = model.HackSpeedMultiplier;
-            PermanentDeath = model.PermanentDeath;
-            AutoSaveInMinutes = model.AutoSaveInMinutes;
-            SpawnShipTimeMultiplier = model.SpawnShipTimeMultiplier;
-            DestructibleBlocks = model.DestructibleBlocks;
-            EnableIngameScripts = model.EnableIngameScripts;
-            ViewDistance = model.ViewDistance;
-            EnableToolShake = model.EnableToolShake;
-
-            IP = model.IP;
-            SteamPort = model.SteamPort;
-            ServerPort = model.ServerPort;
-
-            Administrators = new List<ulong>();
-            if(!string.IsNullOrWhiteSpace(model.Administrators))
-            {
-                string[] splittedAdmins = Regex.Split(model.Administrators, "\r\n");
-
-
-                foreach(string item in splittedAdmins)
-                {
-                    if(!string.IsNullOrWhiteSpace(item))
-                    {
-                        try
-                        {
-                            Administrators.Add(ulong.Parse(item));
-                        }
-                        catch(Exception)
-                        {
-                        }
-                    }
-                }
-            }
-
-            Banned = new List<ulong>();
-            if(!string.IsNullOrWhiteSpace(model.Banned))
-            {
-                string[] splittedBanned = Regex.Split(model.Banned, "\r\n");
-
-                foreach(string item in splittedBanned)
-                {
-                    if(!string.IsNullOrWhiteSpace(item))
-                    {
-                        try
-                        {
-                            Banned.Add(ulong.Parse(item));
-                        }
-                        catch(Exception)
-                        {
-                        }
-                    }
-                }
-            }
-
-            Mods = new List<ulong>();
-            if(!string.IsNullOrWhiteSpace(model.Mods))
-            {
-                string[] splittedMod = Regex.Split(model.Mods, "\r\n");
-
-                foreach(string item in splittedMod)
-                {
-                    if(!string.IsNullOrWhiteSpace(item))
-                    {
-                        try
-                        {
-                            Mods.Add(ulong.Parse(item));
-                        }
-                        catch(Exception)
-                        {
-                        }
-                    }
-                }
-            }
-            GroupID = model.GroupID;
-            ServerName = model.ServerName;
-            WorldName = model.WorldName;
-            PauseGameWhenEmpty = model.PauseGameWhenEmpty;
-            IgnoreLastSession = model.IgnoreLastSession;
-        }
-
-        /// <summary>
-        /// Parse the object into the View Model
-        /// </summary>
-        public ServerViewModel ParseOut(ServerViewModel model)
-        {
-            model.GameMode = GameMode;
-            model.InventorySizeMultiplier = InventorySizeMultiplier;
-            model.AssemblerSpeedMultiplier = AssemblerSpeedMultiplier;
-            model.AssemblerEfficiencyMultiplier = AssemblerEfficiencyMultiplier;
-            model.RefinerySpeedMultiplier = RefinerySpeedMultiplier;
-            model.OnlineMode = OnlineMode;
-            model.MaxPlayers = MaxPlayers;
-            model.MaxFloatingObjects = MaxFloatingObjects;
-            model.EnvironmentHostility = EnvironmentHostility;
-            model.AutoHealing = AutoHealing;
-            model.EnableCopyPaste = EnableCopyPaste;
-            model.WeaponsEnabled = WeaponsEnabled;
-            model.ShowPlayerNamesOnHud = ShowPlayerNamesOnHud;
-            model.ThrusterDamage = ThrusterDamage;
-            model.CargoShipsEnabled = CargoShipsEnabled;
-            model.EnableSpectator = EnableSpectator;
-            model.RemoveTrash = RemoveTrash;
-            model.WorldSizeKm = WorldSizeKm;
-            model.RespawnShipDelete = RespawnShipDelete;
-            model.ResetOwnership = ResetOwnership;
-            model.WelderSpeedMultiplier = WelderSpeedMultiplier;
-            model.GrinderSpeedMultiplier = GrinderSpeedMultiplier;
-            model.RealisticSound = RealisticSound;
-            model.ClientCanSave = ClientCanSave;
-            model.HackSpeedMultiplier = HackSpeedMultiplier;
-            model.PermanentDeath = PermanentDeath;
-            model.AutoSaveInMinutes = AutoSaveInMinutes;
-            model.SpawnShipTimeMultiplier = SpawnShipTimeMultiplier;
-            model.DestructibleBlocks = DestructibleBlocks;
-            model.EnableIngameScripts = EnableIngameScripts;
-            model.ViewDistance = ViewDistance;
-            model.EnableToolShake = EnableToolShake;
-
-            model.ScenarioType = ScenarioType;
-            model.SaveName = SaveName;
-            model.IP = IP;
-            model.SteamPort = SteamPort;
-            model.ServerPort = ServerPort;
-            model.AsteroidAmount = AsteroidAmount;
-            model.Administrators = String.Join("\r\n", Administrators);
-            model.Banned = String.Join("\r\n", Banned);
-            model.Mods = String.Join("\r\n", Mods);
-            model.GroupID = GroupID;
-            model.ServerName = ServerName;
-            model.PauseGameWhenEmpty = PauseGameWhenEmpty;
-            model.IgnoreLastSession = IgnoreLastSession;
-            model.WorldName = WorldName;
-            return model;
-        }
+        public bool RespawnShipDelete = Default.RespawnShipDelete;
+        public bool EnableToolShake = Default.EnableToolShake;
+        public bool EnableIngameScripts = Default.EnableIngameScripts;
 
         public void Save(EntityServer serv)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("<?xml version=\"1.0\"?>");
-            sb.AppendLine(
-                "<MyConfigDedicated xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">");
+            sb.AppendLine("<MyConfigDedicated xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">");
             sb.AppendLine("  <SessionSettings>");
             sb.AppendLine("    <GameMode>" + GameMode.ToString() + "</GameMode>");
             sb.AppendLine("    <InventorySizeMultiplier>" + InventorySizeMultiplier + "</InventorySizeMultiplier>");
@@ -450,11 +190,6 @@ namespace SESM.Tools.Helpers
                 XmlNode root = doc.DocumentElement;
                 XmlNode settingsNode = root.SelectSingleNode("descendant::Settings");
                 XmlNode valueNode = null;
-
-                valueNode = settingsNode.SelectSingleNode("descendant::AutoSave");
-                if(valueNode != null)
-                    settingsNode.RemoveChild(valueNode);
-
 
                 valueNode = settingsNode.SelectSingleNode("descendant::GameMode");
                 if(valueNode == null)
@@ -704,8 +439,6 @@ namespace SESM.Tools.Helpers
                 string text = File.ReadAllText(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc");
                 text = text.Replace("<PreviousEnvironmentHostility />", "<PreviousEnvironmentHostility xsi:nil=\"true\" />");
                 File.WriteAllText(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc", text);
-
-                //<PreviousEnvironmentHostility xsi:nil="true" />
             }
         }
 

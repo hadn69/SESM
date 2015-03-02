@@ -137,7 +137,7 @@ namespace SESM.Controllers
             }
             return null;
         }
-
+        /*
         public ActionResult SignGen(int id)
         {
             DataContext _context = new DataContext();
@@ -158,7 +158,7 @@ namespace SESM.Controllers
             ViewData["State"] = srvPrv.GetState(serv);
             return View(serverView);
         }
-
+        */
         public ActionResult Signature(string id)
         {
             bool flagPass = false;

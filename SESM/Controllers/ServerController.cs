@@ -149,7 +149,7 @@ namespace SESM.Controllers
         #endregion
 
         #region Status
-
+            
         //
         // GET: Server/Status/5
         [HttpGet]
@@ -165,7 +165,7 @@ namespace SESM.Controllers
             serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
 
             ServerViewModel serverView = new ServerViewModel();
-            serverView = serverConfig.ParseOut(serverView);
+            //serverView = serverConfig.ParseOut(serverView);
             serverView.Name = serv.Name;
             serverView.IsLvl1BackupEnabled = serv.IsLvl1BackupEnabled;
             serverView.IsLvl2BackupEnabled = serv.IsLvl2BackupEnabled;
@@ -180,7 +180,7 @@ namespace SESM.Controllers
 
             return View(serverView);
         }
-
+        
         #endregion
 
         
@@ -431,7 +431,7 @@ namespace SESM.Controllers
             serverConfig.LoadFromServConf(PathHelper.GetConfigurationFilePath(serv));
             
             ServerViewModel serverView = new ServerViewModel();
-            serverView = serverConfig.ParseOut(serverView);
+            //serverView = serverConfig.ParseOut(serverView);
             serverView.Name = serv.Name;
             serverView.IsPublic = serv.IsPublic;
             serverView.IsLvl1BackupEnabled = serv.IsLvl1BackupEnabled;

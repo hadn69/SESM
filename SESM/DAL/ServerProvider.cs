@@ -228,44 +228,18 @@ namespace SESM.DAL
             }
         }
 
-        public AccessLevel GetHighestAccessLevel(List<EntityServer> servers, EntityUser user)
+        public bool IsManagerOrAbore(AccessLevel accessLevel)
         {
+            return accessLevel == AccessLevel.SuperAdmin || 
+                    accessLevel == AccessLevel.Admin ||
+                    accessLevel == AccessLevel.Manager;
+        }
 
-            if(user == null)
-                return AccessLevel.Guest;
-            if(user.IsAdmin)
-                return AccessLevel.SuperAdmin;
-            AccessLevel accessLevel = AccessLevel.Guest;
-            foreach(AccessLevel itemAccessLevel in servers.Select(item => GetAccessLevel(user.Id, item.Id)))
-            {
-                if(accessLevel == AccessLevel.Guest
-                    && itemAccessLevel != AccessLevel.Guest)
-                {
-                    accessLevel = itemAccessLevel;
-                }
-                else if(accessLevel == AccessLevel.User
-                    && itemAccessLevel != AccessLevel.Guest
-                    && itemAccessLevel != AccessLevel.User)
-                {
-                    accessLevel = itemAccessLevel;
-                }
-                else if(accessLevel == AccessLevel.Manager
-                    && itemAccessLevel != AccessLevel.Guest
-                    && itemAccessLevel != AccessLevel.User
-                    && itemAccessLevel != AccessLevel.Manager)
-                {
-                    accessLevel = itemAccessLevel;
-                }
-                else if(accessLevel == AccessLevel.Admin
-                    && itemAccessLevel != AccessLevel.Guest
-                    && itemAccessLevel != AccessLevel.User
-                    && itemAccessLevel != AccessLevel.Manager
-                    && itemAccessLevel != AccessLevel.Admin)
-                {
-                    accessLevel = itemAccessLevel;
-                }
-            }
-            return accessLevel;
+        public bool IsAdminOrAbore(AccessLevel accessLevel)
+        {
+            return accessLevel == AccessLevel.SuperAdmin ||
+                    accessLevel == AccessLevel.Admin ||
+                    accessLevel == AccessLevel.Manager;
         }
 
         public List<EntityServer> GetAllServers()

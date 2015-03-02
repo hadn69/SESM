@@ -46,5 +46,11 @@ namespace SESM.Tools
         public static readonly int AutoSaveInMinutes = 5;
         public static readonly bool PauseGameWhenEmpty = false;
         public static readonly int SpawnShipTimeMultiplier = 1;
+        public static readonly bool DestructibleBlocks = true;
+        public static readonly bool EnableIngameScripts = true;
+        public static readonly int ViewDistance = 20000;
+        public static readonly bool EnableToolShake = false;
+        public static readonly float ProceduralDensity = 0;
+        public static readonly int ProceduralSeed = 0;
     }
 }
