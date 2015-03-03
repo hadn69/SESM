@@ -21,18 +21,21 @@ namespace SESM.Controllers
     {
         readonly DataContext _context = new DataContext();
 
-        #region Index
-
         //
         // GET: Server
-        // This page show the list of all the servers the current user is authorised to see
         [HttpGet]
         public ActionResult Index()
         {
             return View();
         }
 
-        #endregion
+        //
+        // GET: Server/Configuration
+        [HttpGet]
+        public ActionResult Configuration(int id)
+        {
+            return View();
+        }
 
         #region Create
         //

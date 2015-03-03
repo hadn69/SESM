@@ -9,58 +9,167 @@ namespace SESM
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
+            // === API ===
+
+            // Misc API
             routes.MapRoute(
                 name: "APIMisc",
                 url: "API/Misc/{action}",
-                defaults: new { controller = "APIMisc", action = "Index" }
+                defaults: new { controller = "APIMisc" },
+                constraints: new
+                {
+                    action = "IsCronValid|" +
+                             "GetNextCronDates"
+                }
             );
 
+            // Settings API
             routes.MapRoute(
                 name: "APISettings",
                 url: "API/Settings/{action}",
-                defaults: new { controller = "APISettings", action = "Index" }
+                defaults: new { controller = "APISettings" },
+                constraints: new
+                {
+                    action = "GetSESEStatus|" +
+                             "GetSESEVersion|" +
+                             "GetSESESettings|" +
+                             "SetSESESettings|" +
+                             "UploadSESE|" +
+                             "UpdateSESE|" +
+                             "DeleteSESE"
+                }
             );
 
+            // Server API
             routes.MapRoute(
                 name: "APIServer",
                 url: "API/Server/{action}",
-                defaults: new { controller = "APIServer", action = "Index"}
+                defaults: new { controller = "APIServer" },
+                constraints: new
+                {
+                    action = "GetServers|" +
+                             "GetServer|" +
+                             "CreateServer|" +
+                             "DeleteServers|" +
+                             "GetConfiguration|" +
+                             "SetConfiguration|" +
+                             "StartServers|" +
+                             "StopServers|" +
+                             "RestartServers|" +
+                             "KillServers"
+                }
             );
 
+            // Explorer API
             routes.MapRoute(
                 name: "APIExplorer",
                 url: "API/Explorer/{action}",
-                defaults: new { controller = "APIExplorer", action = "Index"}
+                defaults: new { controller = "APIExplorer" },
+                constraints: new
+                {
+                    action = "GetDirectoryContent|" +
+                             "GetDirectoryDirectories|" +
+                             "Delete|" +
+                             "Rename|" +
+                             "Download|" +
+                             "NewFolder|" +
+                             "NewFile|" +
+                             "Upload|" +
+                             "GetFileContent|" +
+                             "SetFileContent"
+                }
             );
 
+            // Account API
             routes.MapRoute(
                 name: "APIAccount",
                 url: "API/Account/{action}",
-                defaults: new { controller = "APIAccount", action = "Index" }
+                defaults: new { controller = "APIAccount" },
+                constraints: new
+                {
+                    action = "GetChallenge|" +
+                             "LogOut|" +
+                             "Authenticate|" +
+                             "Register|" +
+                             "GetDetails|" +
+                             "SetDetails"
+                }
             );
 
-            routes.MapRoute(
-                name: "Home",
-                url: "",
-                defaults: new { controller = "Home", action = "Index" }
-            );
-
-            routes.MapRoute(
-                name: "Views",
-                url: "{controller}/{action}/{id}",
-                defaults: new { action = "Index", id = UrlParameter.Optional },
-                constraints: new { controller = "Home|Account|Server|Explorer|Settings" }
-            );
-
-
-            // Show a 404 error page for API.
+            // API 404
             routes.MapRoute(
                 name: "404API",
                 url: "API/{*url}",
                 defaults: new { controller = "Error", action = "404API" }
             );
 
-            // Show a 404 error page for anything else.
+            // === GUI ===
+
+            // Home
+            routes.MapRoute(
+                name: "Home",
+                url: "",
+                defaults: new { controller = "Home", action = "Index" }
+            );
+
+            // Server List
+            routes.MapRoute(
+                name: "ServerList",
+                url: "Servers",
+                defaults: new { action = "Index", controller = "Server" }
+            );
+
+            // Explorer
+            routes.MapRoute(
+                name: "Explorer",
+                url: "{id}/Explorer",
+                defaults: new { action = "Browse", controller = "Explorer" }
+            );
+
+            // Map
+            routes.MapRoute(
+                name: "Map",
+                url: "{id}/Map",
+                defaults: new { action = "Index", controller = "Map" }
+            );
+
+            // Account
+            routes.MapRoute(
+                name: "Account",
+                url: "Account/{action}",
+                defaults: new {controller = "Account" },
+                constraints: new
+                {
+                    action = "Login|" +
+                             "Manage"
+                }
+            );
+
+            // Settings
+            routes.MapRoute(
+                name: "Settings",
+                url: "Settings/{action}",
+                defaults: new { controller = "Settings" },
+                constraints: new
+                {
+                    action = "SESE|" +
+                             "SE"
+                }
+            );
+
+            // Other
+            routes.MapRoute(
+                name: "Other",
+                url: "{id}/{action}",
+                defaults: new { action = "Dashboard", controller = "Server" },
+                constraints: new
+                {
+                    action = "Dashboard|" +
+                             "Configuration"
+                }
+            );
+
+            // 404
             routes.MapRoute(
                 name: "404",
                 url: "{*url}",

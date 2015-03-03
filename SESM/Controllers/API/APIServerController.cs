@@ -132,7 +132,7 @@ namespace SESM.Controllers.API
             return Content(XMLMessage.Success("SRV-CRS-OK", "The server " + serverName + " was created").ToString());
         }
 
-        // POST: API/Server/DeleteServers/
+        // POST: API/Server/DeleteServers
         [HttpPost]
         public ActionResult DeleteServers()
         {
@@ -294,7 +294,7 @@ namespace SESM.Controllers.API
 
         #region Power Cycle
 
-        // POST: API/Server/StartServers/
+        // POST: API/Server/StartServers
         [HttpPost]
         public ActionResult StartServers()
         {
@@ -350,7 +350,7 @@ namespace SESM.Controllers.API
             return Content(XMLMessage.Success("SRV-STRS-OK", "The following server(s) have been started : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
-        // POST: API/Server/StopServers/
+        // POST: API/Server/StopServers
         [HttpPost]
         public ActionResult StopServers()
         {
@@ -406,7 +406,7 @@ namespace SESM.Controllers.API
             return Content(XMLMessage.Success("SRV-STRS-OK", "The following server(s) have been stopped : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
         }
 
-        // POST: API/Server/RestartServers/
+        // POST: API/Server/RestartServers
         [HttpPost]
         public ActionResult RestartServers()
         {
@@ -481,7 +481,7 @@ namespace SESM.Controllers.API
                 + string.Join(", ", serversToRestart.Select(x => x.Name))).ToString());
         }
 
-        // POST: API/Server/KillServers/
+        // POST: API/Server/KillServers
         [HttpPost]
         public ActionResult KillServers()
         {

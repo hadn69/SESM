@@ -60,7 +60,7 @@ namespace SESM.Tools.Helpers
         public bool ClientCanSave = Default.ClientCanSave;
         public List<ulong> Mods = Default.Mods;
         public int ViewDistance = Default.ViewDistance;
-        
+
         // -- Access
         public OnlineMode OnlineMode = Default.OnlineMode;
         public bool ResetOwnership = Default.ResetOwnership;
@@ -116,7 +116,7 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <EnableIngameScripts>" + EnableIngameScripts.ToString().ToLower() + "</EnableIngameScripts>");
             sb.AppendLine("    <ViewDistance>" + ViewDistance + "</ViewDistance>");
             sb.AppendLine("    <EnableToolShake>" + EnableToolShake.ToString().ToLower() + "</EnableToolShake>");
-            if(ProceduralDensity != 0)
+            if (ProceduralDensity != 0)
             {
                 sb.AppendLine("    <ProceduralDensity>" + ProceduralDensity + "</ProceduralDensity>");
                 sb.AppendLine("    <ProceduralSeed>" + ProceduralSeed + "</ProceduralSeed>");
@@ -126,7 +126,7 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <TypeId>MyObjectBuilder_ScenarioDefinition</TypeId>");
             sb.AppendLine("    <SubtypeId>" + ScenarioType.ToString() + "</SubtypeId>");
             sb.AppendLine("  </Scenario>");
-            if(string.IsNullOrEmpty(SaveName))
+            if (string.IsNullOrEmpty(SaveName))
                 sb.AppendLine("  <LoadWorld />");
             else
                 sb.AppendLine("  <LoadWorld>" + PathHelper.GetSavePath(serv, SaveName) + "</LoadWorld>");
@@ -134,46 +134,46 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("  <SteamPort>" + SteamPort + "</SteamPort>");
             sb.AppendLine("  <ServerPort>" + ServerPort + "</ServerPort>");
             sb.AppendLine("  <AsteroidAmount>" + AsteroidAmount + "</AsteroidAmount>");
-            if(Administrators.Count == 0)
+            if (Administrators.Count == 0)
                 sb.AppendLine("  <Administrators />");
             else
             {
                 sb.AppendLine("  <Administrators>");
-                foreach(ulong item in Administrators)
+                foreach (ulong item in Administrators)
                 {
                     sb.AppendLine("    <unsignedLong>" + item + "</unsignedLong>");
                 }
                 sb.AppendLine("  </Administrators>");
             }
-            if(Banned.Count == 0)
+            if (Banned.Count == 0)
                 sb.AppendLine("  <Banned />");
             else
             {
                 sb.AppendLine("  <Banned>");
-                foreach(ulong item in Banned)
+                foreach (ulong item in Banned)
                 {
                     sb.AppendLine("    <unsignedLong>" + item + "</unsignedLong>");
                 }
                 sb.AppendLine("  </Banned>");
             }
 
-            if(Mods.Count == 0)
+            if (Mods.Count == 0)
                 sb.AppendLine("  <Mods />");
             else
             {
                 sb.AppendLine("  <Mods>");
-                foreach(ulong item in Mods)
+                foreach (ulong item in Mods)
                 {
                     sb.AppendLine("    <unsignedLong>" + item + "</unsignedLong>");
                 }
                 sb.AppendLine("  </Mods>");
             }
             sb.AppendLine("  <GroupID>" + GroupID + "</GroupID>");
-            if(string.IsNullOrEmpty(ServerName))
+            if (string.IsNullOrEmpty(ServerName))
                 sb.AppendLine("  <ServerName />");
             else
                 sb.AppendLine("  <ServerName>" + ServerName.Replace('&', ' ') + "</ServerName>");
-            if(string.IsNullOrEmpty(WorldName))
+            if (string.IsNullOrEmpty(WorldName))
                 sb.AppendLine("  <WorldName />");
             else
                 sb.AppendLine("  <WorldName>" + WorldName.Replace('&', ' ') + "</WorldName>");
@@ -183,7 +183,7 @@ namespace SESM.Tools.Helpers
             File.WriteAllText(PathHelper.GetConfigurationFilePath(serv), sb.ToString());
 
             // Saving the parameters also to the save file
-            if(!String.IsNullOrEmpty(SaveName) && File.Exists(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc"))
+            if (!String.IsNullOrEmpty(SaveName) && File.Exists(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc"))
             {
                 XmlDocument doc = new XmlDocument();
                 doc.Load(PathHelper.GetSavePath(serv, SaveName) + @"\Sandbox.sbc");
@@ -192,73 +192,73 @@ namespace SESM.Tools.Helpers
                 XmlNode valueNode = null;
 
                 valueNode = settingsNode.SelectSingleNode("descendant::GameMode");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "GameMode", null));
                 settingsNode.SelectSingleNode("descendant::GameMode").InnerText = GameMode.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::InventorySizeMultiplier");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "InventorySizeMultiplier", null));
                 settingsNode.SelectSingleNode("descendant::InventorySizeMultiplier").InnerText =
                     InventorySizeMultiplier.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::AssemblerEfficiencyMultiplier");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "AssemblerEfficiencyMultiplier", null));
                 settingsNode.SelectSingleNode("descendant::AssemblerEfficiencyMultiplier").InnerText =
                     AssemblerEfficiencyMultiplier.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::AssemblerSpeedMultiplier");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "AssemblerSpeedMultiplier", null));
                 settingsNode.SelectSingleNode("descendant::AssemblerSpeedMultiplier").InnerText =
                     AssemblerSpeedMultiplier.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::RefinerySpeedMultiplier");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "RefinerySpeedMultiplier", null));
                 settingsNode.SelectSingleNode("descendant::RefinerySpeedMultiplier").InnerText =
                     RefinerySpeedMultiplier.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::OnlineMode");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "OnlineMode", null));
                 settingsNode.SelectSingleNode("descendant::OnlineMode").InnerText = OnlineMode.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::MaxPlayers");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "MaxPlayers", null));
                 settingsNode.SelectSingleNode("descendant::MaxPlayers").InnerText = MaxPlayers.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::MaxFloatingObjects");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "MaxFloatingObjects", null));
                 settingsNode.SelectSingleNode("descendant::MaxFloatingObjects").InnerText =
                     MaxFloatingObjects.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::EnvironmentHostility");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnvironmentHostility", null));
                 settingsNode.SelectSingleNode("descendant::EnvironmentHostility").InnerText =
                     EnvironmentHostility.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::AutoHealing");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "AutoHealing", null));
                 settingsNode.SelectSingleNode("descendant::AutoHealing").InnerText = AutoHealing.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::EnableCopyPaste");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableCopyPaste", null));
                 settingsNode.SelectSingleNode("descendant::EnableCopyPaste").InnerText =
                     EnableCopyPaste.ToString().ToLower();
@@ -267,156 +267,156 @@ namespace SESM.Tools.Helpers
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::WeaponsEnabled");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "WeaponsEnabled", null));
                 settingsNode.SelectSingleNode("descendant::WeaponsEnabled").InnerText =
                     WeaponsEnabled.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::ShowPlayerNamesOnHud");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ShowPlayerNamesOnHud", null));
                 settingsNode.SelectSingleNode("descendant::ShowPlayerNamesOnHud").InnerText =
                     ShowPlayerNamesOnHud.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::ThrusterDamage");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ThrusterDamage", null));
                 settingsNode.SelectSingleNode("descendant::ThrusterDamage").InnerText =
                     ThrusterDamage.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::CargoShipsEnabled");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "CargoShipsEnabled", null));
                 settingsNode.SelectSingleNode("descendant::CargoShipsEnabled").InnerText =
                     CargoShipsEnabled.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::EnableSpectator");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableSpectator", null));
                 settingsNode.SelectSingleNode("descendant::EnableSpectator").InnerText =
                     EnableSpectator.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::RemoveTrash");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "RemoveTrash", null));
                 settingsNode.SelectSingleNode("descendant::RemoveTrash").InnerText = RemoveTrash.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::WorldSizeKm");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "WorldSizeKm", null));
                 settingsNode.SelectSingleNode("descendant::WorldSizeKm").InnerText = WorldSizeKm.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::RespawnShipDelete");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "RespawnShipDelete", null));
                 settingsNode.SelectSingleNode("descendant::RespawnShipDelete").InnerText =
                     RespawnShipDelete.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::ResetOwnership");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ResetOwnership", null));
                 settingsNode.SelectSingleNode("descendant::ResetOwnership").InnerText =
                     ResetOwnership.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::WelderSpeedMultiplier");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "WelderSpeedMultiplier", null));
                 settingsNode.SelectSingleNode("descendant::WelderSpeedMultiplier").InnerText =
                     WelderSpeedMultiplier.ToString().Replace(',', '.');
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::GrinderSpeedMultiplier");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "GrinderSpeedMultiplier", null));
                 settingsNode.SelectSingleNode("descendant::GrinderSpeedMultiplier").InnerText =
                     GrinderSpeedMultiplier.ToString().Replace(',', '.');
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::RealisticSound");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "RealisticSound", null));
                 settingsNode.SelectSingleNode("descendant::RealisticSound").InnerText =
                     RealisticSound.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::ClientCanSave");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ClientCanSave", null));
                 settingsNode.SelectSingleNode("descendant::ClientCanSave").InnerText =
                     ClientCanSave.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::HackSpeedMultiplier");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "HackSpeedMultiplier", null));
                 settingsNode.SelectSingleNode("descendant::HackSpeedMultiplier").InnerText =
                     HackSpeedMultiplier.ToString().Replace(',', '.');
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::PermanentDeath");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "PermanentDeath", null));
                 settingsNode.SelectSingleNode("descendant::PermanentDeath").InnerText =
                     PermanentDeath.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::AutoSaveInMinutes");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "AutoSaveInMinutes", null));
                 settingsNode.SelectSingleNode("descendant::AutoSaveInMinutes").InnerText =
                     AutoSaveInMinutes.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::SpawnShipTimeMultiplier");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "SpawnShipTimeMultiplier", null));
                 settingsNode.SelectSingleNode("descendant::SpawnShipTimeMultiplier").InnerText =
                     SpawnShipTimeMultiplier.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::DestructibleBlocks");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "DestructibleBlocks", null));
                 settingsNode.SelectSingleNode("descendant::DestructibleBlocks").InnerText =
                     DestructibleBlocks.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::EnableIngameScripts");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableIngameScripts", null));
                 settingsNode.SelectSingleNode("descendant::EnableIngameScripts").InnerText =
                     EnableIngameScripts.ToString().ToLower();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::ViewDistance");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ViewDistance", null));
                 settingsNode.SelectSingleNode("descendant::ViewDistance").InnerText =
                     ViewDistance.ToString();
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::EnableToolShake");
-                if(valueNode == null)
+                if (valueNode == null)
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableToolShake", null));
                 settingsNode.SelectSingleNode("descendant::EnableToolShake").InnerText =
                     EnableToolShake.ToString().ToLower();
 
 
                 valueNode = root.SelectSingleNode("descendant::Mods");
-                if(valueNode == null)
+                if (valueNode == null)
                     root.AppendChild(doc.CreateNode(XmlNodeType.Element, "Mods", null));
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 valueNode.RemoveAll();
-                foreach(ulong item in Mods)
+                foreach (ulong item in Mods)
                 {
                     XmlNode modItem = doc.CreateNode(XmlNodeType.Element, "ModItem", null);
                     XmlNode name = doc.CreateNode(XmlNodeType.Element, "Name", null);
@@ -429,7 +429,7 @@ namespace SESM.Tools.Helpers
                 }
 
                 valueNode = root.SelectSingleNode("descendant::PreviousEnvironmentHostility");
-                if(valueNode == null)
+                if (valueNode == null)
                 {
                     root.AppendChild(doc.CreateNode(XmlNodeType.Element, "PreviousEnvironmentHostility", null));
                 }
@@ -459,223 +459,230 @@ namespace SESM.Tools.Helpers
         /// <returns>true if the load succeded, false if not</returns>
         public bool LoadFromServConf(string path)
         {
-            if(!File.Exists(path))
-                return false;
-            XDocument doc = XDocument.Load(path);
-            XElement root = doc.Element("MyConfigDedicated");
-            if(root == null)
-                return false;
-            XElement sessionSettings = root.Element("SessionSettings");
-            if(sessionSettings == null)
-                return false;
-            if(sessionSettings.Element("GameMode") != null)
-                Enum.TryParse(sessionSettings.Element("GameMode").Value, out GameMode);
-            if(sessionSettings.Element("InventorySizeMultiplier") != null)
-                int.TryParse(sessionSettings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
-            if(sessionSettings.Element("AssemblerSpeedMultiplier") != null)
-                int.TryParse(sessionSettings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
-            if(sessionSettings.Element("AssemblerEfficiencyMultiplier") != null)
-                int.TryParse(sessionSettings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
-            if(sessionSettings.Element("RefinerySpeedMultiplier") != null)
-                int.TryParse(sessionSettings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
-            if(sessionSettings.Element("OnlineMode") != null)
-                Enum.TryParse(sessionSettings.Element("OnlineMode").Value, out OnlineMode);
-            if(sessionSettings.Element("MaxPlayers") != null)
-                int.TryParse(sessionSettings.Element("MaxPlayers").Value, out MaxPlayers);
-            if(sessionSettings.Element("MaxFloatingObjects") != null)
-                int.TryParse(sessionSettings.Element("MaxFloatingObjects").Value, out MaxFloatingObjects);
-            if(sessionSettings.Element("EnvironmentHostility") != null)
-                Enum.TryParse(sessionSettings.Element("EnvironmentHostility").Value, out EnvironmentHostility);
-            if(sessionSettings.Element("AutoHealing") != null)
-                bool.TryParse(sessionSettings.Element("AutoHealing").Value, out AutoHealing);
-            if(sessionSettings.Element("EnableCopyPaste") != null)
-                bool.TryParse(sessionSettings.Element("EnableCopyPaste").Value, out EnableCopyPaste);
-            if(sessionSettings.Element("WeaponsEnabled") != null)
-                bool.TryParse(sessionSettings.Element("WeaponsEnabled").Value, out WeaponsEnabled);
-            if(sessionSettings.Element("ShowPlayerNamesOnHud") != null)
-                bool.TryParse(sessionSettings.Element("ShowPlayerNamesOnHud").Value, out ShowPlayerNamesOnHud);
-            if(sessionSettings.Element("ThrusterDamage") != null)
-                bool.TryParse(sessionSettings.Element("ThrusterDamage").Value, out ThrusterDamage);
-            if(sessionSettings.Element("CargoShipsEnabled") != null)
-                bool.TryParse(sessionSettings.Element("CargoShipsEnabled").Value, out CargoShipsEnabled);
-            if(sessionSettings.Element("EnableSpectator") != null)
-                bool.TryParse(sessionSettings.Element("EnableSpectator").Value, out EnableSpectator);
-            if(sessionSettings.Element("RemoveTrash") != null)
-                bool.TryParse(sessionSettings.Element("RemoveTrash").Value, out RemoveTrash);
-            if(sessionSettings.Element("WorldSizeKm") != null)
-                int.TryParse(sessionSettings.Element("WorldSizeKm").Value, out WorldSizeKm);
-            if(sessionSettings.Element("RespawnShipDelete") != null)
-                bool.TryParse(sessionSettings.Element("RespawnShipDelete").Value, out RespawnShipDelete);
-            if(sessionSettings.Element("ResetOwnership") != null)
-                bool.TryParse(sessionSettings.Element("ResetOwnership").Value, out ResetOwnership);
-            if(sessionSettings.Element("WelderSpeedMultiplier") != null)
-                double.TryParse(sessionSettings.Element("WelderSpeedMultiplier").Value, out WelderSpeedMultiplier);
-            if(sessionSettings.Element("GrinderSpeedMultiplier") != null)
-                double.TryParse(sessionSettings.Element("GrinderSpeedMultiplier").Value, out GrinderSpeedMultiplier);
-            if(sessionSettings.Element("RealisticSound") != null)
-                bool.TryParse(sessionSettings.Element("RealisticSound").Value, out RealisticSound);
-            if(sessionSettings.Element("ClientCanSave") != null)
-                bool.TryParse(sessionSettings.Element("ClientCanSave").Value, out ClientCanSave);
-            if(sessionSettings.Element("HackSpeedMultiplier") != null)
-                double.TryParse(sessionSettings.Element("HackSpeedMultiplier").Value, out HackSpeedMultiplier);
-            if(sessionSettings.Element("PermanentDeath") != null)
-                bool.TryParse(sessionSettings.Element("PermanentDeath").Value, out PermanentDeath);
-            if(sessionSettings.Element("AutoSaveInMinutes") != null)
-                int.TryParse(sessionSettings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
-            if(sessionSettings.Element("SpawnShipTimeMultiplier") != null)
-                int.TryParse(sessionSettings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
-            if(sessionSettings.Element("DestructibleBlocks") != null)
-                bool.TryParse(sessionSettings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
-            if(sessionSettings.Element("EnableIngameScripts") != null)
-                bool.TryParse(sessionSettings.Element("EnableIngameScripts").Value, out EnableIngameScripts);
-            if(sessionSettings.Element("ViewDistance") != null)
-                int.TryParse(sessionSettings.Element("ViewDistance").Value, out ViewDistance);
-            if(sessionSettings.Element("EnableToolShake") != null)
-                bool.TryParse(sessionSettings.Element("EnableToolShake").Value, out EnableToolShake);
-
-            if(sessionSettings.Element("ProceduralDensity") != null)
-                float.TryParse(sessionSettings.Element("ProceduralDensity").Value, out ProceduralDensity);
-            if(sessionSettings.Element("ProceduralSeed") != null)
+            try
             {
-                if(sessionSettings.Element("ProceduralSeed").Value.Contains("."))
-                    int.TryParse(sessionSettings.Element("ProceduralSeed").Value.Split('.')[0], out ProceduralSeed);
-                else
-                    int.TryParse(sessionSettings.Element("ProceduralSeed").Value, out ProceduralSeed);
+                if (!File.Exists(path))
+                    return false;
+                XDocument doc = XDocument.Load(path);
+                XElement root = doc.Element("MyConfigDedicated");
+                if (root == null)
+                    return false;
+                XElement sessionSettings = root.Element("SessionSettings");
+                if (sessionSettings == null)
+                    return false;
+                if (sessionSettings.Element("GameMode") != null)
+                    Enum.TryParse(sessionSettings.Element("GameMode").Value, out GameMode);
+                if (sessionSettings.Element("InventorySizeMultiplier") != null)
+                    int.TryParse(sessionSettings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
+                if (sessionSettings.Element("AssemblerSpeedMultiplier") != null)
+                    int.TryParse(sessionSettings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
+                if (sessionSettings.Element("AssemblerEfficiencyMultiplier") != null)
+                    int.TryParse(sessionSettings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
+                if (sessionSettings.Element("RefinerySpeedMultiplier") != null)
+                    int.TryParse(sessionSettings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
+                if (sessionSettings.Element("OnlineMode") != null)
+                    Enum.TryParse(sessionSettings.Element("OnlineMode").Value, out OnlineMode);
+                if (sessionSettings.Element("MaxPlayers") != null)
+                    int.TryParse(sessionSettings.Element("MaxPlayers").Value, out MaxPlayers);
+                if (sessionSettings.Element("MaxFloatingObjects") != null)
+                    int.TryParse(sessionSettings.Element("MaxFloatingObjects").Value, out MaxFloatingObjects);
+                if (sessionSettings.Element("EnvironmentHostility") != null)
+                    Enum.TryParse(sessionSettings.Element("EnvironmentHostility").Value, out EnvironmentHostility);
+                if (sessionSettings.Element("AutoHealing") != null)
+                    bool.TryParse(sessionSettings.Element("AutoHealing").Value, out AutoHealing);
+                if (sessionSettings.Element("EnableCopyPaste") != null)
+                    bool.TryParse(sessionSettings.Element("EnableCopyPaste").Value, out EnableCopyPaste);
+                if (sessionSettings.Element("WeaponsEnabled") != null)
+                    bool.TryParse(sessionSettings.Element("WeaponsEnabled").Value, out WeaponsEnabled);
+                if (sessionSettings.Element("ShowPlayerNamesOnHud") != null)
+                    bool.TryParse(sessionSettings.Element("ShowPlayerNamesOnHud").Value, out ShowPlayerNamesOnHud);
+                if (sessionSettings.Element("ThrusterDamage") != null)
+                    bool.TryParse(sessionSettings.Element("ThrusterDamage").Value, out ThrusterDamage);
+                if (sessionSettings.Element("CargoShipsEnabled") != null)
+                    bool.TryParse(sessionSettings.Element("CargoShipsEnabled").Value, out CargoShipsEnabled);
+                if (sessionSettings.Element("EnableSpectator") != null)
+                    bool.TryParse(sessionSettings.Element("EnableSpectator").Value, out EnableSpectator);
+                if (sessionSettings.Element("RemoveTrash") != null)
+                    bool.TryParse(sessionSettings.Element("RemoveTrash").Value, out RemoveTrash);
+                if (sessionSettings.Element("WorldSizeKm") != null)
+                    int.TryParse(sessionSettings.Element("WorldSizeKm").Value, out WorldSizeKm);
+                if (sessionSettings.Element("RespawnShipDelete") != null)
+                    bool.TryParse(sessionSettings.Element("RespawnShipDelete").Value, out RespawnShipDelete);
+                if (sessionSettings.Element("ResetOwnership") != null)
+                    bool.TryParse(sessionSettings.Element("ResetOwnership").Value, out ResetOwnership);
+                if (sessionSettings.Element("WelderSpeedMultiplier") != null)
+                    double.TryParse(sessionSettings.Element("WelderSpeedMultiplier").Value, out WelderSpeedMultiplier);
+                if (sessionSettings.Element("GrinderSpeedMultiplier") != null)
+                    double.TryParse(sessionSettings.Element("GrinderSpeedMultiplier").Value, out GrinderSpeedMultiplier);
+                if (sessionSettings.Element("RealisticSound") != null)
+                    bool.TryParse(sessionSettings.Element("RealisticSound").Value, out RealisticSound);
+                if (sessionSettings.Element("ClientCanSave") != null)
+                    bool.TryParse(sessionSettings.Element("ClientCanSave").Value, out ClientCanSave);
+                if (sessionSettings.Element("HackSpeedMultiplier") != null)
+                    double.TryParse(sessionSettings.Element("HackSpeedMultiplier").Value, out HackSpeedMultiplier);
+                if (sessionSettings.Element("PermanentDeath") != null)
+                    bool.TryParse(sessionSettings.Element("PermanentDeath").Value, out PermanentDeath);
+                if (sessionSettings.Element("AutoSaveInMinutes") != null)
+                    int.TryParse(sessionSettings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
+                if (sessionSettings.Element("SpawnShipTimeMultiplier") != null)
+                    int.TryParse(sessionSettings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
+                if (sessionSettings.Element("DestructibleBlocks") != null)
+                    bool.TryParse(sessionSettings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
+                if (sessionSettings.Element("EnableIngameScripts") != null)
+                    bool.TryParse(sessionSettings.Element("EnableIngameScripts").Value, out EnableIngameScripts);
+                if (sessionSettings.Element("ViewDistance") != null)
+                    int.TryParse(sessionSettings.Element("ViewDistance").Value, out ViewDistance);
+                if (sessionSettings.Element("EnableToolShake") != null)
+                    bool.TryParse(sessionSettings.Element("EnableToolShake").Value, out EnableToolShake);
 
+                if (sessionSettings.Element("ProceduralDensity") != null)
+                    float.TryParse(sessionSettings.Element("ProceduralDensity").Value, out ProceduralDensity);
+                if (sessionSettings.Element("ProceduralSeed") != null)
+                {
+                    if (sessionSettings.Element("ProceduralSeed").Value.Contains("."))
+                        int.TryParse(sessionSettings.Element("ProceduralSeed").Value.Split('.')[0], out ProceduralSeed);
+                    else
+                        int.TryParse(sessionSettings.Element("ProceduralSeed").Value, out ProceduralSeed);
+
+                }
+                if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
+                    Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
+                if (root.Element("LoadWorld") != null)
+                    SaveName = PathHelper.GetLastLeaf(root.Element("LoadWorld").Value);
+                if (root.Element("IP") != null)
+                    IP = root.Element("IP").Value;
+                if (root.Element("SteamPort") != null)
+                    int.TryParse(root.Element("SteamPort").Value, out SteamPort);
+                if (root.Element("ServerPort") != null)
+                    int.TryParse(root.Element("ServerPort").Value, out ServerPort);
+                if (root.Element("AsteroidAmount") != null)
+                    int.TryParse(root.Element("AsteroidAmount").Value, out AsteroidAmount);
+
+                Administrators = new List<ulong>();
+                if (root.Element("Administrators") != null)
+                    foreach (XElement item in root.Element("Administrators").Elements("unsignedLong"))
+                    {
+                        ulong val = 0;
+                        ulong.TryParse(item.Value, out val);
+                        Administrators.Add(val);
+                    }
+                Banned = new List<ulong>();
+                if (root.Element("Banned") != null)
+                    foreach (XElement item in root.Element("Banned").Elements("unsignedLong"))
+                    {
+                        ulong val = 0;
+                        ulong.TryParse(item.Value, out val);
+                        Banned.Add(val);
+                    }
+                Mods = new List<ulong>();
+                if (root.Element("Mods") != null)
+                    foreach (XElement item in root.Element("Mods").Elements("unsignedLong"))
+                    {
+                        ulong val = 0;
+                        ulong.TryParse(item.Value, out val);
+                        Mods.Add(val);
+                    }
+
+                if (root.Element("GroupID") != null)
+                    ulong.TryParse(root.Element("GroupID").Value, out GroupID);
+                if (root.Element("ServerName") != null)
+                    ServerName = root.Element("ServerName").Value;
+                if (root.Element("WorldName") != null)
+                    WorldName = root.Element("WorldName").Value;
+                if (root.Element("PauseGameWhenEmpty") != null)
+                    bool.TryParse(root.Element("PauseGameWhenEmpty").Value, out PauseGameWhenEmpty);
+                if (root.Element("IgnoreLastSession") != null)
+                    bool.TryParse(root.Element("IgnoreLastSession").Value, out IgnoreLastSession);
+
+
+                return true;
             }
-            if(root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
-                Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
-            if(root.Element("LoadWorld") != null)
-                SaveName = PathHelper.GetLastLeaf(root.Element("LoadWorld").Value);
-            if(root.Element("IP") != null)
-                IP = root.Element("IP").Value;
-            if(root.Element("SteamPort") != null)
-                int.TryParse(root.Element("SteamPort").Value, out SteamPort);
-            if(root.Element("ServerPort") != null)
-                int.TryParse(root.Element("ServerPort").Value, out ServerPort);
-            if(root.Element("AsteroidAmount") != null)
-                int.TryParse(root.Element("AsteroidAmount").Value, out AsteroidAmount);
-
-            Administrators = new List<ulong>();
-            if(root.Element("Administrators") != null)
-                foreach(XElement item in root.Element("Administrators").Elements("unsignedLong"))
-                {
-                    ulong val = 0;
-                    ulong.TryParse(item.Value, out val);
-                    Administrators.Add(val);
-                }
-            Banned = new List<ulong>();
-            if(root.Element("Banned") != null)
-                foreach(XElement item in root.Element("Banned").Elements("unsignedLong"))
-                {
-                    ulong val = 0;
-                    ulong.TryParse(item.Value, out val);
-                    Banned.Add(val);
-                }
-            Mods = new List<ulong>();
-            if(root.Element("Mods") != null)
-                foreach(XElement item in root.Element("Mods").Elements("unsignedLong"))
-                {
-                    ulong val = 0;
-                    ulong.TryParse(item.Value, out val);
-                    Mods.Add(val);
-                }
-
-            if(root.Element("GroupID") != null)
-                ulong.TryParse(root.Element("GroupID").Value, out GroupID);
-            if(root.Element("ServerName") != null)
-                ServerName = root.Element("ServerName").Value;
-            if(root.Element("WorldName") != null)
-                WorldName = root.Element("WorldName").Value;
-            if(root.Element("PauseGameWhenEmpty") != null)
-                bool.TryParse(root.Element("PauseGameWhenEmpty").Value, out PauseGameWhenEmpty);
-            if(root.Element("IgnoreLastSession") != null)
-                bool.TryParse(root.Element("IgnoreLastSession").Value, out IgnoreLastSession);
-
-
-            return true;
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public bool LoadFromSave(string path)
         {
-            if(!File.Exists(path))
+            if (!File.Exists(path))
                 return false;
             XDocument doc = XDocument.Load(path);
             XElement root = doc.Element("MyObjectBuilder_Checkpoint");
             XElement settings = root?.Element("Settings");
-            if(settings == null)
+            if (settings == null)
                 return false;
-            if(settings.Element("GameMode") != null)
+            if (settings.Element("GameMode") != null)
                 Enum.TryParse(settings.Element("GameMode").Value, out GameMode);
-            if(settings.Element("InventorySizeMultiplier") != null)
+            if (settings.Element("InventorySizeMultiplier") != null)
                 int.TryParse(settings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
-            if(settings.Element("AssemblerSpeedMultiplier") != null)
+            if (settings.Element("AssemblerSpeedMultiplier") != null)
                 int.TryParse(settings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
-            if(settings.Element("AssemblerEfficiencyMultiplier") != null)
+            if (settings.Element("AssemblerEfficiencyMultiplier") != null)
                 int.TryParse(settings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
-            if(settings.Element("RefinerySpeedMultiplier") != null)
+            if (settings.Element("RefinerySpeedMultiplier") != null)
                 int.TryParse(settings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
-            if(settings.Element("OnlineMode") != null)
+            if (settings.Element("OnlineMode") != null)
                 Enum.TryParse(settings.Element("OnlineMode").Value, out OnlineMode);
-            if(settings.Element("MaxPlayers") != null)
+            if (settings.Element("MaxPlayers") != null)
                 int.TryParse(settings.Element("MaxPlayers").Value, out MaxPlayers);
-            if(settings.Element("MaxFloatingObjects") != null)
+            if (settings.Element("MaxFloatingObjects") != null)
                 int.TryParse(settings.Element("MaxFloatingObjects").Value, out MaxFloatingObjects);
-            if(settings.Element("EnvironmentHostility") != null)
+            if (settings.Element("EnvironmentHostility") != null)
                 Enum.TryParse(settings.Element("EnvironmentHostility").Value, out EnvironmentHostility);
-            if(settings.Element("AutoHealing") != null)
+            if (settings.Element("AutoHealing") != null)
                 bool.TryParse(settings.Element("AutoHealing").Value, out AutoHealing);
-            if(settings.Element("EnableCopyPaste") != null)
+            if (settings.Element("EnableCopyPaste") != null)
                 bool.TryParse(settings.Element("EnableCopyPaste").Value, out EnableCopyPaste);
-            if(settings.Element("WeaponsEnabled") != null)
+            if (settings.Element("WeaponsEnabled") != null)
                 bool.TryParse(settings.Element("WeaponsEnabled").Value, out WeaponsEnabled);
-            if(settings.Element("ShowPlayerNamesOnHud") != null)
+            if (settings.Element("ShowPlayerNamesOnHud") != null)
                 bool.TryParse(settings.Element("ShowPlayerNamesOnHud").Value, out ShowPlayerNamesOnHud);
-            if(settings.Element("ThrusterDamage") != null)
+            if (settings.Element("ThrusterDamage") != null)
                 bool.TryParse(settings.Element("ThrusterDamage").Value, out ThrusterDamage);
-            if(settings.Element("CargoShipsEnabled") != null)
+            if (settings.Element("CargoShipsEnabled") != null)
                 bool.TryParse(settings.Element("CargoShipsEnabled").Value, out CargoShipsEnabled);
-            if(settings.Element("EnableSpectator") != null)
+            if (settings.Element("EnableSpectator") != null)
                 bool.TryParse(settings.Element("EnableSpectator").Value, out EnableSpectator);
-            if(settings.Element("RemoveTrash") != null)
+            if (settings.Element("RemoveTrash") != null)
                 bool.TryParse(settings.Element("RemoveTrash").Value, out RemoveTrash);
-            if(settings.Element("WorldSizeKm") != null)
+            if (settings.Element("WorldSizeKm") != null)
                 int.TryParse(settings.Element("WorldSizeKm").Value, out WorldSizeKm);
-            if(settings.Element("RespawnShipDelete") != null)
+            if (settings.Element("RespawnShipDelete") != null)
                 bool.TryParse(settings.Element("RespawnShipDelete").Value, out RespawnShipDelete);
-            if(settings.Element("ResetOwnership") != null)
+            if (settings.Element("ResetOwnership") != null)
                 bool.TryParse(settings.Element("ResetOwnership").Value, out ResetOwnership);
-            if(settings.Element("WelderSpeedMultiplier") != null)
+            if (settings.Element("WelderSpeedMultiplier") != null)
                 double.TryParse(settings.Element("WelderSpeedMultiplier").Value, out WelderSpeedMultiplier);
-            if(settings.Element("GrinderSpeedMultiplier") != null)
+            if (settings.Element("GrinderSpeedMultiplier") != null)
                 double.TryParse(settings.Element("GrinderSpeedMultiplier").Value, out GrinderSpeedMultiplier);
-            if(settings.Element("RealisticSound") != null)
+            if (settings.Element("RealisticSound") != null)
                 bool.TryParse(settings.Element("RealisticSound").Value, out RealisticSound);
-            if(settings.Element("ClientCanSave") != null)
+            if (settings.Element("ClientCanSave") != null)
                 bool.TryParse(settings.Element("ClientCanSave").Value, out ClientCanSave);
-            if(settings.Element("HackSpeedMultiplier") != null)
+            if (settings.Element("HackSpeedMultiplier") != null)
                 double.TryParse(settings.Element("HackSpeedMultiplier").Value, out HackSpeedMultiplier);
-            if(settings.Element("PermanentDeath") != null)
+            if (settings.Element("PermanentDeath") != null)
                 bool.TryParse(settings.Element("PermanentDeath").Value, out PermanentDeath);
-            if(settings.Element("AutoSaveInMinutes") != null)
+            if (settings.Element("AutoSaveInMinutes") != null)
                 int.TryParse(settings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
-            if(settings.Element("SpawnShipTimeMultiplier") != null)
+            if (settings.Element("SpawnShipTimeMultiplier") != null)
                 int.TryParse(settings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
-            if(settings.Element("DestructibleBlocks") != null)
+            if (settings.Element("DestructibleBlocks") != null)
                 bool.TryParse(settings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
-            if(settings.Element("EnableIngameScripts") != null)
+            if (settings.Element("EnableIngameScripts") != null)
                 bool.TryParse(settings.Element("EnableIngameScripts").Value, out EnableIngameScripts);
-            if(settings.Element("ViewDistance") != null)
+            if (settings.Element("ViewDistance") != null)
                 int.TryParse(settings.Element("ViewDistance").Value, out ViewDistance);
-            if(settings.Element("EnableToolShake") != null)
+            if (settings.Element("EnableToolShake") != null)
                 bool.TryParse(settings.Element("EnableToolShake").Value, out EnableToolShake);
 
             Mods = new List<ulong>();
-            if(root.Element("Mods") != null)
+            if (root.Element("Mods") != null)
             {
-                foreach(XElement item in root.Element("Mods").Elements("ModItem"))
+                foreach (XElement item in root.Element("Mods").Elements("ModItem"))
                 {
-                    if(item.Element("Name") != null
+                    if (item.Element("Name") != null
                         && item.Element("PublishedFileId") != null
                         && item.Element("PublishedFileId").Value ==
                         item.Element("Name").Value.Substring(0, item.Element("Name").Value.Length - 4))

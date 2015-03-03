@@ -1,0 +1,54 @@
+﻿@{
+    ViewBag.Title = "Server Configuration";
+
+    List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
+    breadCrumb.Add(new KeyValuePair<string, string>("Server", "/Server/"));
+    breadCrumb.Add(new KeyValuePair<string, string>(ViewBag.Server.Name, "/Servers/Dashboard/" + ViewBag.ServerID));
+    breadCrumb.Add(new KeyValuePair<string, string>("Server Configuration", "/Explorer/Browse/" + ViewBag.ServerID));
+    ViewBag.Breadcrumb = breadCrumb;
+
+    ViewBag.RefreshBtn = true;
+}
+
+<div class="col-md-4 col-sm-12">
+    <div class="portlet light">
+        <div class="portlet-body">
+            <div class="tabbable-line nav-justified">
+                <ul class="nav nav-tabs nav-justified">
+                    <li class="active">
+                        <a href="#tab_Network" data-toggle="tab">
+                            Network
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tab_Production" data-toggle="tab">
+                            Production
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tab_Construction" data-toggle="tab">
+                            Construction
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_Network">
+                        <p>
+                            Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat.
+                        </p>
+                    </div>
+                    <div class="tab-pane" id="tab_Production">
+                        <p>
+                            Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat. Ut wisi enim ad minim veniam, quis nostrud exerci tation.
+                        </p>
+                    </div>
+                    <div class="tab-pane" id="tab_Construction">
+                        <p>
+                            Howdy, I'm in Section 3.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

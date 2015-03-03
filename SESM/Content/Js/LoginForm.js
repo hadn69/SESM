@@ -82,7 +82,7 @@
                                 $('#LoginError').show();
                                 return;
                             }
-                            window.location.href = "/Server";
+                            window.location.href = "/Servers";
                         });
                 });
         }

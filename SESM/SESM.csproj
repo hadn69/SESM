@@ -3797,6 +3797,7 @@
     <Content Include="Views\Settings\SESE.cshtml" />
     <Content Include="Views\Error\404.cshtml" />
     <Content Include="Views\Explorer\Browse.cshtml" />
+    <Content Include="Views\Server\Configuration.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
