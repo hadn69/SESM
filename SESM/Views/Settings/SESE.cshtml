@@ -20,7 +20,7 @@
 <div class="col-md-12" style="display:none;" id="state-SESE">
     <div class="portlet light">
         <div class="portlet-body text-center">
-            <h4>SESE is actualy installed on <span id="nbSESE"></span> server(s)</h4>
+            <h4>SESE is actualy used on <span id="nbSESE"></span> server(s)</h4>
             <h4 id="isRunning">An SESE Upate is running</h4>
         </div>
     </div>
@@ -150,7 +150,7 @@
                 <div class="form-actions">
                     <div class="row">
                         <div class="col-md-offset-4 col-md-8">
-                            <button type="button" class="btn blue" id="btnUpdateSESE">Save Settings</button>
+                            <button type="button" class="btn blue" id="btnUpdateSettings">Save Settings</button>
                         </div>
                     </div>
                 </div>
@@ -272,15 +272,64 @@
                 $("#SettingsPanel").show(animationDelay);
             }
         }
+        function TestCron() {
+            $("#CronDetails").hide(animationDelay);
+            $.post("/API/Misc/IsCronValid",
+                {
+                    Cron: $("#inpAutoUpdateCron").val()
+                },
+                function (data, status) {
+                    isCronValid = false;
+
+                    var root = $($.parseXML(data)).find("Response");
+
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        $("form").valid();
+                        return;
+                    }
+
+                    isCronValid = root.children("Content").text() == "True";
+                    $("form").valid();
+                    if (isCronValid) {
+                        $.post("/API/Misc/GetNextCronDates",
+                            {
+                                Cron: $("#inpAutoUpdateCron").val()
+                            },
+                            function (data, status) {
+
+                                var root = $($.parseXML(data)).find("Response");
+
+                                if (root.children("Type").text() == "Error") {
+                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                    return;
+                                }
+
+                                $("#CronDetails").find("ul").empty();
+
+                                root.children("Content").children().each(function (index, value) {
+                                    var date = new Date($(this).text());
+                                    $("#CronDetails").find("ul").append("<li class=\"list-group-item\">" + date.toLocaleString() + "</li>");
+                                });
+
+                                $("#CronDetails").show(animationDelay);
+                            });
+                    }
+                });
+        }
         function refresh() {
             $("#loading-SESE").show(animationDelay);
             $("#state-SESE").hide(animationDelay);
             $("#VersionPanel").hide(animationDelay);
             $("#SettingsPanel").hide(animationDelay);
 
+            statusLoaded = false;
+            versionLoaded = false;
+            settingsLoaded = false;
+
             $.get("/API/Settings/GetSESEStatus",
                 {},
-                function (data, status) {
+                function (data) {
                     statusLoaded = true;
 
                     var root = $($.parseXML(data)).find("Response");
@@ -304,7 +353,7 @@
 
             $.get("/API/Settings/GetSESEVersion",
                 {},
-                function (data, status) {
+                function (data) {
                     versionLoaded = true;
 
                     var root = $($.parseXML(data)).find("Response");
@@ -357,7 +406,7 @@
 
             $.get("/API/Settings/GetSESESettings",
                 {},
-                function (data, status) {
+                function (data) {
                     settingsLoaded = true;
 
                     var root = $($.parseXML(data)).find("Response");
@@ -384,60 +433,15 @@
             refresh();
         });
 
-        function TestCron() {
-            $("#CronDetails").hide(animationDelay);
-            $.post("/API/Misc/IsCronValid",
-                {
-                    Cron: $("#inpAutoUpdateCron").val()
-                },
-                function (data, status) {
-                    isCronValid = false;
-
-                    var root = $($.parseXML(data)).find("Response");
-
-                    if (root.children("Type").text() == "Error") {
-                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                        $("form").valid();
-                        return;
-                    }
-
-                    isCronValid = root.children("Content").text() == "True";
-                    $("form").valid();
-                    if (isCronValid) {
-                        $.post("/API/Misc/GetNextCronDates",
-                            {
-                                Cron: $("#inpAutoUpdateCron").val()
-                            },
-                            function (data, status) {
-
-                                var root = $($.parseXML(data)).find("Response");
-
-                                if (root.children("Type").text() == "Error") {
-                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                    return;
-                                }
-
-                                $("#CronDetails").find("ul").empty();
-
-                                root.children("Content").children().each(function (index, value) {
-                                    var date = new Date($(this).text());
-                                    $("#CronDetails").find("ul").append("<li class=\"list-group-item\">" + date.toLocaleString() + "</li>");
-                                });
-
-                                $("#CronDetails").show(animationDelay);
-                            });
-                    }
-                });
-        }
+        
 
         $("#inpAutoUpdateCron").focusout(function () {
             TestCron();
         });
 
-        $("#btnUpdateSESE").click(function () {
-            var aaa = $("form").valid();
+        $("#btnUpdateSettings").click(function () {
             if ($("form").valid()) {
-                $("#btnUpdate").prop('disabled', true);
+                $("#btnUpdateSettings").prop('disabled', true);
                 $.post("/API/Settings/SetSESESettings",
                 {
                     GithubURL: $("#inpGithubURL").val(),
@@ -445,22 +449,111 @@
                     AutoUpdateEnabled: $("#inpAutoUpdateEnabled").is(':checked'),
                     AutoUpdateCron: $("#inpAutoUpdateCron").val()
                 },
-                    function (data, status) {
+                function (data) {
+                    $("#btnUpdateSettings").prop('disabled', false);
+
+                    var root = $($.parseXML(data)).find("Response");
+
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        showViewSESE();
+                        return;
+                    }
+
+                    toastr.success(root.children("Content").text(), "Settings Updated");
+                });
+
+            }
+        });
+
+        $("#btnUpdate").click(function () {
+            bootbox.confirm("Are you sure you want to try to update SESE ?<br/> " +
+            "Note : If an update is found, all server using SESE will be restarted.",
+            function (result) {
+                if (result) {
+                    toastr.warning("This process can take up to several minutes", "SESE Update Started");
+                    $("#btnUpdate").prop('disabled', true);
+                    $("#btnForceUpdate").prop('disabled', true);
+                    $("#btnDelete").prop('disabled', true);
+                    $.post("/API/Settings/UpdateSESE",
+                    {
+                        Force: "false"
+                    },
+                    function (data) {
                         $("#btnUpdate").prop('disabled', false);
+                        $("#btnForceUpdate").prop('disabled', false);
+                        $("#btnDelete").prop('disabled', false);
 
                         var root = $($.parseXML(data)).find("Response");
 
                         if (root.children("Type").text() == "Error") {
                             toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                            showViewSESE();
                             return;
                         }
-
-                        toastr.success(root.children("Content").text(), "Settings Updated");
+                        refresh();
+                        toastr.success(root.children("Content").text(), "SESE Update");
                     });
-
-            }
+                }
+            });
         });
 
+        $("#btnForceUpdate").click(function () {
+            bootbox.confirm("Are you sure you want to force an SESE update?<br/> " +
+            "Note : All server using SESE WILL be restarted.",
+            function (result) {
+                if (result) {
+                    toastr.warning("This process can take up to several minutes", "SESE Force Update Started");
+                    $("#btnUpdate").prop('disabled', true);
+                    $("#btnForceUpdate").prop('disabled', true);
+                    $("#btnDelete").prop('disabled', true);
+                    $.post("/API/Settings/UpdateSESE",
+                    {
+                        Force: "true"
+                    },
+                    function (data) {
+                        $("#btnUpdate").prop('disabled', false);
+                        $("#btnForceUpdate").prop('disabled', false);
+                        $("#btnDelete").prop('disabled', false);
+
+                        var root = $($.parseXML(data)).find("Response");
+
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+                        refresh();
+                        toastr.success(root.children("Content").text(), "SESE Force Update");
+                    });
+                }
+            });
+        });
+
+        $("#btnDelete").click(function () {
+            bootbox.confirm("Are you sure you want to delete the SESE binary file ?<br/> " +
+            "Note : All server using SESE WILL be stopped.",
+            function (result) {
+                if (result) {
+                    toastr.warning("This process can take up to several minutes", "SESE Deletion Started");
+                    $("#btnUpdate").prop('disabled', true);
+                    $("#btnForceUpdate").prop('disabled', true);
+                    $("#btnDelete").prop('disabled', true);
+                    $.get("/API/Settings/DeleteSESE",
+                    function (data) {
+                        $("#btnUpdate").prop('disabled', false);
+                        $("#btnForceUpdate").prop('disabled', false);
+                        $("#btnDelete").prop('disabled', false);
+
+                        var root = $($.parseXML(data)).find("Response");
+
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+                        refresh();
+                        toastr.success(root.children("Content").text(), "SESE Deletion");
+                    });
+                }
+            });
+        });
     }
 </script>

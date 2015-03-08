@@ -3401,6 +3401,7 @@
     <Content Include="Content\Js\QuickActions.js" />
     <Content Include="Content\Js\RNG.js" />
     <Content Include="Content\Js\sha1-min.js" />
+    <Content Include="Content\Js\TouchSpinMod.js" />
     <Content Include="Content\logo-small.png" />
     <Content Include="Content\logo.png" />
     <Content Include="Content\sesmLogo.png" />

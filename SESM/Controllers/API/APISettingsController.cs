@@ -212,10 +212,13 @@ namespace SESM.Controllers.API
             EntityUser user = Session["User"] as EntityUser;
 
             // ** PARSING **
-            bool force = Request.Form["Force"] == "True";
+            bool force = false;
+            if (string.IsNullOrWhiteSpace(Request.Form["Force"]))
+                if(bool.TryParse(Request.Form["Force"], out force))
+                    return Content(XMLMessage.Error("SET-UPDSESE-NOACCESS", "The value provided in the Force field is not valid").ToString());
 
             // ** ACCESS **
-            if(user == null || !user.IsAdmin)
+            if (user == null || !user.IsAdmin)
                 return Content(XMLMessage.Error("SET-UPDSESE-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **

@@ -18,17 +18,31 @@ namespace SESM.DAL
             _context = context;
         }
 
-        public bool CheckPortAvailability(int port)
+
+        // Port Check
+
+        /// <summary>
+        /// Check if a server port is in use by another server
+        /// </summary>
+        /// <param name="port"></param>
+        /// <returns></returns>
+        public bool IsPortAvailable(int port, EntityServer server)
         {
             try
             {
-                if(_context.Servers.First(server => server.Port == port || server.ServerExtenderPort == port) != null)
-                    return false;
-                return true;
+                EntityServer testServ = _context.Servers.First(serv => server.Port == port || server.ServerExtenderPort == port);
+                if (testServ == null)
+                    return true;
+
+                if (testServ.Id == server.Id)
+                    return true;
+                return false;
+
+
             }
             catch(Exception)
             {
-                return true;
+                return false;
             }
         }
 
@@ -82,30 +96,6 @@ namespace SESM.DAL
             foreach(string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Users.Contains(usrPrv.GetUser(item))))
             {
                 server.Users.Add(usrPrv.GetUser(item));
-            }
-        }
-
-        public EntityServer GetServerByPort(int port)
-        {
-            try
-            {
-                return _context.Servers.First(s => s.Port == port);
-            }
-            catch(Exception)
-            {
-                return null;
-            }
-        }
-
-        public EntityServer GetServerBySESEPort(int port)
-        {
-            try
-            {
-                return _context.Servers.First(s => s.ServerExtenderPort == port);
-            }
-            catch(Exception)
-            {
-                return null;
             }
         }
 
@@ -230,9 +220,10 @@ namespace SESM.DAL
 
         public bool IsManagerOrAbore(AccessLevel accessLevel)
         {
-            return accessLevel == AccessLevel.SuperAdmin || 
+            bool ret = accessLevel == AccessLevel.SuperAdmin ||
                     accessLevel == AccessLevel.Admin ||
                     accessLevel == AccessLevel.Manager;
+            return ret;
         }
 
         public bool IsAdminOrAbore(AccessLevel accessLevel)

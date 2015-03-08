@@ -75,7 +75,7 @@
                             Login: $("#LoginUsername").val(),
                             password: password.toString()
                         },
-                        function (data, status) {
+                        function (data) {
                             var root = $($.parseXML(data)).find("Response");
                             if (root.children("Type").text() == "Error") {
                                 $("#LoginErrorText").html(root.children("Content").text());

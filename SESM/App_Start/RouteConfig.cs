@@ -52,6 +52,7 @@ namespace SESM
                              "CreateServer|" +
                              "DeleteServers|" +
                              "GetConfiguration|" +
+                             "GetConfigurationRights|" +
                              "SetConfiguration|" +
                              "StartServers|" +
                              "StopServers|" +
