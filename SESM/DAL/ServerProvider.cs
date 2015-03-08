@@ -40,9 +40,9 @@ namespace SESM.DAL
 
 
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                return false;
+                return true;
             }
         }
 

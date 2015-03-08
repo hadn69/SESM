@@ -413,13 +413,13 @@ namespace SESM.Controllers.API
                 // ==== SteamPort ====
                 if (string.IsNullOrWhiteSpace(Request.Form["SteamPort"]))
                     return Content(XMLMessage.Error("SRV-SC-MISSTMPRT", "The SteamPort field must be provided").ToString());
-                if (!int.TryParse(Request.Form["SteamPort"], out serverConfig.SteamPort) || serverConfig.SteamPort >= 1 || serverConfig.SteamPort <= 65535)
+                if (!int.TryParse(Request.Form["SteamPort"], out serverConfig.SteamPort) || serverConfig.SteamPort < 1 || serverConfig.SteamPort > 65535)
                     return Content(XMLMessage.Error("SRV-SC-BADSTMPRT", "The SteamPort field is invalid").ToString());
 
                 // ==== ServerPort ====
                 if (string.IsNullOrWhiteSpace(Request.Form["ServerPort"]))
                     return Content(XMLMessage.Error("SRV-SC-MISSRVPRT", "The ServerPort field must be provided").ToString());
-                if (!int.TryParse(Request.Form["ServerPort"], out serverConfig.ServerPort) || serverConfig.ServerPort >= 1 || serverConfig.ServerPort <= 65535)
+                if (!int.TryParse(Request.Form["ServerPort"], out serverConfig.ServerPort) || serverConfig.ServerPort < 1 || serverConfig.ServerPort > 65535)
                     return Content(XMLMessage.Error("SRV-SC-BADSRVPRT", "The ServerPort field is invalid").ToString());
                 if (!srvPrv.IsPortAvailable(serverConfig.ServerPort, server))
                     return Content(XMLMessage.Error("SRV-SC-EXSRVPRT", "The ServerPort is already in use").ToString());
@@ -427,13 +427,13 @@ namespace SESM.Controllers.API
                 // ==== MaxPlayers ====
                 if (string.IsNullOrWhiteSpace(Request.Form["MaxPlayers"]))
                     return Content(XMLMessage.Error("SRV-SC-MISMAXPL", "The MaxPlayers field must be provided").ToString());
-                if (!int.TryParse(Request.Form["MaxPlayers"], out serverConfig.MaxPlayers) || serverConfig.MaxPlayers >= 1)
+                if (!int.TryParse(Request.Form["MaxPlayers"], out serverConfig.MaxPlayers) || serverConfig.MaxPlayers < 1)
                     return Content(XMLMessage.Error("SRV-SC-BADMAXPL", "The MaxPlayers field is invalid").ToString());
 
                 // ==== MaxFloatingObjects ====
                 if (string.IsNullOrWhiteSpace(Request.Form["MaxFloatingObjects"]))
                     return Content(XMLMessage.Error("SRV-SC-MISMAXFO", "The MaxFloatingObjects field must be provided").ToString());
-                if (!int.TryParse(Request.Form["MaxFloatingObjects"], out serverConfig.MaxFloatingObjects) || serverConfig.MaxFloatingObjects >= 1)
+                if (!int.TryParse(Request.Form["MaxFloatingObjects"], out serverConfig.MaxFloatingObjects) || serverConfig.MaxFloatingObjects < 1)
                     return Content(XMLMessage.Error("SRV-SC-BADMAXFO", "The MaxFloatingObjects field is invalid").ToString());
 
                 // ==== RemoveTrash ====
@@ -444,9 +444,8 @@ namespace SESM.Controllers.API
             }
 
             // ==== ServerName ====
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerName"]))
-                return Content(XMLMessage.Error("SRV-SC-MISSN", "The ServerName field must be provided").ToString());
-            serverConfig.ServerName = Request.Form["ServerName"];
+            if (!string.IsNullOrWhiteSpace(Request.Form["ServerName"]))
+                serverConfig.ServerName = Request.Form["ServerName"];
 
             // ==== IgnoreLastSession ====
             if (string.IsNullOrWhiteSpace(Request.Form["IgnoreLastSession"]))
@@ -475,31 +474,31 @@ namespace SESM.Controllers.API
             // ==== AutoSaveInMinutes ====
             if (string.IsNullOrWhiteSpace(Request.Form["AutoSaveInMinutes"]))
                 return Content(XMLMessage.Error("SRV-SC-MISASIM", "The AutoSaveInMinutes field must be provided").ToString());
-            if (!int.TryParse(Request.Form["AutoSaveInMinutes"], out serverConfig.AutoSaveInMinutes) || serverConfig.AutoSaveInMinutes >= 0)
+            if (!int.TryParse(Request.Form["AutoSaveInMinutes"], out serverConfig.AutoSaveInMinutes) || serverConfig.AutoSaveInMinutes < 0)
                 return Content(XMLMessage.Error("SRV-SC-BADASIM", "The AutoSaveInMinutes field is invalid").ToString());
 
             // ==== InventorySizeMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["InventorySizeMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISISM", "The InventorySizeMultiplier field must be provided").ToString());
-            if (!int.TryParse(Request.Form["InventorySizeMultiplier"], out serverConfig.InventorySizeMultiplier) || serverConfig.InventorySizeMultiplier >= 1)
+            if (!int.TryParse(Request.Form["InventorySizeMultiplier"], out serverConfig.InventorySizeMultiplier) || serverConfig.InventorySizeMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADISM", "The InventorySizeMultiplier field is invalid").ToString());
 
             // ==== AssemblerSpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["AssemblerSpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISASM", "The AssemblerSpeedMultiplier field must be provided").ToString());
-            if (!int.TryParse(Request.Form["AssemblerSpeedMultiplier"], out serverConfig.AssemblerSpeedMultiplier) || serverConfig.AssemblerSpeedMultiplier >= 1)
+            if (!int.TryParse(Request.Form["AssemblerSpeedMultiplier"], out serverConfig.AssemblerSpeedMultiplier) || serverConfig.AssemblerSpeedMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADASM", "The AssemblerSpeedMultiplier field is invalid").ToString());
 
             // ==== AssemblerEfficiencyMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["AssemblerEfficiencyMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISAEM", "The AssemblerEfficiencyMultiplier field must be provided").ToString());
-            if (!int.TryParse(Request.Form["AssemblerEfficiencyMultiplier"], out serverConfig.AssemblerEfficiencyMultiplier) || serverConfig.AssemblerEfficiencyMultiplier >= 1)
+            if (!int.TryParse(Request.Form["AssemblerEfficiencyMultiplier"], out serverConfig.AssemblerEfficiencyMultiplier) || serverConfig.AssemblerEfficiencyMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADAEM", "The AssemblerEfficiencyMultiplier field is invalid").ToString());
 
             // ==== RefinerySpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["RefinerySpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISRSM", "The RefinerySpeedMultiplier field must be provided").ToString());
-            if (!int.TryParse(Request.Form["RefinerySpeedMultiplier"], out serverConfig.RefinerySpeedMultiplier) || serverConfig.RefinerySpeedMultiplier >= 1)
+            if (!int.TryParse(Request.Form["RefinerySpeedMultiplier"], out serverConfig.RefinerySpeedMultiplier) || serverConfig.RefinerySpeedMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADRSM", "The RefinerySpeedMultiplier field is invalid").ToString());
 
             // ==== GameMode ====
@@ -517,19 +516,19 @@ namespace SESM.Controllers.API
             // ==== WelderSpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["WelderSpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISWSM", "The WelderSpeedMultiplier field must be provided").ToString());
-            if (!double.TryParse(Request.Form["WelderSpeedMultiplier"], out serverConfig.WelderSpeedMultiplier) || serverConfig.WelderSpeedMultiplier >= 0)
+            if (!double.TryParse(Request.Form["WelderSpeedMultiplier"], out serverConfig.WelderSpeedMultiplier) || serverConfig.WelderSpeedMultiplier < 0)
                 return Content(XMLMessage.Error("SRV-SC-BADWSM", "The WelderSpeedMultiplier field is invalid").ToString());
 
             // ==== GrinderSpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["GrinderSpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISGSM", "The GrinderSpeedMultiplier field must be provided").ToString());
-            if (!double.TryParse(Request.Form["GrinderSpeedMultiplier"], out serverConfig.GrinderSpeedMultiplier) || serverConfig.GrinderSpeedMultiplier >= 0)
+            if (!double.TryParse(Request.Form["GrinderSpeedMultiplier"], out serverConfig.GrinderSpeedMultiplier) || serverConfig.GrinderSpeedMultiplier < 0)
                 return Content(XMLMessage.Error("SRV-SC-BADGSM", "The GrinderSpeedMultiplier field is invalid").ToString());
 
             // ==== HackSpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["HackSpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISHSM", "The HackSpeedMultiplier field must be provided").ToString());
-            if (!double.TryParse(Request.Form["HackSpeedMultiplier"], out serverConfig.HackSpeedMultiplier) || serverConfig.HackSpeedMultiplier >= 0)
+            if (!double.TryParse(Request.Form["HackSpeedMultiplier"], out serverConfig.HackSpeedMultiplier) || serverConfig.HackSpeedMultiplier < 0)
                 return Content(XMLMessage.Error("SRV-SC-BADHSM", "The HackSpeedMultiplier field is invalid").ToString());
 
             // ==== DestructibleBlocks ====
@@ -539,9 +538,8 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SC-BADDB", "The DestructibleBlocks field is invalid").ToString());
 
             // ==== WorldName ====
-            if (string.IsNullOrWhiteSpace(Request.Form["WorldName"]))
-                return Content(XMLMessage.Error("SRV-SC-MISWN", "The WorldName field must be provided").ToString());
-            serverConfig.WorldName = Request.Form["WorldName"];
+            if (!string.IsNullOrWhiteSpace(Request.Form["WorldName"]))
+                serverConfig.WorldName = Request.Form["WorldName"];
 
             // ==== EnvironmentHostility ====
             if (string.IsNullOrWhiteSpace(Request.Form["EnvironmentHostility"]))
@@ -552,7 +550,7 @@ namespace SESM.Controllers.API
             // ==== WorldSizeKm ====
             if (string.IsNullOrWhiteSpace(Request.Form["WorldSizeKm"]))
                 return Content(XMLMessage.Error("SRV-SC-MISWSK", "The WorldSizeKm field must be provided").ToString());
-            if (!int.TryParse(Request.Form["WorldSizeKm"], out serverConfig.WorldSizeKm) || serverConfig.WorldSizeKm >= 0)
+            if (!int.TryParse(Request.Form["WorldSizeKm"], out serverConfig.WorldSizeKm) || serverConfig.WorldSizeKm < 0)
                 return Content(XMLMessage.Error("SRV-SC-BADWSK", "The WorldSizeKm field is invalid").ToString());
 
             // ==== PermanentDeath ====
@@ -574,21 +572,22 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SC-BADCCS", "The ClientCanSave field is invalid").ToString());
 
             // ==== Mods ====
-            if (string.IsNullOrWhiteSpace(Request.Form["Mods"]))
-                return Content(XMLMessage.Error("SRV-SC-MISMOD", "The Mods field must be provided").ToString());
             serverConfig.Mods.Clear();
             foreach (string mod in Request.Form["Mods"].Split(';'))
             {
-                ulong modParsed;
-                if (!ulong.TryParse(mod, out modParsed))
-                    return Content(XMLMessage.Error("SRV-SC-BADMOD", "The Mods field is invalid").ToString());
-                serverConfig.Mods.Add(modParsed);
+                if (!string.IsNullOrWhiteSpace(mod))
+                {
+                    ulong modParsed;
+                    if (!ulong.TryParse(mod, out modParsed))
+                        return Content(XMLMessage.Error("SRV-SC-BADMOD", "The Mods field is invalid").ToString());
+                    serverConfig.Mods.Add(modParsed);
+                }
             }
 
             // ==== ViewDistance ====
             if (string.IsNullOrWhiteSpace(Request.Form["ViewDistance"]))
                 return Content(XMLMessage.Error("SRV-SC-MISVD", "The ViewDistance field must be provided").ToString());
-            if (!int.TryParse(Request.Form["ViewDistance"], out serverConfig.ViewDistance) || serverConfig.ViewDistance >= 1)
+            if (!int.TryParse(Request.Form["ViewDistance"], out serverConfig.ViewDistance) || serverConfig.ViewDistance < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADVD", "The ViewDistance field is invalid").ToString());
 
             // ==== OnlineMode ====
@@ -604,27 +603,30 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SC-BADRO", "The ResetOwnership field is invalid").ToString());
 
             // ==== Administrators ====
-            if (string.IsNullOrWhiteSpace(Request.Form["Administrators"]))
-                return Content(XMLMessage.Error("SRV-SC-MISADM", "The Administrators field must be provided").ToString());
             serverConfig.Administrators.Clear();
             foreach (string adm in Request.Form["Administrators"].Split(';'))
             {
-                ulong admParsed;
-                if (!ulong.TryParse(adm, out admParsed))
-                    return Content(XMLMessage.Error("SRV-SC-BADADM", "The Administrators field is invalid").ToString());
-                serverConfig.Administrators.Add(admParsed);
+                if (!string.IsNullOrWhiteSpace(adm))
+                {
+                    ulong admParsed;
+                    if (!ulong.TryParse(adm, out admParsed))
+                        return
+                            Content(XMLMessage.Error("SRV-SC-BADADM", "The Administrators field is invalid").ToString());
+                    serverConfig.Administrators.Add(admParsed);
+                }
             }
 
             // ==== Banned ====
-            if (string.IsNullOrWhiteSpace(Request.Form["Banned"]))
-                return Content(XMLMessage.Error("SRV-SC-MISBAN", "The Banned field must be provided").ToString());
             serverConfig.Banned.Clear();
             foreach (string ban in Request.Form["Banned"].Split(';'))
             {
-                ulong banParsed;
-                if (!ulong.TryParse(ban, out banParsed))
-                    return Content(XMLMessage.Error("SRV-SC-BADBAN", "The Banned field is invalid").ToString());
-                serverConfig.Banned.Add(banParsed);
+                if (!string.IsNullOrWhiteSpace(ban))
+                {
+                    ulong banParsed;
+                    if (!ulong.TryParse(ban, out banParsed))
+                        return Content(XMLMessage.Error("SRV-SC-BADBAN", "The Banned field is invalid").ToString());
+                    serverConfig.Banned.Add(banParsed);
+                }
             }
 
             // ==== AutoHealing ====
@@ -654,7 +656,7 @@ namespace SESM.Controllers.API
             // ==== SpawnShipTimeMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["SpawnShipTimeMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISSSTM", "The SpawnShipTimeMultiplier field must be provided").ToString());
-            if (!int.TryParse(Request.Form["SpawnShipTimeMultiplier"], out serverConfig.SpawnShipTimeMultiplier) || serverConfig.SpawnShipTimeMultiplier >= 0)
+            if (!int.TryParse(Request.Form["SpawnShipTimeMultiplier"], out serverConfig.SpawnShipTimeMultiplier) || serverConfig.SpawnShipTimeMultiplier < 0)
                 return Content(XMLMessage.Error("SRV-SC-BADSSTM", "The SpawnShipTimeMultiplier field is invalid").ToString());
 
             // ==== RespawnShipDelete ====
