@@ -197,7 +197,7 @@ namespace SESM.Controllers.API
 
             ZipFile.SaveAs(SESMConfigHelper.SEDataPath + zipName);
 
-            Logger logger = LogManager.GetLogger("SESEAutoUpdateLogger");
+            Logger logger = LogManager.GetLogger("SESEManualUpdateLogger");
             ReturnEnum result = SESEAutoUpdateJob.Run(logger, true, true);
 
             if(result != ReturnEnum.Success)
@@ -225,7 +225,7 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SET-UPDSESE-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
-            Logger logger = LogManager.GetLogger("SESEAutoUpdateLogger");
+            Logger logger = LogManager.GetLogger("SESEManuealUpdateLogger");
             ReturnEnum result = SESEAutoUpdateJob.Run(logger, true, false, force);
             
             if(result != ReturnEnum.Success)

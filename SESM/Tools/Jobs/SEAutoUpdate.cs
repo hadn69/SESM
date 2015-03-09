@@ -1,9 +1,17 @@
-﻿using Quartz;
+﻿using NLog;
+using Quartz;
 
 namespace SESM.Tools.Jobs
 {
-    public class SEAutoUpdate
+    [DisallowConcurrentExecution]
+    public class SEAutoUpdate : IJob
     {
+        public void Execute(IJobExecutionContext context)
+        {
+            Logger logger = LogManager.GetLogger("SEAutoUpdateLogger");
+            Run(logger, false, false);
+        }
+
 
         public static JobKey GetJobKey()
         {
