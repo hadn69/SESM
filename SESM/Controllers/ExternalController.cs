@@ -6,9 +6,6 @@ using System.Drawing.Text;
 using System.IO;
 using System.Text;
 using System.Web.Mvc;
-using SESM.DAL;
-using SESM.DTO;
-using SESM.Models.Views.Server;
 using SESM.Tools;
 using SESM.Tools.Helpers;
 

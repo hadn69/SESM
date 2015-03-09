@@ -38,30 +38,7 @@ namespace SESM.Controllers
             return View();
         }
 
-        /*
-
-
-        //
-        // GET: Settings
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult Index()
-        {
-            SettingsViewModel model = new SettingsViewModel
-            {
-                Prefix = SESMConfigHelper.Prefix,
-                SESavePath = SESMConfigHelper.SESavePath,
-                SEDataPath = SESMConfigHelper.SEDataPath,
-                Arch = SESMConfigHelper.Arch,
-                AddDateToLog = SESMConfigHelper.AddDateToLog,
-                SendLogToKeen = SESMConfigHelper.SendLogToKeen
-            };
-
-            return View(model);
-        }
-        */
+       
         //
         // POST: Settings
         [HttpPost]
@@ -292,7 +269,7 @@ namespace SESM.Controllers
             switch (SESMConfigHelper.Arch)
             {
                 case ArchType.x64:
-                    if (System.Environment.Is64BitOperatingSystem)
+                    if (Environment.Is64BitOperatingSystem)
                     {
                         model.ArchMatch.State = true;
                         model.ArchMatch.Message =
@@ -306,7 +283,7 @@ namespace SESM.Controllers
                     }
                     break;
                 case ArchType.x86:
-                    if (System.Environment.Is64BitOperatingSystem)
+                    if (Environment.Is64BitOperatingSystem)
                     {
                         model.ArchMatch.State = true;
                         model.ArchMatch.Message =

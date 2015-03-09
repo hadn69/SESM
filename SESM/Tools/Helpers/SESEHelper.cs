@@ -68,7 +68,7 @@ namespace SESM.Tools.Helpers
 
         public static Version GetLastRemoteVersion(bool useDev)
         {
-            string githubData = SESEHelper.GetGithubData();
+            string githubData = GetGithubData();
             return GetLastRemoteVersion(githubData, useDev);
         }
 

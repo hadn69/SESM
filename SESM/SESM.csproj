@@ -3933,6 +3933,7 @@
     <Compile Include="Tools\Helpers\PathHelper.cs" />
     <Compile Include="Tools\Helpers\SignParams.cs" />
     <Compile Include="Tools\Jobs\ReturnEnum.cs" />
+    <Compile Include="Tools\Jobs\SEAutoUpdate.cs" />
     <Compile Include="Tools\Jobs\SESEAutoUpdateJob.cs" />
     <Compile Include="Tools\Monitor\Collector.cs" />
     <Compile Include="Tools\Helpers\ServiceHelper.cs" />

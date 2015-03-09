@@ -150,10 +150,11 @@ namespace SESM
             routes.MapRoute(
                 name: "Settings",
                 url: "Settings/{action}",
-                defaults: new { controller = "Settings" },
+                defaults: new { controller = "Settings", action ="Index"},
                 constraints: new
                 {
-                    action = "SESE|" +
+                    action = "Index|" +
+                             "SE|" +
                              "SE"
                 }
             );

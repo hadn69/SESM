@@ -6,6 +6,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml.Linq;
+using Ionic.Zip;
 using NLog;
 using Quartz;
 using Quartz.Impl;
@@ -20,6 +21,8 @@ namespace SESM.Controllers.API
     public class APISettingsController : Controller
     {
         private readonly DataContext _context = new DataContext();
+
+        #region SESE
 
         // GET: API/Settings/GetSESEStatus        
         [HttpGet]
@@ -176,7 +179,7 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SET-UPSESE-BADZIP", "The provided file in not a zip file").ToString());
 
             ZipFile.InputStream.Seek(0, SeekOrigin.Begin);
-            using (Ionic.Zip.ZipFile zip = Ionic.Zip.ZipFile.Read(ZipFile.InputStream))
+            using (ZipFile zip = Ionic.Zip.ZipFile.Read(ZipFile.InputStream))
             {
                 if (!zip.ContainsEntry("SEServerExtender.exe"))
                     return
@@ -263,6 +266,8 @@ namespace SESM.Controllers.API
 
             return Content(XMLMessage.Success("SET-DELSESE-OK", "SESE deleted").ToString());
         }
+
+        #endregion
 
         protected override void Dispose(bool disposing)
         {

@@ -212,7 +212,7 @@ namespace SESM.Tools.Helpers
 
         public static void SetPriority(EntityServer server)
         {
-            string serviceName = ServiceHelper.GetServiceName(server);
+            string serviceName = GetServiceName(server);
 
             switch (server.ProcessPriority)
             {

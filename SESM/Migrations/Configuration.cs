@@ -1,3 +1,4 @@
+using System.Data.Entity.Migrations;
 using System.Linq;
 using SESM.DAL;
 using SESM.DTO;
@@ -5,9 +6,7 @@ using SESM.Tools.Helpers;
 
 namespace SESM.Migrations
 {
-    using System.Data.Entity.Migrations;
-
-    internal sealed class Configuration : DbMigrationsConfiguration<SESM.DAL.DataContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<DataContext>
     {
         public Configuration()
         {

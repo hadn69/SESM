@@ -1,4 +1,5 @@
-﻿using Westwind.Utilities.Configuration;
+﻿using System;
+using Westwind.Utilities.Configuration;
 
 namespace SESM.Tools
 {
@@ -56,7 +57,7 @@ namespace SESM.Tools
         {
             ConfigurationFileConfigurationProvider<SESMConfigStorage> provider = new ConfigurationFileConfigurationProvider<SESMConfigStorage>()
             {
-                ConfigurationFile = System.AppDomain.CurrentDomain.BaseDirectory + @"\SESM.config",
+                ConfigurationFile = AppDomain.CurrentDomain.BaseDirectory + @"\SESM.config",
                 ConfigurationSection = sectionName,
             };
             

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Quartz;
@@ -8,7 +9,7 @@ using SESM.Tools;
 
 namespace SESM
 {
-    public class MvcApplication : System.Web.HttpApplication
+    public class MvcApplication : HttpApplication
     {
         protected void Application_Start()
         {
