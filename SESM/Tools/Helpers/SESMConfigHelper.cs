@@ -128,6 +128,13 @@ namespace SESM.Tools.Helpers
             get
             {
                 ConfigStorage.Read();
+
+                if (!ConfigStorage.SESavePath.EndsWith(@"\"))
+                {
+                    ConfigStorage.SESavePath += @"\";
+                    ConfigStorage.Write();
+                }
+
                 return ConfigStorage.SESavePath;                
             }
             set
@@ -142,6 +149,13 @@ namespace SESM.Tools.Helpers
             get
             {
                 ConfigStorage.Read();
+
+                if (!ConfigStorage.SEDataPath.EndsWith(@"\"))
+                {
+                    ConfigStorage.SEDataPath += @"\";
+                    ConfigStorage.Write();
+                }
+
                 return ConfigStorage.SEDataPath;                
             }
             set

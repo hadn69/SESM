@@ -89,7 +89,7 @@ namespace SESM.Controllers
                     }
 
                     // Killing some ghost processes that might still exists
-                    ServiceHelper.KillAllService();
+                    ServiceHelper.KillAllServices();
 
                     foreach (EntityServer item in srvPrv.GetAllServers())
                     {
@@ -214,7 +214,7 @@ namespace SESM.Controllers
                 }
 
                 // Killing some ghost processes that might still exists
-                ServiceHelper.KillAllService();
+                ServiceHelper.KillAllServices();
 
                 model.ServerZip.InputStream.Seek(0, SeekOrigin.Begin);
 
@@ -654,7 +654,7 @@ namespace SESM.Controllers
                 }
                 logger.Info("Killing ghosts processes");
                 // Killing some ghost processes that might still exists
-                ServiceHelper.KillAllSESEService();
+                ServiceHelper.KillAllSESEServices();
 
                 logger.Info("Applying SESE Files");
                 SESEHelper.ApplyUpdate();
@@ -718,7 +718,7 @@ namespace SESM.Controllers
                 }
                 logger.Info("Killing ghosts processes");
                 // Killing some ghost processes that might still exists
-                ServiceHelper.KillAllSESEService();
+                ServiceHelper.KillAllSESEServices();
 
                 logger.Info("Applying SESE Files");
                 SESEHelper.ApplyUpdate();

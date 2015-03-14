@@ -336,7 +336,7 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public static void KillAllService()
+        public static void KillAllServices()
         {
             foreach(Process proc in Process.GetProcessesByName("SpaceEngineersDedicated"))
             {
@@ -346,10 +346,10 @@ namespace SESM.Tools.Helpers
                 }
                 catch(Exception) { }
             }
-            KillAllSESEService();
+            KillAllSESEServices();
         }
 
-        public static void KillAllSESEService()
+        public static void KillAllSESEServices()
         {
             foreach(Process proc in Process.GetProcessesByName("SEServerExtender"))
             {

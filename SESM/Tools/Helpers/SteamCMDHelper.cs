@@ -506,7 +506,7 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        private static string ExecuteSteamCMD(Logger logger, string arguments)
+        private static string ExecuteSteamCMD(Logger logger, string arguments, int duration = GetInfoDuration)
         {
             // Check and DL SteamCMD
             CheckSteamCMD(logger);
@@ -526,7 +526,7 @@ namespace SESM.Tools.Helpers
             logger.Info("Arguments : " + si.StartInfo.Arguments);
             si.Start();
 
-            DateTime endTime = DateTime.Now.AddSeconds(GetInfoDuration);
+            DateTime endTime = DateTime.Now.AddSeconds(duration);
             string output = string.Empty;
 
             logger.Info("Start of SteamCMD output :");
@@ -621,20 +621,18 @@ namespace SESM.Tools.Helpers
             return 0;
         }
 
-        public static SteamCMDResult Update(Logger logger, int duration)
+        public static void Update(Logger logger, bool dev)
         {
-            CheckSteamCMD(logger);
-            return SteamCMDResult.Fail_Unknow;
+            string output = ExecuteSteamCMD(logger, " +login Anonymous"
+                                                    + " +force_install_dir " + PathHelper.GetSyncDirPath()
+                                                    + " +app_update " + AppId + " -validate "
+                                                    + (dev? 
+                                                        " -beta development -betapassword " + SESMConfigHelper.AutoUpdateBetaPassword : 
+                                                        " -beta public")
+                                                    + " +quit", 120);
+            logger.Info("Update output : " + output);
+
         }
 
-
-        public enum SteamCMDResult
-        {
-            Fail_Unknow,
-            Fail_TooLong,
-            Success_UpdateInstalled,
-            Success_NothingToDo
-
-        }
     }
 }

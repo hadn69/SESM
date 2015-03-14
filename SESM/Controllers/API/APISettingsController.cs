@@ -259,7 +259,7 @@ namespace SESM.Controllers.API
                 ServiceHelper.WaitForStopped(server);
             }
             Thread.Sleep(10000);
-            ServiceHelper.KillAllSESEService();
+            ServiceHelper.KillAllSESEServices();
             Thread.Sleep(2000);
             if(System.IO.File.Exists(SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe"))
                 System.IO.File.Delete(SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe");
