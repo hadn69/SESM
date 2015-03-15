@@ -638,7 +638,7 @@ var Metronic = function() {
                     },
                     overlayCSS: {
                         backgroundColor: options.overlayColor ? options.overlayColor : '#555',
-                        opacity: options.boxed ? 0.05 : 0.1,
+                        opacity: options.boxed ? 0.5 : 0.1,
                         cursor: 'wait'
                     }
                 });

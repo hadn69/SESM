@@ -30,7 +30,13 @@ namespace SESM
                 defaults: new { controller = "APISettings" },
                 constraints: new
                 {
-                    action = "GetSESEStatus|" +
+                    action = "GetSEStatus|" +
+                             "GetSEVersion|" +
+                             "GetSESettings|" +
+                             "SetSESettings|" +
+                             "UploadSE|" +
+                             "UpdateSE|" + 
+                             "GetSESEStatus|" +
                              "GetSESEVersion|" +
                              "GetSESESettings|" +
                              "SetSESESettings|" +
@@ -155,7 +161,7 @@ namespace SESM
                 {
                     action = "Index|" +
                              "SE|" +
-                             "SE"
+                             "SESE"
                 }
             );
 

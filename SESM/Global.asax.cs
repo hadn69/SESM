@@ -6,6 +6,8 @@ using System.Web.Routing;
 using Quartz;
 using Quartz.Impl;
 using SESM.Tools;
+using SESM.Tools.Helpers;
+using SESM.Tools.Jobs;
 
 namespace SESM
 {
@@ -25,7 +27,39 @@ namespace SESM
 
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.Start();
+            /*
+            // Auto-Update
+            if (SESMConfigHelper.AutoUpdateEnabled)
+            {
+                // Instantiating the job
+                IJobDetail SEAutoUpdateJobDetail = JobBuilder.Create<SESEAutoUpdateJob>()
+                    .WithIdentity(SEAutoUpdateJob.GetJobKey())
+                    .Build();
 
+                ITrigger SEAutoUpdateJobTrigger = TriggerBuilder.Create()
+                    .WithIdentity(SEAutoUpdateJob.GetTriggerKey())
+                    .WithCronSchedule(SESMConfigHelper.SESEAutoUpdateCron)
+                    .Build();
+
+                scheduler.ScheduleJob(SEAutoUpdateJobDetail, SEAutoUpdateJobTrigger);
+            }
+
+            // SESE Auto-update
+            if (SESMConfigHelper.SESEAutoUpdateEnabled)
+            {
+                // Instantiating the job
+                IJobDetail SESEAutoUpdateJobDetail = JobBuilder.Create<SESEAutoUpdateJob>()
+                    .WithIdentity(SESEAutoUpdateJob.GetJobKey())
+                    .Build();
+
+                ITrigger SESEAutoUpdateJobTrigger = TriggerBuilder.Create()
+                    .WithIdentity(SESEAutoUpdateJob.GetTriggerKey())
+                    .WithCronSchedule(SESMConfigHelper.SESEAutoUpdateCron)
+                    .Build();
+
+                scheduler.ScheduleJob(SESEAutoUpdateJobDetail, SESEAutoUpdateJobTrigger);
+            }
+            */
             /*
             if(SESMConfigHelper.PerfMonitor)
             {

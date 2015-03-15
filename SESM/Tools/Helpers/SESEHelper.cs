@@ -93,7 +93,7 @@ namespace SESM.Tools.Helpers
                     return new Version("0." + extract.Groups[1].Value);
                 }
             }
-            return null;
+            return new Version(0,0);
         }
 
         public static string GetGithubData()

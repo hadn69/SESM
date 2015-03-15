@@ -32,6 +32,14 @@ namespace SESM.Controllers
 
         [HttpGet]
         [SuperAdmin]
+        public ActionResult SE()
+        {
+
+            return View();
+        }
+
+        [HttpGet]
+        [SuperAdmin]
         public ActionResult SESE()
         {
 
@@ -428,89 +436,6 @@ namespace SESM.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult AutoUpdate(AutoUpdateViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            SESMConfigHelper.AutoUpdateEnabled = model.AutoUpdate;
-            SESMConfigHelper.AutoUpdateCron = model.CronInterval;
-
-            IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
-
-            scheduler.DeleteJob(new JobKey("AutoUpdateJob", "AutoUpdate"));
-
-            if (model.AutoUpdate)
-            {
-                IJobDetail autoUpdateJob = JobBuilder.Create<AutoUpdate>()
-                    .WithIdentity("AutoUpdateJob", "AutoUpdate")
-                    .Build();
-
-                ITrigger autoUpdateTrigger = TriggerBuilder.Create()
-                    .WithIdentity("AutoUpdateTrigger", "AutoUpdate")
-                    .WithCronSchedule(model.CronInterval)
-                    .StartNow()
-                    .Build();
-
-                scheduler.ScheduleJob(autoUpdateJob, autoUpdateTrigger);
-            }
-
-            return RedirectToAction("Index", "Settings").Success("Auto-Update Parameters Updated");
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult ManualUpdate()
-        {
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-
-            logger.Info("----Starting ManualUpdate----");
-            SteamCMDHelper.SteamCMDResult result = SteamCMDHelper.Update(logger, 300);
-            logger.Info("----End of ManualUpdate----");
-            /*
-            switch (result)
-            {
-                case SteamCMDHelper.SteamCMDResult.Fail_Credentials:
-                    return RedirectToAction("Index").Danger("Wrong credentials, please check and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardMissing:
-                    return
-                        RedirectToAction("Index")
-                            .Danger(
-                                "Steam Guard active on your account, please input the code in SteamCMD Configuration page and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardBadCode:
-                    return
-                        RedirectToAction("Index")
-                            .Danger(
-                                "Wrong Steam Guard code, please input the right code in SteamCMD Configuration page and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_TooLong:
-                    return
-                        RedirectToAction("Index")
-                            .Warning(
-                                "Update took too long. If it's the first update and you don't have a server-grade connection, please try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Success_NothingToDo:
-                    return RedirectToAction("Index").Success("There are no updates available :-(");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Success_UpdateInstalled:
-                    return RedirectToAction("Index").Success("Manual Update Successful");
-                    break;
-                default:
-                    return RedirectToAction("Index").Danger("Manual Update : Unknow Error");
-                    break;
-
-            }*/
-            return null;
-        }
-
         [HttpGet]
         [LoggedOnly]
         [SuperAdmin]
@@ -742,32 +667,6 @@ namespace SESM.Controllers
                 logger.Info("----End of SESEManualUpdateForce----");
                 return RedirectToAction("Index").Warning("No SESE Update detected");
             }
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        public ActionResult HourlyStats()
-        {
-            ServerProvider srvPrv = new ServerProvider(_context);
-            List<EntityServer> serv = srvPrv.GetAllServers();
-            Dictionary<string, List<EntityPerfEntry>> perfEntries = serv.ToDictionary(server => server.Name, server => server.PerfEntries.Where(x => x.Timestamp >= DateTime.Now.AddHours(-2)).OrderBy(x => x.Timestamp).ToList());
-
-            ViewData["perfEntries"] = perfEntries;
-            return View();
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        public ActionResult GlobalStats()
-        {
-            ServerProvider srvPrv = new ServerProvider(_context);
-            List<EntityServer> serv = srvPrv.GetAllServers();
-            Dictionary<string, List<EntityPerfEntry>> perfEntries = serv.ToDictionary(server => server.Name, server => server.PerfEntries.Where(x => x.CPUUsagePeak != null).OrderBy(x => x.Timestamp).ToList());
-
-            ViewData["perfEntries"] = perfEntries;
-            return View();
         }
 
         protected override void Dispose(bool disposing)

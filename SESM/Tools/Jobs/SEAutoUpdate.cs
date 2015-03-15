@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.AccessControl;
 using System.Threading;
+using Ionic.Zip;
 using NLog;
 using Quartz;
 using SESM.DAL;
@@ -11,15 +13,15 @@ using SESM.Tools.Helpers;
 namespace SESM.Tools.Jobs
 {
     [DisallowConcurrentExecution]
-    public class SEAutoUpdate : IJob
+    public class SEAutoUpdateJob : IJob
     {
         public void Execute(IJobExecutionContext context)
         {
             Logger logger = LogManager.GetLogger("SEAutoUpdateLogger");
-            Run(logger, false, false);
+            Run(logger, false, false, false);
         }
 
-        public static ReturnEnum Run(Logger logger, bool manualFire = true, bool force = false)
+        public static ReturnEnum Run(Logger logger, bool manualFire = true, bool useLocalZip = false, bool force = false)
         {
             if (!SESMConfigHelper.AutoUpdateEnabled)
                 return ReturnEnum.AloneJob;
@@ -29,17 +31,18 @@ namespace SESM.Tools.Jobs
 
             logger.Info("--- Starting SE Auto-Update Process ---");
             logger.Info("Type : " + (manualFire ? "Manuel" : "Automatic"));
+            logger.Info("Using Local zip : " + useLocalZip.ToString().ToUpper());
             logger.Info("Force : " + force.ToString().ToUpper());
             logger.Info("Checking Versions ...");
 
             int localVersion = SteamCMDHelper.GetInstalledVersion(logger);
             logger.Info(" - Local Version : " + localVersion);
 
-            int remoteVersion = SteamCMDHelper.GetAvailableVersion(logger, SESMConfigHelper.SESEAutoUpdateUseDev);
+            int remoteVersion = SteamCMDHelper.GetAvailableVersion(SESMConfigHelper.SESEAutoUpdateUseDev, logger);
             logger.Info(" - Remote Version : " + remoteVersion);
 
             // Test for update
-            if (!force && localVersion.CompareTo(remoteVersion) >= 0)
+            if (!useLocalZip && !force && localVersion.CompareTo(remoteVersion) >= 0)
             {
                 logger.Info("No Update Available, Exiting ...");
                 return ReturnEnum.NothingToDo;
@@ -106,23 +109,47 @@ namespace SESM.Tools.Jobs
                 logger.Info("SESE Present (to reapply it) : " + SESEPresent.ToString().ToUpper());
 
                 logger.Info("Cleaning SE Game Files ...");
-                logger.Info("Deleting Content ...");
-                Directory.Delete(SESMConfigHelper.SEDataPath + @"Content\", true);
-                logger.Info("Deleting DedicatedServer ...");
-                Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
-                logger.Info("Deleting DedicatedServer64 ...");
-                Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
+                if (Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
+                {
+                    logger.Info("Deleting Content ...");
+                    Directory.Delete(SESMConfigHelper.SEDataPath + @"Content\", true);
+                }
+                if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
+                {
+                    logger.Info("Deleting DedicatedServer ...");
+                    Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
+                }
+                if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
+                {
+                    logger.Info("Deleting DedicatedServer64 ...");
+                    Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
+                }
 
                 logger.Info("Updating SE Game Files ...");
-                SteamCMDHelper.Update(logger, !string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword));
+                if (useLocalZip)
+                {
+                    logger.Info("Extracting SE Game Files ...");
+                    using (ZipFile zip = ZipFile.Read(SESMConfigHelper.SEDataPath + "DedicatedServer.zip"))
+                    {
+                        zip.ExtractAll(SESMConfigHelper.SEDataPath);
+                    }
+                }
+                else
+                {
+                    SteamCMDHelper.Update(logger, !string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword));
 
-                logger.Info("Applying SE Game Files ...");
-                logger.Info("Applying Content ...");
-                FSHelper.DirectoryCopy(PathHelper.GetSyncDirPath() + @"Content\", SESMConfigHelper.SEDataPath + @"Content\", true);
-                logger.Info("Applying DedicatedServer ...");
-                FSHelper.DirectoryCopy(PathHelper.GetSyncDirPath() + @"DedicatedServer\", SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
-                logger.Info("Applying DedicatedServer64 ...");
-                FSHelper.DirectoryCopy(PathHelper.GetSyncDirPath() + @"DedicatedServer64\", SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
+                    logger.Info("Applying SE Game Files ...");
+                    logger.Info("Applying Content ...");
+                    FSHelper.DirectoryCopy(PathHelper.GetSyncDirPath() + @"Content\",
+                        SESMConfigHelper.SEDataPath + @"Content\", true);
+                    logger.Info("Applying DedicatedServer ...");
+                    FSHelper.DirectoryCopy(PathHelper.GetSyncDirPath() + @"DedicatedServer\",
+                        SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
+                    logger.Info("Applying DedicatedServer64 ...");
+                    FSHelper.DirectoryCopy(PathHelper.GetSyncDirPath() + @"DedicatedServer64\",
+                        SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
+                }
+
                 if (SESEPresent)
                 {
                     logger.Info("Applying SESE ...");
@@ -157,12 +184,12 @@ namespace SESM.Tools.Jobs
 
         public static JobKey GetJobKey()
         {
-            return new JobKey("SESEAutoUpdate", "SESEAutoUpdate");
+            return new JobKey("SEAutoUpdate", "SEAutoUpdate");
         }
 
         public static TriggerKey GetTriggerKey()
         {
-            return new TriggerKey("SESEAutoUpdate", "SESEAutoUpdate");
+            return new TriggerKey("SEAutoUpdate", "SEAutoUpdate");
         }
     }
 }
