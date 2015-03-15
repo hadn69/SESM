@@ -2,9 +2,9 @@
     ViewBag.Title = "Server Configuration";
 
     List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
-    breadCrumb.Add(new KeyValuePair<string, string>("Server", "/Server/"));
-    breadCrumb.Add(new KeyValuePair<string, string>(ViewBag.Server.Name, "/Servers/Dashboard/" + ViewBag.ServerID));
-    breadCrumb.Add(new KeyValuePair<string, string>("Server Configuration", "/Explorer/Browse/" + ViewBag.ServerID));
+    breadCrumb.Add(new KeyValuePair<string, string>("Servers", "/Servers/"));
+    breadCrumb.Add(new KeyValuePair<string, string>(ViewBag.Server.Name, "/" + ViewBag.ServerID + "/Dashboard/"));
+    breadCrumb.Add(new KeyValuePair<string, string>("Server Configuration", "/" + ViewBag.ServerID + "/Configuration/"));
     ViewBag.Breadcrumb = breadCrumb;
 
     ViewBag.RefreshBtn = true;
@@ -14,15 +14,7 @@
 <script type="text/javascript" src="/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" />
 
-<div class="col-md-12">
-    <div class="portlet light" id="loading-div">
-        <div class="portlet-body text-center">
-            <h4 class="text-center"><i class="fa fa-spin fa-spinner fa-3x"></i></h4>
-        </div>
-    </div>
-</div>
-
-<div class="col-md-12" id="content-div" style="display: none">
+<div class="col-md-12" id="content-div">
     <div class="portlet light">
         <div class="portlet-body">
             <div class="tabbable-custom nav-justified">
@@ -196,9 +188,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Pause Game When Empty</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpPauseGameWhenEmpty" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpPauseGameWhenEmpty">
                                             </div>
                                         </div>
                                     </div>
@@ -232,9 +222,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Client Can Save Locally</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpClientCanSave" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpClientCanSave">
                                             </div>
                                         </div>
                                     </div>
@@ -242,9 +230,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Remove Trash</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpRemoveTrash" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpRemoveTrash">
                                             </div>
                                         </div>
                                     </div>
@@ -273,9 +259,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Auto Delete Respawn Ship</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpRespawnShipDelete" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpRespawnShipDelete">
                                             </div>
                                         </div>
                                     </div>
@@ -286,9 +270,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Thruster Damage</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpThrusterDamage" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpThrusterDamage">
                                             </div>
                                         </div>
                                     </div>
@@ -296,9 +278,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Enable Ingame Scripts</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpEnableIngameScripts" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpEnableIngameScripts">
                                             </div>
                                         </div>
                                     </div>
@@ -322,9 +302,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Enable Ingame Scripts</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpCargoShipsEnabled" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpCargoShipsEnabled">
                                             </div>
                                         </div>
                                     </div>
@@ -335,9 +313,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Enable Tool Shake</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpEnableToolShake" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpEnableToolShake">
                                             </div>
                                         </div>
                                     </div>
@@ -356,9 +332,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Auto Healing</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpAutoHealing" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpAutoHealing">
                                             </div>
                                         </div>
                                     </div>
@@ -366,8 +340,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Weapons Enabled</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpWeaponsEnabled" class="make-switch" data-on-text="                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpWeaponsEnabled">
                                             </div>
                                         </div>
                                     </div>
@@ -388,9 +361,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Enable Spectator</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpEnableSpectator" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpEnableSpectator">
                                             </div>
                                         </div>
                                     </div>
@@ -401,9 +372,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Permanent Death</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpPermanentDeath" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpPermanentDeath">
                                             </div>
                                         </div>
                                     </div>
@@ -411,9 +380,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Show Player Names On Hud</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpShowPlayerNamesOnHud" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpShowPlayerNamesOnHud">
                                             </div>
                                         </div>
                                     </div>
@@ -470,9 +437,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Reset Ownership</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpResetOwnership" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpResetOwnership">
                                             </div>
                                         </div>
                                     </div>
@@ -579,9 +544,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Enable Copy Paste</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpEnableCopyPaste" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpEnableCopyPaste">
                                             </div>
                                         </div>
                                     </div>
@@ -589,9 +552,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Destructible Blocks</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpDestructibleBlocks" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpDestructibleBlocks">
                                             </div>
                                         </div>
                                     </div>
@@ -610,9 +571,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Ignore Last Session</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpIgnoreLastSession" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpIgnoreLastSession">
                                             </div>
                                         </div>
                                     </div>
@@ -620,9 +579,7 @@
                                         <div class="form-group">
                                             <label class="control-label col-md-6">Realistic Sound</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpRealisticSound" class="make-switch" data-on-text="
-                                                <i class='fa fa-check'></i>" data-off-text="
-                                                <i class='fa fa-times'></i>">
+                                                <input type="checkbox" id="inpRealisticSound">
                                             </div>
                                         </div>
                                     </div>
@@ -651,6 +608,8 @@
         }
 
         // Initializers
+        $.fn.bootstrapSwitch.defaults.onText = '<i class="fa fa-check"></i>';
+        $.fn.bootstrapSwitch.defaults.offText = '<i class="fa fa-times"></i>';
 
         // Network
         $('#inpServerPort').TouchSpin({
@@ -769,6 +728,8 @@
             decimals: 2,
             step: 0.01
         });
+
+        $("input[type='checkbox']").bootstrapSwitch();
 
         var dataLoaded = false;
         var maskLoaded = false;

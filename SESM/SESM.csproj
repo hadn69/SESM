@@ -3779,9 +3779,7 @@
     <Content Include="Views\Map\Upload.cshtml" />
     <Content Include="Views\Log\View.cshtml" />
     <Content Include="Views\Settings\Index.cshtml" />
-    <Content Include="Views\Settings\UploadBin.cshtml" />
     <Content Include="Views\User\Edit.cshtml" />
-    <Content Include="Views\Settings\Diagnosis.cshtml" />
     <Content Include="Views\Log\Index.cshtml" />
     <Content Include="Views\Mod\Index.cshtml" />
     <Content Include="Views\Mod\Upload.cshtml" />
@@ -3791,15 +3789,15 @@
     <Content Include="Views\Map\Rename.cshtml" />
     <Content Include="Views\Settings\Backups.cshtml" />
     <Content Include="Views\Backup\Index.cshtml" />
-    <Content Include="Views\Settings\SteamCMD.cshtml" />
     <Content Include="Views\External\SignGen.cshtml" />
     <Content Include="Views\Shared\_BreadCrumb.cshtml" />
     <Content Include="Views\Shared\_SideBar.cshtml" />
     <Content Include="Views\Settings\SESE.cshtml" />
     <Content Include="Views\Error\404.cshtml" />
-    <Content Include="Views\Explorer\Browse.cshtml" />
+    <Content Include="Views\Server\Explorer.cshtml" />
     <Content Include="Views\Server\Configuration.cshtml" />
     <Content Include="Views\Settings\SE.cshtml" />
+    <Content Include="Views\Server\Dashboard.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -3990,6 +3988,7 @@
     <Folder Include="assets\global\plugins\angularjs\plugins\angular-file-upload\uploads\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\node\public\files\thumbnail\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\php\files\thumbnail\" />
+    <Folder Include="Views\Explorer\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -126,20 +126,6 @@ namespace SESM
                 defaults: new { action = "Index", controller = "Server" }
             );
 
-            // Explorer
-            routes.MapRoute(
-                name: "Explorer",
-                url: "{id}/Explorer",
-                defaults: new { action = "Browse", controller = "Explorer" }
-            );
-
-            // Map
-            routes.MapRoute(
-                name: "Map",
-                url: "{id}/Map",
-                defaults: new { action = "Index", controller = "Map" }
-            );
-
             // Account
             routes.MapRoute(
                 name: "Account",
@@ -173,7 +159,10 @@ namespace SESM
                 constraints: new
                 {
                     action = "Dashboard|" +
-                             "Configuration"
+                             "Configuration|" +
+                             "Settings|" +
+                             "Map|" +
+                             "Explorer"
                 }
             );
 

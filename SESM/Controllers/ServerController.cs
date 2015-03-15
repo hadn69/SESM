@@ -19,20 +19,39 @@ namespace SESM.Controllers
     {
         readonly DataContext _context = new DataContext();
 
-        // GET: Server
+        // GET: Servers
         [HttpGet]
         public ActionResult Index()
         {
             return View();
         }
 
-        // GET: Server/Configuration
+        // GET: 1/Dashboard
+        [HttpGet]
+        [CheckAuth]
+        public ActionResult Dashboard(int id)
+        {
+            return View();
+        }
+
+        // GET: 1/Configuration
         [HttpGet]
         [CheckAuth]
         public ActionResult Configuration(int id)
         {
             return View();
         }
+
+        // GET: 1/Explorer
+        [HttpGet]
+        [CheckAuth]
+        public ActionResult Explorer(int id)
+        {
+            return View();
+        }
+
+
+
 
         // GET: Server/Delete/5
         [HttpGet]
