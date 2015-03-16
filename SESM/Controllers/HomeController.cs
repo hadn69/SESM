@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Web.Mvc;
-using SESM.DAL;
-using SESM.DTO;
+﻿using System.Web.Mvc;
 
 namespace SESM.Controllers
 {

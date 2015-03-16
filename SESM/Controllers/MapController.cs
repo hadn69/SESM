@@ -1,19 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Web.Mvc;
-using System.Xml;
-using Ionic.Zip;
-using NLog;
-using SESM.Controllers.ActionFilters;
-using SESM.DAL;
-using SESM.DTO;
-using SESM.Models.Views.Map;
-using SESM.Tools.Helpers;
-
-namespace SESM.Controllers
+﻿namespace SESM.Controllers
 {
     /*
     [LoggedOnly]
