@@ -9,6 +9,7 @@ using Quartz;
 using Quartz.Impl;
 using SESM.DTO;
 using SESM.Models.Views.Settings;
+using SESM.Tools.Jobs;
 
 namespace SESM.Tools.Helpers
 {
@@ -106,14 +107,14 @@ namespace SESM.Tools.Helpers
                     {
                         SetLowPriority(serviceName);
                         IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
-                        scheduler.DeleteJob(new JobKey("LowPriorityStart" + server.Id + "Job", "LowPriorityStart"));
+                        scheduler.DeleteJob(ResetPriorityJob.GetJobKey(server));
                         IJobDetail lowPriorityStartJob = JobBuilder.Create<ResetPriorityJob>()
-                            .WithIdentity("LowPriorityStart" + server.Id + "Job", "LowPriorityStart")
+                            .WithIdentity(ResetPriorityJob.GetJobKey(server))
                             .UsingJobData("id", server.Id)
                             .Build();
 
                         ITrigger lowPriorityStartTrigger = TriggerBuilder.Create()
-                            .WithIdentity("LowPriorityStart" + server.Id + "Trigger", "LowPriorityStart")
+                            .WithIdentity(ResetPriorityJob.GetTriggerKey(server))
                             .StartAt(DateBuilder.FutureDate(3, IntervalUnit.Minute))
                             .Build();
 
@@ -252,7 +253,6 @@ namespace SESM.Tools.Helpers
             string output = si.StandardOutput.ReadToEnd();
             si.Close();
         }
-
 
         public static void RegisterServerExtenderService(EntityServer server)
         {

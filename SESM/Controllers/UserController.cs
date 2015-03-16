@@ -7,6 +7,7 @@ using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {
+    /*
     [LoggedOnly]
     [SuperAdmin]
     [CheckLockout]
@@ -90,4 +91,5 @@ namespace SESM.Controllers
         }
         
     }
+    */
 }

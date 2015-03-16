@@ -3,7 +3,7 @@ using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools.Helpers;
 
-namespace SESM.Tools
+namespace SESM.Tools.Jobs
 {
     public class ResetPriorityJob : IJob
     {
@@ -18,6 +18,16 @@ namespace SESM.Tools
             EntityServer server = srvPrv.GetServer(serverId);
 
             ServiceHelper.SetPriority(server);
+        }
+
+        public static JobKey GetJobKey(EntityServer server)
+        {
+            return new JobKey("ResetPriority" + server.Id, "ResetPriority");
+        }
+
+        public static TriggerKey GetTriggerKey(EntityServer server)
+        {
+            return new TriggerKey("ResetPriority" + server.Id, "ResetPriority");
         }
     }
 }

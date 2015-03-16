@@ -15,6 +15,7 @@ using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {
+    /*
     [LoggedOnly]
     [CheckAuth]
     [ManagerAndAbove]
@@ -402,4 +403,5 @@ namespace SESM.Controllers
             base.Dispose(disposing);
         }
     }
+    */
 }

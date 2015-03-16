@@ -421,10 +421,10 @@ namespace SESM.Controllers
         [LoggedOnly]
         [SuperAdmin]
         [CheckLockout]
-        public ActionResult CleanPerf()
+        public ActionResult CleanPerf() // TODO : Webservice call
         {
             _context.Database.ExecuteSqlCommand("truncate table SESM.dbo.EntityPerfEntries");
-            return RedirectToAction("Index", "Home").Success("Perf Data Cleaned Up");
+            return RedirectToAction("Index", "Home");
         }
 
         protected override void Dispose(bool disposing)

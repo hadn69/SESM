@@ -178,13 +178,18 @@ namespace SESM.Controllers.API
 
             // ** PROCESS **
             Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
-
+            IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             foreach (EntityServer item in servers)
             {
                 serviceLogger.Info(item.Name + " killed by " + user.Login + " by API/Server/DeleteServers/");
                 ServiceHelper.KillService(item);
                 Thread.Sleep(200);
                 ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(item));
+
+                scheduler.DeleteJob(ResetPriorityJob.GetJobKey(item));
+                scheduler.DeleteJob(AutoRestartJob.GetJobKey(item));
+                srvPrv.RemoveServer(item);
+
                 try
                 {
                     Directory.Delete(PathHelper.GetInstancePath(item), true);
@@ -760,37 +765,6 @@ namespace SESM.Controllers.API
             // ** Process **
             try
             {
-
-
-                /*
-                HashSet<EntityUser> webAdministrators = new HashSet<EntityUser>();
-                HashSet<EntityUser> webManagers = new HashSet<EntityUser>();
-                HashSet<EntityUser> webUsers = new HashSet<EntityUser>();
-
-                if (!string.IsNullOrWhiteSpace(webAdministratorsStr))
-                {
-                    foreach (string item in webAdministratorsStr.Split(';').Where(item => usrPrv.UserExist(item) && !webAdministrators.Contains(usrPrv.GetUser(item))))
-                        webAdministrators.Add(usrPrv.GetUser(item));
-                }
-
-                if (!string.IsNullOrWhiteSpace(webManagersStr))
-                {
-                    foreach (string item in webManagersStr.Split(';').Where(item => usrPrv.UserExist(item) && !webManagers.Contains(usrPrv.GetUser(item))))
-                        webManagers.Add(usrPrv.GetUser(item));
-                }
-
-                if (!string.IsNullOrWhiteSpace(webUsersStr))
-                {
-                    foreach (string item in webUsersStr.Split(';').Where(item => usrPrv.UserExist(item) && !webUsers.Contains(usrPrv.GetUser(item))))
-                        webUsers.Add(usrPrv.GetUser(item));
-                }
-
-
-                server.Administrators = webAdministrators;
-                server.Managers = webManagers;
-                server.Users = webUsers;
-
-    */
                 if(accessLevel != AccessLevel.Manager)
                     srvPrv.AddAdministrator(webAdministratorsStr.Split(';'),server);
                 srvPrv.AddManagers(webManagersStr.Split(';'), server);
