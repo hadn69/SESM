@@ -262,6 +262,11 @@ namespace SESM.DAL
             return _context.Servers.Where(item => item.UseServerExtender).ToList();
         }
 
+        public List<EntityServer> GetAllPublicServers()
+        {
+            return _context.Servers.Where(item => item.IsPublic).ToList();
+        }
+
         public List<EntityServer> GetServers(EntityUser user)
         {
             if(user == null)
