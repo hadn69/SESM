@@ -14,7 +14,7 @@
 <script type="text/javascript" src="/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" />
 
-<div class="col-md-12" id="content-div">
+<div class="col-md-12">
     <div class="portlet light">
         <div class="portlet-body">
             <div class="tabbable-custom nav-justified">
@@ -590,8 +590,10 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-offset-3 col-md-9">
-                    <button type="button" class="btn green" id="btnSave">Save</button>
+                <div class="col-md-6">
+                    <div class="col-md-offset-6 col-md-6">
+                        <button type="button" class="btn green" id="btnSave">Save</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -610,7 +612,7 @@
         // Initializers
         $.fn.bootstrapSwitch.defaults.onText = '<i class="fa fa-check"></i>';
         $.fn.bootstrapSwitch.defaults.offText = '<i class="fa fa-times"></i>';
-
+        $("input[type='checkbox']").bootstrapSwitch();
         // Network
         $('#inpServerPort').TouchSpin({
             buttondown_class: 'btn blue',
@@ -729,22 +731,19 @@
             step: 0.01
         });
 
-        $("input[type='checkbox']").bootstrapSwitch();
-
         var dataLoaded = false;
         var maskLoaded = false;
         var maskData = "";
 
         function ShowContent() {
             if (dataLoaded && maskLoaded) {
-                $("#loading-div").hide();
-                $("#content-div").show();
+                UnlockPage();
             }
         }
 
         function LoadParam() {
-            $("#loading-div").show();
-            $("#content-div").hide();
+            LockPage();
+
             dataLoaded = false;
             maskLoaded = false;
             $.post("/API/Server/GetConfiguration",

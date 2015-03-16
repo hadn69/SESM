@@ -3798,6 +3798,7 @@
     <Content Include="Views\Server\Configuration.cshtml" />
     <Content Include="Views\Settings\SE.cshtml" />
     <Content Include="Views\Server\Dashboard.cshtml" />
+    <Content Include="Views\Server\Settings.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -3918,9 +3919,9 @@
     <Compile Include="Models\Views\User\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\API\XMLMessage.cs" />
-    <Compile Include="Tools\AutoRestartJob.cs" />
-    <Compile Include="Tools\AutoStartJob.cs" />
-    <Compile Include="Tools\BackupJob.cs" />
+    <Compile Include="Tools\Jobs\AutoRestartJob.cs" />
+    <Compile Include="Tools\Jobs\AutoStartJob.cs" />
+    <Compile Include="Tools\Jobs\AutoBackupJob.cs" />
     <Compile Include="Tools\Constants.cs" />
     <Compile Include="Tools\Default.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
@@ -3931,7 +3932,7 @@
     <Compile Include="Tools\Helpers\PathHelper.cs" />
     <Compile Include="Tools\Helpers\SignParams.cs" />
     <Compile Include="Tools\Jobs\ReturnEnum.cs" />
-    <Compile Include="Tools\Jobs\SEAutoUpdate.cs" />
+    <Compile Include="Tools\Jobs\SEAutoUpdateJob.cs" />
     <Compile Include="Tools\Jobs\SESEAutoUpdateJob.cs" />
     <Compile Include="Tools\Monitor\Collector.cs" />
     <Compile Include="Tools\Helpers\ServiceHelper.cs" />

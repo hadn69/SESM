@@ -57,6 +57,18 @@ namespace SESM
                              "GetServer|" +
                              "CreateServer|" +
                              "DeleteServers|" +
+
+                             "GetSettings|" +
+                             "SetSettings|" +
+                             "GetSESESettings|" +
+                             "SetSESESettings|" +
+                             "GetJobsSettings|" +
+                             "SetJobsSettings|" +
+                             "GetBackupsSettings|" +
+                             "SetBackupsSettings|" +
+                             "GetAccessSettings|" +
+                             "SetAccessSettings|" +
+
                              "GetConfiguration|" +
                              "GetConfigurationRights|" +
                              "SetConfiguration|" +

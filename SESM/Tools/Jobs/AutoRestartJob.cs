@@ -33,5 +33,15 @@ namespace SESM.Tools
                 exceptionLogger.Fatal("Caught Exception in AutoRestart Job", ex);
             }
         }
+
+        public static JobKey GetJobKey(EntityServer server)
+        {
+            return new JobKey("AutoRestart" + server.Id, "AutoRestart");
+        }
+
+        public static TriggerKey GetTriggerKey(EntityServer server)
+        {
+            return new TriggerKey("AutoRestart" + server.Id, "AutoRestart");
+        }
     }
 }

@@ -34,6 +34,14 @@ namespace SESM.Controllers
             return View();
         }
 
+        // GET: 1/Settings
+        [HttpGet]
+        [CheckAuth]
+        public ActionResult Settings(int id)
+        {
+            return View();
+        }
+
         // GET: 1/Configuration
         [HttpGet]
         [CheckAuth]

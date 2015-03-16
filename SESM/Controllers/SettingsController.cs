@@ -176,80 +176,7 @@ namespace SESM.Controllers
             return View(model);
         }
 
-        //
-        // GET: Settings/UploadBin
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult UploadBin()
-        {
-            return View();
-        }
-
-        //
-        // POST: Settings/UploadBin
-        [HttpPost]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult UploadBin(UploadBinViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                EntityUser user = Session["User"] as EntityUser;
-                if (!ZipFile.IsZipFile(model.ServerZip.InputStream, false))
-                {
-                    ModelState.AddModelError("ZipError", "Your File is not a valid zip file");
-                    return View(model);
-                }
-
-                ServerProvider srvPrv = new ServerProvider(_context);
-
-                // Getting started server list
-                List<EntityServer> listStartedServ =
-                    srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
-                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
-                foreach (EntityServer item in srvPrv.GetAllServers())
-                {
-                    serviceLogger.Info(item.Name + " stopped by " + user.Login + " to Update Binaries");
-                    ServiceHelper.StopService(item);
-                }
-
-                foreach (EntityServer item in srvPrv.GetAllServers())
-                {
-                    ServiceHelper.WaitForStopped(item);
-                }
-
-                // Killing some ghost processes that might still exists
-                ServiceHelper.KillAllServices();
-
-                model.ServerZip.InputStream.Seek(0, SeekOrigin.Begin);
-
-                using (ZipFile zip = ZipFile.Read(model.ServerZip.InputStream))
-                {
-                    if (!Directory.Exists(SESMConfigHelper.SEDataPath))
-                        Directory.CreateDirectory(SESMConfigHelper.SEDataPath);
-                    if (Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
-                        Directory.Delete(SESMConfigHelper.SEDataPath + @"Content\", true);
-                    if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
-                        Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
-                    if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
-                        Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
-                    zip.ExtractAll(SESMConfigHelper.SEDataPath);
-                }
-
-                foreach (EntityServer item in listStartedServ)
-                {
-                    serviceLogger.Info(item.Name + " started by " + user.Login + " to Update Binaries");
-                    ServiceHelper.StartService(item);
-                }
-
-                return RedirectToAction("Index", "Server");
-            }
-            return View(model);
-        }
-
+   /*
         //
         // GET: Settings/Diagnosis
         [HttpGet]
@@ -336,8 +263,8 @@ namespace SESM.Controllers
                                             @"DedicatedServer64\SpaceEngineersDedicated.exe<br/>You should try to reupload your game files or activate the auto update";
             }
 
-
-            /*ServiceHelper.RegisterService("SESMDiagTest");
+            
+            ServiceHelper.RegisterService("SESMDiagTest");
             if (ServiceHelper.DoesServiceExist("SESMDiagTest"))
             {
                 model.ServiceCreation.State = true;
@@ -365,7 +292,7 @@ namespace SESM.Controllers
                 model.ServiceDeletion.State = null;
                 model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" irrelevant";
             }
-            */
+            
             try
             {
                 FileStream stream = System.IO.File.Create(@"C:\SESMDiagTest.bin");
@@ -422,31 +349,7 @@ namespace SESM.Controllers
             }
             return View(model);
         }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult AutoUpdate()
-        {
-            AutoUpdateViewModel model = new AutoUpdateViewModel();
-            model.AutoUpdate = SESMConfigHelper.AutoUpdateEnabled;
-            model.CronInterval = SESMConfigHelper.AutoUpdateCron;
-
-            return View(model);
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult SteamCMD()
-        {
-            SteamCMDViewModel model = new SteamCMDViewModel();
-            return View(model);
-        }
-
- 
+        */
 
         [HttpPost]
         [LoggedOnly]
@@ -464,7 +367,7 @@ namespace SESM.Controllers
             scheduler.DeleteJob(new JobKey("BackupLvl3Job", "Backups"));
             if (model.EnableLvl1)
             {
-                IJobDetail BackupJob = JobBuilder.Create<BackupJob>()
+                IJobDetail BackupJob = JobBuilder.Create<AutoBackupJob>()
                     .WithIdentity("BackupLvl1Job", "Backups")
                     .UsingJobData("lvl", 1)
                     .Build();
@@ -480,7 +383,7 @@ namespace SESM.Controllers
 
             if (model.EnableLvl2)
             {
-                IJobDetail BackupJob = JobBuilder.Create<BackupJob>()
+                IJobDetail BackupJob = JobBuilder.Create<AutoBackupJob>()
                     .WithIdentity("BackupLvl2Job", "Backups")
                     .UsingJobData("lvl", 2)
                     .Build();
@@ -496,7 +399,7 @@ namespace SESM.Controllers
 
             if (model.EnableLvl3)
             {
-                IJobDetail BackupJob = JobBuilder.Create<BackupJob>()
+                IJobDetail BackupJob = JobBuilder.Create<AutoBackupJob>()
                     .WithIdentity("BackupLvl3Job", "Backups")
                     .UsingJobData("lvl", 3)
                     .Build();
@@ -513,21 +416,7 @@ namespace SESM.Controllers
             return RedirectToAction("Index", "Server");
         }
 
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult CleanSteamCMD()
-        {
-            if (Directory.Exists(SESMConfigHelper.SEDataPath + @"\SteamCMD\"))
-                Directory.Delete(SESMConfigHelper.SEDataPath + @"\SteamCMD\", true);
-
-            if (Directory.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\"))
-                Directory.Delete(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\", true);
-
-            return RedirectToAction("Index", "Home").Success("Auto/Manual Update Cleaned Up");
-        }
-
+     
         [HttpGet]
         [LoggedOnly]
         [SuperAdmin]
@@ -536,137 +425,6 @@ namespace SESM.Controllers
         {
             _context.Database.ExecuteSqlCommand("truncate table SESM.dbo.EntityPerfEntries");
             return RedirectToAction("Index", "Home").Success("Perf Data Cleaned Up");
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        public ActionResult SESEManualUpdate()
-        {
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-
-            logger.Info("----Starting SESEManualUpdate----");
-
-            string SESEUrl = ""; //SESEHelper.UpdateIsAvailable();
-            if(!string.IsNullOrEmpty(SESEUrl))
-            {
-                logger.Info("SE Server Extender Update detected");
-                logger.Info("URL : " + SESEUrl);
-                logger.Info("Cleaning up SESE Zip");
-                SESEHelper.CleanupUpdate();
-                logger.Info("Downloading New SESE Update Zip");
-                SESEHelper.DownloadUpdate(SESEUrl);
-                logger.Info("Initiating lockdown mode ...");
-                SESMConfigHelper.Lockdown = true;
-                logger.Info("Waiting 30 secs for all requests to end ...");
-                Thread.Sleep(30000);
-                DataContext context = new DataContext();
-                ServerProvider srvPrv = new ServerProvider(context);
-                List<EntityServer> listStartedServ = srvPrv.GetAllServers().Where(item => item.UseServerExtender && srvPrv.GetState(item) == ServiceState.Running).ToList();
-
-                logger.Info("Stopping SESE running server ...");
-                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Sending stop order to " + item.Name);
-                    serviceLogger.Info(item.Name + " stopped by SESEManualUpdate");
-                    ServiceHelper.StopService(item);
-                }
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Waiting for stop of " + item.Name);
-                    ServiceHelper.WaitForStopped(item);
-                }
-                logger.Info("Killing ghosts processes");
-                // Killing some ghost processes that might still exists
-                ServiceHelper.KillAllSESEServices();
-
-                logger.Info("Applying SESE Files");
-                SESEHelper.ApplyUpdate();
-
-                logger.Info("SESE Update finished, lifting lockdown");
-                SESMConfigHelper.Lockdown = false;
-
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Restarting " + item.Name);
-                    serviceLogger.Info(item.Name + " stopped by SESEManualUpdate");
-                    ServiceHelper.StartService(item);
-                }
-
-                logger.Info("----End of SESEManualUpdate----");
-                return RedirectToAction("Index").Success("SESE Update applyed");
-            }
-            else
-            {
-                logger.Info("No SE Server Extender Update detected");
-                logger.Info("----End of SESEManualUpdate----");
-                return RedirectToAction("Index").Warning("No SESE Update detected");
-            }
-        }
-
-        public ActionResult SESEManualUpdateForce()
-        {
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-
-            logger.Info("----Starting SESEManualUpdateForce----");
-            logger.Info("Cleaning up SESE Zip");
-            SESEHelper.CleanupUpdate();
-            string SESEUrl = "";//SESEHelper.UpdateIsAvailable();
-            if(!string.IsNullOrEmpty(SESEUrl))
-            {
-                logger.Info("SE Server Extender Update detected");
-                logger.Info("URL : " + SESEUrl);
-
-                logger.Info("Downloading New SESE Update Zip");
-                SESEHelper.DownloadUpdate(SESEUrl);
-                logger.Info("Initiating lockdown mode ...");
-                SESMConfigHelper.Lockdown = true;
-                logger.Info("Waiting 30 secs for all requests to end ...");
-                Thread.Sleep(30000);
-                DataContext context = new DataContext();
-                ServerProvider srvPrv = new ServerProvider(context);
-                List<EntityServer> listStartedServ = srvPrv.GetAllServers().Where(item => item.UseServerExtender && srvPrv.GetState(item) == ServiceState.Running).ToList();
-
-                logger.Info("Stopping SESE running server ...");
-                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Sending stop order to " + item.Name);
-                    serviceLogger.Info(item.Name + " stopped by SESEManualUpdate");
-                    ServiceHelper.StopService(item);
-                }
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Waiting for stop of " + item.Name);
-                    ServiceHelper.WaitForStopped(item);
-                }
-                logger.Info("Killing ghosts processes");
-                // Killing some ghost processes that might still exists
-                ServiceHelper.KillAllSESEServices();
-
-                logger.Info("Applying SESE Files");
-                SESEHelper.ApplyUpdate();
-
-                logger.Info("SESE Update finished, lifting lockdown");
-                SESMConfigHelper.Lockdown = false;
-
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Restarting " + item.Name);
-                    serviceLogger.Info(item.Name + " stopped by SESEManualUpdate");
-                    ServiceHelper.StartService(item);
-                }
-
-                logger.Info("----End of SESEManualUpdateForce----");
-                return RedirectToAction("Index").Success("SESE Update applyed");
-            }
-            else
-            {
-                logger.Info("No SE Server Extender Update detected");
-                logger.Info("----End of SESEManualUpdateForce----");
-                return RedirectToAction("Index").Warning("No SESE Update detected");
-            }
         }
 
         protected override void Dispose(bool disposing)

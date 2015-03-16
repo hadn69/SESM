@@ -105,7 +105,6 @@ namespace SESM.Controllers.API
             bool autoUpdateEnabled;
             if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateEnabled"]))
                 return Content(XMLMessage.Error("SET-SSES-MISAUE", "The AutoUpdateEnabled field must be provided").ToString());
-
             if (!bool.TryParse(Request.Form["AutoUpdateEnabled"], out autoUpdateEnabled))
                 return Content(XMLMessage.Error("SET-SSES-BADAUE", "The AutoUpdateEnabled field must be equal to \"True\" or \"False\"").ToString());
 
@@ -113,7 +112,6 @@ namespace SESM.Controllers.API
             string autoUpdateCron = Request.Form["AutoUpdateCron"];
             if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateCron"]))
                 return Content(XMLMessage.Error("SET-SSES-MISAUC", "The AutoUpdateCron field must be provided").ToString());
-
             if (!CronExpression.IsValidExpression(autoUpdateCron))
                 return Content(XMLMessage.Error("SET-SSES-BADAUC", "The AutoUpdateCron field is invalid").ToString());
 

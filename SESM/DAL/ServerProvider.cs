@@ -68,6 +68,8 @@ namespace SESM.DAL
 
         public void AddAdministrator(string[] listUsers, EntityServer server)
         {
+            if (listUsers == null || listUsers.Length == 0)
+                return;
             UserProvider usrPrv = new UserProvider(_context);
             server.Administrators = null;
 
@@ -79,6 +81,8 @@ namespace SESM.DAL
 
         public void AddManagers(string[] listUsers, EntityServer server)
         {
+            if(listUsers == null || listUsers.Length == 0)
+                return;
             UserProvider usrPrv = new UserProvider(_context);
             server.Managers = null;
 
@@ -90,6 +94,8 @@ namespace SESM.DAL
 
         public void AddUsers(string[] listUsers, EntityServer server)
         {
+            if (listUsers == null || listUsers.Length == 0)
+                return;
             UserProvider usrPrv = new UserProvider(_context);
             server.Users = null;
 
@@ -98,6 +104,7 @@ namespace SESM.DAL
                 server.Users.Add(usrPrv.GetUser(item));
             }
         }
+
 
         public EntityServer GetServer(int id)
         {
@@ -138,6 +145,18 @@ namespace SESM.DAL
                 return ServiceState.Unknow;
             }
 
+        }
+
+        public bool IsNameAvaialble(string name)
+        {
+            try
+            {
+                return !_context.Servers.Any(s => s.Name == name);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public void UpdateServer(EntityServer server)

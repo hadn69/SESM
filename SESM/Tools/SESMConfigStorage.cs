@@ -11,6 +11,7 @@ namespace SESM.Tools
         public string SESavePath { get; set; }
         public string SEDataPath { get; set; }
         public string Arch { get; set; }
+        public bool PerfMonitorEnabled { get; set; }
 
         // Auto-Update Settings
         public bool AutoUpdateEnabled { get; set; }
@@ -22,6 +23,17 @@ namespace SESM.Tools
         public bool SESEAutoUpdateEnabled { get; set; }
         public bool SESEAutoUpdateUseDev { get; set; }
         public string SESEAutoUpdateCron { get; set; }
+
+        // Backups Settings
+        public bool AutoBackupLvl1Enabled { get; set; }
+        public string AutoBackupLvl1Cron { get; set; }
+        public int AutoBackupLvl1NbToKeep { get; set; }
+        public bool AutoBackupLvl2Enabled { get; set; }
+        public string AutoBackupLvl2Cron { get; set; }
+        public int AutoBackupLvl2NbToKeep { get; set; }
+        public bool AutoBackupLvl3Enabled { get; set; }
+        public string AutoBackupLvl3Cron { get; set; }
+        public int AutoBackupLvl3NbToKeep { get; set; }
 
         // Misc
         public bool DiagnosisEnabled { get; set; }
@@ -36,23 +48,37 @@ namespace SESM.Tools
             SESavePath = @"C:\ProgramData\SpaceEngineersDedicated\";
             SEDataPath = @"C:\SpaceEngineers\";
             Arch = "x64";
+            PerfMonitorEnabled = true;
 
             // Auto-Update Settings
             AutoUpdateEnabled = true;
             AutoUpdateCron = "0 0/10 * * * ?";
             AutoUpdateBetaPassword = string.Empty;
 
-            // SESEAuto-Update Settings
+            // SESE Auto-Update Settings
             SESEUpdateURL = "https://api.github.com/repos/Tyrsis/SE-Community-Mod-API/releases";
             SESEAutoUpdateEnabled = false;
             SESEAutoUpdateUseDev = true;
             SESEAutoUpdateCron = "0 5/10 * * * ?";
 
+            // Backups Settings
+            AutoBackupLvl1Enabled = false;
+            AutoBackupLvl1Cron = "0 0/10 * * * ?";
+            AutoBackupLvl1NbToKeep = 6;
+
+            AutoBackupLvl2Enabled = false;
+            AutoBackupLvl2Cron = "0 0 * * * ?";
+            AutoBackupLvl2NbToKeep = 24;
+
+            AutoBackupLvl3Enabled = false;
+            AutoBackupLvl3Cron = "0 0 0 * * ?";
+            AutoBackupLvl3NbToKeep = 14;
+
             // Misc
             DiagnosisEnabled = false;
             BlockDll = true;
             LowPriorityStart = false;
-        }   
+        }
         protected override IConfigurationProvider OnCreateDefaultProvider(string sectionName, object configData)
         {
             ConfigurationFileConfigurationProvider<SESMConfigStorage> provider = new ConfigurationFileConfigurationProvider<SESMConfigStorage>()
@@ -60,8 +86,8 @@ namespace SESM.Tools
                 ConfigurationFile = AppDomain.CurrentDomain.BaseDirectory + @"\SESM.config",
                 ConfigurationSection = sectionName,
             };
-            
+
             return provider;
-        }    
+        }
     }
 }

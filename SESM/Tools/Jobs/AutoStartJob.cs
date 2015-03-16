@@ -38,5 +38,15 @@ namespace SESM.Tools
                 exceptionLogger.Fatal("Caught Exception in AutoStart Job", ex);
             }
         }
+
+        public static JobKey GetJobKey()
+        {
+            return new JobKey("AutoStart", "AutoStart");
+        }
+
+        public static TriggerKey GetTriggerKey()
+        {
+            return new TriggerKey("AutoStart", "AutoStart");
+        }
     }
 }

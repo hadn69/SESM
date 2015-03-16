@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Mvc;
 using System.Xml.Linq;
 using NLog;
+using Quartz;
+using Quartz.Impl;
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools;
 using SESM.Tools.API;
 using SESM.Tools.Helpers;
+using SESM.Tools.Jobs;
 
 namespace SESM.Controllers.API
 {
@@ -191,6 +195,615 @@ namespace SESM.Controllers.API
             }
 
             return Content(XMLMessage.Success("SRV-DEL-OK", "The following server(s) have been deleted : " + string.Join(", ", servers.Select(x => x.Name))).ToString());
+        }
+
+        #endregion
+
+        #region Server Settings
+
+        // POST: API/Server/GetSettings
+        [HttpPost]
+        public ActionResult GetSettings()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-GSET-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-GSET-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-GSET-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("SRV-GSET-NOACCESS", "You don't have access to this server").ToString());
+
+            // ** PROCESS **
+
+            XMLMessage response = new XMLMessage("SRV-GSET-OK");
+
+            response.AddToContent(new XElement("Name", server.Name));
+            response.AddToContent(new XElement("Public", server.IsPublic));
+            response.AddToContent(new XElement("ProcessPriority", server.ProcessPriority.ToString()));
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Server/SetSettings
+        [HttpPost]
+        public ActionResult SetSettings()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-SSET-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-SSET-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-SSET-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsAdminOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("SRV-SSET-NOACCESS", "You don't have access to this server").ToString());
+
+            string serverName = Request.Form["Name"];
+            if (string.IsNullOrWhiteSpace(serverName))
+                return Content(XMLMessage.Error("SRV-SSET-MISNAME", "The Name field must be provided").ToString());
+            if (!Regex.IsMatch(serverName, @"^[a-zA-Z0-9_.-]+$"))
+                return Content(XMLMessage.Error("SRV-SSET-BADNAME", "The Name field must be only composed of letters, numbers, dots, dashs and underscores").ToString());
+            if (serverName != server.Name && !srvPrv.IsNameAvaialble(serverName))
+                return Content(XMLMessage.Error("SRV-SSET-NAMEUSE", "The server " + serverName + "Already Exist").ToString());
+
+            bool serverPublic;
+            if (string.IsNullOrWhiteSpace(Request.Form["Public"]))
+                return Content(XMLMessage.Error("SRV-SSET-MISPUB", "The Public field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["Public"], out serverPublic))
+                return Content(XMLMessage.Error("SRV-SSET-BADPUB", "The Public field is invalid").ToString());
+
+            EnumProcessPriority serverProcessPriority;
+            if (string.IsNullOrWhiteSpace(Request.Form["ProcessPriority"]))
+                return Content(XMLMessage.Error("SRV-SSET-MISPP", "The ProcessPriority field must be provided").ToString());
+            if (!Enum.TryParse(Request.Form["ProcessPriority"], out serverProcessPriority))
+                return Content(XMLMessage.Error("SRV-SSET-BADPP", "The ProcessPriority field is invalid").ToString());
+
+            // ** Process **
+            try
+            {
+                ServiceState serverState = srvPrv.GetState(server);
+                bool restartRequired = false;
+
+                if (serverName != server.Name)
+                {
+                    if (serverState != ServiceState.Stopped &&
+                        serverState != ServiceState.Unknow)
+                    {
+                        ServiceHelper.StopServiceAndWait(server);
+                        Thread.Sleep(5000);
+                        ServiceHelper.KillService(server);
+                        Thread.Sleep(1000);
+                        restartRequired = true;
+                    }
+                    ServiceHelper.UnRegisterService(server);
+                    string oldpath = PathHelper.GetInstancePath(server);
+                    server.Name = serverName;
+                    string newpath = PathHelper.GetInstancePath(server);
+
+                    Directory.Move(oldpath, newpath);
+
+                    if (server.UseServerExtender)
+                        ServiceHelper.RegisterServerExtenderService(server);
+                    else
+                        ServiceHelper.RegisterService(server);
+                }
+                server.IsPublic = serverPublic;
+                server.ProcessPriority = serverProcessPriority;
+
+                if (serverState != ServiceState.Stopped && serverState != ServiceState.Unknow)
+                    ServiceHelper.SetPriority(server);
+
+                srvPrv.UpdateServer(server);
+                if (restartRequired)
+                    ServiceHelper.StartService(server);
+
+                return Content(XMLMessage.Success("SRV-SSET-OK", "The server settings have been updated").ToString());
+            }
+            catch (Exception ex)
+            {
+                return Content(XMLMessage.Error("SRV-SSET-EX", "Exception :" + ex).ToString());
+            }
+        }
+
+        // POST: API/Server/GetSESESettings
+        [HttpPost]
+        public ActionResult GetSESESettings()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-GSESES-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-GSESES-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-GSESES-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("SRV-GSESES-NOACCESS", "You don't have access to this server").ToString());
+
+            // ** PROCESS **
+
+            XMLMessage response = new XMLMessage("SRV-GSESES-OK");
+
+            response.AddToContent(new XElement("UseServerExtender", server.UseServerExtender));
+            response.AddToContent(new XElement("ServerExtenderPort", server.ServerExtenderPort));
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Server/SetSESESettings
+        [HttpPost]
+        public ActionResult SetSESESettings()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-SSESES-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-SSESES-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-SSESES-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("SRV-SSESES-NOACCESS", "You don't have access to this server").ToString());
+
+            bool useServerExtender;
+            if (string.IsNullOrWhiteSpace(Request.Form["UseServerExtender"]))
+                return Content(XMLMessage.Error("SRV-SSESES-MISUSE", "The UseServerExtender field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["UseServerExtender"], out useServerExtender))
+                return Content(XMLMessage.Error("SRV-SSESES-BADUSE", "The UseServerExtender field is invalid").ToString());
+
+            int serverExtenderPort;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerExtenderPort"]))
+                return Content(XMLMessage.Error("SRV-SSESES-MISSEP", "The ServerExtenderPort field must be provided").ToString());
+            if (!int.TryParse(Request.Form["ServerExtenderPort"], out serverExtenderPort) || serverExtenderPort < 1 || serverExtenderPort > 65535)
+                return Content(XMLMessage.Error("SRV-SSESES-BADSEP", "The ServerExtenderPort field is invalid").ToString());
+            if (serverExtenderPort != server.ServerExtenderPort && !srvPrv.IsPortAvailable(serverExtenderPort, server))
+                return Content(XMLMessage.Error("SRV-SSESES-EXSEP", "The ServerExtenderPort is already in use by another server").ToString());
+
+            // ** Process **
+            try
+            {
+                ServiceState serverState = srvPrv.GetState(server);
+                bool restartRequired = false;
+
+                if (serverState != ServiceState.Stopped &&
+                    serverState != ServiceState.Unknow)
+                {
+                    ServiceHelper.StopServiceAndWait(server);
+                    Thread.Sleep(5000);
+                    ServiceHelper.KillService(server);
+                    Thread.Sleep(1000);
+                    restartRequired = true;
+                }
+
+                if (useServerExtender != server.UseServerExtender)
+                {
+                    server.UseServerExtender = useServerExtender;
+                    ServiceHelper.UnRegisterService(server);
+                    if (server.UseServerExtender)
+                        ServiceHelper.RegisterServerExtenderService(server);
+                    else
+                        ServiceHelper.RegisterService(server);
+                }
+
+                server.ServerExtenderPort = serverExtenderPort;
+
+                srvPrv.UpdateServer(server);
+                if (restartRequired)
+                    ServiceHelper.StartService(server);
+
+                return Content(XMLMessage.Success("SRV-SSESES-OK", "The server SESE settings have been updated").ToString());
+            }
+            catch (Exception ex)
+            {
+                return Content(XMLMessage.Error("SRV-SSESES-EX", "Exception :" + ex).ToString());
+            }
+        }
+
+        // POST: API/Server/GetJobsSettings
+        [HttpPost]
+        public ActionResult GetJobsSettings()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-GJS-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-GJS-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-GJS-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("SRV-GJS-NOACCESS", "You don't have access to this server").ToString());
+
+            // ** PROCESS **
+
+            XMLMessage response = new XMLMessage("SRV-GJS-OK");
+
+            response.AddToContent(new XElement("AutoRestart", server.IsAutoRestartEnabled));
+            response.AddToContent(new XElement("AutoRestartCron", server.AutoRestartCron));
+            response.AddToContent(new XElement("AutoStart", server.IsAutoStartEnabled));
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Server/SetJobsSettings
+        [HttpPost]
+        public ActionResult SetJobsSettings()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-SJS-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-SJS-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-SJS-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("SRV-SJS-NOACCESS", "You don't have access to this server").ToString());
+
+            bool autoRestart;
+            if (string.IsNullOrWhiteSpace(Request.Form["AutoRestart"]))
+                return Content(XMLMessage.Error("SRV-SJS-MISAR", "The AutoRestart field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["AutoRestart"], out autoRestart))
+                return Content(XMLMessage.Error("SRV-SJS-BADAR", "The AutoRestart field is invalid").ToString());
+
+            string autoRestartCron = Request.Form["AutoRestartCron"];
+            if (string.IsNullOrWhiteSpace(autoRestartCron))
+                return Content(XMLMessage.Error("SET-SJS-MISARC", "The AutoRestartCron field must be provided").ToString());
+            if (!CronExpression.IsValidExpression(autoRestartCron))
+                return Content(XMLMessage.Error("SET-SJS-BADARC", "The AutoRestartCron field is invalid").ToString());
+
+            bool autoStart;
+            if (string.IsNullOrWhiteSpace(Request.Form["AutoStart"]))
+                return Content(XMLMessage.Error("SRV-SJS-MISAS", "The AutoStart field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["AutoStart"], out autoStart))
+                return Content(XMLMessage.Error("SRV-SJS-BADAS", "The AutoStart field is invalid").ToString());
+
+            // ** Process **
+            try
+            {
+                if (autoRestart != server.IsAutoRestartEnabled || server.AutoRestartCron != autoRestartCron)
+                {
+                    server.IsAutoRestartEnabled = autoRestart;
+                    server.AutoRestartCron = autoRestartCron;
+
+                    IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+                    scheduler.DeleteJob(SEAutoUpdateJob.GetJobKey());
+
+                    if (server.IsAutoRestartEnabled)
+                    {
+                        // Instantiating the job
+                        IJobDetail AutoRestartJobDetail = JobBuilder.Create<AutoRestartJob>()
+                            .WithIdentity(AutoRestartJob.GetJobKey(server))
+                            .Build();
+
+                        ITrigger AutoRestartJobTrigger = TriggerBuilder.Create()
+                            .WithIdentity(AutoRestartJob.GetTriggerKey(server))
+                            .WithCronSchedule(autoRestartCron)
+                            .Build();
+
+                        scheduler.ScheduleJob(AutoRestartJobDetail, AutoRestartJobTrigger);
+                    }
+                }
+
+                server.IsAutoStartEnabled = autoStart;
+
+                srvPrv.UpdateServer(server);
+
+                return Content(XMLMessage.Success("SRV-SSESESET-OK", "The server Jobs settings have been updated").ToString());
+            }
+            catch (Exception ex)
+            {
+                return Content(XMLMessage.Error("SRV-SSESESET-EX", "Exception :" + ex).ToString());
+            }
+        }
+
+        // POST: API/Server/GetBackupsSettings
+        [HttpPost]
+        public ActionResult GetBackupsSettings()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-GBS-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-GBS-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-GBS-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("SRV-GBS-NOACCESS", "You don't have access to this server").ToString());
+
+            // ** PROCESS **
+
+            XMLMessage response = new XMLMessage("SRV-GBS-OK");
+
+            response.AddToContent(new XElement("Lvl1BackupEnabled", server.IsLvl1BackupEnabled));
+            response.AddToContent(new XElement("Lvl1BackupInfos", "Cron : " + SESMConfigHelper.AutoBackupLvl1Cron +
+                                                                " ; " + (SESMConfigHelper.AutoBackupLvl1Enabled ? "Enabled" : "Disabled") +
+                                                                " ; Nb Rotating Backup : " + SESMConfigHelper.AutoBackupLvl1NbToKeep));
+            response.AddToContent(new XElement("Lvl2BackupEnabled", server.IsLvl2BackupEnabled));
+            response.AddToContent(new XElement("Lvl2BackupInfos", "Cron : " + SESMConfigHelper.AutoBackupLvl2Cron +
+                                                                " ; " + (SESMConfigHelper.AutoBackupLvl2Enabled ? "Enabled" : "Disabled") +
+                                                                " ; Nb Rotating Backup : " + SESMConfigHelper.AutoBackupLvl2NbToKeep));
+            response.AddToContent(new XElement("Lvl3BackupEnabled", server.IsLvl3BackupEnabled));
+            response.AddToContent(new XElement("Lvl3BackupInfos", "Cron : " + SESMConfigHelper.AutoBackupLvl3Cron +
+                                                                " ; " + (SESMConfigHelper.AutoBackupLvl3Enabled ? "Enabled" : "Disabled") +
+                                                                " ; Nb Rotating Backup : " + SESMConfigHelper.AutoBackupLvl3NbToKeep));
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Server/SetBackupsSettings
+        [HttpPost]
+        public ActionResult SetBackupsSettings()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-SBS-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-SBS-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-SBS-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("SRV-SBS-NOACCESS", "You don't have access to this server").ToString());
+
+            bool lvl1BackupEnabled;
+            if (string.IsNullOrWhiteSpace(Request.Form["Lvl1BackupEnabled"]))
+                return Content(XMLMessage.Error("SRV-SBS-LVL1", "The Lvl1BackupEnabled field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["Lvl1BackupEnabled"], out lvl1BackupEnabled))
+                return Content(XMLMessage.Error("SRV-SBS-LVL1", "The Lvl1BackupEnabled field is invalid").ToString());
+
+            bool lvl2BackupEnabled;
+            if (string.IsNullOrWhiteSpace(Request.Form["Lvl2BackupEnabled"]))
+                return Content(XMLMessage.Error("SRV-SBS-LVL2", "The Lvl2BackupEnabled field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["Lvl2BackupEnabled"], out lvl2BackupEnabled))
+                return Content(XMLMessage.Error("SRV-SBS-LVL2", "The Lvl2BackupEnabled field is invalid").ToString());
+
+            bool lvl3BackupEnabled;
+            if (string.IsNullOrWhiteSpace(Request.Form["Lvl3BackupEnabled"]))
+                return Content(XMLMessage.Error("SRV-SBS-LVL3", "The Lvl3BackupEnabled field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["Lvl3BackupEnabled"], out lvl3BackupEnabled))
+                return Content(XMLMessage.Error("SRV-SBS-LVL3", "The Lvl3BackupEnabled field is invalid").ToString());
+
+            // ** Process **
+            try
+            {
+                server.IsLvl1BackupEnabled = lvl1BackupEnabled;
+                server.IsLvl2BackupEnabled = lvl2BackupEnabled;
+                server.IsLvl3BackupEnabled = lvl3BackupEnabled;
+
+                srvPrv.UpdateServer(server);
+
+                return Content(XMLMessage.Success("SRV-SBS-OK", "The server backups settings have been updated").ToString());
+            }
+            catch (Exception ex)
+            {
+                return Content(XMLMessage.Error("SRV-SBS-EX", "Exception :" + ex).ToString());
+            }
+        }
+
+        // POST: API/Server/GetAccessSettings
+        [HttpPost]
+        public ActionResult GetAccessSettings()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-GAS-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-GAS-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-GAS-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("SRV-GAS-NOACCESS", "You don't have access to this server").ToString());
+
+            // ** PROCESS **
+
+            XMLMessage response = new XMLMessage("SRV-GAS-OK");
+
+            XElement webAdministrators = new XElement("WebAdministrators");
+            foreach (EntityUser wadmin in server.Administrators)
+                webAdministrators.Add(new XElement("WebAdministrator", wadmin.Login));
+            response.AddToContent(webAdministrators);
+
+            XElement webManagers = new XElement("WebManagers");
+            foreach (EntityUser wmanager in server.Managers)
+                webManagers.Add(new XElement("WebManager", wmanager.Login));
+            response.AddToContent(webManagers);
+
+            XElement webUsers = new XElement("WebUsers");
+            foreach (EntityUser wuser in server.Users)
+                webUsers.Add(new XElement("WebUser", wuser.Login));
+            response.AddToContent(webUsers);
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Server/SetAccessSettings
+        [HttpPost]
+        public ActionResult SetAccessSettings()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+            UserProvider usrPrv = new UserProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-SAS-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-SAS-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-SAS-UKNSRV", "The server doesn't exist").ToString());
+
+            AccessLevel accessLevel = srvPrv.GetAccessLevel(userID, server.Id);
+            if (!srvPrv.IsManagerOrAbore(accessLevel))
+                return Content(XMLMessage.Error("SRV-SAS-NOACCESS", "You don't have access to this server").ToString());
+
+            string webAdministratorsStr = Request.Form["WebAdministrators"];
+            if (accessLevel == AccessLevel.Manager && !string.IsNullOrWhiteSpace(webAdministratorsStr))
+                return Content(XMLMessage.Error("SRV-SAS-NOADMACC", "You don't sufficient priviledges to edit the administrators list").ToString());
+
+            string webManagersStr = Request.Form["WebManagers"];
+            string webUsersStr = Request.Form["WebUsers"];
+
+            // ** Process **
+            try
+            {
+
+
+                /*
+                HashSet<EntityUser> webAdministrators = new HashSet<EntityUser>();
+                HashSet<EntityUser> webManagers = new HashSet<EntityUser>();
+                HashSet<EntityUser> webUsers = new HashSet<EntityUser>();
+
+                if (!string.IsNullOrWhiteSpace(webAdministratorsStr))
+                {
+                    foreach (string item in webAdministratorsStr.Split(';').Where(item => usrPrv.UserExist(item) && !webAdministrators.Contains(usrPrv.GetUser(item))))
+                        webAdministrators.Add(usrPrv.GetUser(item));
+                }
+
+                if (!string.IsNullOrWhiteSpace(webManagersStr))
+                {
+                    foreach (string item in webManagersStr.Split(';').Where(item => usrPrv.UserExist(item) && !webManagers.Contains(usrPrv.GetUser(item))))
+                        webManagers.Add(usrPrv.GetUser(item));
+                }
+
+                if (!string.IsNullOrWhiteSpace(webUsersStr))
+                {
+                    foreach (string item in webUsersStr.Split(';').Where(item => usrPrv.UserExist(item) && !webUsers.Contains(usrPrv.GetUser(item))))
+                        webUsers.Add(usrPrv.GetUser(item));
+                }
+
+
+                server.Administrators = webAdministrators;
+                server.Managers = webManagers;
+                server.Users = webUsers;
+
+    */
+                if(accessLevel != AccessLevel.Manager)
+                    srvPrv.AddAdministrator(webAdministratorsStr.Split(';'),server);
+                srvPrv.AddManagers(webManagersStr.Split(';'), server);
+                srvPrv.AddUsers(webUsersStr.Split(';'), server);
+
+                srvPrv.UpdateServer(server);
+
+                return Content(XMLMessage.Success("SRV-SAS-OK", "The server Access settings have been updated").ToString());
+            }
+            catch (Exception ex)
+            {
+                return Content(XMLMessage.Error("SRV-SAS-EX", "Exception :" + ex).ToString());
+            }
         }
 
         #endregion
@@ -701,8 +1314,8 @@ namespace SESM.Controllers.API
                 ServiceHelper.StartService(server);
                 return Content(XMLMessage.Success("SRV-SC-OK", "The server configuration has been updated, the server is restarting ...").ToString());
             }
-            
-            return Content(XMLMessage.Success("SRV-SC-OK","The server configuration has been updated").ToString());
+
+            return Content(XMLMessage.Success("SRV-SC-OK", "The server configuration has been updated").ToString());
         }
 
         #endregion

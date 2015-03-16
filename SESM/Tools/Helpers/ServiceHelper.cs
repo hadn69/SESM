@@ -276,6 +276,12 @@ namespace SESM.Tools.Helpers
             si.Close();
         }
 
+        public static void UnRegisterService(EntityServer server)
+        {
+            UnRegisterService(GetServiceName(server));
+            return;
+        }
+
         public static void UnRegisterService(string serviceName)
         {
             if (DoesServiceExist(serviceName))
