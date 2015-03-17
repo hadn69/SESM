@@ -61,6 +61,17 @@ namespace SESM
                 }
             );
 
+            // Map API
+            routes.MapRoute(
+                name: "APIMap",
+                url: "API/Map/{action}",
+                defaults: new { controller = "APIMap" },
+                constraints: new
+                {
+                    action = "GetMaps"
+                }
+            );
+
             // Explorer API
             routes.MapRoute(
                 name: "APIExplorer",
@@ -127,13 +138,6 @@ namespace SESM
                 defaults: new { action = "Browse", controller = "Explorer" }
             );
 
-            // Map
-            routes.MapRoute(
-                name: "Map",
-                url: "{id}/Map",
-                defaults: new { action = "Index", controller = "Map" }
-            );
-
             // Account
             routes.MapRoute(
                 name: "Account",
@@ -167,7 +171,8 @@ namespace SESM
                 constraints: new
                 {
                     action = "Dashboard|" +
-                             "Configuration"
+                             "Configuration|" + 
+                             "Maps"
                 }
             );
 

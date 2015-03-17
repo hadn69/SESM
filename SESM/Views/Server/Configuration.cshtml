@@ -3,8 +3,8 @@
 
     List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
     breadCrumb.Add(new KeyValuePair<string, string>("Server", "/Server/"));
-    breadCrumb.Add(new KeyValuePair<string, string>(ViewBag.Server.Name, "/Servers/Dashboard/" + ViewBag.ServerID));
-    breadCrumb.Add(new KeyValuePair<string, string>("Server Configuration", "/Explorer/Browse/" + ViewBag.ServerID));
+    breadCrumb.Add(new KeyValuePair<string, string>(ViewBag.Server.Name, "/" + ViewBag.ServerID + "/Dashboard/"));
+    breadCrumb.Add(new KeyValuePair<string, string>("Server Configuration", "/" + ViewBag.ServerID + "/Configuration/"));
     ViewBag.Breadcrumb = breadCrumb;
 
     ViewBag.RefreshBtn = true;

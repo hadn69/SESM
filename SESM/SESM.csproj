@@ -3799,6 +3799,7 @@
     <Content Include="Views\Error\404.cshtml" />
     <Content Include="Views\Explorer\Browse.cshtml" />
     <Content Include="Views\Server\Configuration.cshtml" />
+    <Content Include="Views\Server\Maps.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -3828,6 +3829,7 @@
     <Compile Include="Controllers\ActionFilters\SuperAdminAttribute.cs" />
     <Compile Include="Controllers\API\APIAccountController.cs" />
     <Compile Include="Controllers\API\APIExplorerController.cs" />
+    <Compile Include="Controllers\API\APIMapController.cs" />
     <Compile Include="Controllers\API\APIServerController.cs" />
     <Compile Include="Controllers\API\APISettingsController.cs" />
     <Compile Include="Controllers\API\APIMiscController.cs" />
