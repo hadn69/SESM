@@ -43,7 +43,7 @@
     </li>
     <li>
         <a href="/Servers/">
-            <i class="icon-power"></i>
+            <i class="icon-globe"></i>
             <span class="title">Servers</span>
             <span class="arrow "></span>
         </a>
@@ -58,6 +58,9 @@
                         </a>
                         <ul class="sub-menu">
                             <li>
+                                <a href="/@item.Id/Dashboard/"><i class="icon-speedometer"></i> Dashboard</a>
+                            </li>
+                            <li>
                                 <a href="/@item.Id/Settings/"><i class="icon-settings"></i> Server Settings</a>
                             </li>
                             <li>
@@ -69,16 +72,18 @@
                             <li>
                                 <a href="/@item.Id/Maps/"><i class="icon-compass"></i> Maps Manager</a>
                             </li>
+                            <li>
+                                <a href="/@item.Id/Status/"><i class="icon-screen-desktop"></i> Status Page</a>
+                            </li>
                         </ul>
                     </li>
                 }
                 @foreach (EntityServer item in publicServers.OrderBy(x => x.Name))
                 {
                     <li>
-                        <a href="/@item.Id/Dashboard/">
-                            @item.Name <span class="arrow"></span>
+                        <a href="/@item.Id/Status/">
+                            @item.Name
                         </a>
-                        
                     </li>
                 }
             </ul>
@@ -95,14 +100,19 @@
         </li>
         <li>
             <a href="/Settings/">
-                <i class="icon-equalizer"></i>
+                <i class="icon-settings"></i>
                 <span class="title">Global Settings</span>
                 <span class="arrow "></span>
             </a>
             <ul class="sub-menu">
                 <li>
+                    <a href="/Settings/">
+                        <i class="icon-equalizer"></i> SESM
+                    </a>
+                </li>
+                <li>
                     <a href="/Settings/SE/">
-                        <i class="icon-settings"></i> Space Engineers
+                        <i class="icon-graph"></i> Space Engineers
                     </a>
                 </li>
                 <li>

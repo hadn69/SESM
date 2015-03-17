@@ -4,31 +4,328 @@
     List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
     breadCrumb.Add(new KeyValuePair<string, string>("Global Setting", "/Settings/"));
     ViewBag.Breadcrumb = breadCrumb;
-}
 
-<div class="col-md-6 col-sm-12">
-    <div class="dashboard-stat green-meadow">
+    ViewBag.RefreshBtn = true;
+}
+<script type="text/javascript" src="/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" />
+<script type="text/javascript" src="/Content/Js/TouchSpinMod.js"></script>
+<div class="col-md-4 col-sm-12">
+    <div class="portlet light bordered">
+        <div class="portlet-body form">
+            <form action="#" class="form-horizontal">
+                <div class="form-body">
+                    <h3 class="form-section">SESM Settings</h3>
+                    <div class="alert alert-danger display-hide" id="validationAlert">
+                        <button class="close" data-close="alert"></button>
+                        You have some errors. Please check below.
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Current Password</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" placeholder="Ex : SESM" id="inpPrefix">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Data Path</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" placeholder="Ex : C:\SpaceEngineers\" id="inpSEDataPath">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Save Path</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" placeholder="Ex : C:\ProgramData\SpaceEngineersDedicated\" id="inpSESavePath">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Architecture</label>
+                        <div class="col-md-8">
+                            <input type="checkbox" id="inpArch" class="make-switch" data-off-text="&nbsp;x64&nbsp;" data-on-text="&nbsp;x86&nbsp;">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-offset-4 col-md-8">
+                            <button type="button" class="btn blue" id="btnSaveSESM">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="col-md-4 col-sm-12">
+    <div class="portlet light bordered">
+        <div class="portlet-body form">
+            <form action="#" class="form-horizontal">
+                <div class="form-body">
+                    <h3 class="form-section">Backups Settings</h3>
+                    <div class="alert alert-danger display-hide" id="validationAlert">
+                        <button class="close" data-close="alert"></button>
+                        You have some errors. Please check below.
+                    </div>
+                    <h4 class="form-section">Level 1</h4>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Enabled</label>
+                        <div class="col-md-8">
+                            <input type="checkbox" id="inpAutoBackupLvl1Enabled">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Cron Interval</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" placeholder="Ex : 0 0 * * * ?" id="inpAutoBackupLvl1Cron">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Nb Rotating Backups</label>
+                        <div class="col-md-8">
+                            <div class="input-inline input-small">
+                                <input id="inpAutoBackupLvl1NbToKeep" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="form-section">Level 2</h4>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Enabled</label>
+                        <div class="col-md-8">
+                            <input type="checkbox" id="inpAutoBackupLvl2Enabled">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Cron Interval</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" placeholder="Ex : 0 0 * * * ?" id="inpAutoBackupLvl2Cron">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Nb Rotating Backups</label>
+                        <div class="col-md-8">
+                            <div class="input-inline input-small">
+                                <input id="inpAutoBackupLvl2NbToKeep" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 class="form-section">Level 3</h4>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Enabled</label>
+                        <div class="col-md-8">
+                            <input type="checkbox" id="inpAutoBackupLvl3Enabled">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Cron Interval</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" placeholder="Ex : 0 0 * * * ?" id="inpAutoBackupLvl3Cron">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Nb Rotating Backups</label>
+                        <div class="col-md-8">
+                            <div class="input-inline input-small">
+                                <input id="inpAutoBackupLvl3NbToKeep" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-offset-4 col-md-8">
+                            <button type="button" class="btn blue" id="btnSaveBackups">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="col-md-4 col-sm-12">
+    <a class="dashboard-stat dashboard-stat-light green-meadow" href="/Settings/SE/">
         <div class="visual">
             <i class="icon-settings"></i>
         </div>
         <div class="details">
             <div class="number">
-                Space Engineers
+                Space Engineers Settings
             </div>
         </div>
-
-    </div>
-</div>
-<div class="col-md-6 col-sm-12">
-    <div class="dashboard-stat blue-madison">
+    </a>
+    <a class="dashboard-stat dashboard-stat-light blue-madison" href="/Settings/SESE/">
         <div class="visual">
             <i class="icon-rocket"></i>
         </div>
         <div class="details">
             <div class="number">
-                SE Server Extender
+                SE Server Extender Settings
             </div>
         </div>
-
-    </div>
+    </a>
 </div>
+<script type="text/javascript">
+    function initPage() {
+        // Initializers
+        $.fn.bootstrapSwitch.defaults.onText = '<i class="fa fa-check"></i>';
+        $.fn.bootstrapSwitch.defaults.offText = '<i class="fa fa-times"></i>';
+        $("input[type='checkbox']").bootstrapSwitch();
+
+        $('#inpAutoBackupLvl1NbToKeep').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+        $('#inpAutoBackupLvl2NbToKeep').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+        $('#inpAutoBackupLvl3NbToKeep').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+
+        var SESMLoaded = false;
+        var BackupsLoaded = false;
+
+        function checkLock() {
+            if (SESMLoaded && BackupsLoaded)
+                UnlockPage();
+        }
+
+        function refreshData() {
+            LockPage();
+            SESMLoaded = false;
+            BackupsLoaded = false;
+
+            // SESM Settings
+            $.get("/API/Settings/GetSESMSettings",
+            function (data) {
+                SESMLoaded = true;
+                checkLock();
+
+                var root = $($.parseXML(data)).find("Response");
+
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    return;
+                }
+
+                var content = root.children("Content");
+
+                $('#inpPrefix').val(content.children("Prefix").text());
+                $('#inpSEDataPath').val(content.children("SEDataPath").text());
+                $('#inpSESavePath').val(content.children("SESavePath").text());
+                $('#inpArch').bootstrapSwitch('state', content.children("Arch").text() == "x86");
+            });
+
+            // Backups Settings
+            $.get("/API/Settings/GetBackupsSettings",
+            function (data) {
+                BackupsLoaded = true;
+                checkLock();
+
+                var root = $($.parseXML(data)).find("Response");
+
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    return;
+                }
+
+                var content = root.children("Content");
+
+                $('#inpAutoBackupLvl1Enabled').bootstrapSwitch('state', content.children("AutoBackupLvl1Enabled").text() == "true");
+                $('#inpAutoBackupLvl1Cron').val(content.children("AutoBackupLvl1Cron").text());
+                $('#inpAutoBackupLvl1NbToKeep').val(content.children("AutoBackupLvl1NbToKeep").text());
+
+                $('#inpAutoBackupLvl2Enabled').bootstrapSwitch('state', content.children("AutoBackupLvl2Enabled").text() == "true");
+                $('#inpAutoBackupLvl2Cron').val(content.children("AutoBackupLvl2Cron").text());
+                $('#inpAutoBackupLvl2NbToKeep').val(content.children("AutoBackupLvl2NbToKeep").text());
+
+                $('#inpAutoBackupLvl3Enabled').bootstrapSwitch('state', content.children("AutoBackupLvl3Enabled").text() == "true");
+                $('#inpAutoBackupLvl3Cron').val(content.children("AutoBackupLvl3Cron").text());
+                $('#inpAutoBackupLvl3NbToKeep').val(content.children("AutoBackupLvl3NbToKeep").text());
+            });
+        }
+
+        refreshData();
+
+        $('#btnSaveSESM').click(function () {
+            bootbox.confirm("WARNING : IF YOU CHANGE THOSE SETTINGS, IT MIGHT LEAD TO UNEXPECTED BEHAVIOURS !!<br/>" +
+                "IN 95% OF CASE YOU SHOULDN'T HAVE TO CHANGE THOSE !<br/>" +
+                "ALL RUNNING SERVERS WILL BE RESTARTED !<br/>" +
+                "ARE YOU SURE YOU WANT TO CONTINUE ?",
+            function (result) {
+                if (result) {
+                    toastr.warning("This operation may take up to a few minutes", "SESM Settings Updating ...");
+                    $.post("/API/Settings/SetSESMSettings",
+                    {
+                        Prefix: $("#inpPrefix").val(),
+                        SESavePath: $("#inpSESavePath").val(),
+                        SEDataPath: $("#inpSEDataPath").val(),
+                        Arch: $('#inpArch').is(":checked") ? "x86" : "x64"
+                    },
+                    function (data) {
+
+                        var root = $($.parseXML(data)).find("Response");
+
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+
+                        toastr.success("The SESM settings have been updated", "SESM Settings Updated");
+
+                        refreshData();
+                    });
+
+                }
+            });
+        });
+
+        $('#btnSaveBackups').click(function () {
+            $.post("/API/Settings/SetBackupsSettings",
+            {
+                AutoBackupLvl1Enabled: $("#inpAutoBackupLvl1Enabled").is(":checked"),
+                AutoBackupLvl1Cron: $("#inpAutoBackupLvl1Cron").val(),
+                AutoBackupLvl1NbToKeep: $("#inpAutoBackupLvl1NbToKeep").val(),
+
+                AutoBackupLvl2Enabled: $("#inpAutoBackupLvl2Enabled").is(":checked"),
+                AutoBackupLvl2Cron: $("#inpAutoBackupLvl2Cron").val(),
+                AutoBackupLvl2NbToKeep: $("#inpAutoBackupLvl2NbToKeep").val(),
+
+                AutoBackupLvl3Enabled: $("#inpAutoBackupLvl3Enabled").is(":checked"),
+                AutoBackupLvl3Cron: $("#inpAutoBackupLvl3Cron").val(),
+                AutoBackupLvl3NbToKeep: $("#inpAutoBackupLvl3NbToKeep").val()
+
+            },
+            function (data) {
+                var root = $($.parseXML(data)).find("Response");
+
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    return;
+                }
+
+                toastr.success("The Backups settings have been updated", "Backups Settings Updated");
+
+                refreshData();
+            });
+        });
+
+
+        $("#btnRefresh").click(function () {
+            refreshData();
+        });
+
+    };
+</script>

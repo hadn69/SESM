@@ -35,13 +35,13 @@ namespace SESM
             if (SESMConfigHelper.AutoUpdateEnabled)
             {
                 // Instantiating the job
-                IJobDetail SEAutoUpdateJobDetail = JobBuilder.Create<SESEAutoUpdateJob>()
+                IJobDetail SEAutoUpdateJobDetail = JobBuilder.Create<SEAutoUpdateJob>()
                     .WithIdentity(SEAutoUpdateJob.GetJobKey())
                     .Build();
 
                 ITrigger SEAutoUpdateJobTrigger = TriggerBuilder.Create()
                     .WithIdentity(SEAutoUpdateJob.GetTriggerKey())
-                    .WithCronSchedule(SESMConfigHelper.SESEAutoUpdateCron)
+                    .WithCronSchedule(SESMConfigHelper.AutoUpdateCron)
                     .Build();
 
                 scheduler.ScheduleJob(SEAutoUpdateJobDetail, SEAutoUpdateJobTrigger);

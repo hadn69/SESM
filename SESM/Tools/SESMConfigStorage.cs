@@ -11,8 +11,7 @@ namespace SESM.Tools
         public string SESavePath { get; set; }
         public string SEDataPath { get; set; }
         public string Arch { get; set; }
-        public bool PerfMonitorEnabled { get; set; }
-
+        
         // Auto-Update Settings
         public bool AutoUpdateEnabled { get; set; }
         public string AutoUpdateCron { get; set; }
@@ -39,6 +38,7 @@ namespace SESM.Tools
         public bool DiagnosisEnabled { get; set; }
         public bool BlockDll { get; set; }
         public bool LowPriorityStart { get; set; }
+        public bool PerfMonitorEnabled { get; set; }
 
         public SESMConfigStorage()
         {
@@ -48,8 +48,7 @@ namespace SESM.Tools
             SESavePath = @"C:\ProgramData\SpaceEngineersDedicated\";
             SEDataPath = @"C:\SpaceEngineers\";
             Arch = "x64";
-            PerfMonitorEnabled = true;
-
+            
             // Auto-Update Settings
             AutoUpdateEnabled = true;
             AutoUpdateCron = "0 0/10 * * * ?";
@@ -78,6 +77,7 @@ namespace SESM.Tools
             DiagnosisEnabled = false;
             BlockDll = true;
             LowPriorityStart = false;
+            PerfMonitorEnabled = true;
         }
         protected override IConfigurationProvider OnCreateDefaultProvider(string sectionName, object configData)
         {
