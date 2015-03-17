@@ -25,6 +25,7 @@ namespace SESM.Controllers.API
         {
             // ** INIT **
             EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
             ServerProvider srvPrv = new ServerProvider(_context);
             int serverId = -1;
 
@@ -40,6 +41,9 @@ namespace SESM.Controllers.API
             if(server == null)
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
 
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
+
             string path = Request.Form["Path"];
             if(string.IsNullOrWhiteSpace(path))
                 path = string.Empty;
@@ -49,9 +53,6 @@ namespace SESM.Controllers.API
             {
                 path += "\\";
             }
-
-            if(!srvPrv.SecurityCheck(server, user))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
 
             if(!path.Contains(PathHelper.GetInstancePath(server)))
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "The directory isn't accessible for you, bad boy !").ToString());
@@ -93,8 +94,8 @@ namespace SESM.Controllers.API
         {
             // ** INIT **
             EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
             ServerProvider srvPrv = new ServerProvider(_context);
-
 
             // ** PARSING / ACCESS **
             int serverId = -1;
@@ -108,6 +109,9 @@ namespace SESM.Controllers.API
 
             if(server == null)
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
 
             string path = Request.Form["Path"];
             if(string.IsNullOrWhiteSpace(path))
@@ -162,7 +166,7 @@ namespace SESM.Controllers.API
             if(server == null)
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
 
-            if(!srvPrv.SecurityCheck(server, user))
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
 
             string[] paths = Request.Form["Paths"].Split(':');
@@ -228,7 +232,7 @@ namespace SESM.Controllers.API
             if(server == null)
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
 
-            if(!srvPrv.SecurityCheck(server, user))
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
 
             string path = Request.Form["Path"];
@@ -309,7 +313,7 @@ namespace SESM.Controllers.API
             if(server == null)
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
 
-            if(!srvPrv.SecurityCheck(server, user))
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
 
             string[] paths = Request.Form["Paths"].Split(':');
@@ -427,7 +431,7 @@ namespace SESM.Controllers.API
             if(server == null)
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
 
-            if(!srvPrv.SecurityCheck(server, user))
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
 
             string path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), Request.Form["Path"]));
@@ -471,6 +475,12 @@ namespace SESM.Controllers.API
 
             EntityServer server = srvPrv.GetServer(serverId);
 
+            if (server == null)
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
+
             string path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), Request.Form["Path"]));
 
             if(!path.Contains(PathHelper.GetInstancePath(server)))
@@ -510,9 +520,13 @@ namespace SESM.Controllers.API
             if(!int.TryParse(Request.Form["ServerID"], out serverId))
                 return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID is invalid").ToString());
 
-            // TODO: check path present
-
             EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
 
             string path = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), Request.Form["Path"]));
 

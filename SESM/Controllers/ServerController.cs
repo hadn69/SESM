@@ -42,9 +42,11 @@ namespace SESM.Controllers
         public ActionResult Configuration(int id)
         {
             return View();
+        }
 
         // GET: 1/Explorer
         public ActionResult Explorer(int id)
+        { 
             return View();
         }
 
