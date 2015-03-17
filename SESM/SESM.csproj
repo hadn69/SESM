@@ -1634,6 +1634,7 @@
     <Content Include="assets\global\plugins\bootstrap-colorpicker\img\hue.png" />
     <Content Include="assets\global\plugins\bootstrap-colorpicker\img\saturation.png" />
     <Content Include="assets\global\plugins\bootstrap-colorpicker\js\bootstrap-colorpicker.js" />
+    <Content Include="assets\global\plugins\bootstrap-contextmenu\bootstrap-contextmenu.js" />
     <Content Include="assets\global\plugins\bootstrap-datepaginator\bootstrap-datepaginator.min.css" />
     <Content Include="assets\global\plugins\bootstrap-datepaginator\bootstrap-datepaginator.min.js" />
     <Content Include="assets\global\plugins\bootstrap-datepicker\css\datepicker.css" />
@@ -3770,7 +3771,6 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Server\Index.cshtml" />
     <Content Include="Views\Server\Create.cshtml" />
-    <Content Include="Views\Server\Status.cshtml" />
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Settings\Index.cshtml" />

@@ -44,9 +44,19 @@ namespace SESM.Controllers
             return View();
         }
 
+        [HttpGet]
+        [CheckAuth]
         // GET: 1/Explorer
         public ActionResult Explorer(int id)
         { 
+            return View();
+        }
+
+        [HttpGet]
+        [CheckAuth]
+        // GET: 1/Settings
+        public ActionResult Settings(int id)
+        {
             return View();
         }
 

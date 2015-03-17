@@ -92,7 +92,10 @@ namespace SESM
                 defaults: new { controller = "APIMap" },
                 constraints: new
                 {
-                    action = "GetMaps"
+                    action = "GetMaps|" +
+                             "SelectMap|" +
+                             "DeleteMap|" +
+                             "DownloadMap"
                 }
             );
 
@@ -190,7 +193,7 @@ namespace SESM
                     action = "Dashboard|" +
                              "Configuration|" +
                              "Settings|" +
-                             "Map|" +
+                             "Maps|" +
                              "Explorer"
                 }
             );
