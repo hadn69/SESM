@@ -3783,6 +3783,7 @@
     <Content Include="Views\Error\404.cshtml" />
     <Content Include="Views\Server\Explorer.cshtml" />
     <Content Include="Views\Server\Configuration.cshtml" />
+    <Content Include="Views\Server\Maps.cshtml" />
     <Content Include="Views\Settings\SE.cshtml" />
     <Content Include="Views\Server\Dashboard.cshtml" />
     <Content Include="Views\Server\Settings.cshtml" />
@@ -3815,6 +3816,7 @@
     <Compile Include="Controllers\ActionFilters\SuperAdminAttribute.cs" />
     <Compile Include="Controllers\API\APIAccountController.cs" />
     <Compile Include="Controllers\API\APIExplorerController.cs" />
+    <Compile Include="Controllers\API\APIMapController.cs" />
     <Compile Include="Controllers\API\APIServerController.cs" />
     <Compile Include="Controllers\API\APISettingsController.cs" />
     <Compile Include="Controllers\API\APIMiscController.cs" />

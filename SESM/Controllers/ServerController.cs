@@ -28,10 +28,10 @@ namespace SESM.Controllers
             return View();
         }
 
-        // GET: 1/Settings
+        // GET: 1/Maps
         [HttpGet]
         [CheckAuth]
-        public ActionResult Settings(int id)
+        public ActionResult Maps(int id)
         {
             return View();
         }
@@ -42,18 +42,12 @@ namespace SESM.Controllers
         public ActionResult Configuration(int id)
         {
             return View();
-        }
 
         // GET: 1/Explorer
-        [HttpGet]
-        [CheckAuth]
         public ActionResult Explorer(int id)
-        {
             return View();
         }
 
-        
- 
         // GET: Server/HourlyStats/5
         [HttpGet]
         [LoggedOnly]

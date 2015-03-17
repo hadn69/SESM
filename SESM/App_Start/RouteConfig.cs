@@ -85,6 +85,17 @@ namespace SESM
                 }
             );
 
+            // Map API
+            routes.MapRoute(
+                name: "APIMap",
+                url: "API/Map/{action}",
+                defaults: new { controller = "APIMap" },
+                constraints: new
+                {
+                    action = "GetMaps"
+                }
+            );
+
             // Explorer API
             routes.MapRoute(
                 name: "APIExplorer",

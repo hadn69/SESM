@@ -18,15 +18,15 @@
                         <button id="btnRefreshList" class="btn blue">
                             <i class="fa fa-refresh"></i> Refresh
                         </button>
-                        <button id="btnCreateServer" class="btn green" style="display:none;">
+                        <button id="btnCreateServer" class="btn green" style="display: none;">
                             <i class=" fa fa-plus"></i> New
                         </button>
-                        <button id="btnDeleteServers" class="btn red" style="display:none;">
+                        <button id="btnDeleteServers" class="btn red" style="display: none;">
                             <i class=" fa fa-trash"></i> Delete
                         </button>
                     </div>
                     <div class="col-md-6">
-                        <div class="btn-group pull-right" id="actionBtn" style="display:none;">
+                        <div class="btn-group pull-right" id="actionBtn" style="display: none;">
                             <button id="btnStartServers" class="btn green">
                                 <i class="fa fa-play"></i> Start
                             </button>
@@ -55,7 +55,7 @@
                         <th>
                             Status
                         </th>
-                        <th style="display:none;">
+                        <th style="display: none;">
                             Access Level
                         </th>
                     </tr>
@@ -64,124 +64,188 @@
             </table>
         </div>
     </div>
-    <script type="text/javascript">
-        function initPage() {
-            var table = $('#serverTable');
+</div>
+<script type="text/javascript">
+    function initPage() {
+        var table = $('#serverTable');
 
-            table.dataTable({
-                "language": {
-                    "aria": {
-                        "sortAscending": ": activate to sort column ascending",
-                        "sortDescending": ": activate to sort column descending"
-                    },
-                    "emptyTable": "No server available",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-                    "infoEmpty": "No entries found",
-                    "infoFiltered": "(filtered1 from _MAX_ total entries)",
-                    "lengthMenu": "Show _MENU_ entries",
-                    "search": "Search :",
-                    "zeroRecords": "No matching server found",
-                    "paginate": {
-                        "previous": "Prev",
-                        "next": "Next",
-                        "last": "Last",
-                        "first": "First"
-                    }
+        table.dataTable({
+            "language": {
+                "aria": {
+                    "sortAscending": ": activate to sort column ascending",
+                    "sortDescending": ": activate to sort column descending"
                 },
-
-                "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-
-                "columns": [{
-                    "orderable": false
-                }, {
-                    "orderable": true
-                }, {
-                    "orderable": true
-                }, {
-                    "orderable": false
-                }],
-                "lengthMenu": [
-                    [5, 10, 15, 20, -1],
-                    [5, 10, 15, 20, "All"] // change per page values here
-                ],
-                // set the initial value
-                "pageLength": 10,
-                "pagingType": "bootstrap_full_number",
-                "columnDefs": [{
-                    "searchable": false,
-                    "targets": [0]
-                }, {
-                    "targets": [3],
-                    "visible": false
-                }],
-                "order": [[1, "asc"]] // set second column as a default sort by asc
-            });
-
-            var isSuperAdmin = false;
-
-            table.find('.group-checkable').change(function () {
-                var set = $(this).attr("data-set");
-                var checked = $(this).is(":checked");
-                $(set).each(function () {
-                    if (checked) {
-                        $(this).attr("checked", true);
-                        $(this).parents('tr').addClass("active");
-                    } else {
-                        $(this).attr("checked", false);
-                        $(this).parents('tr').removeClass("active");
-                    }
-                });
-                $.uniform.update(set);
-                if ($('tbody tr input:checkbox:checked').length == 0) {
-                    $("#actionBtn").hide();
-                    if (isSuperAdmin) {
-                        $("#btnDeleteServer").hide();
-                    }
-                } else {
-                    $("#actionBtn").show();
-                    if (isSuperAdmin) {
-                        $("#btnDeleteServer").show();
-                    }
+                "emptyTable": "No server available",
+                "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                "infoEmpty": "No entries found",
+                "infoFiltered": "(filtered1 from _MAX_ total entries)",
+                "lengthMenu": "Show _MENU_ entries",
+                "search": "Search :",
+                "zeroRecords": "No matching server found",
+                "paginate": {
+                    "previous": "Prev",
+                    "next": "Next",
+                    "last": "Last",
+                    "first": "First"
                 }
-            });
+            },
 
-            table.on('change', 'tbody tr .checkboxes', function () {
-                var checked = $(this).is(":checked");
+            "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
+
+            "columns": [{
+                "orderable": false
+            }, {
+                "orderable": true
+            }, {
+                "orderable": true
+            }, {
+                "orderable": false
+            }],
+            "lengthMenu": [
+                [5, 10, 15, 20, -1],
+                [5, 10, 15, 20, "All"] // change per page values here
+            ],
+            // set the initial value
+            "pageLength": 10,
+            "pagingType": "bootstrap_full_number",
+            "columnDefs": [{
+                "searchable": false,
+                "targets": [0]
+            }, {
+                "targets": [3],
+                "visible": false
+            }],
+            "order": [[1, "asc"]] // set second column as a default sort by asc
+        });
+
+        var isSuperAdmin = false;
+
+        table.find('.group-checkable').change(function () {
+            var set = $(this).attr("data-set");
+            var checked = $(this).is(":checked");
+            $(set).each(function () {
                 if (checked) {
+                    $(this).attr("checked", true);
                     $(this).parents('tr').addClass("active");
                 } else {
+                    $(this).attr("checked", false);
                     $(this).parents('tr').removeClass("active");
                 }
-
-                if ($('tbody tr input:checkbox:checked').length == 0) {
-                    table.find('.group-checkable').attr("checked", false);
-                    $("#actionBtn").hide();
-                    if (isSuperAdmin) {
-                        $("#btnDeleteServer").hide();
-                    }
-                } else {
-                    table.find('.group-checkable').attr("checked", true);
-                    $("#actionBtn").show();
-                    if (isSuperAdmin) {
-                        $("#btnDeleteServer").show();
-                    }
+            });
+            $.uniform.update(set);
+            if ($('tbody tr input:checkbox:checked').length == 0) {
+                $("#actionBtn").hide();
+                if (isSuperAdmin) {
+                    $("#btnDeleteServer").hide();
                 }
-                $.uniform.update($('.group-checkable'));
-            });
+            } else {
+                $("#actionBtn").show();
+                if (isSuperAdmin) {
+                    $("#btnDeleteServer").show();
+                }
+            }
+        });
 
-            table.on('click', 'tbody tr td:nth-child(2)', function () {
-                var id = $(this).parent().children().first().find('input').val();
+        table.on('change', 'tbody tr .checkboxes', function () {
+            var checked = $(this).is(":checked");
+            if (checked) {
+                $(this).parents('tr').addClass("active");
+            } else {
+                $(this).parents('tr').removeClass("active");
+            }
+
+            if ($('tbody tr input:checkbox:checked').length == 0) {
+                table.find('.group-checkable').attr("checked", false);
+                $("#actionBtn").hide();
+                if (isSuperAdmin) {
+                    $("#btnDeleteServer").hide();
+                }
+            } else {
+                table.find('.group-checkable').attr("checked", true);
+                $("#actionBtn").show();
+                if (isSuperAdmin) {
+                    $("#btnDeleteServer").show();
+                }
+            }
+            $.uniform.update($('.group-checkable'));
+        });
+
+        table.on('click', 'tbody tr td:nth-child(2)', function () {
+            var id = $(this).parent().children().first().find('input').val();
                 window.location.href = "/" + id + "/Dashboard/";
+        });
+
+        $(".dataTables_filter").addClass("pull-right");
+
+        function refereshList(checkedIDs) {
+            $("#btnRefreshList").children("i").addClass("fa-spin");
+            $.get("/API/Server/GetServers",
+            function (data) {
+                var root = $($.parseXML(data)).find("Response");
+
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    $("#btnRefreshList").children("i").removeClass("fa-spin");
+                    return;
+                }
+
+                table.DataTable().clear();
+                root.children("Content").children("Server").each(function (index) {
+                    var item = $(this);
+                    var Name = item.children("Name").text();
+                    var ID = item.children("ID").text();
+                    var Public = item.children("Public").text();
+                    var State = item.children("State").text();
+                    var AccessLevel = item.children("AccessLevel").text();
+
+                    var chkbField = "";
+                    var statusField = "";
+
+                    if (AccessLevel != "None" && AccessLevel != "Guest" && AccessLevel != "User") {
+                        if (checkedIDs != null && $.inArray(ID, checkedIDs) > -1) {
+                            chkbField = '<input type="checkbox" class="checkboxes" value="' + ID + '" checked />';
+                        }
+                        else {
+                            chkbField = '<input type="checkbox" class="checkboxes" value="' + ID + '" />';
+                        }
+                    }
+
+                    switch (State) {
+                        case "Unknow":
+                            statusField = '<span class="label label-sm label-default">Unknow</span>';
+                            break;
+                        case "Stopped":
+                            statusField = '<span class="label label-sm label-danger">Stopped</span>';
+                            break;
+                        case "Starting":
+                            statusField = '<span class="label label-sm label-info">Starting</span>';
+                            break;
+                        case "Running":
+                            statusField = '<span class="label label-sm label-success">Running</span>';
+                            break;
+                        case "Stopping":
+                            statusField = '<span class="label label-sm label-primary">Stopping</span>';
+                            break;
+                    }
+
+                    table.DataTable().row.add([chkbField, Name, statusField, AccessLevel]);
+                });
+                table.DataTable().draw();
+                $("#btnRefreshList").children("i").removeClass("fa-spin");
+                table.find('input:checkbox').uniform();
+                $("tbody input:checked").each(function () {
+                    $(this).parents('tr').addClass("active");
+                });
+
             });
-
-            $(".dataTables_filter").addClass("pull-right");
-
-            function refereshList(checkedIDs) {
-                $("#btnRefreshList").children("i").addClass("fa-spin");
-                $.get("/API/Server/GetServers",
+            $.get("/API/Account/GetDetails",
                 {},
-                function (data, status) {
+                function (data) {
                     var root = $($.parseXML(data)).find("Response");
+
+                    if (root.children("ReturnCode").text() == "ACT-GTD-NOTLOG") {
+                        return;
+                    }
 
                     if (root.children("Type").text() == "Error") {
                         toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
@@ -189,194 +253,44 @@
                         return;
                     }
 
-                    table.DataTable().clear();
-                    root.children("Content").children("Server").each(function (index) {
-                        var item = $(this);
-                        var Name = item.children("Name").text();
-                        var ID = item.children("ID").text();
-                        var Public = item.children("Public").text();
-                        var State = item.children("State").text();
-                        var AccessLevel = item.children("AccessLevel").text();
-
-                        var chkbField = "";
-                        var statusField = "";
-
-                        if (AccessLevel != "None" && AccessLevel != "Guest" && AccessLevel != "User") {
-                            if (checkedIDs != null && $.inArray(ID, checkedIDs) > -1) {
-                                chkbField = '<input type="checkbox" class="checkboxes" value="' + ID + '" checked />';
-                            }
-                            else {
-                                chkbField = '<input type="checkbox" class="checkboxes" value="' + ID + '" />';
-                            }
-                        }
-
-                        switch (State) {
-                            case "Unknow":
-                                statusField = '<span class="label label-sm label-default">Unknow</span>';
-                                break;
-                            case "Stopped":
-                                statusField = '<span class="label label-sm label-danger">Stopped</span>';
-                                break;
-                            case "Starting":
-                                statusField = '<span class="label label-sm label-info">Starting</span>';
-                                break;
-                            case "Running":
-                                statusField = '<span class="label label-sm label-success">Running</span>';
-                                break;
-                            case "Stopping":
-                                statusField = '<span class="label label-sm label-primary">Stopping</span>';
-                                break;
-                        }
-
-                        $('#serverTable').DataTable().row.add([chkbField, Name, statusField, AccessLevel]);
-                    });
-                    $('#serverTable').DataTable().draw();
-                    $("#btnRefreshList").children("i").removeClass("fa-spin");
-                    $('#serverTable').find('input:checkbox').uniform();
-                    $("tbody input:checked").each(function () {
-                        $(this).parents('tr').addClass("active");
-                    });
-
-                });
-                $.get("/API/Account/GetDetails",
-                    {},
-                    function (data) {
-                        var root = $($.parseXML(data)).find("Response");
-
-                        if (root.children("ReturnCode").text() == "ACT-GTD-NOTLOG") {
-                            return;
-                        }
-
-                        if (root.children("Type").text() == "Error") {
-                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                            $("#btnRefreshList").children("i").removeClass("fa-spin");
-                            return;
-                        }
-
-                        if (root.children("Content").children("IsSuperAdmin").text() == "True") {
-                            $("#btnCreateServer").show();
-                            isSuperAdmin = true;
-                        }
-                    });
-            }
-
-            refereshList();
-            $("#btnRefreshList").click(function () {
-                var ids = getCheckedIds();
-                refereshList(ids);
-            });
-
-
-
-            function getCheckedIds() {
-                var oTable = table.dataTable();
-                var rowcollection = oTable.$(".checkboxes:checked", { "page": "all" });
-                var retArray = [];
-                rowcollection.each(function (index, item) {
-                    retArray.push($(item).val());
-                });
-                return retArray;
-            }
-
-            $("#btnCreateServer").click(function () {
-                bootbox.dialog({
-                    title: "New Server",
-                    message: "<form class=\"bootbox-form\"><input id=\"impNewServ\" class=\"bootbox-input bootbox-input-text form-control\" autocomplete=\"off\" type=\"text\" placeholder=\"Server_Name\"></form>",
-                    buttons: {
-                        success: {
-                            label: "Create",
-                            className: "btn-success",
-                            callback: function () {
-                                var name = $('#impNewServ').val();
-                                $.post("/API/Server/CreateServer",
-                                {
-                                    ServerName: name
-                                },
-                                function (data) {
-                                    var root = $($.parseXML(data)).find("Response");
-
-                                    if (root.children("Type").text() == "Error") {
-                                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                        return;
-                                    }
-                                    toastr.success(root.children("Content").text(), "Server Created");
-                                    refereshList();
-                                });
-                            }
-                        }
+                    if (root.children("Content").children("IsSuperAdmin").text() == "True") {
+                        $("#btnCreateServer").show();
+                        isSuperAdmin = true;
                     }
                 });
+        }
+
+        refereshList();
+        $("#btnRefreshList").click(function () {
+            var ids = getCheckedIds();
+            refereshList(ids);
+        });
+
+
+
+        function getCheckedIds() {
+            var oTable = table.dataTable();
+            var rowcollection = oTable.$(".checkboxes:checked", { "page": "all" });
+            var retArray = [];
+            rowcollection.each(function (index, item) {
+                retArray.push($(item).val());
             });
+            return retArray;
+        }
 
-            $("#btnDeleteServers").click(function () {
-                var ids = getCheckedIds();
-                var names = [];
-                table.DataTable().rows().nodes().to$().each(function (index, value) {
-                    var name = $(value).children(":nth-child(2)").text();
-                    if ($.inArray($(value).first().find("input").val(), ids) > -1) {
-                        names.push(name);
-                    }
-                });
-                bootbox.confirm("<div class=\"note note-danger\">" +
-                    "<h4 class=\"block\"><i class=\"fa fa-warning\"></i> <strong>Warning</strong></h4>" +
-                    "<p>Deleting server(s) will permanantly delete the server configuration, saves, backups and any other related files.<br/>" +
-                    "<strong>This action is irreversible !</strong></p>" +
-                    "</div>" +
-                    "Are you sure you want to delete the folowing server(s) : <br/><br/>" +
-                    "<ul>" +
-                    "<li>" + names.join("</li><li>") + "</li>" +
-                    "</ul>",
-                    function (result) {
-                        if (result) {
-                            bootbox.confirm("<div class=\"note note-danger\">" +
-                                "<h4 class=\"block\"><i class=\"fa fa-warning\"></i> <strong>Last Warning</strong></h4>" +
-                                "<p>" +
-                                "Are you really, really, sure you want to delete the folowing server(s) : <br/><br/>" +
-                                "<ul>" +
-                                "<li>" + names.join("</li><li>") + "</li>" +
-                                "</ul>" +
-                                "<strong>This action is irreversible ! I.R.R.E.V.E.R.S.I.B.L.E !!!!</strong></p>" +
-                                "</div>",
-                                function (result) {
-                                    if (result) {
-                                        $.post("/API/Server/StartServers",
-                                        {
-                                            ServerIDs: ids.join(";")
-                                        },
-                                        function (data, status) {
-                                            var root = $($.parseXML(data)).find("Response");
-
-                                            if (root.children("Type").text() == "Error") {
-                                                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                                return;
-                                            }
-                                            toastr.success(root.children("Content").text(), "Server(s) Started");
-                                            refereshList();
-                                        });
-                                    }
-                                });
-                        }
-                    });
-            });
-
-            $("#btnStartServers").click(function () {
-                var ids = getCheckedIds();
-                var names = [];
-                table.DataTable().rows().nodes().to$().each(function (index, value) {
-                    var name = $(value).children(":nth-child(2)").text();
-                    if ($.inArray($(value).first().find("input").val(), ids) > -1) {
-                        names.push(name);
-                    }
-                });
-                bootbox.confirm("<br/>Are you sure you want to start the folowing server(s) : <br/><br/>" +
-                    "<ul>" +
-                    "<li>" + names.join("</li><li>") + "</li>" +
-                    "</ul>",
-                    function (result) {
-                        if (result) {
-                            $.post("/API/Server/StartServers",
+        $("#btnCreateServer").click(function () {
+            bootbox.dialog({
+                title: "New Server",
+                message: "<form class=\"bootbox-form\"><input id=\"impNewServ\" class=\"bootbox-input bootbox-input-text form-control\" autocomplete=\"off\" type=\"text\" placeholder=\"Server_Name\"></form>",
+                buttons: {
+                    success: {
+                        label: "Create",
+                        className: "btn-success",
+                        callback: function () {
+                            var name = $('#impNewServ').val();
+                            $.post("/API/Server/CreateServer",
                             {
-                                ServerIDs: ids.join(";")
+                                ServerName: name
                             },
                             function (data) {
                                 var root = $($.parseXML(data)).find("Response");
@@ -385,123 +299,208 @@
                                     toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
                                     return;
                                 }
-                                toastr.success(root.children("Content").text(), "Server(s) Started");
+                                toastr.success(root.children("Content").text(), "Server Created");
                                 refereshList();
                             });
                         }
-                    });
-            });
-
-            $("#btnStopServers").click(function () {
-                var ids = getCheckedIds();
-                var names = [];
-                table.DataTable().rows().nodes().to$().each(function (index, value) {
-                    var name = $(value).children(":nth-child(2)").text();
-                    if ($.inArray($(value).first().find("input").val(), ids) > -1) {
-                        names.push(name);
                     }
-                });
-                bootbox.confirm("<br/>Are you sure you want to stop the folowing server(s) : <br/><br/>" +
-                    "<ul>" +
-                    "<li>" + names.join("</li><li>") + "</li>" +
-                    "</ul>",
-                    function (result) {
-                        if (result) {
-                            $.post("/API/Server/StopServers",
-                            {
-                                ServerIDs: ids.join(";")
-                            },
-                            function (data, status) {
-                                var root = $($.parseXML(data)).find("Response");
+                }
+            });
+        });
 
-                                if (root.children("Type").text() == "Error") {
-                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                    return;
+        $("#btnDeleteServers").click(function () {
+            var ids = getCheckedIds();
+            var names = [];
+            table.DataTable().rows().nodes().to$().each(function (index, value) {
+                var name = $(value).children(":nth-child(2)").text();
+                if ($.inArray($(value).first().find("input").val(), ids) > -1) {
+                    names.push(name);
+                }
+            });
+            bootbox.confirm("<div class=\"note note-danger\">" +
+                "<h4 class=\"block\"><i class=\"fa fa-warning\"></i> <strong>Warning</strong></h4>" +
+                "<p>Deleting server(s) will permanantly delete the server configuration, saves, backups and any other related files.<br/>" +
+                "<strong>This action is irreversible !</strong></p>" +
+                "</div>" +
+                "Are you sure you want to delete the folowing server(s) : <br/><br/>" +
+                "<ul>" +
+                "<li>" + names.join("</li><li>") + "</li>" +
+                "</ul>",
+                function (result) {
+                    if (result) {
+                        bootbox.confirm("<div class=\"note note-danger\">" +
+                            "<h4 class=\"block\"><i class=\"fa fa-warning\"></i> <strong>Last Warning</strong></h4>" +
+                            "<p>" +
+                            "Are you really, really, sure you want to delete the folowing server(s) : <br/><br/>" +
+                            "<ul>" +
+                            "<li>" + names.join("</li><li>") + "</li>" +
+                            "</ul>" +
+                            "<strong>This action is irreversible ! I.R.R.E.V.E.R.S.I.B.L.E !!!!</strong></p>" +
+                            "</div>",
+                            function (result) {
+                                if (result) {
+                                    $.post("/API/Server/StartServers",
+                                    {
+                                        ServerIDs: ids.join(";")
+                                    },
+                                    function (data, status) {
+                                        var root = $($.parseXML(data)).find("Response");
+
+                                        if (root.children("Type").text() == "Error") {
+                                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                            return;
+                                        }
+                                        toastr.success(root.children("Content").text(), "Server(s) Started");
+                                        refereshList();
+                                    });
                                 }
-                                toastr.success(root.children("Content").text(), "Server(s) Stopped");
-                                refereshList();
                             });
-                        }
-                    });
-            });
-
-            $("#btnRestartServers").click(function () {
-                var ids = getCheckedIds();
-                var names = [];
-                table.DataTable().rows().nodes().to$().each(function (index, value) {
-                    var name = $(value).children(":nth-child(2)").text();
-                    if ($.inArray($(value).first().find("input").val(), ids) > -1) {
-                        names.push(name);
                     }
                 });
-                bootbox.confirm("<br/>Are you sure you want to restart the folowing server(s) : <br/><br/>" +
-                    "<ul>" +
-                    "<li>" + names.join("</li><li>") + "</li>" +
-                    "</ul>" +
-                    "<input type=\"checkbox\" id=\"chkbxRestart\" name=\"chkbxRestart\"/><label for=\"chkbxRestart\">Restart only running server(s)</label>",
-                    function (result) {
-                        if (result) {
-                            $("#btnRestartServers").children("i").addClass("fa-spin");
-                            toastr.success(names.join(", ") + " restart initiated, it may take up to a few minutes.", "Server(s) Restart Initiated");
-                            $.post("/API/Server/RestartServers",
-                            {
-                                ServerIDs: ids.join(";"),
-                                OnlyStarted: $("#chkbxRestart").is(":checked").toString()
-                            },
-                            function (data, status) {
-                                var root = $($.parseXML(data)).find("Response");
+        });
 
-                                if (root.children("Type").text() == "Error") {
-                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                    $("#btnRestartServers").children("i").removeClass("fa-spin");
-                                    return;
-                                }
-                                toastr.success(root.children("Content").text(), "Server(s) Restart Complete");
-                                refereshList();
+        $("#btnStartServers").click(function () {
+            var ids = getCheckedIds();
+            var names = [];
+            table.DataTable().rows().nodes().to$().each(function (index, value) {
+                var name = $(value).children(":nth-child(2)").text();
+                if ($.inArray($(value).first().find("input").val(), ids) > -1) {
+                    names.push(name);
+                }
+            });
+            bootbox.confirm("<br/>Are you sure you want to start the folowing server(s) : <br/><br/>" +
+                "<ul>" +
+                "<li>" + names.join("</li><li>") + "</li>" +
+                "</ul>",
+                function (result) {
+                    if (result) {
+                        $.post("/API/Server/StartServers",
+                        {
+                            ServerIDs: ids.join(";")
+                        },
+                        function (data) {
+                            var root = $($.parseXML(data)).find("Response");
+
+                            if (root.children("Type").text() == "Error") {
+                                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                return;
+                            }
+                            toastr.success(root.children("Content").text(), "Server(s) Started");
+                            refereshList();
+                        });
+                    }
+                });
+        });
+
+        $("#btnStopServers").click(function () {
+            var ids = getCheckedIds();
+            var names = [];
+            table.DataTable().rows().nodes().to$().each(function (index, value) {
+                var name = $(value).children(":nth-child(2)").text();
+                if ($.inArray($(value).first().find("input").val(), ids) > -1) {
+                    names.push(name);
+                }
+            });
+            bootbox.confirm("<br/>Are you sure you want to stop the folowing server(s) : <br/><br/>" +
+                "<ul>" +
+                "<li>" + names.join("</li><li>") + "</li>" +
+                "</ul>",
+                function (result) {
+                    if (result) {
+                        $.post("/API/Server/StopServers",
+                        {
+                            ServerIDs: ids.join(";")
+                        },
+                        function (data, status) {
+                            var root = $($.parseXML(data)).find("Response");
+
+                            if (root.children("Type").text() == "Error") {
+                                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                return;
+                            }
+                            toastr.success(root.children("Content").text(), "Server(s) Stopped");
+                            refereshList();
+                        });
+                    }
+                });
+        });
+
+        $("#btnRestartServers").click(function () {
+            var ids = getCheckedIds();
+            var names = [];
+            table.DataTable().rows().nodes().to$().each(function (index, value) {
+                var name = $(value).children(":nth-child(2)").text();
+                if ($.inArray($(value).first().find("input").val(), ids) > -1) {
+                    names.push(name);
+                }
+            });
+            bootbox.confirm("<br/>Are you sure you want to restart the folowing server(s) : <br/><br/>" +
+                "<ul>" +
+                "<li>" + names.join("</li><li>") + "</li>" +
+                "</ul>" +
+                "<input type=\"checkbox\" id=\"chkbxRestart\" name=\"chkbxRestart\"/><label for=\"chkbxRestart\">Restart only running server(s)</label>",
+                function (result) {
+                    if (result) {
+                        $("#btnRestartServers").children("i").addClass("fa-spin");
+                        toastr.success(names.join(", ") + " restart initiated, it may take up to a few minutes.", "Server(s) Restart Initiated");
+                        $.post("/API/Server/RestartServers",
+                        {
+                            ServerIDs: ids.join(";"),
+                            OnlyStarted: $("#chkbxRestart").is(":checked").toString()
+                        },
+                        function (data, status) {
+                            var root = $($.parseXML(data)).find("Response");
+
+                            if (root.children("Type").text() == "Error") {
+                                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
                                 $("#btnRestartServers").children("i").removeClass("fa-spin");
-                            });
-                        }
-                    });
-            });
-
-            $("#btnKillServers").click(function () {
-                var ids = getCheckedIds();
-                var names = [];
-                table.DataTable().rows().nodes().to$().each(function (index, value) {
-                    var name = $(value).children(":nth-child(2)").text();
-                    if ($.inArray($(value).first().find("input").val(), ids) > -1) {
-                        names.push(name);
+                                return;
+                            }
+                            toastr.success(root.children("Content").text(), "Server(s) Restart Complete");
+                            refereshList();
+                            $("#btnRestartServers").children("i").removeClass("fa-spin");
+                        });
                     }
                 });
-                bootbox.confirm("<div class=\"note note-danger\">" +
-                    "<h4 class=\"block\"><i class=\"fa fa-warning\"></i> <strong>Warning</strong></h4>" +
-                    "<p>Killing server(s) may result in <strong>save corruption</strong> !<br/>" +
-                    "Do it only in case of emergency or if a server is being unresponsive !</p>" +
-                    "</div>" +
-                    "Are you sure you want to kill the folowing server(s) : <br/><br/>" +
-                    "<ul>" +
-                    "<li>" + names.join("</li><li>") + "</li>" +
-                    "</ul>",
-                    function (result) {
-                        if (result) {
-                            $.post("/API/Server/KillServers",
-                            {
-                                ServerIDs: ids.join(";")
-                            },
-                            function (data, status) {
-                                var root = $($.parseXML(data)).find("Response");
+        });
 
-                                if (root.children("Type").text() == "Error") {
-                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                    return;
-                                }
-                                toastr.success(root.children("Content").text(), "Server(s) Killed");
-                                refereshList();
-                            });
-                        }
-                    });
+        $("#btnKillServers").click(function () {
+            var ids = getCheckedIds();
+            var names = [];
+            table.DataTable().rows().nodes().to$().each(function (index, value) {
+                var name = $(value).children(":nth-child(2)").text();
+                if ($.inArray($(value).first().find("input").val(), ids) > -1) {
+                    names.push(name);
+                }
             });
+            bootbox.confirm("<div class=\"note note-danger\">" +
+                "<h4 class=\"block\"><i class=\"fa fa-warning\"></i> <strong>Warning</strong></h4>" +
+                "<p>Killing server(s) may result in <strong>save corruption</strong> !<br/>" +
+                "Do it only in case of emergency or if a server is being unresponsive !</p>" +
+                "</div>" +
+                "Are you sure you want to kill the folowing server(s) : <br/><br/>" +
+                "<ul>" +
+                "<li>" + names.join("</li><li>") + "</li>" +
+                "</ul>",
+                function (result) {
+                    if (result) {
+                        $.post("/API/Server/KillServers",
+                        {
+                            ServerIDs: ids.join(";")
+                        },
+                        function (data, status) {
+                            var root = $($.parseXML(data)).find("Response");
 
-        }
-    </script>
-</div>
+                            if (root.children("Type").text() == "Error") {
+                                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                return;
+                            }
+                            toastr.success(root.children("Content").text(), "Server(s) Killed");
+                            refereshList();
+                        });
+                    }
+                });
+        });
+
+    }
+</script>
