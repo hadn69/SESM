@@ -3770,7 +3770,6 @@
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Server\Index.cshtml" />
-    <Content Include="Views\Server\Create.cshtml" />
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Settings\Index.cshtml" />
@@ -3877,27 +3876,8 @@
       <DependentUpon>201412041630025_processPriority.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\Views\Account\LoginViewModel.cs" />
-    <Compile Include="Models\Views\Account\ManageViewModel.cs" />
-    <Compile Include="Models\Views\Backup\BackupViewModel.cs" />
-    <Compile Include="Models\Views\Log\LogViewModel.cs" />
-    <Compile Include="Models\Views\Map\MapViewModel.cs" />
-    <Compile Include="Models\Views\Map\NewMapViewModel.cs" />
-    <Compile Include="Models\Views\Map\RenameMapViewModel.cs" />
-    <Compile Include="Models\Views\Mod\ModViewModel.cs" />
-    <Compile Include="Models\Views\Mod\UploadModViewModel.cs" />
-    <Compile Include="Models\Views\Server\NewServerViewModel.cs" />
-    <Compile Include="Models\Views\Account\RegisterViewModel.cs" />
-    <Compile Include="Models\Views\Server\ServerEnums.cs" />
-    <Compile Include="Models\Views\Server\ServerViewModel.cs" />
-    <Compile Include="Models\Views\Settings\AutoUpdateViewModel.cs" />
-    <Compile Include="Models\Views\Settings\BackupsViewModel.cs" />
-    <Compile Include="Models\Views\Settings\DiagnosisElement.cs" />
-    <Compile Include="Models\Views\Settings\DiagnosisViewModel.cs" />
-    <Compile Include="Models\Views\Settings\SettingsViewModel.cs" />
-    <Compile Include="Models\Views\Settings\SteamCMDViewModel.cs" />
-    <Compile Include="Models\Views\Settings\UploadBinViewModel.cs" />
-    <Compile Include="Models\Views\Map\UploadMapViewModel.cs" />
+    <Compile Include="Models\ArchType.cs" />
+    <Compile Include="Models\ServerEnums.cs" />
     <Compile Include="Models\Views\User\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\API\XMLMessage.cs" />
@@ -3971,6 +3951,7 @@
     <Folder Include="assets\global\plugins\angularjs\plugins\angular-file-upload\uploads\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\node\public\files\thumbnail\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\php\files\thumbnail\" />
+    <Folder Include="Models\Views\Server\" />
     <Folder Include="Views\Explorer\" />
   </ItemGroup>
   <PropertyGroup>

@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Win32;
-using SESM.Models.Views.Settings;
+using SESM.Models;
 
 namespace SESM.Tools.Helpers
 {
@@ -173,10 +173,8 @@ namespace SESM.Tools.Helpers
                 {
                     case "x86":
                         return ArchType.x86;
-                        break;
                     case "x64":
                         return ArchType.x64;
-                        break;
                 }
                 throw new SystemException("ArchError");
             }

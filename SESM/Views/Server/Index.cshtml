@@ -67,6 +67,10 @@
 </div>
 <script type="text/javascript">
     function initPage() {
+        $("body").on('submit', '.bootbox-form', function (e) {
+            e.preventDefault();
+        });
+
         var table = $('#serverTable');
 
         table.dataTable({

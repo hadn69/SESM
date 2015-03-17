@@ -1,16 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Web.Mvc;
-using NLog;
-using Quartz;
-using Quartz.Impl;
+﻿using System.Web.Mvc;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
-using SESM.DTO;
-using SESM.Models.Views.Settings;
-using SESM.Tools;
-using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {

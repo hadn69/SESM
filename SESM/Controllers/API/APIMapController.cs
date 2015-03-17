@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Security.AccessControl;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -10,6 +8,7 @@ using System.Xml.Linq;
 using Ionic.Zip;
 using SESM.DAL;
 using SESM.DTO;
+using SESM.Models;
 using SESM.Tools.API;
 using SESM.Tools.Helpers;
 
@@ -79,7 +78,7 @@ namespace SESM.Controllers.API
             return Content(response.ToString());
         }
 
-        // GET: API/Map/SelectMap
+        // POST: API/Map/SelectMap
         [HttpPost]
         public ActionResult SelectMap()
         {
@@ -148,10 +147,10 @@ namespace SESM.Controllers.API
             if(restartRequired)
                 ServiceHelper.StartService(server);
 
-            return Content(XMLMessage.Success("SRV-SM-OK", "The map have been selected").ToString());
+            return Content(XMLMessage.Success("MAP-SM-OK", "The map have been selected").ToString());
         }
 
-        // GET: API/Map/DeleteMap
+        // POST: API/Map/DeleteMap
         [HttpPost]
         public ActionResult DeleteMap()
         {
@@ -205,10 +204,10 @@ namespace SESM.Controllers.API
 
             Directory.Delete(PathHelper.GetSavePath(server, MapDir), true);
 
-            return Content(XMLMessage.Success("SRV-DM-OK", "The map have been deleted").ToString());
+            return Content(XMLMessage.Success("MAP-DM-OK", "The map have been deleted").ToString());
         }
 
-        // GET: API/Map/DownloadMap
+        // POST: API/Map/DownloadMap
         [HttpPost]
         public ActionResult DownloadMap()
         {
@@ -274,6 +273,82 @@ namespace SESM.Controllers.API
                 Response.End();
             }
             return null;
+        }
+
+        // POST: API/Map/CreateMap
+        [HttpPost]
+        public ActionResult CreateMap()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("MAP-CM-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("MAP-CM-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("MAP-CM-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("MAP-CM-NOACCESS", "You don't have access to this server").ToString());
+            
+            SubTypeId SubTypeId;
+            if (string.IsNullOrWhiteSpace(Request.Form["SubTypeId"]))
+                return Content(XMLMessage.Error("MAP-CM-MISSTI", "The SubTypeId field must be provided").ToString());
+            if (!Enum.TryParse(Request.Form["SubTypeId"], out SubTypeId))
+                return Content(XMLMessage.Error("MAP-CM-MISSTI", "The SubTypeId is invalid").ToString());
+
+            int AsteroidAmount;
+            if (string.IsNullOrWhiteSpace(Request.Form["AsteroidAmount"]))
+                return Content(XMLMessage.Error("MAP-CM-MISAA", "The AsteroidAmount field must be provided").ToString());
+            if (!int.TryParse(Request.Form["AsteroidAmount"], out AsteroidAmount) || AsteroidAmount < 0)
+                return Content(XMLMessage.Error("MAP-CM-MISAA", "The AsteroidAmount is invalid").ToString());
+
+            float ProceduralDensity;
+            if (string.IsNullOrWhiteSpace(Request.Form["ProceduralDensity"]))
+                return Content(XMLMessage.Error("MAP-CM-MISPD", "The ProceduralDensity field must be provided").ToString());
+            if (!float.TryParse(Request.Form["ProceduralDensity"], out ProceduralDensity) || ProceduralDensity < 0 || ProceduralDensity > 1)
+                return Content(XMLMessage.Error("MAP-CM-MISPD", "The ProceduralDensity is invalid").ToString());
+
+            int ProceduralSeed;
+            if (string.IsNullOrWhiteSpace(Request.Form["ProceduralSeed"]))
+                return Content(XMLMessage.Error("MAP-CM-MISPS", "The ProceduralSeed field must be provided").ToString());
+            if (!int.TryParse(Request.Form["ProceduralSeed"], out ProceduralSeed) || ProceduralDensity < 0)
+                return Content(XMLMessage.Error("MAP-CM-MISPS", "The ProceduralSeed is invalid").ToString());
+
+            // ** PROCESS **
+            ServiceState serviceState = srvPrv.GetState(server);
+
+            if (serviceState != ServiceState.Stopped && serviceState != ServiceState.Unknow)
+            {
+                ServiceHelper.StopServiceAndWait(server);
+                Thread.Sleep(5000);
+                ServiceHelper.KillService(server);
+            }
+
+            ServerConfigHelper config = new ServerConfigHelper();
+            config.Load(server);
+
+            config.ScenarioType = SubTypeId;
+            config.AsteroidAmount = AsteroidAmount;
+            config.ProceduralDensity = ProceduralDensity;
+            config.ProceduralSeed = ProceduralSeed;
+            config.SaveName = string.Empty;
+
+            config.Save(server);
+
+            ServiceHelper.StartService(server);
+
+            return Content(XMLMessage.Success("MAP-CM-OK", "The map have been created, the server is (re)starting ...").ToString());
         }
 
         protected override void Dispose(bool disposing)

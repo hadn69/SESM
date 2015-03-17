@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SESM.Models.Views.Server;
+using SESM.Models;
 
 namespace SESM.Tools
 {

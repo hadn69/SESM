@@ -1,4 +1,4 @@
-﻿namespace SESM.Models.Views.Server
+﻿namespace SESM.Models
 {
 
     public enum GameMode

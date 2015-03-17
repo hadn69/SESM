@@ -429,6 +429,21 @@ namespace SESM.Controllers.API
 
                 if (useServerExtender != server.UseServerExtender)
                 {
+                    if (useServerExtender)
+                    {
+                        ServerConfigHelper config = new ServerConfigHelper();
+                        config.Load(server);
+                        server.AutoSaveInMinutes = config.AutoSaveInMinutes;
+                        srvPrv.UpdateServer(server);
+                    }
+                    else
+                    {
+                        ServerConfigHelper config = new ServerConfigHelper();
+                        config.Load(server);
+                        config.AutoSaveInMinutes = server.AutoSaveInMinutes ?? 5;
+                        config.Save(server);
+                    }
+
                     server.UseServerExtender = useServerExtender;
                     ServiceHelper.UnRegisterService(server);
                     if (server.UseServerExtender)

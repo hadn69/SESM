@@ -52,13 +52,13 @@ namespace SESM.Tools.Helpers
             {
                 result = Json.Decode(data);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }
-            foreach(dynamic item in result)
+            foreach (dynamic item in result)
             {
-                if((useDev && item.prerelease) || (!useDev && !item.prerelease))
+                if ((useDev && item.prerelease) || (!useDev && !item.prerelease))
                 {
                     return item.assets[0].browser_download_url;
                 }
@@ -79,13 +79,13 @@ namespace SESM.Tools.Helpers
             {
                 result = Json.Decode(data);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }
-            foreach(dynamic item in result)
+            foreach (dynamic item in result)
             {
-                if((useDev && item.prerelease) || (!useDev && !item.prerelease))
+                if ((useDev && item.prerelease) || (!useDev && !item.prerelease))
                 {
                     Match extract = Regex.Match(item.assets[0].name, "^.*v(.*)-.*$");
                     if (extract.Groups.Count != 2)
@@ -93,7 +93,7 @@ namespace SESM.Tools.Helpers
                     return new Version("0." + extract.Groups[1].Value);
                 }
             }
-            return new Version(0,0);
+            return new Version(0, 0);
         }
 
         public static string GetGithubData()
@@ -114,21 +114,21 @@ namespace SESM.Tools.Helpers
         public static Version GetLocalVersion()
         {
             string SESELocPath = SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe";
-            if(File.Exists(SESELocPath))
+            if (File.Exists(SESELocPath))
                 return AssemblyName.GetAssemblyName(SESELocPath).Version;
-            return new Version(0,0,0,0);
+            return new Version(0, 0, 0, 0);
         }
 
         public static void CleanupUpdate()
         {
             string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
-            foreach(var item in files)
+            foreach (var item in files)
             {
                 try
                 {
                     File.Delete(item);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Logger exceptionLogger = LogManager.GetLogger("GenericExceptionLogger");
                     exceptionLogger.Fatal("Caught Exception in CleanupUpdate when deleting " + item, ex);
@@ -147,20 +147,26 @@ namespace SESM.Tools.Helpers
 
         public static void ApplyUpdate(Logger logger = null)
         {
-            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
-            if(files.Length != 1)
+            try
             {
-                // If multiple zip available or no zip, we don't risk an update 
-                return;
+                string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
+                if (files.Length != 1)
+                {
+                    // If multiple zip available or no zip, we don't risk an update 
+                    return;
+                }
+
+                if (logger != null)
+                    logger.Info("Extracting " + PathHelper.GetLastLeaf(files[0]));
+
+                using (ZipFile zip = new ZipFile(files[0]))
+                {
+                    zip.ExtractAll(SESMConfigHelper.SEDataPath + "DedicatedServer64",
+                        ExtractExistingFileAction.OverwriteSilently);
+                }
             }
-
-            if(logger!= null)
-                logger.Info("Extracting " + PathHelper.GetLastLeaf(files[0]));
-
-            using(ZipFile zip = new ZipFile(files[0]))
+            catch (Exception)
             {
-                zip.ExtractAll(SESMConfigHelper.SEDataPath + "DedicatedServer64",
-                    ExtractExistingFileAction.OverwriteSilently);
             }
         }
     }

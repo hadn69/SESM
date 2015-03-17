@@ -12,6 +12,7 @@
 <script src="/assets/global/plugins/datatables/media/js/jquery.dataTables.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/bootstrap-contextmenu/bootstrap-contextmenu.js"></script>
+<script type="text/javascript" src="/Content/Js/TouchSpinMod.js"></script>
 <style>
     td:nth-child(2), th:nth-child(2) {
         text-align: center;
@@ -29,6 +30,63 @@
     </form>
 </div>
 <iframe id="download_frame" name="download_frame" style="display: none"></iframe>
+<!-- --- Create Modal --- -->
+<div class="modal fade" id="createModal" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Create Map</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Scenario</label>
+                        <div class="col-md-7">
+                            <select class="form-control" id="inpSubTypeId">
+                                <option value="LoneSurvivor">Lone Survivor</option>
+                                <option value="EasyStart1">Easy Start 1</option>
+                                <option value="EasyStart2">Easy Start 1</option>
+                                <option value="CrashedRedShip">Crashed Red Ship</option>
+                                <option value="TwoPlatforms">Two Platforms</option>
+                                <option value="Asteroids">Asteroids Only</option>
+                                <option value="EmptyWorld">Empty World</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Asteroid Amount</label>
+                        <div class="col-md-7">
+                            <div class="input-inline input-small">
+                                <input type="text" id="inpAsteroidAmount" class="form-control" value="8">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Procedural Density</label>
+                        <div class="col-md-7">
+                            <div class="input-inline input-small">
+                                <input type="text" id="inpProceduralDensity" class="form-control" value="0.5">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Procedural Seed</label>
+                        <div class="col-md-7">
+                            <div class="input-inline input-small">
+                                <input type="text" id="inpProceduralSeed" class="form-control" value="250193">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn blue" id="btnSaveCreate">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="col-md-12">
     <div class="portlet light bordered">
         <div class="portlet-body">
@@ -54,11 +112,8 @@
             <div class="table-toolbar">
                 <div class="row">
                     <div class="col-md-6">
-                        <button id="btnCreateServer" class="btn green" style="display: none;">
+                        <button id="btnCreate" class="btn green">
                             <i class=" fa fa-plus"></i> New
-                        </button>
-                        <button id="btnDeleteServers" class="btn red" style="display: none;">
-                            <i class=" fa fa-trash"></i> Delete
                         </button>
                     </div>
                 </div>
@@ -96,6 +151,31 @@
     function initPage() {
         var locTable = $('#mapTable');
         $("#downloadFormServerID").val(serverID);
+
+        $('#inpAsteroidAmount').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 0,
+            max: 2000,
+            step: 1
+        });
+
+        $('#inpProceduralDensity').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 0,
+            max: 1,
+            decimals: 2,
+            step: 0.1
+        });
+
+        $('#inpProceduralSeed').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 0,
+            max: 2147483646,
+            step: 1
+        });
 
         function fileSizeIEC(a, b, c, d, e) {
             if (a < 1024)
@@ -246,6 +326,41 @@
         }
 
         refreshList();
+
+        $("#btnCreate").click(function () {
+            $("#createModal").modal('show');
+        });
+
+        $("#btnSaveCreate").click(function() {
+            bootbox.confirm("The server will be (re)started. Are you sure you want to create this map ?",
+                function(result) {
+                    if (result) {
+                        LockPage();
+                        $("#createModal").modal('hide');
+                        $.post("/API/Map/CreateMap",
+                        {
+                            ServerID: serverID,
+                            SubTypeId: $("#inpSubTypeId").val(),
+                            AsteroidAmount: $("#inpAsteroidAmount").val(),
+                            ProceduralDensity: $("#inpProceduralDensity").val(),
+                            ProceduralSeed: $("#inpProceduralSeed").val()
+                        },
+                        function (data) {
+
+                            var root = $($.parseXML(data)).find("Response");
+
+                            if (root.children("Type").text() == "Error") {
+                                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                return;
+                            }
+
+                            toastr.success("The Map is creating ... The process can take up to a few minutes.", "Map Creating");
+
+                            refreshList();
+                        });
+                    }
+                });
+        });
 
         $("#btnRefresh").click(function () {
             refreshList();

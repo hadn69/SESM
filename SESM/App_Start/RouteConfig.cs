@@ -95,7 +95,8 @@ namespace SESM
                     action = "GetMaps|" +
                              "SelectMap|" +
                              "DeleteMap|" +
-                             "DownloadMap"
+                             "DownloadMap|" +
+                             "CreateMap|"
                 }
             );
 

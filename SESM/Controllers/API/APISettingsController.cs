@@ -12,7 +12,7 @@ using Quartz;
 using Quartz.Impl;
 using SESM.DAL;
 using SESM.DTO;
-using SESM.Models.Views.Settings;
+using SESM.Models;
 using SESM.Tools;
 using SESM.Tools.API;
 using SESM.Tools.Helpers;
@@ -372,9 +372,10 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SET-GSEV-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
-            int localVersion = SteamCMDHelper.GetInstalledVersion();
+            Logger logger = LogManager.GetLogger("SEGetVersionLogger");
+            int localVersion = SteamCMDHelper.GetInstalledVersion(logger);
 
-            int remoteVersion = SteamCMDHelper.GetAvailableVersion(!string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword));
+            int remoteVersion = SteamCMDHelper.GetAvailableVersion(!string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword), logger);
             
             XMLMessage response = new XMLMessage("SET-GSEV-OK");
 

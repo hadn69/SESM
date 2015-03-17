@@ -8,7 +8,7 @@ using NLog;
 using Quartz;
 using Quartz.Impl;
 using SESM.DTO;
-using SESM.Models.Views.Settings;
+using SESM.Models;
 using SESM.Tools.Jobs;
 
 namespace SESM.Tools.Helpers

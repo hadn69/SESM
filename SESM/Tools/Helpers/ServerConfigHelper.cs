@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using SESM.DTO;
-using SESM.Models.Views.Server;
+using SESM.Models;
 
 namespace SESM.Tools.Helpers
 {
