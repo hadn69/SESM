@@ -1,0 +1,49 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+
+    List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
+    breadCrumb.Add(new KeyValuePair<string, string>("Servers", "/Servers/"));
+    breadCrumb.Add(new KeyValuePair<string, string>(ViewBag.Server.Name, "/" + ViewBag.ServerID + "/Dashboard/"));
+    ViewBag.Breadcrumb = breadCrumb;
+
+    ViewBag.RefreshBtn = true;
+}
+
+<div class="col-md-4 col-sm-12">
+    <a class="dashboard-stat blue-madison" href="/@ViewBag.ServerID/Settings">
+        <div class="visual">
+            <i class="icon-settings"></i>
+        </div>
+        <div class="details">
+            <div class="number">
+                Server Settings
+            </div>
+        </div>
+    </a>
+</div>
+<div class="col-md-4 col-sm-12">
+    <a class="dashboard-stat blue-madison" href="/@ViewBag.ServerID/Configuration">
+        <div class="visual">
+            <i class="icon-puzzle"></i>
+        </div>
+        <div class="details">
+            <div class="number">
+               Game Configuration
+            </div>
+        </div>
+
+    </a>
+</div>
+<div class="col-md-4 col-sm-12">
+    <a class="dashboard-stat blue-madison" href="/@ViewBag.ServerID/Explorer">
+        <div class="visual">
+            <i class="icon-folder-alt"></i>
+        </div>
+        <div class="details">
+            <div class="number">
+                File Explorer
+            </div>
+        </div>
+
+    </a>
+</div>

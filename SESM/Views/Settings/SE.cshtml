@@ -1,40 +1,40 @@
 ﻿@{
-    ViewBag.Title = "SE Server Extender Settings";
+    ViewBag.Title = "Space Engineers Settings";
 
     List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
     breadCrumb.Add(new KeyValuePair<string, string>("Global Setting", "/Settings/"));
-    breadCrumb.Add(new KeyValuePair<string, string>("SE Server Extender Settings", "/Settings/SESE/"));
+    breadCrumb.Add(new KeyValuePair<string, string>("Space Engineers Settings", "/Settings/SE/"));
     ViewBag.Breadcrumb = breadCrumb;
 
     ViewBag.RefreshBtn = true;
 }
 <link href="/assets/global/plugins/dropzone/css/dropzone.css" rel="stylesheet">
 <script src="/assets/global/plugins/dropzone/dropzone.js"></script>
-<div class="col-md-12" id="state-SESE">
+<div class="col-md-12" id="state-SE">
     <div class="portlet light">
         <div class="portlet-body text-center">
-            <h4>SESE is actualy used on <span id="nbSESE"></span> server(s)</h4>
-            <h4 id="isRunning">An SESE Upate is running</h4>
+            <h4>SE is actualy used on <span id="nbServer">0</span> server(s)</h4>
+            <h4 id="isRunning" class="hidden">An SE Update is running</h4>
         </div>
     </div>
 </div>
-<div class="col-md-6" id="VersionPanel">
+<div class="col-md-6"  id="VersionPanel">
     <div class="row">
-        <div class="col-md-12" id="Status-SESE">
+        <div class="col-md-12" id="Status-SE">
             <div class="alert alert-danger text-center">
-                <h3>Something went wrong !</h3>
+                <h3>Loading</h3>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="Local-SESE">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="Local-SE">
             <div class="dashboard-stat blue-madison">
                 <div class="visual">
                     <i class="fa fa-database"></i>
                 </div>
                 <div class="details">
                     <div class="number">
-                        0.0.0.0
+                        0
                     </div>
                     <div class="desc">
                         Local Version
@@ -43,14 +43,14 @@
             </div>
         </div>
 
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="remote-SESE">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="remote-SE">
             <div class="dashboard-stat blue-madison">
                 <div class="visual">
                     <i class="fa fa-globe"></i>
                 </div>
                 <div class="details">
                     <div class="number">
-                        0.0.0.0
+                        0
                     </div>
                     <div class="desc">
                         Online Version
@@ -68,9 +68,6 @@
                 <a href="#" class="btn yellow" id="btnForceUpdate">
                     Force Update
                 </a>
-                <a href="#" class="btn red" id="btnDelete">
-                    Delete SESE
-                </a>
             </div>
             <br />
         </div>
@@ -79,11 +76,11 @@
         <div class="portlet-title">
             <div class="caption">
                 <i class="fa fa-upload"></i>
-                <span class="caption-subject bold uppercase"> Manual SESE Upload</span>
+                <span class="caption-subject bold uppercase"> Manual Game Files Upload</span>
             </div>
         </div>
         <div class="portlet-body form">
-            <form action="/API/Settings/UploadSESE" class="dropzone" id="uploadDropzone">
+            <form action="/API/Settings/UploadSE" class="dropzone" id="uploadDropzone">
                 <div class="fallback">
                     <input name="ZipFile" type="file" />
                 </div>
@@ -94,32 +91,13 @@
 <div class="col-md-6" id="SettingsPanel">
     <div class="portlet light bordered">
         <div class="portlet-body form">
-            <!-- BEGIN FORM-->
             <form action="#" class="form-horizontal">
                 <div class="form-body">
                     <div class="alert alert-danger display-hide" id="validationAlert">
                         <button class="close" data-close="alert"></button>
                         You have some errors. Please check below.
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Github URL</label>
-                        <div class="col-md-8">
-                            <div class="input-group">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-github"></i>
-                                </span>
-                                <div class="input-icon right">
-                                    <input type="text" class="form-control" placeholder="URL" name="GithubURL" id="inpGithubURL">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Branch</label>
-                        <div class="col-md-8 center-block">
-                            <input type="checkbox" id="inpDev" name="Dev" class="make-switch" data-on-text="&nbsp;Dev&nbsp;&nbsp;" data-off-text="&nbsp;Release&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">
-                        </div>
-                    </div>
+
                     <div class="form-group">
                         <label class="col-md-4 control-label">Auto-Update</label>
                         <div class="col-md-8 center-block">
@@ -139,6 +117,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Beta Password</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-lock"></i>
+                                </span>
+                                <div class="input-icon right">
+                                    <input type="text" class="form-control" name="AutoUpdateBetaPassword" id="inpAutoUpdateBetaPassword">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-actions">
                     <div class="row">
@@ -150,14 +141,13 @@
                 <div class="form-actions" style="display:none;" id="CronDetails">
                     <div class="row">
                         <div class="col-md-12">
-                            With this cron, the next SESE Auto Updates will be at :<br /><br />
+                            With this cron, the next SE Auto Updates will be at :<br /><br />
                             <ul class="list-group"></ul>
                         </div>
                     </div>
                 </div>
 
             </form>
-            <!-- END FORM-->
         </div>
     </div>
 </div>
@@ -176,8 +166,8 @@
             clickable: true,
             acceptedFiles: ".zip",
             accept: function (file, done) {
-                bootbox.confirm("<br/>Are you sure you want to upload SESE ? <br/>" +
-                    "If any running server use SESE, they will be stopped then restarted for the update to take place !",
+                bootbox.confirm("<br/>Are you sure you want to upload SE ? <br/>" +
+                    "If ther is any running server they will be stopped then restarted for the update to take place !",
                     function (result) {
                         if (result) {
                             done();
@@ -200,7 +190,7 @@
                         toastr.warning(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
                         return;
                     }
-                    toastr.success(root.children("Content").text(), "SESE Updated");
+                    toastr.success(root.children("Content").text(), "SE Updated");
                 });
             }
         };
@@ -215,19 +205,14 @@
             focusInvalid: false, // do not focus the last invalid input
             ignore: "",
             rules: {
-                GithubURL: {
-                    required: true,
-                    url: true
-                },
-                Dev: {
-                    required: true
-                },
                 AutoUpdateEnabled: {
                     required: true
                 },
                 AutoUpdateCron: {
                     required: true,
                     cron: true
+                },
+                AutoUpdateBetaPassword: {
                 }
             },
 
@@ -257,7 +242,7 @@
             }
         });
 
-        function showViewSESE() {
+        function showView() {
             if (statusLoaded && versionLoaded && settingsLoaded) {
                 UnlockPage();
             }
@@ -314,7 +299,7 @@
             versionLoaded = false;
             settingsLoaded = false;
 
-            $.get("/API/Settings/GetSESEStatus",
+            $.get("/API/Settings/GetSEStatus",
                 {},
                 function (data) {
                     statusLoaded = true;
@@ -323,7 +308,7 @@
 
                     if (root.children("Type").text() == "Error") {
                         toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                        showViewSESE();
+                        showView();
                         return;
                     }
 
@@ -332,13 +317,13 @@
                         $("#isRunning").show(0);
                     }
 
-                    $("#nbSESE").text(root.children("Content").children("NbServer").text());
+                    $("#nbServer").text(root.children("Content").children("NbServer").text());
 
-                    showViewSESE();
+                    showView();
                     return;
                 });
 
-            $.get("/API/Settings/GetSESEVersion",
+            $.get("/API/Settings/GetSEVersion",
                 {},
                 function (data) {
                     versionLoaded = true;
@@ -347,51 +332,50 @@
 
                     if (root.children("Type").text() == "Error") {
                         toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                        showViewSESE();
+                        showView();
                         return;
                     }
 
                     $("#btnUpdate").hide(0);
-                    $("#btnDelete").hide(0);
 
-                    $("#Status-SESE").children(".alert")
+                    $("#Status-SE").children(".alert")
                         .removeClass("alert-success")
                         .removeClass("alert-info")
                         .removeClass("alert-danger")
                         .removeClass("alert-warning");
 
-                    $("#Local-SESE").find(".number").last().html(root.children("Content").children("Local").text());
-                    $("#remote-SESE").find(".number").last().html(root.children("Content").children("Remote").text());
+                    $("#Local-SE").find(".number").last().html(root.children("Content").children("Local").text());
+                    $("#remote-SE").find(".number").last().html(root.children("Content").children("Remote").text());
 
                     if (root.children("Content").children("Local").text() == "0.0.0.0") {
-                        $("#Status-SESE").find("h3").html("SE Server Extender is not installed");
-                        $("#Status-SESE").find(".alert").addClass("alert-info");
-                        $("#Local-SESE").find(".number").last().html("N/A");
+                        $("#Status-SE").find("h3").html("Space Engineers is not installed");
+                        $("#Status-SE").find(".alert").addClass("alert-info");
+                        $("#Local-SE").find(".number").last().html("N/A");
                         $("#btnUpdate").show(0);
 
-                        showViewSESE();
+                        showView();
                         return;
                     }
                     $("#btnDelete").show(0);
                     if (root.children("Content").children("Diff").text() < 0) {
-                        $("#Status-SESE").find("h3").html("An update is available !");
-                        $("#Status-SESE").children(".alert").addClass("alert-warning");
+                        $("#Status-SE").find("h3").html("An update is available !");
+                        $("#Status-SE").children(".alert").addClass("alert-warning");
                         $("#btnUpdate").show(0);
                     }
                     else if (root.children("Content").children("Diff").text() == 0) {
-                        $("#Status-SESE").find("h3").html("SE Server Extender is up to date !");
-                        $("#Status-SESE").children(".alert").addClass("alert-success");
+                        $("#Status-SE").find("h3").html("Space Engineers is up to date !");
+                        $("#Status-SE").children(".alert").addClass("alert-success");
                     }
                     else if (root.children("Content").children("Diff").text() > 0) {
-                        $("#Status-SESE").find("h3").html("You are more up-to-date than the update feed !<br/>(Are you from the future ?)");
-                        $("#Status-SESE").children(".alert").addClass("alert-danger");
+                        $("#Status-SE").find("h3").html("You are more up-to-date than the update feed !<br/>(Are you from the future ?)");
+                        $("#Status-SE").children(".alert").addClass("alert-danger");
                     }
 
-                    showViewSESE();
+                    showView();
                     return;
                 });
 
-            $.get("/API/Settings/GetSESESettings",
+            $.get("/API/Settings/GetSESettings",
                 {},
                 function (data) {
                     settingsLoaded = true;
@@ -400,16 +384,14 @@
 
                     if (root.children("Type").text() == "Error") {
                         toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                        showViewSESE();
+                        showView();
                         return;
                     }
 
-                    $("#inpGithubURL").val(root.children("Content").children("GithubURL").text());
-                    $("#inpDev").bootstrapSwitch('state', root.children("Content").children("Dev").text() == "True");
                     $("#inpAutoUpdateEnabled").bootstrapSwitch('state', root.children("Content").children("AutoUpdateEnabled").text() == "True");
                     $("#inpAutoUpdateCron").val(root.children("Content").children("AutoUpdateCron").text());
-
-                    showViewSESE();
+                    $("#AutoUpdateBetaPassword").val(root.children("Content").children("AutoUpdateBetaPassword").text());
+                    showView();
                     TestCron();
                     return;
                 });
@@ -429,12 +411,11 @@
         $("#btnUpdateSettings").click(function () {
             if ($("form").valid()) {
                 $("#btnUpdateSettings").prop('disabled', true);
-                $.post("/API/Settings/SetSESESettings",
+                $.post("/API/Settings/SetSESettings",
                 {
-                    GithubURL: $("#inpGithubURL").val(),
-                    Dev: $("#inpDev").is(':checked'),
                     AutoUpdateEnabled: $("#inpAutoUpdateEnabled").is(':checked'),
-                    AutoUpdateCron: $("#inpAutoUpdateCron").val()
+                    AutoUpdateCron: $("#inpAutoUpdateCron").val(),
+                    AutoUpdateBetaPassword: $("#inpAutoUpdateBetaPassword").val()
                 },
                 function (data) {
                     $("#btnUpdateSettings").prop('disabled', false);
@@ -443,7 +424,7 @@
 
                     if (root.children("Type").text() == "Error") {
                         toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                        showViewSESE();
+                        showView();
                         return;
                     }
 
@@ -454,15 +435,15 @@
         });
 
         $("#btnUpdate").click(function () {
-            bootbox.confirm("Are you sure you want to try to update SESE ?<br/> " +
-            "Note : If an update is found, all running server using SESE will be restarted.",
+            bootbox.confirm("Are you sure you want to try to update SE ?<br/> " +
+            "Note : If an update is found, all running server will be restarted.",
             function (result) {
                 if (result) {
-                    toastr.warning("This process can take up to several minutes", "SESE Update Started");
+                    toastr.warning("This process can take up to several minutes", "SE Update Started");
                     $("#btnUpdate").prop('disabled', true);
                     $("#btnForceUpdate").prop('disabled', true);
                     $("#btnDelete").prop('disabled', true);
-                    $.post("/API/Settings/UpdateSESE",
+                    $.post("/API/Settings/UpdateSE",
                     {
                         Force: "false"
                     },
@@ -478,22 +459,22 @@
                             return;
                         }
                         refresh();
-                        toastr.success(root.children("Content").text(), "SESE Update");
+                        toastr.success(root.children("Content").text(), "SE Update");
                     });
                 }
             });
         });
 
         $("#btnForceUpdate").click(function () {
-            bootbox.confirm("Are you sure you want to force an SESE update?<br/> " +
-            "Note : All server using SESE WILL be restarted.",
+            bootbox.confirm("Are you sure you want to force an update?<br/> " +
+            "Note : All running server WILL be restarted.",
             function (result) {
                 if (result) {
-                    toastr.warning("This process can take up to several minutes", "SESE Force Update Started");
+                    toastr.warning("This process can take up to several minutes", "SE Force Update Started");
                     $("#btnUpdate").prop('disabled', true);
                     $("#btnForceUpdate").prop('disabled', true);
                     $("#btnDelete").prop('disabled', true);
-                    $.post("/API/Settings/UpdateSESE",
+                    $.post("/API/Settings/UpdateSE",
                     {
                         Force: "true"
                     },
@@ -509,35 +490,7 @@
                             return;
                         }
                         refresh();
-                        toastr.success(root.children("Content").text(), "SESE Force Update");
-                    });
-                }
-            });
-        });
-
-        $("#btnDelete").click(function () {
-            bootbox.confirm("Are you sure you want to delete the SESE binary file ?<br/> " +
-            "Note : All server using SESE WILL be stopped.",
-            function (result) {
-                if (result) {
-                    toastr.warning("This process can take up to several minutes", "SESE Deletion Started");
-                    $("#btnUpdate").prop('disabled', true);
-                    $("#btnForceUpdate").prop('disabled', true);
-                    $("#btnDelete").prop('disabled', true);
-                    $.get("/API/Settings/DeleteSESE",
-                    function (data) {
-                        $("#btnUpdate").prop('disabled', false);
-                        $("#btnForceUpdate").prop('disabled', false);
-                        $("#btnDelete").prop('disabled', false);
-
-                        var root = $($.parseXML(data)).find("Response");
-
-                        if (root.children("Type").text() == "Error") {
-                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                            return;
-                        }
-                        refresh();
-                        toastr.success(root.children("Content").text(), "SESE Deletion");
+                        toastr.success(root.children("Content").text(), "SE Force Update");
                     });
                 }
             });

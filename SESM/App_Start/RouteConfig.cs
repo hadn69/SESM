@@ -30,7 +30,13 @@ namespace SESM
                 defaults: new { controller = "APISettings" },
                 constraints: new
                 {
-                    action = "GetSESEStatus|" +
+                    action = "GetSEStatus|" +
+                             "GetSEVersion|" +
+                             "GetSESettings|" +
+                             "SetSESettings|" +
+                             "UploadSE|" +
+                             "UpdateSE|" + 
+                             "GetSESEStatus|" +
                              "GetSESEVersion|" +
                              "GetSESESettings|" +
                              "SetSESESettings|" +
@@ -51,6 +57,18 @@ namespace SESM
                              "GetServer|" +
                              "CreateServer|" +
                              "DeleteServers|" +
+
+                             "GetSettings|" +
+                             "SetSettings|" +
+                             "GetSESESettings|" +
+                             "SetSESESettings|" +
+                             "GetJobsSettings|" +
+                             "SetJobsSettings|" +
+                             "GetBackupsSettings|" +
+                             "SetBackupsSettings|" +
+                             "GetAccessSettings|" +
+                             "SetAccessSettings|" +
+
                              "GetConfiguration|" +
                              "GetConfigurationRights|" +
                              "SetConfiguration|" +
@@ -131,13 +149,6 @@ namespace SESM
                 defaults: new { action = "Index", controller = "Server" }
             );
 
-            // Explorer
-            routes.MapRoute(
-                name: "Explorer",
-                url: "{id}/Explorer",
-                defaults: new { action = "Browse", controller = "Explorer" }
-            );
-
             // Account
             routes.MapRoute(
                 name: "Account",
@@ -159,7 +170,7 @@ namespace SESM
                 {
                     action = "Index|" +
                              "SE|" +
-                             "SE"
+                             "SESE"
                 }
             );
 
@@ -171,8 +182,10 @@ namespace SESM
                 constraints: new
                 {
                     action = "Dashboard|" +
-                             "Configuration|" + 
-                             "Maps"
+                             "Configuration|" +
+                             "Settings|" +
+                             "Map|" +
+                             "Explorer"
                 }
             );
 

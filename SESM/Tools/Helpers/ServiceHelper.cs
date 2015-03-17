@@ -9,6 +9,7 @@ using Quartz;
 using Quartz.Impl;
 using SESM.DTO;
 using SESM.Models.Views.Settings;
+using SESM.Tools.Jobs;
 
 namespace SESM.Tools.Helpers
 {
@@ -106,14 +107,14 @@ namespace SESM.Tools.Helpers
                     {
                         SetLowPriority(serviceName);
                         IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
-                        scheduler.DeleteJob(new JobKey("LowPriorityStart" + server.Id + "Job", "LowPriorityStart"));
+                        scheduler.DeleteJob(ResetPriorityJob.GetJobKey(server));
                         IJobDetail lowPriorityStartJob = JobBuilder.Create<ResetPriorityJob>()
-                            .WithIdentity("LowPriorityStart" + server.Id + "Job", "LowPriorityStart")
+                            .WithIdentity(ResetPriorityJob.GetJobKey(server))
                             .UsingJobData("id", server.Id)
                             .Build();
 
                         ITrigger lowPriorityStartTrigger = TriggerBuilder.Create()
-                            .WithIdentity("LowPriorityStart" + server.Id + "Trigger", "LowPriorityStart")
+                            .WithIdentity(ResetPriorityJob.GetTriggerKey(server))
                             .StartAt(DateBuilder.FutureDate(3, IntervalUnit.Minute))
                             .Build();
 
@@ -253,7 +254,6 @@ namespace SESM.Tools.Helpers
             si.Close();
         }
 
-
         public static void RegisterServerExtenderService(EntityServer server)
         {
             if(DoesServiceExist(server))
@@ -274,6 +274,12 @@ namespace SESM.Tools.Helpers
             si.Start();
             string output = si.StandardOutput.ReadToEnd();
             si.Close();
+        }
+
+        public static void UnRegisterService(EntityServer server)
+        {
+            UnRegisterService(GetServiceName(server));
+            return;
         }
 
         public static void UnRegisterService(string serviceName)
@@ -336,7 +342,7 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public static void KillAllService()
+        public static void KillAllServices()
         {
             foreach(Process proc in Process.GetProcessesByName("SpaceEngineersDedicated"))
             {
@@ -346,10 +352,10 @@ namespace SESM.Tools.Helpers
                 }
                 catch(Exception) { }
             }
-            KillAllSESEService();
+            KillAllSESEServices();
         }
 
-        public static void KillAllSESEService()
+        public static void KillAllSESEServices()
         {
             foreach(Process proc in Process.GetProcessesByName("SEServerExtender"))
             {

@@ -1,12 +1,6 @@
-﻿using System.Web.Mvc;
-using SESM.Controllers.ActionFilters;
-using SESM.DAL;
-using SESM.DTO;
-using SESM.Models.Views.User;
-using SESM.Tools.Helpers;
-
-namespace SESM.Controllers
+﻿namespace SESM.Controllers
 {
+    /*
     [LoggedOnly]
     [SuperAdmin]
     [CheckLockout]
@@ -90,4 +84,5 @@ namespace SESM.Controllers
         }
         
     }
+    */
 }

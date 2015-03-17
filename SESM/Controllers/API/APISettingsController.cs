@@ -22,6 +22,191 @@ namespace SESM.Controllers.API
     {
         private readonly DataContext _context = new DataContext();
 
+        #region SE
+
+        // GET: API/Settings/GetSEStatus        
+        [HttpGet]
+        public ActionResult GetSEStatus()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-GSES-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PROCESS **
+            XMLMessage response = new XMLMessage("SET-GSES-OK");
+
+            response.AddToContent(new XElement("UpdateRunning", SESMConfigHelper.SEUpdating.ToString()));
+            response.AddToContent(new XElement("NbServer", srvPrv.GetAllServers().Count));
+            return Content(response.ToString());
+        }
+
+        // GET: API/Settings/GetSEVersion        
+        [HttpGet]
+        public ActionResult GetSEVersion()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-GSEV-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PROCESS **
+            int localVersion = SteamCMDHelper.GetInstalledVersion();
+
+            int remoteVersion = SteamCMDHelper.GetAvailableVersion(!string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword));
+            
+            XMLMessage response = new XMLMessage("SET-GSEV-OK");
+
+            response.AddToContent(new XElement("Local", localVersion.ToString()));
+            response.AddToContent(new XElement("Remote", remoteVersion.ToString()));
+            response.AddToContent(new XElement("Diff", localVersion.CompareTo(remoteVersion)));
+
+            return Content(response.ToString());
+        }
+
+        // GET: API/Settings/GetSESettings        
+        [HttpGet]
+        public ActionResult GetSESettings()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-GSES-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PROCESS **
+            XMLMessage response = new XMLMessage("SET-GSES-OK");
+
+            response.AddToContent(new XElement("AutoUpdateEnabled", SESMConfigHelper.AutoUpdateEnabled));
+            response.AddToContent(new XElement("AutoUpdateCron", SESMConfigHelper.AutoUpdateCron));
+            response.AddToContent(new XElement("AutoUpdateBetaPassword", SESMConfigHelper.AutoUpdateBetaPassword));
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Settings/SetSESettings        
+        [HttpPost]
+        public ActionResult SetSESettings()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-SSES-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PARSING **
+            bool autoUpdateEnabled;
+            if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateEnabled"]))
+                return Content(XMLMessage.Error("SET-SSES-MISAUE", "The AutoUpdateEnabled field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["AutoUpdateEnabled"], out autoUpdateEnabled))
+                return Content(XMLMessage.Error("SET-SSES-BADAUE", "The AutoUpdateEnabled field must be equal to \"True\" or \"False\"").ToString());
+
+
+            string autoUpdateCron = Request.Form["AutoUpdateCron"];
+            if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateCron"]))
+                return Content(XMLMessage.Error("SET-SSES-MISAUC", "The AutoUpdateCron field must be provided").ToString());
+            if (!CronExpression.IsValidExpression(autoUpdateCron))
+                return Content(XMLMessage.Error("SET-SSES-BADAUC", "The AutoUpdateCron field is invalid").ToString());
+
+            string autoUpdateBetaPassword = Request.Form["AutoUpdateBetaPassword"];
+
+            // ** PROCESS **
+            SESMConfigHelper.AutoUpdateEnabled = autoUpdateEnabled;
+            SESMConfigHelper.AutoUpdateCron = autoUpdateCron;
+            SESMConfigHelper.AutoUpdateBetaPassword = autoUpdateBetaPassword;
+
+            // Deleting the Job
+            IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+            scheduler.DeleteJob(SEAutoUpdateJob.GetJobKey());
+
+            if (SESMConfigHelper.AutoUpdateEnabled)
+            {
+                // Instantiating the job
+                IJobDetail SEAutoUpdateJobDetail = JobBuilder.Create<SESEAutoUpdateJob>()
+                    .WithIdentity(SEAutoUpdateJob.GetJobKey())
+                    .Build();
+
+                ITrigger SEAutoUpdateJobTrigger = TriggerBuilder.Create()
+                    .WithIdentity(SEAutoUpdateJob.GetTriggerKey())
+                    .WithCronSchedule(SESMConfigHelper.SESEAutoUpdateCron)
+                    .Build();
+
+                scheduler.ScheduleJob(SEAutoUpdateJobDetail, SEAutoUpdateJobTrigger);
+            }
+
+            return Content(XMLMessage.Success("SET-SSES-OK", "The SESE Settings has been updated").ToString());
+        }
+
+        // POST: API/Settings/UploadSE        
+        [HttpPost]
+        public ActionResult UploadSE(HttpPostedFileBase ZipFile)
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** PARSING **
+            if (ZipFile == null)
+                return Content(XMLMessage.Error("SET-UPSE-MISZIP", "The zipFile parameter must be provided").ToString());
+
+            if (!Ionic.Zip.ZipFile.IsZipFile(ZipFile.InputStream, false))
+                return Content(XMLMessage.Error("SET-UPSE-BADZIP", "The provided file in not a zip file").ToString());
+
+            ZipFile.InputStream.Seek(0, SeekOrigin.Begin);
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-UPSE-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            SESEHelper.CleanupUpdate();
+
+            ZipFile.SaveAs(SESMConfigHelper.SEDataPath + "DedicatedServer.zip");
+
+            Logger logger = LogManager.GetLogger("SEManualUpdateLogger");
+            ReturnEnum result = SEAutoUpdateJob.Run(logger, true, true, false);
+
+            if (result != ReturnEnum.Success)
+                return Content(XMLMessage.Warning("SET-UPSE-NOK", "An error occured : " + result.ToString()).ToString());
+
+
+            return Content(XMLMessage.Success("SET-UPSE-OK", "SE Game Files applied").ToString());
+        }
+
+        // POST: API/Settings/UpdateSE        
+        [HttpPost]
+        public ActionResult UpdateSE()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** PARSING **
+            bool force = false;
+            if (!string.IsNullOrWhiteSpace(Request.Form["Force"]))
+                if (!bool.TryParse(Request.Form["Force"], out force))
+                    return Content(XMLMessage.Error("SET-UPDSE-BADFRC", "The value provided in the Force field is not valid").ToString());
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-UPDSE-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PROCESS **
+            Logger logger = LogManager.GetLogger("SEManualUpdateLogger");
+            ReturnEnum result = SEAutoUpdateJob.Run(logger, true, false, force);
+
+            if (result != ReturnEnum.Success)
+                return Content(XMLMessage.Warning("SET-UPDSE-NOK", "An error occured : " + result.ToString()).ToString());
+
+            return Content(XMLMessage.Success("SET-UPDSE-OK", "SE Game Files applied").ToString());
+        }
+
+        #endregion
+
         #region SESE
 
         // GET: API/Settings/GetSESEStatus        
@@ -216,8 +401,8 @@ namespace SESM.Controllers.API
 
             // ** PARSING **
             bool force = false;
-            if (string.IsNullOrWhiteSpace(Request.Form["Force"]))
-                if(bool.TryParse(Request.Form["Force"], out force))
+            if (!string.IsNullOrWhiteSpace(Request.Form["Force"]))
+                if(!bool.TryParse(Request.Form["Force"], out force))
                     return Content(XMLMessage.Error("SET-UPDSESE-NOACCESS", "The value provided in the Force field is not valid").ToString());
 
             // ** ACCESS **
@@ -225,7 +410,7 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SET-UPDSESE-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
-            Logger logger = LogManager.GetLogger("SESEManuealUpdateLogger");
+            Logger logger = LogManager.GetLogger("SESEManualUpdateLogger");
             ReturnEnum result = SESEAutoUpdateJob.Run(logger, true, false, force);
             
             if(result != ReturnEnum.Success)
@@ -259,7 +444,7 @@ namespace SESM.Controllers.API
                 ServiceHelper.WaitForStopped(server);
             }
             Thread.Sleep(10000);
-            ServiceHelper.KillAllSESEService();
+            ServiceHelper.KillAllSESEServices();
             Thread.Sleep(2000);
             if(System.IO.File.Exists(SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe"))
                 System.IO.File.Delete(SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe");

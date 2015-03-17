@@ -1,4 +1,40 @@
-﻿<ul class="page-sidebar-menu page-sidebar-menu-hover-submenu" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
+﻿@using SESM.DAL
+@using SESM.DTO
+@{
+
+    DataContext context = new DataContext();
+    ServerProvider srvPrv = new ServerProvider(context);
+    UserProvider usrPrv = new UserProvider(context);
+
+    EntityUser user = Session["User"] as EntityUser;
+    int userID = user == null ? 0 : user.Id;
+
+    bool isAdmin = false;
+    HashSet<EntityServer> managedServers = new HashSet<EntityServer>();
+    HashSet<EntityServer> publicServers = new HashSet<EntityServer>();
+
+    if (user != null)
+    {
+        isAdmin = user.IsAdmin;
+        if (user.IsAdmin)
+        {
+            managedServers = new HashSet<EntityServer>(srvPrv.GetAllServers());
+        }
+        else
+        {
+            user = usrPrv.GetUser(userID);
+
+            managedServers = ((HashSet<EntityServer>)user.AdministratorOf);
+            managedServers.UnionWith((HashSet<EntityServer>)user.ManagerOf);
+
+            publicServers = ((HashSet<EntityServer>)user.UserOf);
+            publicServers.UnionWith(new HashSet<EntityServer>(srvPrv.GetAllPublicServers()));
+
+            publicServers.ExceptWith(managedServers);
+        }
+    }
+}
+<ul class="page-sidebar-menu page-sidebar-menu-hover-submenu" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
     <li class="start ">
         <a href="/">
             <i class="icon-home"></i>
@@ -6,100 +42,75 @@
         </a>
     </li>
     <li>
-        <a href="/Server/">
+        <a href="/Servers/">
             <i class="icon-power"></i>
             <span class="title">Servers</span>
-        </a>
-    </li>
-
-    <li>
-        <a href="javascript:;">
-            <i class="icon-present"></i>
-            <span class="title">Extra</span>
             <span class="arrow "></span>
         </a>
-        <ul class="sub-menu">
-            <li>
-                <a href="page_about.html">
-                    About Us
-                </a>
-            </li>
-            <li>
-                <a href="page_contact.html">
-                    Contact Us
-                </a>
-            </li>
-            <li>
-                <a href="extra_search.html">
-                    Search Results
-                </a>
-            </li>
-            <li>
-                <a href="extra_pricing_table.html">
-                    Pricing Tables
-                </a>
-            </li>
-            <li>
-                <a href="extra_404_option1.html">
-                    404 Page Option 1
-                </a>
-            </li>
-            <li>
-                <a href="extra_404_option2.html">
-                    404 Page Option 2
-                </a>
-            </li>
-            <li>
-                <a href="extra_404_option3.html">
-                    404 Page Option 3
-                </a>
-            </li>
-            <li>
-                <a href="extra_500_option1.html">
-                    500 Page Option 1
-                </a>
-            </li>
-            <li>
-                <a href="extra_500_option2.html">
-                    500 Page Option 2
-                </a>
-            </li>
-        </ul>
+        @if (managedServers.Count != 0 || publicServers.Count != 0)
+        {
+            <ul class="sub-menu">
+                @foreach (EntityServer item in managedServers.OrderBy(x => x.Name))
+                {
+                    <li>
+                        <a href="/@item.Id/Dashboard/">
+                            @item.Name <span class="arrow"></span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li>
+                                <a href="/@item.Id/Settings/"><i class="icon-settings"></i> Server Settings</a>
+                            </li>
+                            <li>
+                                <a href="/@item.Id/Configuration/"><i class="icon-puzzle"></i> Game Configuration</a>
+                            </li>
+                            <li>
+                                <a href="/@item.Id/Explorer/"><i class="icon-folder-alt"></i> File Explorer</a>
+                            </li>
+                            <li>
+                                <a href="/@item.Id/Maps/"><i class="icon-compass"></i> Maps Manager</a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                @foreach (EntityServer item in publicServers.OrderBy(x => x.Name))
+                {
+                    <li>
+                        <a href="/@item.Id/Dashboard/">
+                            @item.Name <span class="arrow"></span>
+                        </a>
+                        
+                    </li>
+                }
+            </ul>
+        }
     </li>
-    <li>
-        <a href="/Settings/">
-            <i class="icon-equalizer"></i>
-            <span class="title">Global Settings</span>
-            <span class="arrow "></span>
-        </a>
-        <ul class="sub-menu">
-            <li>
-                <a href="/Settings/SESE/">
-                    <i class="icon-rocket"></i> SE Server Extender
-                </a>
-            </li>
-            <li>
-                <a href="javascript:;">
-                    <i class="icon-globe"></i> Item 2 <span class="arrow"></span>
-                </a>
-                <ul class="sub-menu">
-                    <li>
-                        <a href="#"><i class="icon-tag"></i> Sample Link 1</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="icon-pencil"></i> Sample Link 1</a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="icon-graph"></i> Sample Link 1</a>
-                    </li>
-                </ul>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="icon-bar-chart"></i>
-                    Item 3
-                </a>
-            </li>
-        </ul>
-    </li>
+    @if (isAdmin)
+    {
+        <li>
+            <a href="/Users/">
+                <i class="icon-users"></i>
+                <span class="title">Users Manager</span>
+                <span class="arrow "></span>
+            </a>
+        </li>
+        <li>
+            <a href="/Settings/">
+                <i class="icon-equalizer"></i>
+                <span class="title">Global Settings</span>
+                <span class="arrow "></span>
+            </a>
+            <ul class="sub-menu">
+                <li>
+                    <a href="/Settings/SE/">
+                        <i class="icon-settings"></i> Space Engineers
+                    </a>
+                </li>
+                <li>
+                    <a href="/Settings/SESE/">
+                        <i class="icon-rocket"></i> SE Server Extender
+                    </a>
+                </li>
+            </ul>
+        </li>
+    }
 </ul>

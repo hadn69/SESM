@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Web.Mvc;
-using NLog;
-using Quartz;
-using Quartz.Impl;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
-using SESM.Models.Views.Server;
-using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {
@@ -19,17 +13,17 @@ namespace SESM.Controllers
     {
         readonly DataContext _context = new DataContext();
 
-        // GET: Server
+        // GET: Servers
         [HttpGet]
         public ActionResult Index()
         {
             return View();
         }
 
-        // GET: 1/Configuration
+        // GET: 1/Dashboard
         [HttpGet]
         [CheckAuth]
-        public ActionResult Configuration(int id)
+        public ActionResult Dashboard(int id)
         {
             return View();
         }
@@ -42,8 +36,17 @@ namespace SESM.Controllers
             return View();
         }
 
+        // GET: 1/Configuration
+        [HttpGet]
+        [CheckAuth]
+        public ActionResult Configuration(int id)
+        {
+            return View();
 
-
+        // GET: 1/Explorer
+        public ActionResult Explorer(int id)
+            return View();
+        }
 
         // GET: Server/HourlyStats/5
         [HttpGet]

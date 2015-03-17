@@ -11,32 +11,32 @@ using SESM.Tools.Helpers;
 
 namespace SESM.Tools
 {
-    public class BackupJob : IJob
+    public class AutoBackupJob : IJob
     {
         public void Execute(IJobExecutionContext jobContext)
         {
             JobDataMap dataMap = jobContext.JobDetail.JobDataMap;
 
             int backupLvl = dataMap.GetInt("lvl");
-            /*
+            
             switch (backupLvl)
             {
                 case 1:
-                    if (!SESMConfigHelper.AutoBackupLvl1)
+                    if (!SESMConfigHelper.AutoBackupLvl1Enabled)
                         return;
                     break;
                 case 2:
-                    if (!SESMConfigHelper.AutoBackupLvl2)
+                    if (!SESMConfigHelper.AutoBackupLvl2Enabled)
                         return;
                     break;
                 case 3:
-                    if (!SESMConfigHelper.AutoBackupLvl3)
+                    if (!SESMConfigHelper.AutoBackupLvl2Enabled)
                         return;
                     break;
                 default:
                     return;
                     break;
-            }*/
+            }
             Logger logger = LogManager.GetLogger("Backuplvl" + backupLvl + "Logger");
             DataContext context = new DataContext();
             ServerProvider srvPrv = new ServerProvider(context);
@@ -49,25 +49,24 @@ namespace SESM.Tools
                     logger.Info("Server  " + item.Name + " is not stopped, eligible for backup");
                     bool enabled = false;
                     int nbToKeep = 0;
-                    /*
                     switch (backupLvl)
                     {
                         case 1:
                             if (item.IsLvl1BackupEnabled)
                                 enabled = true;
-                            nbToKeep = SESMConfigHelper.ABNbToKeepLvl1;
+                            nbToKeep = SESMConfigHelper.AutoBackupLvl1NbToKeep;
                             break;
                         case 2:
                             if (item.IsLvl2BackupEnabled)
                                 enabled = true;
-                            nbToKeep = SESMConfigHelper.ABNbToKeepLvl2;
+                            nbToKeep = SESMConfigHelper.AutoBackupLvl2NbToKeep;
                             break;
                         case 3:
                             if (item.IsLvl3BackupEnabled)
                                 enabled = true;
-                            nbToKeep = SESMConfigHelper.ABNbToKeepLvl3;
+                            nbToKeep = SESMConfigHelper.AutoBackupLvl2NbToKeep;
                             break;
-                    }*/
+                    }
                     if (enabled)
                     {
                         try
@@ -148,6 +147,16 @@ namespace SESM.Tools
                 }
             }
             logger.Info("----End of Backup lvl " + backupLvl + "----");
+        }
+
+        public static JobKey GetJobKey(int lvl)
+        {
+            return new JobKey("BackupLvl" + lvl, "Backups");
+        }
+
+        public static TriggerKey GetTriggerKey(int lvl)
+        {
+            return new TriggerKey("BackupLvl" + lvl, "Backups");
         }
     }
 }

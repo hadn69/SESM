@@ -128,6 +128,13 @@ namespace SESM.Tools.Helpers
             get
             {
                 ConfigStorage.Read();
+
+                if (!ConfigStorage.SESavePath.EndsWith(@"\"))
+                {
+                    ConfigStorage.SESavePath += @"\";
+                    ConfigStorage.Write();
+                }
+
                 return ConfigStorage.SESavePath;                
             }
             set
@@ -142,6 +149,13 @@ namespace SESM.Tools.Helpers
             get
             {
                 ConfigStorage.Read();
+
+                if (!ConfigStorage.SEDataPath.EndsWith(@"\"))
+                {
+                    ConfigStorage.SEDataPath += @"\";
+                    ConfigStorage.Write();
+                }
+
                 return ConfigStorage.SEDataPath;                
             }
             set
@@ -177,6 +191,20 @@ namespace SESM.Tools.Helpers
                         ConfigStorage.Arch = "x64";
                         break;
                 }
+            }
+        }
+
+        public static bool PerfMonitorEnabled
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.PerfMonitorEnabled;
+            }
+            set
+            {
+                ConfigStorage.PerfMonitorEnabled = value;
+                ConfigStorage.Write();
             }
         }
 
@@ -322,6 +350,133 @@ namespace SESM.Tools.Helpers
             set
             {
                 ConfigStorage.SESEAutoUpdateCron = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        // Backups Settings
+        public static bool AutoBackupLvl1Enabled
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl1Enabled;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl1Enabled = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string AutoBackupLvl1Cron
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl1Cron;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl1Cron = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static int AutoBackupLvl1NbToKeep
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl1NbToKeep;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl1NbToKeep = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool AutoBackupLvl2Enabled
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl2Enabled;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl2Enabled = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string AutoBackupLvl2Cron
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl2Cron;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl2Cron = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static int AutoBackupLvl2NbToKeep
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl2NbToKeep;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl2NbToKeep = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static bool AutoBackupLvl3Enabled
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl3Enabled;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl3Enabled = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string AutoBackupLvl3Cron
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl3Cron;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl3Cron = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static int AutoBackupLvl3NbToKeep
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoBackupLvl3NbToKeep;
+            }
+            set
+            {
+                ConfigStorage.AutoBackupLvl3NbToKeep = value;
                 ConfigStorage.Write();
             }
         }
