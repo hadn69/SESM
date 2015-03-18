@@ -14,13 +14,11 @@
 <link rel="stylesheet" type="text/css" href="/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" />
 <script src="/Content/Js/md5-min.js" type="text/javascript"></script>
 <style>
-    td:nth-child(2), th:nth-child(2) {
+    td:nth-child(4), th:nth-child(4) {
         text-align: center;
     }
 
-    td:nth-child(5), th:nth-child(5) {
-        text-align: right;
-    }
+
 </style>
 <!-- --- Edit Modal --- -->
 <div class="modal fade" id="editModal" tabindex="-1" role="basic" aria-hidden="true">
@@ -46,22 +44,23 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-md-5">Super Admin</label>
-                        <div class="col-md-7">
-                            <input type="checkbox" id="inpIsAdmin">
-                        </div>
-                    </div>
-                    <div class="form-group">
                         <label class="control-label col-md-5">Change Pasword</label>
                         <div class="col-md-7">
                             <input type="password" id="inpPassword" class="form-control">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Super Admin</label>
+                        <div class="col-md-7">
+                            <input type="checkbox" id="inpIsAdmin">
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn blue" id="btnSaveEdit">Create</button>
+                <button type="button" class="btn blue" id="btnSaveEdit">Save</button>
             </div>
         </div>
     </div>
@@ -110,7 +109,7 @@
     function initPage() {
         $.fn.bootstrapSwitch.defaults.onText = '<i class="fa fa-check"></i>';
         $.fn.bootstrapSwitch.defaults.offText = '<i class="fa fa-times"></i>';
-        $("input[type='checkbox']").bootstrapSwitch();
+        $("#inpIsAdmin").bootstrapSwitch();
 
         var locTable = $('#userTable');
 
@@ -119,11 +118,12 @@
                 "orderable": false,
                 "width": "5%"
             }, {
+                "orderable": true
+            }, {
+                "orderable": true
+            }, {
                 "orderable": true,
-            }, {
-                "orderable": true
-            }, {
-                "orderable": true
+                "width": "10%"
             }],
             // set the initial value
             "language": {
@@ -148,7 +148,7 @@
                 }
 
                 locTable.DataTable().clear();
-                root.children("Content").children("Map").each(function (index) {
+                root.children("Content").children("User").each(function (index) {
                     var item = $(this);
                     var IsAdmin = item.children("IsAdmin").text() == "true";
                     var Login = item.children("Login").text();
@@ -177,10 +177,10 @@
                         var clicked = $(e.target).text().trim();
 
                         if (clicked == "Edit") {
-                            $("#inpId").val(id);
+                            $("#inpID").val(id);
                             $("#inpLogin").val($(context).children("td:nth-child(2)").text());
                             $("#inpEmail").val($(context).children("td:nth-child(3)").text());
-                            $("#inpIsAdmin").bootstrapSwitch('state', $(context).children("td:nth-child(3)").text().trim() != "");
+                            $("#inpIsAdmin").bootstrapSwitch('state', $(context).children("td:nth-child(4)").text().trim() != "");
                             $("#editModal").modal('show');
                         }
                         else if (clicked == "Delete") {
@@ -218,7 +218,7 @@
             LockPage();
             $("#editModal").modal('hide');
 
-            $.post("/API/Map/CreateMap",
+            $.post("/API/Users/SetUser",
             {
                 UserID: $("#inpID").val(),
                 Login: $("#inpLogin").val(),
@@ -227,7 +227,7 @@
                 Password: $("#inpPassword").val() == "" ? "" : CryptoJS.MD5($("#inpPassword").val()).toString()
             },
             function (data) {
-
+                UnlockPage();
                 var root = $($.parseXML(data)).find("Response");
 
                 if (root.children("Type").text() == "Error") {

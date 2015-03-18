@@ -30,13 +30,13 @@ namespace SESM.Controllers.ActionFilters
                 filterContext.Controller.ViewBag.ServerID = idServer;
                 filterContext.Controller.ViewBag.Server = server;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary
-                    {
-                        {"Controller", "Server"},
-                        {"Action", "Index"}
-                    });
+                {
+                    {"Controller", "Server"},
+                    {"Action", "Index"}
+                });
             }
         }
     }

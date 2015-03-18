@@ -4,7 +4,7 @@ using SESM.Controllers.ActionFilters;
 namespace SESM.Controllers
 {
     [SuperAdmin]
-    public class UserController : Controller
+    public class UsersController : Controller
     {
         // GET : /Users/
         [HttpGet]

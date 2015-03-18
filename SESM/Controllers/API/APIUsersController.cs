@@ -41,8 +41,8 @@ namespace SESM.Controllers.API
             return Content(response.ToString());
         }
 
-        // GET: API/Users/SetUser
-        [HttpGet]
+        // POST: API/Users/SetUser
+        [HttpPost]
         public ActionResult SetUser()
         {
             // ** INIT **
@@ -73,7 +73,7 @@ namespace SESM.Controllers.API
             bool IsAdmin;
             if (string.IsNullOrWhiteSpace(Request.Form["IsAdmin"]))
                 return Content(XMLMessage.Error("USR-SU-MISIA", "The IsAdmin field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["UserID"], out IsAdmin))
+            if (!bool.TryParse(Request.Form["IsAdmin"], out IsAdmin))
                 return Content(XMLMessage.Error("USR-SU-BADIA", "The IsAdmin field is invalid").ToString());
 
             string Password = Request.Form["Password"];
@@ -90,11 +90,13 @@ namespace SESM.Controllers.API
             if (!string.IsNullOrWhiteSpace(Password))
                 User.Password = Password;
 
+            usrPrv.UpdateUser(User);
+
             return Content(XMLMessage.Success("USR-SU-OK", "The user have been updated successfully").ToString());
         }
 
-        // GET: API/Users/DeleteUser
-        [HttpGet]
+        // POST: API/Users/DeleteUser
+        [HttpPost]
         public ActionResult DeleteUser()
         {
             // ** INIT **

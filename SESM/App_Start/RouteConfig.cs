@@ -138,7 +138,7 @@ namespace SESM
                 }
             );
 
-            // Account API
+            // Users API
             routes.MapRoute(
                 name: "APIUsers",
                 url: "API/Users/{action}",
@@ -192,11 +192,7 @@ namespace SESM
             routes.MapRoute(
                 name: "Users",
                 url: "Users",
-                defaults: new { controller = "Users", action = "Index" },
-                constraints: new
-                {
-                    action = "Index"
-                }
+                defaults: new { controller = "Users", action = "Index" }
             );
 
             // Other
@@ -210,7 +206,8 @@ namespace SESM
                              "Configuration|" +
                              "Settings|" +
                              "Maps|" +
-                             "Explorer"
+                             "Explorer",
+                    id = @"\d+"
                 }
             );
 
@@ -224,7 +221,7 @@ namespace SESM
             // Server List
             routes.MapRoute(
                 name: "ServerList",
-                url: "Serversa",
+                url: "Servers",
                 defaults: new { controller = "Server", action = "Index" }
             );
 

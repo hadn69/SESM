@@ -3771,7 +3771,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Server\Index.cshtml" />
     <Content Include="Views\Account\Manage.cshtml" />
-    <Content Include="Views\User\Index.cshtml" />
+    <Content Include="Views\Users\Index.cshtml" />
     <Content Include="Views\Settings\Index.cshtml" />
     <Content Include="Views\Server\HourlyStats.cshtml" />
     <Content Include="Views\Server\GlobalStats.cshtml" />
@@ -3824,7 +3824,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ActionFilters\LoggedOnlyAttribute.cs" />
     <Compile Include="Controllers\ServerController.cs" />
-    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="DAL\DataContext.cs" />
     <Compile Include="DAL\DataContextInitializer.cs" />
     <Compile Include="DAL\PerfProvider.cs" />
@@ -3877,7 +3877,6 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ArchType.cs" />
     <Compile Include="Models\ServerEnums.cs" />
-    <Compile Include="Models\Views\User\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\API\XMLMessage.cs" />
     <Compile Include="Tools\Jobs\AutoRestartJob.cs" />
@@ -3950,8 +3949,6 @@
     <Folder Include="assets\global\plugins\angularjs\plugins\angular-file-upload\uploads\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\node\public\files\thumbnail\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\php\files\thumbnail\" />
-    <Folder Include="Models\Views\Server\" />
-    <Folder Include="Views\Explorer\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
