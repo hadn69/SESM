@@ -136,6 +136,19 @@ namespace SESM
                 }
             );
 
+            // Account API
+            routes.MapRoute(
+                name: "APIUsers",
+                url: "API/Users/{action}",
+                defaults: new { controller = "APIUsers" },
+                constraints: new
+                {
+                    action = "GetUsers|" +
+                             "SetUser|" +
+                             "DeleteUser"
+                }
+            );
+
             // API 404
             routes.MapRoute(
                 name: "404API",
@@ -145,19 +158,7 @@ namespace SESM
 
             // === GUI ===
 
-            // Home
-            routes.MapRoute(
-                name: "Home",
-                url: "",
-                defaults: new { controller = "Home", action = "Index" }
-            );
 
-            // Server List
-            routes.MapRoute(
-                name: "ServerList",
-                url: "Servers",
-                defaults: new { action = "Index", controller = "Server" }
-            );
 
             // Account
             routes.MapRoute(
@@ -184,6 +185,17 @@ namespace SESM
                 }
             );
 
+            // Users
+            routes.MapRoute(
+                name: "Users",
+                url: "Users",
+                defaults: new { controller = "Users", action = "Index" },
+                constraints: new
+                {
+                    action = "Index"
+                }
+            );
+
             // Other
             routes.MapRoute(
                 name: "Other",
@@ -197,6 +209,20 @@ namespace SESM
                              "Maps|" +
                              "Explorer"
                 }
+            );
+
+            // Home
+            routes.MapRoute(
+                name: "Home",
+                url: "",
+                defaults: new { controller = "Home", action = "Index" }
+            );
+
+            // Server List
+            routes.MapRoute(
+                name: "ServerList",
+                url: "Servers/",
+                defaults: new { action = "Index", controller = "Server" }
             );
 
             // 404

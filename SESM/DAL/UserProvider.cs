@@ -51,7 +51,19 @@ namespace SESM.DAL
             }
         }
 
-        
+        public bool UserExist(int id)
+        {
+            try
+            {
+                EntityUser usr = _context.Users.First(u => u.Id == id);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public bool UserExist(string login)
         {
             try
@@ -66,6 +78,7 @@ namespace SESM.DAL
                 return false;
             }
         }
+
         public void UpdateUser(EntityUser user)
         {
             try

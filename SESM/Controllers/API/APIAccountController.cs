@@ -100,9 +100,13 @@ namespace SESM.Controllers.API
 
             if(string.IsNullOrWhiteSpace(password))
                 return Content(XMLMessage.Error("ACT-REG-MISPWD", "The Password field must be provided").ToString());
+            if (!Regex.IsMatch(password, "^[0-9a-f]{32}$", RegexOptions.IgnoreCase))
+                return Content(XMLMessage.Error("ACT-REG-BADPWD", "The password " + password + " is not a valid MD5").ToString());
 
-            if(string.IsNullOrWhiteSpace(eMail))
-                return Content(XMLMessage.Error("ACT-REG-MISEML", "The EMail field must be provided").ToString());
+            if (string.IsNullOrWhiteSpace(eMail))
+                return Content(XMLMessage.Error("ACT-REG-MISEML", "The Email field must be provided").ToString());
+            if (!Regex.IsMatch(eMail, @"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$", RegexOptions.IgnoreCase))
+                return Content(XMLMessage.Error("ACT-REG-BADEML", "The email " + eMail + " is not valid").ToString());
 
             UserProvider usrPrv = new UserProvider(_context);
             EntityUser usr = usrPrv.GetUser(login);
@@ -110,11 +114,6 @@ namespace SESM.Controllers.API
             if(usr != null)
                 return Content(XMLMessage.Error("ACT-REG-USREXI", "User " + login + " already exist").ToString());
 
-            if(!Regex.IsMatch(password, "^[0-9a-f]{32}$", RegexOptions.IgnoreCase))
-                return Content(XMLMessage.Error("ACT-REG-BADPWD", "The password " + password + " is not a valid MD5").ToString());
-
-            if(!Regex.IsMatch(eMail, @"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$", RegexOptions.IgnoreCase))
-                return Content(XMLMessage.Error("ACT-REG-BADEML", "The email " + eMail + " is not valid").ToString());
 
             // ** PROCESS **
             EntityUser newUser = new EntityUser();
