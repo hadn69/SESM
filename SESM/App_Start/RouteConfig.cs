@@ -231,6 +231,11 @@ namespace SESM
                 url: "{*url}",
                 defaults: new { controller = "Error", action = "404" }
             );
+            routes.MapRoute(
+                name: "404URL",
+                url: "Error/404",
+                defaults: new { controller = "Error", action = "404" }
+            );
         }
     }
 }

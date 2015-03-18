@@ -589,7 +589,7 @@ namespace SESM.Controllers.API
 
             response.AddToContent(new XElement("GithubURL", SESMConfigHelper.SESEUpdateURL));
             response.AddToContent(new XElement("Dev", SESMConfigHelper.SESEAutoUpdateUseDev.ToString()));
-            response.AddToContent(new XElement("AutoUpdateEnabled", SESMConfigHelper.AutoUpdateEnabled.ToString()));
+            response.AddToContent(new XElement("AutoUpdateEnabled", SESMConfigHelper.SESEAutoUpdateEnabled.ToString()));
             response.AddToContent(new XElement("AutoUpdateCron", SESMConfigHelper.SESEAutoUpdateCron));
 
             return Content(response.ToString());

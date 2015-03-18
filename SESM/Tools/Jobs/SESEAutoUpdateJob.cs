@@ -20,7 +20,7 @@ namespace SESM.Tools.Jobs
 
         public static ReturnEnum Run(Logger logger, bool manualFire = true, bool useLocalZip = false, bool force = false)
         {
-            if (!SESMConfigHelper.SESEAutoUpdateEnabled)
+            if (!manualFire && !SESMConfigHelper.SESEAutoUpdateEnabled)
                 return ReturnEnum.AloneJob;
 
             if (SESMConfigHelper.SESEUpdating)
