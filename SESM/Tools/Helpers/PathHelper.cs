@@ -27,9 +27,22 @@ namespace SESM.Tools.Helpers
         {
             return SESMConfigHelper.Prefix;
         }
+
+        public static string GetSteamCMDPath()
+        {
+            return SESMConfigHelper.SEDataPath + @"SteamCMD\";
+        }
+        public static string GetSyncDirPath()
+        {
+            return SESMConfigHelper.SEDataPath + @"SyncData\";
+        }
+        public static string GetInstancePath(string prefix, EntityServer server)
+        {
+            return SESMConfigHelper.SESavePath + prefix + "_" + server.Id + "_" + server.Name + @"\";
+        }
         public static string GetInstancePath(EntityServer server)
         {
-            return SESMConfigHelper.SESavePath + GetPrefix() + "_" + server.Id + "_" + server.Name + @"\";
+            return GetInstancePath(GetPrefix(), server);
         }
         public static string GetSavesPath(EntityServer server)
         {
@@ -55,6 +68,11 @@ namespace SESM.Tools.Helpers
         public static string GetBackupsPath(EntityServer server)
         {
             return GetInstancePath(server) + @"Backups\";
+        }
+
+        internal static string GetFSDirName(EntityServer server)
+        {
+            return GetPrefix() + "_" + server.Id + "_" + server.Name;
         }
     }
 }

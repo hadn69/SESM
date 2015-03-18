@@ -2,8 +2,8 @@
 if "%1"=="" goto :question
 if %1 == acceptEULA goto :deploy
 :question
-start "" notepad "%~dp0\SESM EULA.txt"
-set /p accept=Do you accept the SESM End User Licese Agreement (EULA) ? [Y/N] %=%
+start "" notepad "%~dp0\MITLicense.txt"
+set /p accept=SESM is Released under MIT License. You must agree to it to install/use SESM.Do you agree to it ? [Y/N] %=%
 
 if %accept% == y goto :deploy
 if %accept% == Y goto :deploy

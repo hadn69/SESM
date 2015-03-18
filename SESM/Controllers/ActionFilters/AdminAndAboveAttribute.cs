@@ -29,6 +29,7 @@ namespace SESM.Controllers.ActionFilters
             }
             catch (Exception)
             {
+
                 filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary
                     {
                         {"Controller", "Server"},

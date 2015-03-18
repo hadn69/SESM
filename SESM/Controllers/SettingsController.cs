@@ -1,19 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Web.Mvc;
-using Ionic.Zip;
-using NLog;
-using Quartz;
-using Quartz.Impl;
+﻿using System.Web.Mvc;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
-using SESM.DTO;
-using SESM.Models.Views.Settings;
-using SESM.Tools;
-using SESM.Tools.Helpers;
 
 namespace SESM.Controllers
 {
@@ -22,236 +9,38 @@ namespace SESM.Controllers
     {
         private readonly DataContext _context = new DataContext();
 
-        //
-        // GET: Settings
         [HttpGet]
-        [LoggedOnly]
         [SuperAdmin]
-        [CheckLockout]
         public ActionResult Index()
         {
-            SettingsViewModel model = new SettingsViewModel
-            {
-                Prefix = SESMConfigHelper.Prefix,
-                SESavePath = SESMConfigHelper.SESavePath,
-                SEDataPath = SESMConfigHelper.SEDataPath,
-                Arch = SESMConfigHelper.Arch,
-                AddDateToLog = SESMConfigHelper.AddDateToLog,
-                SendLogToKeen = SESMConfigHelper.SendLogToKeen
-            };
 
-            return View(model);
-        }
-
-        //
-        // POST: Settings
-        [HttpPost]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult Index(SettingsViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                EntityUser user = Session["User"] as EntityUser;
-                ServerProvider srvPrv = new ServerProvider(_context);
-                bool flag = false;
-                if (model.SEDataPath.Substring(model.SEDataPath.Length - 1, 1) != @"\")
-                {
-                    flag = true;
-                    ModelState.AddModelError("DataPath", @"The server path must end with \");
-                }
-                if (model.SESavePath.Substring(model.SESavePath.Length - 1, 1) != @"\")
-                {
-                    flag = true;
-                    ModelState.AddModelError("SavePath", @"The save path must end with \");
-                }
-
-                if (flag)
-                    return View(model);
-
-                if (model.Prefix != SESMConfigHelper.Prefix
-                    || model.SEDataPath != SESMConfigHelper.SEDataPath
-                    || model.SESavePath != SESMConfigHelper.SESavePath
-                    || model.Arch != SESMConfigHelper.Arch
-                    || model.AddDateToLog != SESMConfigHelper.AddDateToLog
-                    || model.SendLogToKeen != SESMConfigHelper.SendLogToKeen)
-                {
-                    // Getting started server list
-                    List<EntityServer> listStartedServ =
-                        srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
-                    Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
-                    foreach (EntityServer item in srvPrv.GetAllServers())
-                    {
-                        serviceLogger.Info(item.Name + " stopped by " + user.Login + " to Update Global Settings");
-                        ServiceHelper.StopService(item);
-                    }
-
-                    foreach (EntityServer item in srvPrv.GetAllServers())
-                    {
-                        ServiceHelper.WaitForStopped(item);
-                    }
-
-                    // Killing some ghost processes that might still exists
-                    ServiceHelper.KillAllService();
-
-                    foreach (EntityServer item in srvPrv.GetAllServers())
-                    {
-                        ServiceHelper.UnRegisterService(ServiceHelper.GetServiceName(item));
-                    }
-                    
-                    if (model.SEDataPath != SESMConfigHelper.SEDataPath)
-                    {
-                        /*
-                        if (!Directory.Exists(model.SEDataPath))
-                            Directory.CreateDirectory(model.SEDataPath);
-                        if (Directory.Exists(model.SEDataPath + @"Content\"))
-                            Directory.Delete(model.SEDataPath + @"Content\", true);
-                        if (Directory.Exists(model.SEDataPath + @"DedicatedServer\"))
-                            Directory.Delete(model.SEDataPath + @"DedicatedServer\", true);
-                        if (Directory.Exists(model.SEDataPath + @"DedicatedServer64\"))
-                            Directory.Delete(model.SEDataPath + @"DedicatedServer64\", true);
-                        if (Directory.Exists(model.SEDataPath + @"SteamCMD\"))
-                            Directory.Delete(model.SEDataPath + @"SteamCMD\", true);
-                        if (Directory.Exists(model.SEDataPath + @"autoupdatedata\"))
-                            Directory.Delete(model.SEDataPath + @"autoupdatedata\", true);
-
-
-
-                        if (Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
-                            Directory.Move(SESMConfigHelper.SEDataPath + @"Content\", model.SEDataPath + @"Content\");
-                        if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
-                            Directory.Move(SESMConfigHelper.SEDataPath + @"DedicatedServer\",
-                                model.SEDataPath + @"DedicatedServer\");
-                        if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
-                            Directory.Move(SESMConfigHelper.SEDataPath + @"DedicatedServer64\",
-                                model.SEDataPath + @"DedicatedServer64\");
-                        if (Directory.Exists(SESMConfigHelper.SEDataPath + @"SteamCMD\"))
-                            Directory.Move(SESMConfigHelper.SEDataPath + @"SteamCMD\", model.SEDataPath + @"SteamCMD\");
-                        if (Directory.Exists(SESMConfigHelper.SEDataPath + @"autoupdatedata\"))
-                            Directory.Move(SESMConfigHelper.SEDataPath + @"autoupdatedata\",
-                                model.SEDataPath + @"autoupdatedata\");
-                        */
-                        SESMConfigHelper.SEDataPath = model.SEDataPath;
-                    }
-
-                    if (model.Prefix != SESMConfigHelper.Prefix)
-                    {
-                        foreach (EntityServer item in srvPrv.GetAllServers())
-                        {
-                            Directory.Move(
-                                SESMConfigHelper.SEDataPath +
-                                ServiceHelper.GetServiceName(SESMConfigHelper.Prefix, item),
-                                SESMConfigHelper.SEDataPath + ServiceHelper.GetServiceName(model.Prefix, item));
-                        }
-                        SESMConfigHelper.Prefix = model.Prefix;
-                    }
-
-                    if (model.SESavePath != SESMConfigHelper.SESavePath)
-                    {
-                        //Directory.Move(SESMConfigHelper.SESavePath, model.SESavePath);
-                        SESMConfigHelper.SESavePath = model.SESavePath;
-                    }
-                    SESMConfigHelper.Arch = model.Arch;
-                    SESMConfigHelper.AddDateToLog = model.AddDateToLog;
-                    SESMConfigHelper.SendLogToKeen = model.SendLogToKeen;
-
-                    foreach (EntityServer item in srvPrv.GetAllServers())
-                    {
-                        ServiceHelper.RegisterService(ServiceHelper.GetServiceName(item));
-                    }
-
-                    foreach (EntityServer item in listStartedServ)
-                    {
-                        serviceLogger.Info(item.Name + " started by " + user.Login + " to Update Global Settings");
-                        ServiceHelper.StartService(item);
-                    }
-                    RedirectToAction("Index", "Server");
-                }
-            }
-            return View(model);
-        }
-
-        //
-        // GET: Settings/UploadBin
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult UploadBin()
-        {
             return View();
         }
 
-        //
-        // POST: Settings/UploadBin
-        [HttpPost]
-        [LoggedOnly]
+        [HttpGet]
         [SuperAdmin]
-        [CheckLockout]
-        public ActionResult UploadBin(UploadBinViewModel model)
+        public ActionResult SE()
         {
-            if (ModelState.IsValid)
-            {
-                EntityUser user = Session["User"] as EntityUser;
-                if (!ZipFile.IsZipFile(model.ServerZip.InputStream, false))
-                {
-                    ModelState.AddModelError("ZipError", "Your File is not a valid zip file");
-                    return View(model);
-                }
 
-                ServerProvider srvPrv = new ServerProvider(_context);
-
-                // Getting started server list
-                List<EntityServer> listStartedServ =
-                    srvPrv.GetAllServers().Where(item => srvPrv.GetState(item) == ServiceState.Running).ToList();
-                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
-                foreach (EntityServer item in srvPrv.GetAllServers())
-                {
-                    serviceLogger.Info(item.Name + " stopped by " + user.Login + " to Update Binaries");
-                    ServiceHelper.StopService(item);
-                }
-
-                foreach (EntityServer item in srvPrv.GetAllServers())
-                {
-                    ServiceHelper.WaitForStopped(item);
-                }
-
-                // Killing some ghost processes that might still exists
-                ServiceHelper.KillAllService();
-
-                model.ServerZip.InputStream.Seek(0, SeekOrigin.Begin);
-
-                using (ZipFile zip = ZipFile.Read(model.ServerZip.InputStream))
-                {
-                    if (!Directory.Exists(SESMConfigHelper.SEDataPath))
-                        Directory.CreateDirectory(SESMConfigHelper.SEDataPath);
-                    if (Directory.Exists(SESMConfigHelper.SEDataPath + @"Content\"))
-                        Directory.Delete(SESMConfigHelper.SEDataPath + @"Content\", true);
-                    if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
-                        Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
-                    if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
-                        Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
-                    zip.ExtractAll(SESMConfigHelper.SEDataPath);
-                }
-
-                foreach (EntityServer item in listStartedServ)
-                {
-                    serviceLogger.Info(item.Name + " started by " + user.Login + " to Update Binaries");
-                    ServiceHelper.StartService(item);
-                }
-
-                return RedirectToAction("Index", "Server");
-            }
-            return View(model);
+            return View();
         }
 
+        [HttpGet]
+        [SuperAdmin]
+        public ActionResult SESE()
+        {
+
+            return View();
+        }
+
+       
+   /*
         //
         // GET: Settings/Diagnosis
         [HttpGet]
         public ActionResult Diagnosis()
         {
-            if (!SESMConfigHelper.Diagnosis)
+            if (!SESMConfigHelper.DiagnosisEnabled)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -273,7 +62,7 @@ namespace SESM.Controllers
             switch (SESMConfigHelper.Arch)
             {
                 case ArchType.x64:
-                    if (System.Environment.Is64BitOperatingSystem)
+                    if (Environment.Is64BitOperatingSystem)
                     {
                         model.ArchMatch.State = true;
                         model.ArchMatch.Message =
@@ -287,7 +76,7 @@ namespace SESM.Controllers
                     }
                     break;
                 case ArchType.x86:
-                    if (System.Environment.Is64BitOperatingSystem)
+                    if (Environment.Is64BitOperatingSystem)
                     {
                         model.ArchMatch.State = true;
                         model.ArchMatch.Message =
@@ -332,7 +121,7 @@ namespace SESM.Controllers
                                             @"DedicatedServer64\SpaceEngineersDedicated.exe<br/>You should try to reupload your game files or activate the auto update";
             }
 
-
+            
             ServiceHelper.RegisterService("SESMDiagTest");
             if (ServiceHelper.DoesServiceExist("SESMDiagTest"))
             {
@@ -361,7 +150,7 @@ namespace SESM.Controllers
                 model.ServiceDeletion.State = null;
                 model.ServiceDeletion.Message = "Deletion of the service \"SESMDiagTest\" irrelevant";
             }
-
+            
             try
             {
                 FileStream stream = System.IO.File.Create(@"C:\SESMDiagTest.bin");
@@ -418,484 +207,16 @@ namespace SESM.Controllers
             }
             return View(model);
         }
-
+        */
+     
         [HttpGet]
         [LoggedOnly]
         [SuperAdmin]
         [CheckLockout]
-        public ActionResult AutoUpdate()
-        {
-            AutoUpdateViewModel model = new AutoUpdateViewModel();
-            model.AutoUpdate = SESMConfigHelper.AutoUpdate;
-            model.CronInterval = SESMConfigHelper.AUInterval;
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult AutoUpdate(AutoUpdateViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            SESMConfigHelper.AutoUpdate = model.AutoUpdate;
-            SESMConfigHelper.AUInterval = model.CronInterval;
-
-            IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
-
-            scheduler.DeleteJob(new JobKey("AutoUpdateJob", "AutoUpdate"));
-
-            if (model.AutoUpdate)
-            {
-                IJobDetail autoUpdateJob = JobBuilder.Create<AutoUpdate>()
-                    .WithIdentity("AutoUpdateJob", "AutoUpdate")
-                    .Build();
-
-                ITrigger autoUpdateTrigger = TriggerBuilder.Create()
-                    .WithIdentity("AutoUpdateTrigger", "AutoUpdate")
-                    .WithCronSchedule(model.CronInterval)
-                    .StartNow()
-                    .Build();
-
-                scheduler.ScheduleJob(autoUpdateJob, autoUpdateTrigger);
-            }
-
-            return RedirectToAction("Index", "Settings").Success("Auto-Update Parameters Updated");
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult ManualUpdate()
-        {
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-
-            logger.Info("----Starting ManualUpdate----");
-            SteamCMDHelper.SteamCMDResult result = SteamCMDHelper.Update(logger, 300);
-            logger.Info("----End of ManualUpdate----");
-
-            switch (result)
-            {
-                case SteamCMDHelper.SteamCMDResult.Fail_Credentials:
-                    return RedirectToAction("Index").Danger("Wrong credentials, please check and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardMissing:
-                    return
-                        RedirectToAction("Index")
-                            .Danger(
-                                "Steam Guard active on your account, please input the code in SteamCMD Configuration page and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardBadCode:
-                    return
-                        RedirectToAction("Index")
-                            .Danger(
-                                "Wrong Steam Guard code, please input the right code in SteamCMD Configuration page and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_TooLong:
-                    return
-                        RedirectToAction("Index")
-                            .Warning(
-                                "Update took too long. If it's the first update and you don't have a server-grade connection, please try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Success_NothingToDo:
-                    return RedirectToAction("Index").Success("There are no updates available :-(");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Success_UpdateInstalled:
-                    return RedirectToAction("Index").Success("Manual Update Successful");
-                    break;
-                default:
-                    return RedirectToAction("Index").Danger("Manual Update : Unknow Error");
-                    break;
-
-            }
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult SteamCMD()
-        {
-            SteamCMDViewModel model = new SteamCMDViewModel();
-            model.UserName = SESMConfigHelper.AUUsername;
-            return View(model);
-        }
-
-        [HttpPost]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        [MultipleButton(Name = "action", Argument = "SaveSteamCMD")]
-        public ActionResult SteamCMD(SteamCMDViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            SESMConfigHelper.AUUsername = model.UserName;
-            if (!string.IsNullOrEmpty(model.Password))
-            {
-                SESMConfigHelper.AUPassword = model.Password;
-            }
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-            logger.Info("----Stating SteamCMD Initialisation----");
-            SteamCMDHelper.Initialise(logger, model.UserName, model.Password, model.SteamGuard);
-            logger.Info("----End of SteamCMD Initialisation----");
-
-            return RedirectToAction("Index", "Settings").Success("SteamCMD Initialized");
-        }
-
-        [HttpPost]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        [MultipleButton(Name = "action", Argument = "FireSteamGuard")]
-        public ActionResult FireSteamGuard(SteamCMDViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View("SteamCMD", model);
-
-            SESMConfigHelper.AUUsername = model.UserName;
-            if (!string.IsNullOrEmpty(model.Password))
-            {
-                SESMConfigHelper.AUPassword = model.Password;
-            }
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-            logger.Info("----Stating SteamCMD SteamGuard Firering----");
-            SteamCMDHelper.Initialise(logger, model.UserName, model.Password, string.Empty);
-            logger.Info("----End of SteamCMD SteamGuard Firering----");
-
-            return
-                RedirectToAction("SteamCMD", "Settings")
-                    .Information("Steam Guard Fired, please check your Inbox and input the Steam Guard code below");
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult Backups()
-        {
-            BackupsViewModel model = new BackupsViewModel();
-            model.EnableLvl1 = SESMConfigHelper.AutoBackupLvl1;
-            model.EnableLvl2 = SESMConfigHelper.AutoBackupLvl2;
-            model.EnableLvl3 = SESMConfigHelper.AutoBackupLvl3;
-
-            model.NbToKeepLvl1 = SESMConfigHelper.ABNbToKeepLvl1;
-            model.NbToKeepLvl2 = SESMConfigHelper.ABNbToKeepLvl2;
-            model.NbToKeepLvl3 = SESMConfigHelper.ABNbToKeepLvl3;
-
-            model.CronIntervalLvl1 = SESMConfigHelper.ABIntervalLvl1;
-            model.CronIntervalLvl2 = SESMConfigHelper.ABIntervalLvl2;
-            model.CronIntervalLvl3 = SESMConfigHelper.ABIntervalLvl3;
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult Backups(BackupsViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-
-            IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
-            scheduler.DeleteJob(new JobKey("BackupLvl1Job", "Backups"));
-            scheduler.DeleteJob(new JobKey("BackupLvl2Job", "Backups"));
-            scheduler.DeleteJob(new JobKey("BackupLvl3Job", "Backups"));
-            if (model.EnableLvl1)
-            {
-                IJobDetail BackupJob = JobBuilder.Create<BackupJob>()
-                    .WithIdentity("BackupLvl1Job", "Backups")
-                    .UsingJobData("lvl", 1)
-                    .Build();
-
-                ITrigger BackupTrigger = TriggerBuilder.Create()
-                    .WithIdentity("BackupLvl1Trigger", "Backups")
-                    .WithCronSchedule(model.CronIntervalLvl1)
-                    .StartNow()
-                    .Build();
-
-                scheduler.ScheduleJob(BackupJob, BackupTrigger);
-            }
-
-            if (model.EnableLvl2)
-            {
-                IJobDetail BackupJob = JobBuilder.Create<BackupJob>()
-                    .WithIdentity("BackupLvl2Job", "Backups")
-                    .UsingJobData("lvl", 2)
-                    .Build();
-
-                ITrigger BackupTrigger = TriggerBuilder.Create()
-                    .WithIdentity("BackupLvl2Trigger", "Backups")
-                    .WithCronSchedule(model.CronIntervalLvl2)
-                    .StartNow()
-                    .Build();
-
-                scheduler.ScheduleJob(BackupJob, BackupTrigger);
-            }
-
-            if (model.EnableLvl3)
-            {
-                IJobDetail BackupJob = JobBuilder.Create<BackupJob>()
-                    .WithIdentity("BackupLvl3Job", "Backups")
-                    .UsingJobData("lvl", 3)
-                    .Build();
-
-                ITrigger BackupTrigger = TriggerBuilder.Create()
-                    .WithIdentity("BackupLvl3Trigger", "Backups")
-                    .WithCronSchedule(model.CronIntervalLvl3)
-                    .StartNow()
-                    .Build();
-
-                scheduler.ScheduleJob(BackupJob, BackupTrigger);
-            }
-
-            SESMConfigHelper.AutoBackupLvl1 = model.EnableLvl1;
-            SESMConfigHelper.AutoBackupLvl2 = model.EnableLvl2;
-            SESMConfigHelper.AutoBackupLvl3 = model.EnableLvl3;
-
-            SESMConfigHelper.ABNbToKeepLvl1 = model.NbToKeepLvl1;
-            SESMConfigHelper.ABNbToKeepLvl2 = model.NbToKeepLvl2;
-            SESMConfigHelper.ABNbToKeepLvl3 = model.NbToKeepLvl3;
-
-            SESMConfigHelper.ABIntervalLvl1 = model.CronIntervalLvl1;
-            SESMConfigHelper.ABIntervalLvl2 = model.CronIntervalLvl2;
-            SESMConfigHelper.ABIntervalLvl3 = model.CronIntervalLvl3;
-
-            return RedirectToAction("Index", "Server");
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult CleanSteamCMD()
-        {
-            if (Directory.Exists(SESMConfigHelper.SEDataPath + @"\SteamCMD\"))
-                Directory.Delete(SESMConfigHelper.SEDataPath + @"\SteamCMD\", true);
-
-            if (Directory.Exists(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\"))
-                Directory.Delete(SESMConfigHelper.SEDataPath + @"\AutoUpdateData\", true);
-
-            return RedirectToAction("Index", "Home").Success("Auto/Manual Update Cleaned Up");
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        [CheckLockout]
-        public ActionResult CleanPerf()
+        public ActionResult CleanPerf() // TODO : Webservice call
         {
             _context.Database.ExecuteSqlCommand("truncate table SESM.dbo.EntityPerfEntries");
-            return RedirectToAction("Index", "Home").Success("Perf Data Cleaned Up");
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        public ActionResult ManualUpdateForce()
-        {
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-
-            logger.Info("----Starting ManualUpdateForce----");
-            SteamCMDHelper.SteamCMDResult result = SteamCMDHelper.ForceUpdate(logger, 300);
-            logger.Info("----End of ManualUpdateForce----");
-
-            switch (result)
-            {
-                case SteamCMDHelper.SteamCMDResult.Fail_Credentials:
-                    return RedirectToAction("Index").Danger("Wrong credentials, please check and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardMissing:
-                    return
-                        RedirectToAction("Index")
-                            .Danger(
-                                "Steam Guard active on your account, please input the code in SteamCMD Configuration page and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_SteamGuardBadCode:
-                    return
-                        RedirectToAction("Index")
-                            .Danger(
-                                "Wrong Steam Guard code, please input the right code in SteamCMD Configuration page and try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Fail_TooLong:
-                    return RedirectToAction("Index")
-                            .Warning("Update took too long. If it's the first update and you don't have a server-grade connection, please try again");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Success_NothingToDo:
-                    return RedirectToAction("Index").Success("There are no updates available :-(");
-                    break;
-                case SteamCMDHelper.SteamCMDResult.Success_UpdateInstalled:
-                    return RedirectToAction("Index").Success("Manual Update Successful");
-                    break;
-                default:
-                    return RedirectToAction("Index").Danger("Manual Update : Unknow Error");
-                    break;
-            }
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        public ActionResult SESEManualUpdate()
-        {
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-
-            logger.Info("----Starting SESEManualUpdate----");
-            
-            string SESEUrl = GithubHelper.UpdateIsAvailable();
-            if(!string.IsNullOrEmpty(SESEUrl))
-            {
-                logger.Info("SE Server Extender Update detected");
-                logger.Info("URL : " + SESEUrl);
-                logger.Info("Cleaning up SESE Zip");
-                GithubHelper.CleanupUpdate();
-                logger.Info("Downloading New SESE Update Zip");
-                GithubHelper.DownloadUpdate(SESEUrl);
-                logger.Info("Initiating lockdown mode ...");
-                SESMConfigHelper.Lockdown = true;
-                logger.Info("Waiting 30 secs for all requests to end ...");
-                Thread.Sleep(30000);
-                DataContext context = new DataContext();
-                ServerProvider srvPrv = new ServerProvider(context);
-                List<EntityServer> listStartedServ = srvPrv.GetAllServers().Where(item => item.UseServerExtender && srvPrv.GetState(item) == ServiceState.Running).ToList();
-
-                logger.Info("Stopping SESE running server ...");
-                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Sending stop order to " + item.Name);
-                    serviceLogger.Info(item.Name + " stopped by SESEManualUpdate");
-                    ServiceHelper.StopService(item);
-                }
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Waiting for stop of " + item.Name);
-                    ServiceHelper.WaitForStopped(item);
-                }
-                logger.Info("Killing ghosts processes");
-                // Killing some ghost processes that might still exists
-                ServiceHelper.KillAllSESEService();
-
-                logger.Info("Applying SESE Files");
-                GithubHelper.ApplyUpdate();
-
-                logger.Info("SESE Update finished, lifting lockdown");
-                SESMConfigHelper.Lockdown = false;
-
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Restarting " + item.Name);
-                    serviceLogger.Info(item.Name + " stopped by SESEManualUpdate");
-                    ServiceHelper.StartService(item);
-                }
-
-                logger.Info("----End of SESEManualUpdate----");
-                return RedirectToAction("Index").Success("SESE Update applyed");
-            }
-            else
-            {
-                logger.Info("No SE Server Extender Update detected");
-                logger.Info("----End of SESEManualUpdate----");
-                return RedirectToAction("Index").Warning("No SESE Update detected");
-            }
-        }
-
-        public ActionResult SESEManualUpdateForce()
-        {
-            Logger logger = LogManager.GetLogger("ManualUpdateLogger");
-
-            logger.Info("----Starting SESEManualUpdateForce----");
-            logger.Info("Cleaning up SESE Zip");
-            GithubHelper.CleanupUpdate();
-            string SESEUrl = GithubHelper.UpdateIsAvailable();
-            if(!string.IsNullOrEmpty(SESEUrl))
-            {
-                logger.Info("SE Server Extender Update detected");
-                logger.Info("URL : " + SESEUrl);
-
-                logger.Info("Downloading New SESE Update Zip");
-                GithubHelper.DownloadUpdate(SESEUrl);
-                logger.Info("Initiating lockdown mode ...");
-                SESMConfigHelper.Lockdown = true;
-                logger.Info("Waiting 30 secs for all requests to end ...");
-                Thread.Sleep(30000);
-                DataContext context = new DataContext();
-                ServerProvider srvPrv = new ServerProvider(context);
-                List<EntityServer> listStartedServ = srvPrv.GetAllServers().Where(item => item.UseServerExtender && srvPrv.GetState(item) == ServiceState.Running).ToList();
-
-                logger.Info("Stopping SESE running server ...");
-                Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Sending stop order to " + item.Name);
-                    serviceLogger.Info(item.Name + " stopped by SESEManualUpdate");
-                    ServiceHelper.StopService(item);
-                }
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Waiting for stop of " + item.Name);
-                    ServiceHelper.WaitForStopped(item);
-                }
-                logger.Info("Killing ghosts processes");
-                // Killing some ghost processes that might still exists
-                ServiceHelper.KillAllSESEService();
-
-                logger.Info("Applying SESE Files");
-                GithubHelper.ApplyUpdate();
-
-                logger.Info("SESE Update finished, lifting lockdown");
-                SESMConfigHelper.Lockdown = false;
-
-                foreach(EntityServer item in listStartedServ)
-                {
-                    logger.Info("Restarting " + item.Name);
-                    serviceLogger.Info(item.Name + " stopped by SESEManualUpdate");
-                    ServiceHelper.StartService(item);
-                }
-
-                logger.Info("----End of SESEManualUpdateForce----");
-                return RedirectToAction("Index").Success("SESE Update applyed");
-            }
-            else
-            {
-                logger.Info("No SE Server Extender Update detected");
-                logger.Info("----End of SESEManualUpdateForce----");
-                return RedirectToAction("Index").Warning("No SESE Update detected");
-            }
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        public ActionResult HourlyStats()
-        {
-            ServerProvider srvPrv = new ServerProvider(_context);
-            List<EntityServer> serv = srvPrv.GetAllServers();
-            Dictionary<string, List<EntityPerfEntry>> perfEntries = serv.ToDictionary(server => server.Name, server => server.PerfEntries.Where(x => x.Timestamp >= DateTime.Now.AddHours(-2)).OrderBy(x => x.Timestamp).ToList());
-
-            ViewData["perfEntries"] = perfEntries;
-            return View();
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [SuperAdmin]
-        public ActionResult GlobalStats()
-        {
-            ServerProvider srvPrv = new ServerProvider(_context);
-            List<EntityServer> serv = srvPrv.GetAllServers();
-            Dictionary<string, List<EntityPerfEntry>> perfEntries = serv.ToDictionary(server => server.Name, server => server.PerfEntries.Where(x => x.CPUUsagePeak != null).OrderBy(x => x.Timestamp).ToList());
-
-            ViewData["perfEntries"] = perfEntries;
-            return View();
+            return RedirectToAction("Index", "Home");
         }
 
         protected override void Dispose(bool disposing)

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Quartz;
@@ -7,24 +9,62 @@ using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools;
 using SESM.Tools.Helpers;
+using SESM.Tools.Jobs;
 using SESM.Tools.Monitor;
 
 namespace SESM
 {
-    public class MvcApplication : System.Web.HttpApplication
+    public class MvcApplication : HttpApplication
     {
         protected void Application_Start()
         {
             Constants.SetVersion(2, 10, 0);
+            // Resetting Run Vars
+            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar"))
+                File.Delete(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar");
 
+
+            // Registering routes
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.Start();
 
+            // Auto-Update
+            if (SESMConfigHelper.AutoUpdateEnabled)
+            {
+                // Instantiating the job
+                IJobDetail SEAutoUpdateJobDetail = JobBuilder.Create<SEAutoUpdateJob>()
+                    .WithIdentity(SEAutoUpdateJob.GetJobKey())
+                    .Build();
 
-            if(SESMConfigHelper.PerfMonitor)
+                ITrigger SEAutoUpdateJobTrigger = TriggerBuilder.Create()
+                    .WithIdentity(SEAutoUpdateJob.GetTriggerKey())
+                    .WithCronSchedule(SESMConfigHelper.AutoUpdateCron)
+                    .Build();
+
+                scheduler.ScheduleJob(SEAutoUpdateJobDetail, SEAutoUpdateJobTrigger);
+            }
+
+            // SESE Auto-update
+            if (SESMConfigHelper.SESEAutoUpdateEnabled)
+            {
+                // Instantiating the job
+                IJobDetail SESEAutoUpdateJobDetail = JobBuilder.Create<SESEAutoUpdateJob>()
+                    .WithIdentity(SESEAutoUpdateJob.GetJobKey())
+                    .Build();
+
+                ITrigger SESEAutoUpdateJobTrigger = TriggerBuilder.Create()
+                    .WithIdentity(SESEAutoUpdateJob.GetTriggerKey())
+                    .WithCronSchedule(SESMConfigHelper.SESEAutoUpdateCron)
+                    .Build();
+
+                scheduler.ScheduleJob(SESEAutoUpdateJobDetail, SESEAutoUpdateJobTrigger);
+            }
+
+            // Perf Monitor
+            if (SESMConfigHelper.PerfMonitorEnabled)
             {
                 IJobDetail collectorJob = JobBuilder.Create<Collector>()
                     .WithIdentity("CollectorJob", "Monitor")
@@ -50,86 +90,75 @@ namespace SESM
 
                 scheduler.ScheduleJob(hourlyCrusherJob, hourlyCrusherTrigger);
             }
-            if(SESMConfigHelper.AutoUpdate)
-            {
-                IJobDetail autoUpdateJob = JobBuilder.Create<AutoUpdate>()
-                    .WithIdentity("AutoUpdateJob", "AutoUpdate")
-                    .Build();
 
-                ITrigger autoUpdateTrigger = TriggerBuilder.Create()
-                    .WithIdentity("AutoUpdateTrigger", "AutoUpdate")
-                    .WithCronSchedule(SESMConfigHelper.AUInterval)
-                    .StartNow()
-                    .Build();
-
-                scheduler.ScheduleJob(autoUpdateJob, autoUpdateTrigger);
-            }
-            if(SESMConfigHelper.AutoBackupLvl1)
+            // Auto Backups
+            if (SESMConfigHelper.AutoBackupLvl1Enabled)
             {
-                IJobDetail backupJob = JobBuilder.Create<BackupJob>()
-                    .WithIdentity("BackupLvl1Job", "Backups")
+                IJobDetail backupJob = JobBuilder.Create<AutoBackupJob>()
+                    .WithIdentity(AutoBackupJob.GetJobKey(1))
                     .UsingJobData("lvl", 1)
                     .Build();
 
                 ITrigger backupTrigger = TriggerBuilder.Create()
-                    .WithIdentity("BackupLvl1Trigger", "Backups")
-                    .WithCronSchedule(SESMConfigHelper.ABIntervalLvl1)
+                    .WithIdentity(AutoBackupJob.GetTriggerKey(1))
+                    .WithCronSchedule(SESMConfigHelper.AutoBackupLvl1Cron)
                     .StartNow()
                     .Build();
 
                 scheduler.ScheduleJob(backupJob, backupTrigger);
             }
 
-            if(SESMConfigHelper.AutoBackupLvl2)
+            if (SESMConfigHelper.AutoBackupLvl2Enabled)
             {
-                IJobDetail backupJob = JobBuilder.Create<BackupJob>()
-                    .WithIdentity("BackupLvl2Job", "Backups")
+                IJobDetail backupJob = JobBuilder.Create<AutoBackupJob>()
+                    .WithIdentity(AutoBackupJob.GetJobKey(2))
                     .UsingJobData("lvl", 2)
                     .Build();
 
                 ITrigger backupTrigger = TriggerBuilder.Create()
-                    .WithIdentity("BackupLvl2Trigger", "Backups")
-                    .WithCronSchedule(SESMConfigHelper.ABIntervalLvl2)
+                    .WithIdentity(AutoBackupJob.GetTriggerKey(2))
+                    .WithCronSchedule(SESMConfigHelper.AutoBackupLvl2Cron)
                     .StartNow()
                     .Build();
 
                 scheduler.ScheduleJob(backupJob, backupTrigger);
             }
 
-            if(SESMConfigHelper.AutoBackupLvl3)
+            if (SESMConfigHelper.AutoBackupLvl3Enabled)
             {
-                IJobDetail backupJob = JobBuilder.Create<BackupJob>()
-                    .WithIdentity("BackupLvl3Job", "Backups")
+                IJobDetail backupJob = JobBuilder.Create<AutoBackupJob>()
+                    .WithIdentity(AutoBackupJob.GetJobKey(3))
                     .UsingJobData("lvl", 3)
                     .Build();
 
                 ITrigger backupTrigger = TriggerBuilder.Create()
-                    .WithIdentity("BackupLvl3Trigger", "Backups")
-                    .WithCronSchedule(SESMConfigHelper.ABIntervalLvl3)
+                    .WithIdentity(AutoBackupJob.GetTriggerKey(3))
+                    .WithCronSchedule(SESMConfigHelper.AutoBackupLvl3Cron)
                     .StartNow()
                     .Build();
 
                 scheduler.ScheduleJob(backupJob, backupTrigger);
             }
 
-            DataContext context = new DataContext();
 
+            // Auto Restart
+            DataContext context = new DataContext();
             ServerProvider srvPrv = new ServerProvider(context);
 
-            foreach(EntityServer item in srvPrv.GetAllServers())
+            foreach (EntityServer item in srvPrv.GetAllServers())
             {
-                if(item.IsAutoRestartEnabled)
+                if (item.IsAutoRestartEnabled)
                 {
                     try
                     {
 
                         IJobDetail autoRestartJob = JobBuilder.Create<AutoRestartJob>()
-                            .WithIdentity("AutoRestart" + item.Id + "Job", "AutoRestart")
+                            .WithIdentity(AutoRestartJob.GetJobKey(item))
                             .UsingJobData("id", item.Id)
                             .Build();
 
                         ITrigger autoRestartTrigger = TriggerBuilder.Create()
-                            .WithIdentity("AutoRestart" + item.Id + "Trigger", "AutoRestart")
+                            .WithIdentity(AutoRestartJob.GetTriggerKey(item))
                             .WithCronSchedule(item.AutoRestartCron)
                             .StartNow()
                             .Build();
@@ -137,38 +166,23 @@ namespace SESM
                         scheduler.ScheduleJob(autoRestartJob, autoRestartTrigger);
 
                     }
-                    catch(Exception)
+                    catch (Exception)
                     {
                     }
                 }
             }
 
             IJobDetail autoStartJob = JobBuilder.Create<AutoStartJob>()
-                        .WithIdentity("AutoStartJob", "AutoStart")
+                        .WithIdentity(AutoStartJob.GetJobKey())
                         .Build();
 
             ITrigger autoStartTrigger = TriggerBuilder.Create()
-                .WithIdentity("AutoStartTrigger", "AutoStart")
+                .WithIdentity(AutoStartJob.GetTriggerKey())
                 .WithCronSchedule("0 0/15 * * * ?")
                 .StartNow()
                 .Build();
 
             scheduler.ScheduleJob(autoStartJob, autoStartTrigger);
-
-            /*
-            // Font for the signature generator
-            GraphHelper.privateFontCollection = new PrivateFontCollection();
-
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Black.ttf");
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-BlackItalic.ttf");
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Bold.ttf");
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-BoldItalic.ttf");
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Hairline.ttf");
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-HairlineItalic.ttf");
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Italic.ttf");
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Light.ttf");
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-LightItalic.ttf");
-            GraphHelper.privateFontCollection.AddFontFile(System.AppDomain.CurrentDomain.BaseDirectory + @"\Content\font\Lato-Regular.ttf");*/
         }
     }
 }

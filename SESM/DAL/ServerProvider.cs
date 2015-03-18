@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.ServiceProcess;
 using SESM.DTO;
+using SESM.Tools;
 using SESM.Tools.Helpers;
 
 namespace SESM.DAL
@@ -17,57 +18,71 @@ namespace SESM.DAL
             _context = context;
         }
 
-        public bool CheckPortAvailability(int port)
+
+        // Port Check
+
+        /// <summary>
+        /// Check if a server port is in use by another server
+        /// </summary>
+        /// <param name="port"></param>
+        /// <returns></returns>
+        public bool IsPortAvailable(int port, EntityServer server)
         {
             try
             {
-                if (_context.Servers.First(s => s.Port == port) != null)
-                    return false;
-                return true;
+                EntityServer testServ = _context.Servers.First(serv => server.Port == port || server.ServerExtenderPort == port);
+                if (testServ == null)
+                    return true;
+
+                if (testServ.Id == server.Id)
+                    return true;
+                return false;
+
+
             }
-            catch (Exception)
+            catch(Exception ex)
             {
                 return true;
             }
         }
-        public bool CheckSESEPortAvailability(int port)
+
+        public int GetNextAvailablePort(string ip = "")
         {
-            try
-            {
-                if(_context.Servers.First(s => s.ServerExtenderPort == port) != null)
-                    return false;
-                return true;
-            }
-            catch(Exception)
-            {
-                return true;
-            }
+            if (string.IsNullOrWhiteSpace(ip))
+                ip = Default.IP;
+
+            if (!_context.Servers.Any(server => server.Ip == ip))
+                return Default.ServerPort;
+            return _context.Servers.Where(server => server.Ip == ip).Select(server => server.Port).Max() + 1;
         }
-        public bool CheckSESEPortAvailabilityActive(int port)
+
+        public int GetNextAvailableSESEPort(string ip = "")
         {
-            try
-            {
-                if(_context.Servers.First(s => s.ServerExtenderPort == port && s.UseServerExtender) != null)
-                    return false;
-                return true;
-            }
-            catch(Exception)
-            {
-                return true;
-            }
+            if (string.IsNullOrWhiteSpace(ip))
+                ip = Default.IP;
+
+            if (!_context.Servers.Any(server => server.Ip == ip))
+                return Default.ServerExtenderPort;
+            return _context.Servers.Where(server => server.Ip == ip).Select(server => server.ServerExtenderPort).Max() + 1;
         }
+
         public void AddAdministrator(string[] listUsers, EntityServer server)
         {
+            if (listUsers == null || listUsers.Length == 0)
+                return;
             UserProvider usrPrv = new UserProvider(_context);
             server.Administrators = null;
 
-            foreach (string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Administrators.Contains(usrPrv.GetUser(item))))
+            foreach(string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Administrators.Contains(usrPrv.GetUser(item))))
             {
                 server.Administrators.Add(usrPrv.GetUser(item));
             }
         }
+
         public void AddManagers(string[] listUsers, EntityServer server)
         {
+            if(listUsers == null || listUsers.Length == 0)
+                return;
             UserProvider usrPrv = new UserProvider(_context);
             server.Managers = null;
 
@@ -79,6 +94,8 @@ namespace SESM.DAL
 
         public void AddUsers(string[] listUsers, EntityServer server)
         {
+            if (listUsers == null || listUsers.Length == 0)
+                return;
             UserProvider usrPrv = new UserProvider(_context);
             server.Users = null;
 
@@ -87,35 +104,15 @@ namespace SESM.DAL
                 server.Users.Add(usrPrv.GetUser(item));
             }
         }
-        public EntityServer GetServerByPort(int port)
-        {
-            try
-            {
-                return _context.Servers.First(s => s.Port == port);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-        public EntityServer GetServerBySESEPort(int port)
-        {
-            try
-            {
-                return _context.Servers.First(s => s.ServerExtenderPort == port);
-            }
-            catch(Exception)
-            {
-                return null;
-            }
-        }
+
+
         public EntityServer GetServer(int id)
         {
             try
             {
                 return _context.Servers.First(s => s.Id == id);
             }
-            catch (Exception)
+            catch(Exception)
             {
                 return null;
             }
@@ -129,25 +126,37 @@ namespace SESM.DAL
             {
                 service = services.First(x => x.ServiceName == ServiceHelper.GetServiceName(server));
             }
-            catch (Exception)
+            catch(Exception)
             {
                 service = null;
             }
-            if (service == null)
+            if(service == null)
                 return ServiceState.Unknow;
             else
             {
-                if (service.Status == ServiceControllerStatus.Running)
+                if(service.Status == ServiceControllerStatus.Running)
                     return ServiceState.Running;
-                if (service.Status == ServiceControllerStatus.StartPending)
+                if(service.Status == ServiceControllerStatus.StartPending)
                     return ServiceState.Starting;
-                if (service.Status == ServiceControllerStatus.StopPending)
+                if(service.Status == ServiceControllerStatus.StopPending)
                     return ServiceState.Stopping;
-                if (service.Status == ServiceControllerStatus.Stopped)
+                if(service.Status == ServiceControllerStatus.Stopped)
                     return ServiceState.Stopped;
                 return ServiceState.Unknow;
             }
 
+        }
+
+        public bool IsNameAvaialble(string name)
+        {
+            try
+            {
+                return !_context.Servers.Any(s => s.Name == name);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public void UpdateServer(EntityServer server)
@@ -189,11 +198,11 @@ namespace SESM.DAL
                 UserProvider usrPrv = new UserProvider(_context);
                 EntityUser usr = usrPrv.GetUser(idUser);
                 EntityServer srv = GetServer(idServer);
-                if (usr.IsAdmin || srv.IsPublic || srv.Administrators.Contains(usr) || srv.Managers.Contains(usr) || srv.Users.Contains(usr))
+                if(usr.IsAdmin || srv.IsPublic || srv.Administrators.Contains(usr) || srv.Managers.Contains(usr) || srv.Users.Contains(usr))
                     return true;
                 return false;
             }
-            catch (Exception)
+            catch(Exception)
             {
                 return false;
             }
@@ -206,63 +215,41 @@ namespace SESM.DAL
                 UserProvider usrPrv = new UserProvider(_context);
                 EntityUser usr = usrPrv.GetUser(idUser);
                 EntityServer srv = GetServer(idServer);
-                if (usr.IsAdmin)
+
+                if(usr == null)
+                    return srv.IsPublic ? AccessLevel.Guest : AccessLevel.None;
+           
+                if(usr.IsAdmin)
                     return AccessLevel.SuperAdmin;
 
-                if (srv.Administrators.Contains(usr))
+                if(srv.Administrators.Contains(usr))
                     return AccessLevel.Admin;
-                if (srv.Managers.Contains(usr))
+                if(srv.Managers.Contains(usr))
                     return AccessLevel.Manager;
-                if (srv.Users.Contains(usr))
+                if(srv.Users.Contains(usr))
                     return AccessLevel.User;
 
-                return AccessLevel.Guest;
-
+                return srv.IsPublic ? AccessLevel.Guest : AccessLevel.None;
             }
-            catch (Exception)
+            catch(Exception)
             {
-                return AccessLevel.Guest;
+                return AccessLevel.None;
             }
         }
 
-        public AccessLevel GetHighestAccessLevel(List<EntityServer> servers, EntityUser user)
+        public bool IsManagerOrAbore(AccessLevel accessLevel)
         {
-           
-            if (user == null)
-                return AccessLevel.Guest;
-            if(user.IsAdmin)
-                return AccessLevel.SuperAdmin;
-            AccessLevel accessLevel = AccessLevel.Guest;
-           foreach (AccessLevel itemAccessLevel in servers.Select(item => GetAccessLevel(user.Id, item.Id)))
-            {
-                if (accessLevel == AccessLevel.Guest 
-                    && itemAccessLevel != AccessLevel.Guest)
-                {
-                    accessLevel = itemAccessLevel;
-                }
-                else if (accessLevel == AccessLevel.User
-                    && itemAccessLevel != AccessLevel.Guest
-                    && itemAccessLevel != AccessLevel.User)
-                {
-                    accessLevel = itemAccessLevel;
-                }
-                else if (accessLevel == AccessLevel.Manager
-                    && itemAccessLevel != AccessLevel.Guest
-                    && itemAccessLevel != AccessLevel.User
-                    && itemAccessLevel != AccessLevel.Manager)
-                {
-                    accessLevel = itemAccessLevel;
-                }
-                else if (accessLevel == AccessLevel.Admin
-                    && itemAccessLevel != AccessLevel.Guest
-                    && itemAccessLevel != AccessLevel.User
-                    && itemAccessLevel != AccessLevel.Manager
-                    && itemAccessLevel != AccessLevel.Admin)
-                {
-                    accessLevel = itemAccessLevel;
-                }
-            }
-            return accessLevel;
+            bool ret = accessLevel == AccessLevel.SuperAdmin ||
+                    accessLevel == AccessLevel.Admin ||
+                    accessLevel == AccessLevel.Manager;
+            return ret;
+        }
+
+        public bool IsAdminOrAbore(AccessLevel accessLevel)
+        {
+            return accessLevel == AccessLevel.SuperAdmin ||
+                    accessLevel == AccessLevel.Admin ||
+                    accessLevel == AccessLevel.Manager;
         }
 
         public List<EntityServer> GetAllServers()
@@ -270,9 +257,19 @@ namespace SESM.DAL
             return _context.Servers.ToList();
         }
 
+        public List<EntityServer> GetAllSESEServers()
+        {
+            return _context.Servers.Where(item => item.UseServerExtender).ToList();
+        }
+
+        public List<EntityServer> GetAllPublicServers()
+        {
+            return _context.Servers.Where(item => item.IsPublic).ToList();
+        }
+
         public List<EntityServer> GetServers(EntityUser user)
         {
-            if (user == null)
+            if(user == null)
             {
                 return _context.Servers.Where(item => item.IsPublic).ToList();
             }
@@ -280,7 +277,7 @@ namespace SESM.DAL
             {
                 UserProvider usrPrv = new UserProvider(_context);
                 EntityUser usr = usrPrv.GetUser(user.Id);
-                if (usr.IsAdmin)
+                if(usr.IsAdmin)
                 {
                     return _context.Servers.ToList();
                 }
@@ -290,18 +287,19 @@ namespace SESM.DAL
                     listServ.AddRange(usr.AdministratorOf);
                     listServ.AddRange(usr.ManagerOf);
                     listServ.AddRange(usr.UserOf);
-                    foreach (EntityServer item in _context.Servers.ToList().Where(item => item.IsPublic && !listServ.Contains(item)))
+                    foreach(EntityServer item in _context.Servers.ToList().Where(item => item.IsPublic && !listServ.Contains(item)))
                     {
                         listServ.Add(item);
                     }
                     return listServ;
                 }
             }
-            catch (Exception)
+            catch(Exception)
             {
                 return null;
             }
         }
+
         public void RemoveServer(EntityServer server)
         {
             try
@@ -315,6 +313,19 @@ namespace SESM.DAL
                 throw;
             }
         }
+
+        public bool SecurityCheck(EntityServer server, EntityUser user)
+        {
+            if(user == null || server == null)
+                return false;
+
+            AccessLevel accessLevel = GetAccessLevel(user.Id, server.Id);
+            if(accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 
     public enum AccessLevel
@@ -323,6 +334,7 @@ namespace SESM.DAL
         Admin,
         Manager,
         User,
-        Guest
+        Guest,
+        None
     }
 }
