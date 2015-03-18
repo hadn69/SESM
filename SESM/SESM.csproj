@@ -287,6 +287,7 @@
     <Content Include="assets\admin\pages\img\inbox-nav-arrow-blue.png" />
     <Content Include="assets\admin\pages\media\pages\asteroid.png" />
     <Content Include="assets\admin\pages\media\pages\atronaute.png" />
+    <Content Include="assets\admin\pages\media\pages\bg.png" />
     <Content Include="assets\admin\pages\media\pages\earth.jpg" />
     <Content Include="assets\admin\pages\media\pages\earth.png" />
     <Content Include="assets\admin\pages\media\pages\server.png" />

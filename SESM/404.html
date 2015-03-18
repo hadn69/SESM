@@ -57,7 +57,7 @@ License: You must have a valid license purchased only from themeforest(the above
         }
     </style>
     <div class="page-inner">
-        <img src="/assets/admin/pages/media/pages/StarBackground.jpg" class="img-responsive" alt="" />
+        <img src="/assets/admin/pages/media/pages/bg.png" class="img-responsive" alt="" />
         <img src="/assets/admin/pages/media/pages/earth.png" class="img-responsive" alt="" />
 
         <style>
@@ -348,8 +348,8 @@ License: You must have a valid license purchased only from themeforest(the above
             var asteroTimer;
             var asteroSpeed;
 
-            var asteroTimerBase = 800;
-            var asteroSpeedBase = 5000;
+            var asteroTimerBase = 1000;
+            var asteroSpeedBase = 6000;
 
             var currentID;
 
@@ -359,7 +359,7 @@ License: You must have a valid license purchased only from themeforest(the above
             var srcTeapot = "/assets/admin/pages/media/pages/teapot.png";
             var srcServer = "/assets/admin/pages/media/pages/server.png";
 
-            var seed = "SESMSESM";
+            var seed = "quatre-cent quatre";
 
             function getParameterByName(name) {
                 name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -471,9 +471,9 @@ License: You must have a valid license purchased only from themeforest(the above
                         }
                     });
                 currentID++;
-                asteroTimer -= 10;
-                if (asteroTimer < 200)
-                    asteroTimer = 200;
+                asteroTimer -= 3;
+                if (asteroTimer < 400)
+                    asteroTimer = 400;
 
                 var nextCall = asteroTimer - rng.random(-250, 250);
                 timerObject = setTimeout(function () {
