@@ -9,6 +9,8 @@ namespace SESM
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
+            #region API
+
             // === API ===
 
             // Misc API
@@ -40,7 +42,7 @@ namespace SESM
                              "GetSESettings|" +
                              "SetSESettings|" +
                              "UploadSE|" +
-                             "UpdateSE|" + 
+                             "UpdateSE|" +
 
                              "GetSESEStatus|" +
                              "GetSESEVersion|" +
@@ -155,6 +157,7 @@ namespace SESM
                 url: "API/{*url}",
                 defaults: new { controller = "Error", action = "404API" }
             );
+            #endregion
 
             // === GUI ===
 
@@ -164,7 +167,7 @@ namespace SESM
             routes.MapRoute(
                 name: "Account",
                 url: "Account/{action}",
-                defaults: new {controller = "Account" },
+                defaults: new { controller = "Account" },
                 constraints: new
                 {
                     action = "Login|" +
@@ -176,7 +179,7 @@ namespace SESM
             routes.MapRoute(
                 name: "Settings",
                 url: "Settings/{action}",
-                defaults: new { controller = "Settings", action ="Index"},
+                defaults: new { controller = "Settings", action = "Index" },
                 constraints: new
                 {
                     action = "Index|" +
@@ -221,8 +224,8 @@ namespace SESM
             // Server List
             routes.MapRoute(
                 name: "ServerList",
-                url: "Servers/",
-                defaults: new { action = "Index", controller = "Server" }
+                url: "Serversa",
+                defaults: new { controller = "Server", action = "Index" }
             );
 
             // 404

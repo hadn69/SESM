@@ -3820,7 +3820,6 @@
     <Compile Include="Controllers\API\APIMiscController.cs" />
     <Compile Include="Controllers\API\APIUsersController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
-    <Compile Include="Controllers\MapController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ActionFilters\LoggedOnlyAttribute.cs" />
