@@ -128,6 +128,8 @@ namespace SESM.Controllers.API
             Directory.CreateDirectory(PathHelper.GetInstancePath(server) + @"Backups");
 
             ServerConfigHelper configHelper = new ServerConfigHelper();
+            configHelper.IP = server.Ip;
+            configHelper.ServerPort = server.Port;
 
             configHelper.Save(server);
             ServiceHelper.RegisterService(server);
