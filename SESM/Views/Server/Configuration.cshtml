@@ -1,0 +1,1081 @@
+﻿@{
+    ViewBag.Title = "Server Configuration";
+
+    List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
+    breadCrumb.Add(new KeyValuePair<string, string>("Servers", "/Servers/"));
+    breadCrumb.Add(new KeyValuePair<string, string>(ViewBag.Server.Name, "/" + ViewBag.ServerID + "/Dashboard/"));
+    breadCrumb.Add(new KeyValuePair<string, string>("Server Configuration", "/" + ViewBag.ServerID + "/Configuration/"));
+    ViewBag.Breadcrumb = breadCrumb;
+
+    ViewBag.RefreshBtn = true;
+}
+<script type="text/javascript" src="/assets/global/plugins/jquery.input-ip-address-control-1.0.min.js"></script>
+<script type="text/javascript" src="/Content/Js/TouchSpinMod.js"></script>
+<script type="text/javascript" src="/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" />
+
+<div class="col-md-12">
+    <div class="portlet light">
+        <div class="portlet-body">
+            <div class="tabbable-custom nav-justified">
+                <ul class="nav nav-tabs nav-justified">
+                    <li class="active">
+                        <a href="#tab_Network" data-toggle="tab">
+                            Network
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tab_Server" data-toggle="tab">
+                            Server
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tab_Gameplay" data-toggle="tab">
+                            Gameplay
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tab_Players" data-toggle="tab">
+                            Players
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tab_Mods" data-toggle="tab">
+                            Mods
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tab_Access" data-toggle="tab">
+                            Access
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tab_Production" data-toggle="tab">
+                            Production
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tab_Construction" data-toggle="tab">
+                            Construction
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tab_Misc" data-toggle="tab">
+                            Miscellaneous
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-toggle="tab" id="btnShowAll">
+                            All
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_Network">
+                        <form action="#" class="form-horizontal form">
+                            <div class="form-body">
+                                <h3 class="form-section">Network Settings</h3>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Listening IP</label>
+                                            <div class="col-md-6">
+                                                <input class="form-control" id="inpIP" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Listening Port</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpServerPort" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Steam Port</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpSteamPort" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Online Mode</label>
+                                            <div class="col-md-6">
+                                                <select id="inpOnlineMode" class="bs-select form-control">
+                                                    <option value="OFFLINE">Offline</option>
+                                                    <option value="PRIVATE">Private</option>
+                                                    <option value="FRIENDS">Friends</option>
+                                                    <option value="PUBLIC">Public</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Server Name</label>
+                                            <div class="col-md-6">
+                                                <input class="form-control" id="inpServerName" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">World Name</label>
+                                            <div class="col-md-6">
+                                                <input class="form-control" id="inpWorldName" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="tab_Server">
+                        <form action="#" class="form-horizontal form">
+                            <div class="form-body">
+                                <h3 class="form-section">Server Settings</h3>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Max Players</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpMaxPlayers" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Max Floating Objects</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpMaxFloatingObjects" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Auto Save (In Minutes)</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpAutoSaveInMinutes" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Pause Game When Empty</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpPauseGameWhenEmpty">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">World Size Km</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpWorldSizeKm" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">View Distance</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpViewDistance" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Client Can Save Locally</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpClientCanSave">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Remove Trash</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpRemoveTrash">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="tab_Gameplay">
+                        <form action="#" class="form-horizontal form">
+                            <div class="form-body">
+                                <h3 class="form-section">Gameplay Settings</h3>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Spawn Ship Time Multiplier</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpSpawnShipTimeMultiplier" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Auto Delete Respawn Ship</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpRespawnShipDelete">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Thruster Damage</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpThrusterDamage">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Enable Ingame Scripts</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpEnableIngameScripts">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Environment Hostility</label>
+                                            <div class="col-md-6">
+                                                <select id="inpEnvironmentHostility" class="bs-select form-control">
+                                                    <option value="SAFE">Safe</option>
+                                                    <option value="NORMAL">Normal</option>
+                                                    <option value="CATACLYSM">Cataclysm</option>
+                                                    <option value="CATACLYSM_UNREAL">Cataclysm Unreal</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Enable Ingame Scripts</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpCargoShipsEnabled">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Enable Tool Shake</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpEnableToolShake">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="tab_Players">
+                        <form action="#" class="form-horizontal form">
+                            <div class="form-body">
+                                <h3 class="form-section">Players Settings</h3>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Auto Healing</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpAutoHealing">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Weapons Enabled</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpWeaponsEnabled">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Inventory Size Multiplier</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpInventorySizeMultiplier" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Enable Spectator</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpEnableSpectator">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Permanent Death</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpPermanentDeath">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Show Player Names On Hud</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpShowPlayerNamesOnHud">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="tab_Mods">
+                        <form action="#" class="form-horizontal form">
+                            <div class="form-body">
+                                <h3 class="form-section">Mods</h3>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Mods</label>
+                                            <div class="col-md-6">
+                                                <textarea rows="10" id="inpMods" style="width: 100%; resize: none;"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="tab_Access">
+                        <form action="#" class="form-horizontal form">
+                            <div class="form-body">
+                                <h3 class="form-section">Access Settings</h3>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Administrators</label>
+                                            <div class="col-md-6">
+                                                <textarea rows="10" id="inpAdministrators" style="width: 100%; resize: none;"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Banned</label>
+                                            <div class="col-md-6">
+                                                <textarea rows="10" id="inpBanned" style="width: 100%; resize: none;"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Reset Ownership</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpResetOwnership">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="tab_Production">
+                        <form action="#" class="form-horizontal form">
+                            <div class="form-body">
+                                <h3 class="form-section">Production Settings</h3>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Assembler Speed Multiplier</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpAssemblerSpeedMultiplier" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Assembler Efficiency Multiplier</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpAssemblerEfficiencyMultiplier" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Refinery Speed Multiplier</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpRefinerySpeedMultiplier" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="tab_Construction">
+                        <form action="#" class="form-horizontal form">
+                            <div class="form-body">
+                                <h3 class="form-section">Construction Settings</h3>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Gamemode</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpGamemode" class="make-switch" data-off-text="&nbsp;Survival&nbsp;" data-on-text="&nbsp;Creative&nbsp;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Welder Speed Multiplier</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpWelderSpeedMultiplier" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Grinder Speed Multiplier</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpGrinderSpeedMultiplier" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Hack Speed Multiplier</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpHackSpeedMultiplier" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Enable Copy Paste</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpEnableCopyPaste">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Destructible Blocks</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpDestructibleBlocks">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane" id="tab_Misc">
+                        <form action="#" class="form-horizontal form">
+                            <div class="form-body">
+                                <h3 class="form-section">Miscellaneous</h3>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Ignore Last Session</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpIgnoreLastSession">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Realistic Sound</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpRealisticSound">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-offset-6 col-md-6">
+                        <button type="button" class="btn green" id="btnSave">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function initPage() {
+        $('#btnShowAll').click(function () {
+            $('.tab-pane').addClass("active");
+        });
+
+        function isEmptyOrSpaces(str) {
+            return str === null || str.match(/^\s*$/) !== null;
+        }
+
+        // Initializers
+        $.fn.bootstrapSwitch.defaults.onText = '<i class="fa fa-check"></i>';
+        $.fn.bootstrapSwitch.defaults.offText = '<i class="fa fa-times"></i>';
+        $("input[type='checkbox']").bootstrapSwitch();
+        // Network
+        $('#inpServerPort').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 65535,
+            step: 1
+        });
+        $('#inpSteamPort').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 65535,
+            step: 1
+        });
+
+        // Server
+        $('#inpMaxPlayers').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+        $('#inpMaxFloatingObjects').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+        $('#inpAutoSaveInMinutes').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 0,
+            max: 1000000,
+            step: 1
+        });
+        $('#inpWorldSizeKm').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 0,
+            max: 10000000,
+            step: 1
+        });
+        $('#inpViewDistance').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 10000000,
+            step: 1000
+        });
+
+        // Gameplay
+        $('#inpSpawnShipTimeMultiplier').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+
+        // Players
+        $('#inpInventorySizeMultiplier').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+
+        // Production
+        $('#inpAssemblerSpeedMultiplier').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+        $('#inpAssemblerEfficiencyMultiplier').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+        $('#inpRefinerySpeedMultiplier').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+
+        // Construction
+        $('#inpWelderSpeedMultiplier').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+        $('#inpGrinderSpeedMultiplier').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 1,
+            max: 1000000,
+            step: 1
+        });
+        $('#inpHackSpeedMultiplier').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 0,
+            max: 1000000,
+            decimals: 2,
+            step: 0.01
+        });
+
+        var dataLoaded = false;
+        var maskLoaded = false;
+        var maskData = "";
+
+        function ShowContent() {
+            if (dataLoaded && maskLoaded) {
+                UnlockPage();
+            }
+        }
+
+        function LoadParam() {
+            LockPage();
+
+            dataLoaded = false;
+            maskLoaded = false;
+            $.post("/API/Server/GetConfiguration",
+            {
+                ServerID: serverID
+            },
+            function (data) {
+                dataLoaded = true;
+                var root = $($.parseXML(data)).find("Response");
+
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    ShowContent();
+                    return;
+                }
+
+                var content = root.children("Content");
+                console.log(data);
+                // Network
+                $('#inpIP').val(content.children("IP").text());
+                $('#inpServerPort').val(content.children("ServerPort").text());
+                $('#inpSteamPort').val(content.children("SteamPort").text());
+                $('#inpOnlineMode').val(content.children("OnlineMode").text());
+                $('#inpServerName').val(content.children("ServerName").text());
+                $('#inpWorldName').val(content.children("WorldName").text());
+
+                // Server
+                $('#inpMaxPlayers').val(content.children("MaxPlayers").text());
+                $('#inpMaxFloatingObjects').val(content.children("MaxFloatingObjects").text());
+                $('#inpAutoSaveInMinutes').val(content.children("AutoSaveInMinutes").text());
+                $("#inpPauseGameWhenEmpty").bootstrapSwitch('state', content.children("PauseGameWhenEmpty").text() == "true");
+                $('#inpWorldSizeKm').val(content.children("WorldSizeKm").text());
+                $('#inpViewDistance').val(content.children("ViewDistance").text());
+                $("#inpClientCanSave").bootstrapSwitch('state', content.children("ClientCanSave").text() == "true");
+                $("#inpRemoveTrash").bootstrapSwitch('state', content.children("RemoveTrash").text() == "true");
+
+                // Gameplay
+                $('#inpSpawnShipTimeMultiplier').val(content.children("SpawnShipTimeMultiplier").text());
+                $('#inpRespawnShipDelete').bootstrapSwitch('state', content.children("RespawnShipDelete").text() == "true");
+                $('#inpThrusterDamage').bootstrapSwitch('state', content.children("ThrusterDamage").text() == "true");
+                $('#inpEnableIngameScripts').bootstrapSwitch('state', content.children("EnableIngameScripts").text() == "true");
+                $('#inpEnvironmentHostility').val(content.children("EnvironmentHostility").text());
+                $('#inpCargoShipsEnabled').bootstrapSwitch('state', content.children("CargoShipsEnabled").text() == "true");
+                $('#inpEnableToolShake').bootstrapSwitch('state', content.children("EnableToolShake").text() == "true");
+
+                // Players
+                $('#inpAutoHealing').bootstrapSwitch('state', content.children("AutoHealing").text() == "true");
+                $('#inpWeaponsEnabled').bootstrapSwitch('state', content.children("WeaponsEnabled").text() == "true");
+                $('#inpInventorySizeMultiplier').val(content.children("InventorySizeMultiplier").text());
+                $('#inpEnableSpectator').bootstrapSwitch('state', content.children("EnableSpectator").text() == "true");
+                $('#inpPermanentDeath').bootstrapSwitch('state', content.children("PermanentDeath").text() == "true");
+                $('#inpShowPlayerNamesOnHud').bootstrapSwitch('state', content.children("ShowPlayerNamesOnHud").text() == "true");
+
+                // Mods
+                var mods = [];
+                content.children("Mods").children().each(function (index) {
+                    var item = $(this);
+                    mods.push(item.text());
+                });
+                $('#inpMods').val(mods.join("\r\n"));
+
+                // Access
+                var administrators = [];
+                content.children("Administrators").children().each(function (index) {
+                    var item = $(this);
+                    administrators.push(item.text());
+                });
+                $('#inpAdministrators').val(administrators.join("\r\n"));
+                var banned = [];
+                content.children("Banned").children().each(function (index) {
+                    var item = $(this);
+                    banned.push(item.text());
+                });
+                $('#inpBanned').val(banned.join("\r\n"));
+                $('#inpResetOwnership').bootstrapSwitch('state', content.children("ResetOwnership").text() == "true");
+
+                // Production
+                $('#inpAssemblerSpeedMultiplier').val(content.children("AssemblerSpeedMultiplier").text());
+                $('#inpAssemblerEfficiencyMultiplier').val(content.children("AssemblerEfficiencyMultiplier").text());
+                $('#inpRefinerySpeedMultiplier').val(content.children("RefinerySpeedMultiplier").text());
+
+                // Construction
+                if (content.children("GameMode").text() == "Survival") {
+                    $("#inpGamemode").bootstrapSwitch('state', false);
+                } else if (content.children("GameMode").text() == "Creative") {
+                    $("#inpGamemode").bootstrapSwitch('state', true);
+                }
+                $('#inpWelderSpeedMultiplier').val(content.children("WelderSpeedMultiplier").text());
+                $('#inpGrinderSpeedMultiplier').val(content.children("GrinderSpeedMultiplier").text());
+                $('#inpHackSpeedMultiplier').val(content.children("HackSpeedMultiplier").text());
+                $("#inpEnableCopyPaste").bootstrapSwitch('state', content.children("EnableCopyPaste").text() == "true");
+                $("#inpDestructibleBlocks").bootstrapSwitch('state', content.children("DestructibleBlocks").text() == "true");
+
+                // Misc
+                $("#inpIgnoreLastSession").bootstrapSwitch('state', content.children("IgnoreLastSession").text() == "true");
+                $("#inpRealisticSound").bootstrapSwitch('state', content.children("RealisticSound").text() == "true");
+
+                ShowContent();
+            });
+
+            $.post("/API/Server/GetConfigurationRights",
+            {
+                ServerID: serverID
+            },
+            function (data) {
+                maskLoaded = true;
+                var root = $($.parseXML(data)).find("Response");
+
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    ShowContent();
+                    return;
+                }
+
+                var content = root.children("Content");
+                maskData = content;
+
+                // Network
+                $('#inpIP').prop("readonly", content.children("IP").text() != "true");
+                $('#inpServerPort').prop("readonly", content.children("ServerPort").text() != "true");
+                $('#inpSteamPort').prop("readonly", content.children("SteamPort").text() != "true");
+                $('#inpOnlineMode').prop("disabled", content.children("OnlineMode").text() != "true");
+                $('#inpServerName').prop("readonly", content.children("ServerName").text() != "true");
+                $('#inpWorldName').prop("readonly", content.children("WorldName").text() != "true");
+
+                // Server
+                $('#inpMaxPlayers').prop("readonly", content.children("MaxPlayers").text() != "true");
+                $('#inpMaxFloatingObjects').prop("readonly", content.children("MaxFloatingObjects").text() != "true");
+                $('#inpAutoSaveInMinutes').prop("readonly", content.children("AutoSaveInMinutes").text() != "true");
+                $("#inpPauseGameWhenEmpty").bootstrapSwitch("readonly", content.children("PauseGameWhenEmpty").text() != "true");
+                $('#inpWorldSizeKm').prop("readonly", content.children("WorldSizeKm").text() != "true");
+                $('#inpViewDistance').prop("readonly", content.children("ViewDistance").text() != "true");
+                $("#inpClientCanSave").bootstrapSwitch("readonly", content.children("ClientCanSave").text() != "true");
+                $("#inpRemoveTrash").bootstrapSwitch("readonly", content.children("RemoveTrash").text() != "true");
+
+                // Gameplay
+                $('#inpSpawnShipTimeMultiplier').prop("readonly", content.children("SpawnShipTimeMultiplier").text() != "true");
+                $('#inpRespawnShipDelete').bootstrapSwitch("readonly", content.children("RespawnShipDelete").text() != "true");
+                $('#inpThrusterDamage').bootstrapSwitch("readonly", content.children("ThrusterDamage").text() != "true");
+                $('#inpEnableIngameScripts').bootstrapSwitch("readonly", content.children("EnableIngameScripts").text() != "true");
+                $('#inpEnvironmentHostility').prop("disabled", content.children("EnvironmentHostility").text() != "true");
+                $('#inpCargoShipsEnabled').bootstrapSwitch("readonly", content.children("CargoShipsEnabled").text() != "true");
+                $('#inpEnableToolShake').bootstrapSwitch("readonly", content.children("EnableToolShake").text() != "true");
+
+                // Players
+                $('#inpAutoHealing').bootstrapSwitch("readonly", content.children("AutoHealing").text() != "true");
+                $('#inpWeaponsEnabled').bootstrapSwitch("readonly", content.children("WeaponsEnabled").text() != "true");
+                $('#inpInventorySizeMultiplier').prop("readonly", content.children("InventorySizeMultiplier").text() != "true");
+                $('#inpEnableSpectator').bootstrapSwitch("readonly", content.children("EnableSpectator").text() != "true");
+                $('#inpPermanentDeath').bootstrapSwitch("readonly", content.children("PermanentDeath").text() != "true");
+                $('#inpShowPlayerNamesOnHud').bootstrapSwitch("readonly", content.children("ShowPlayerNamesOnHud").text() != "true");
+
+                // Mods
+                $('#inpMods').prop("readonly", content.children("Mods").text() != "true");
+
+                // Access
+                $('#inpAdministrators').prop("readonly", content.children("Administrators").text() != "true");
+                $('#inpBanned').prop("readonly", content.children("Banned").text() != "true");
+                $('#inpResetOwnership').bootstrapSwitch("readonly", content.children("ResetOwnership").text() != "true");
+
+                // Production
+                $('#inpAssemblerSpeedMultiplier').prop("readonly", content.children("AssemblerSpeedMultiplier").text() != "true");
+                $('#inpAssemblerEfficiencyMultiplier').prop("readonly", content.children("AssemblerEfficiencyMultiplier").text() != "true");
+                $('#inpRefinerySpeedMultiplier').prop("readonly", content.children("RefinerySpeedMultiplier").text() != "true");
+
+                // Construction
+                $("#inpGamemode").bootstrapSwitch("readonly", content.children("Gamemode").text() != "true");
+                $('#inpWelderSpeedMultiplier').prop("readonly", content.children("WelderSpeedMultiplier").text() != "true");
+                $('#inpGrinderSpeedMultiplier').prop("readonly", content.children("GrinderSpeedMultiplier").text() != "true");
+                $('#inpHackSpeedMultiplier').prop("readonly", content.children("HackSpeedMultiplier").text() != "true");
+                $("#inpEnableCopyPaste").bootstrapSwitch("readonly", content.children("EnableCopyPaste").text() != "true");
+                $("#inpDestructibleBlocks").bootstrapSwitch("readonly", content.children("DestructibleBlocks").text() != "true");
+
+                // Misc
+                $("#inpIgnoreLastSession").bootstrapSwitch("readonly", content.children("IgnoreLastSession").text() != "true");
+                $("#inpRealisticSound").bootstrapSwitch("readonly", content.children("RealisticSound").text() != "true");
+
+                ShowContent();
+            });
+        }
+
+        LoadParam();
+
+        $("#btnRefresh").click(function () {
+            LoadParam();
+        });
+
+        $("#btnSave").click(function () {
+            bootbox.confirm("If the server is running, it WILL be restarted !<br/>Are you sure you want to save ?",
+            function (result) {
+                if (result) {
+                    var config = {};
+
+                    // Network
+                    if (maskData.children("IP").text() == "true")
+                        config.IP = $('#inpIP').val();
+                    if (maskData.children("ServerPort").text() == "true")
+                        config.ServerPort = $('#inpServerPort').val();
+                    if (maskData.children("SteamPort").text() == "true")
+                        config.SteamPort = $('#inpSteamPort').val();
+                    if (maskData.children("OnlineMode").text() == "true")
+                        config.OnlineMode = $('#inpOnlineMode').val();
+                    if (maskData.children("ServerName").text() == "true")
+                        config.ServerName = $('#inpServerName').val();
+                    if (maskData.children("WorldName").text() == "true")
+                        config.WorldName = $('#inpWorldName').val();
+
+                    // Server
+                    if (maskData.children("MaxPlayers").text() == "true")
+                        config.MaxPlayers = $('#inpMaxPlayers').val();
+                    if (maskData.children("MaxFloatingObjects").text() == "true")
+                        config.MaxFloatingObjects = $('#inpMaxFloatingObjects').val();
+                    if (maskData.children("AutoSaveInMinutes").text() == "true")
+                        config.AutoSaveInMinutes = $('#inpAutoSaveInMinutes').val();
+                    if (maskData.children("PauseGameWhenEmpty").text() == "true")
+                        config.PauseGameWhenEmpty = $('#inpPauseGameWhenEmpty').is(":checked");
+                    if (maskData.children("WorldSizeKm").text() == "true")
+                        config.WorldSizeKm = $('#inpWorldSizeKm').val();
+                    if (maskData.children("ViewDistance").text() == "true")
+                        config.ViewDistance = $('#inpViewDistance').val();
+                    if (maskData.children("ClientCanSave").text() == "true")
+                        config.ClientCanSave = $('#inpClientCanSave').is(":checked");
+                    if (maskData.children("RemoveTrash").text() == "true")
+                        config.RemoveTrash = $('#inpRemoveTrash').is(":checked");
+
+                    // Gameplay
+                    if (maskData.children("SpawnShipTimeMultiplier").text() == "true")
+                        config.SpawnShipTimeMultiplier = $('#inpSpawnShipTimeMultiplier').val();
+                    if (maskData.children("RespawnShipDelete").text() == "true")
+                        config.RespawnShipDelete = $('#inpRespawnShipDelete').is(":checked");
+                    if (maskData.children("ThrusterDamage").text() == "true")
+                        config.ThrusterDamage = $('#inpThrusterDamage').is(":checked");
+                    if (maskData.children("EnableIngameScripts").text() == "true")
+                        config.EnableIngameScripts = $('#inpEnableIngameScripts').is(":checked");
+                    if (maskData.children("EnvironmentHostility").text() == "true")
+                        config.EnvironmentHostility = $('#inpEnvironmentHostility').val();
+                    if (maskData.children("CargoShipsEnabled").text() == "true")
+                        config.CargoShipsEnabled = $('#inpCargoShipsEnabled').is(":checked");
+                    if (maskData.children("EnableToolShake").text() == "true")
+                        config.EnableToolShake = $('#inpEnableToolShake').is(":checked");
+
+                    // Players
+                    if (maskData.children("AutoHealing").text() == "true")
+                        config.AutoHealing = $('#inpAutoHealing').is(":checked");
+                    if (maskData.children("WeaponsEnabled").text() == "true")
+                        config.WeaponsEnabled = $('#inpWeaponsEnabled').is(":checked");
+                    if (maskData.children("InventorySizeMultiplier").text() == "true")
+                        config.InventorySizeMultiplier = $('#inpInventorySizeMultiplier').val();
+                    if (maskData.children("EnableSpectator").text() == "true")
+                        config.EnableSpectator = $('#inpEnableSpectator').is(":checked");
+                    if (maskData.children("PermanentDeath").text() == "true")
+                        config.PermanentDeath = $('#inpPermanentDeath').is(":checked");
+                    if (maskData.children("ShowPlayerNamesOnHud").text() == "true")
+                        config.ShowPlayerNamesOnHud = $('#inpShowPlayerNamesOnHud').is(":checked");
+
+                    // Mods
+                    if (maskData.children("Mods").text() == "true") {
+                        var mods = [];
+                        $("#inpMods").val().split("\n").forEach(function (value) {
+                            if (!isEmptyOrSpaces(value))
+                                mods.push(value);
+                        });
+                        config.Mods = mods.join(";");
+                    }
+
+                    // Access
+                    if (maskData.children("Administrators").text() == "true") {
+                        var administrators = [];
+                        $("#inpAdministrators").val().split("\n").forEach(function (value) {
+                            if (!isEmptyOrSpaces(value))
+                                administrators.push(value);
+                        });
+                        config.Administrators = administrators.join(";");
+                    }
+                    if (maskData.children("Banned").text() == "true") {
+                        var banned = [];
+                        $("#inpBanned").val().split("\n").forEach(function (value) {
+                            if (!isEmptyOrSpaces(value))
+                                banned.push(value);
+                        });
+                        config.Banned = banned.join(";");
+                    }
+                    if (maskData.children("ResetOwnership").text() == "true")
+                        config.ResetOwnership = $('#inpResetOwnership').is(":checked");
+
+                    // Production
+                    if (maskData.children("AssemblerSpeedMultiplier").text() == "true")
+                        config.AssemblerSpeedMultiplier = $('#inpAssemblerSpeedMultiplier').val();
+                    if (maskData.children("AssemblerEfficiencyMultiplier").text() == "true")
+                        config.AssemblerEfficiencyMultiplier = $('#inpAssemblerEfficiencyMultiplier').val();
+                    if (maskData.children("RefinerySpeedMultiplier").text() == "true")
+                        config.RefinerySpeedMultiplier = $('#inpRefinerySpeedMultiplier').val();
+
+                    // Construction
+                    if (maskData.children("Gamemode").text() == "true") {
+                        if ($('#inpGamemode').is(":checked"))
+                            config.Gamemode = "Creative";
+                        else
+                            config.Gamemode = "Survival";
+                    }
+                    if (maskData.children("WelderSpeedMultiplier").text() == "true")
+                        config.WelderSpeedMultiplier = $('#inpWelderSpeedMultiplier').val();
+                    if (maskData.children("GrinderSpeedMultiplier").text() == "true")
+                        config.GrinderSpeedMultiplier = $('#inpGrinderSpeedMultiplier').val();
+                    if (maskData.children("HackSpeedMultiplier").text() == "true")
+                        config.HackSpeedMultiplier = $('#inpHackSpeedMultiplier').val();
+                    if (maskData.children("EnableCopyPaste").text() == "true")
+                        config.EnableCopyPaste = $('#inpEnableCopyPaste').is(":checked");
+                    if (maskData.children("DestructibleBlocks").text() == "true")
+                        config.DestructibleBlocks = $('#inpDestructibleBlocks').is(":checked");
+
+                    // Misc
+                    if (maskData.children("IgnoreLastSession").text() == "true")
+                        config.IgnoreLastSession = $('#inpIgnoreLastSession').is(":checked");
+                    if (maskData.children("RealisticSound").text() == "true")
+                        config.RealisticSound = $('#inpRealisticSound').is(":checked");
+
+                    config.ServerID = serverID;
+
+                    $.post("/API/Server/SetConfiguration",
+                    config,
+                    function (data) {
+                        var root = $($.parseXML(data)).find("Response");
+
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+                        toastr.success(root.children("Content").text(), "Server Settings updated");
+                    });
+                }
+            });
+        });
+    }
+</script>

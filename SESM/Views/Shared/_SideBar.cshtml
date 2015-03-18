@@ -1,0 +1,126 @@
+﻿@using SESM.DAL
+@using SESM.DTO
+@{
+
+    DataContext context = new DataContext();
+    ServerProvider srvPrv = new ServerProvider(context);
+    UserProvider usrPrv = new UserProvider(context);
+
+    EntityUser user = Session["User"] as EntityUser;
+    int userID = user == null ? 0 : user.Id;
+
+    bool isAdmin = false;
+    HashSet<EntityServer> managedServers = new HashSet<EntityServer>();
+    HashSet<EntityServer> publicServers = new HashSet<EntityServer>();
+
+    if (user != null)
+    {
+        isAdmin = user.IsAdmin;
+        if (user.IsAdmin)
+        {
+            managedServers = new HashSet<EntityServer>(srvPrv.GetAllServers());
+        }
+        else
+        {
+            user = usrPrv.GetUser(userID);
+
+            managedServers = ((HashSet<EntityServer>)user.AdministratorOf);
+            managedServers.UnionWith((HashSet<EntityServer>)user.ManagerOf);
+
+            publicServers = ((HashSet<EntityServer>)user.UserOf);
+            publicServers.UnionWith(new HashSet<EntityServer>(srvPrv.GetAllPublicServers()));
+
+            publicServers.ExceptWith(managedServers);
+        }
+    }
+}
+<ul class="page-sidebar-menu page-sidebar-menu-hover-submenu" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
+    <li class="start ">
+        <a href="/">
+            <i class="icon-home"></i>
+            <span class="title">Home</span>
+        </a>
+    </li>
+    <li>
+        <a href="/Servers/">
+            <i class="icon-globe"></i>
+            <span class="title">Servers</span>
+            <span class="arrow "></span>
+        </a>
+        @if (managedServers.Count != 0 || publicServers.Count != 0)
+        {
+            <ul class="sub-menu">
+                @foreach (EntityServer item in managedServers.OrderBy(x => x.Name))
+                {
+                    <li>
+                        <a href="/@item.Id/Dashboard/">
+                            @item.Name <span class="arrow"></span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li>
+                                <a href="/@item.Id/Dashboard/"><i class="icon-speedometer"></i> Dashboard</a>
+                            </li>
+                            <li>
+                                <a href="/@item.Id/Settings/"><i class="icon-settings"></i> Server Settings</a>
+                            </li>
+                            <li>
+                                <a href="/@item.Id/Configuration/"><i class="icon-puzzle"></i> Game Configuration</a>
+                            </li>
+                            <li>
+                                <a href="/@item.Id/Explorer/"><i class="icon-folder-alt"></i> File Explorer</a>
+                            </li>
+                            <li>
+                                <a href="/@item.Id/Maps/"><i class="icon-compass"></i> Maps Manager</a>
+                            </li>
+                            <li>
+                                <a href="/@item.Id/Status/"><i class="icon-screen-desktop"></i> Status Page</a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                @foreach (EntityServer item in publicServers.OrderBy(x => x.Name))
+                {
+                    <li>
+                        <a href="/@item.Id/Status/">
+                            @item.Name
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+    </li>
+    @if (isAdmin)
+    {
+        <li>
+            <a href="/Users/">
+                <i class="icon-users"></i>
+                <span class="title">Users Manager</span>
+                <span class="arrow "></span>
+            </a>
+        </li>
+        <li>
+            <a href="/Settings/">
+                <i class="icon-settings"></i>
+                <span class="title">Global Settings</span>
+                <span class="arrow "></span>
+            </a>
+            <ul class="sub-menu">
+                <li>
+                    <a href="/Settings/">
+                        <i class="icon-equalizer"></i> SESM
+                    </a>
+                </li>
+                <li>
+                    <a href="/Settings/SE/">
+                        <i class="icon-graph"></i> Space Engineers
+                    </a>
+                </li>
+                <li>
+                    <a href="/Settings/SESE/">
+                        <i class="icon-rocket"></i> SE Server Extender
+                    </a>
+                </li>
+            </ul>
+        </li>
+    }
+</ul>

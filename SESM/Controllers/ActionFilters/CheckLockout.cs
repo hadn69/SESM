@@ -11,10 +11,10 @@ namespace SESM.Controllers.ActionFilters
     {
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if(SESMConfigHelper.Lockdown)
+            if (SESMConfigHelper.Lockdown)
                 try
                 {
-                
+
                     EntityUser user = HttpContext.Current.Session["User"] as EntityUser;
 
                     if (user == null || !user.IsAdmin)

@@ -1,7 +1,7 @@
+using System.Data.Entity.Migrations;
+
 namespace SESM.Migrations
 {
-    using System.Data.Entity.Migrations;
-    
     public partial class ServerExtender : DbMigration
     {
         public override void Up()

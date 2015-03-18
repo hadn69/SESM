@@ -51,20 +51,34 @@ namespace SESM.DAL
             }
         }
 
-        
-        public bool UserExist(string login)
+        public bool UserExist(int id)
         {
             try
             {
-                if (_context.Users.First(u => u.Login == login) != null)
-                    return true;
-                return false;
+                EntityUser usr = _context.Users.First(u => u.Id == id);
+                return true;
             }
             catch (Exception)
             {
                 return false;
             }
         }
+
+        public bool UserExist(string login)
+        {
+            try
+            {
+                EntityUser usr = _context.Users.First(u => u.Login == login);
+                if(usr.Login != login)
+                    return false;
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public void UpdateUser(EntityUser user)
         {
             try

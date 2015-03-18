@@ -1,23 +1,24 @@
 ﻿using System;
-using System.Text;
-using System.Web.Security;
 using Microsoft.Win32;
-using SESM.Models.Views.Settings;
+using SESM.Models;
 
 namespace SESM.Tools.Helpers
 {
     public class SESMConfigHelper
     {
-        // TODO : refactor getter/setter as properties
-
-        public static SESMConfigStorage ConfigStorage;
+        private static readonly SESMConfigStorage ConfigStorage;
+        private static readonly SESMRunningVarsStorage RunningVars;
 
         static SESMConfigHelper()
         {
             ConfigStorage = new SESMConfigStorage();
             ConfigStorage.Initialize();
+
+            RunningVars = new SESMRunningVarsStorage();
+            RunningVars.Initialize();
         }
 
+        // Registry Settings
         private static void InitializeRegistry()
         {
             RegistryKey wow6432Node = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node", true);
@@ -91,6 +92,8 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        // Server Settings
+
         public static string DBConnString
         {
             get
@@ -125,6 +128,13 @@ namespace SESM.Tools.Helpers
             get
             {
                 ConfigStorage.Read();
+
+                if (!ConfigStorage.SESavePath.EndsWith(@"\"))
+                {
+                    ConfigStorage.SESavePath += @"\";
+                    ConfigStorage.Write();
+                }
+
                 return ConfigStorage.SESavePath;                
             }
             set
@@ -139,6 +149,13 @@ namespace SESM.Tools.Helpers
             get
             {
                 ConfigStorage.Read();
+
+                if (!ConfigStorage.SEDataPath.EndsWith(@"\"))
+                {
+                    ConfigStorage.SEDataPath += @"\";
+                    ConfigStorage.Write();
+                }
+
                 return ConfigStorage.SEDataPath;                
             }
             set
@@ -148,316 +165,335 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public static ArchType Arch
+        {
+            get
+            {
+                switch(ConfigStorage.Arch)
+                {
+                    case "x86":
+                        return ArchType.x86;
+                    case "x64":
+                        return ArchType.x64;
+                }
+                throw new SystemException("ArchError");
+            }
+            set
+            {
+                switch(value)
+                {
+                    case ArchType.x86:
+                        ConfigStorage.Arch = "x86";
+                        break;
+                    case ArchType.x64:
+                        ConfigStorage.Arch = "x64";
+                        break;
+                }
+            }
+        }
+
+        public static bool PerfMonitorEnabled
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.PerfMonitorEnabled;
+            }
+            set
+            {
+                ConfigStorage.PerfMonitorEnabled = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        // Running Vars
+
         public static bool Lockdown
         {
             get
             {
-                ConfigStorage.Read();
-                return ConfigStorage.Lockdown;
+                RunningVars.Read();
+                return RunningVars.Lockdown;
             }
             set
             {
-                ConfigStorage.Lockdown = value;
+                RunningVars.Lockdown = value;
+                RunningVars.Write();
+            }
+        }
+
+        public static bool SEUpdating
+        {
+            get
+            {
+                RunningVars.Read();
+                return RunningVars.SEUpdating;
+            }
+            set
+            {
+                RunningVars.SEUpdating = value;
+                RunningVars.Write();
+            }
+        }
+
+        public static bool SESEUpdating
+        {
+            get
+            {
+                RunningVars.Read();
+                return RunningVars.SESEUpdating;
+            }
+            set
+            {
+                RunningVars.SESEUpdating = value;
+                RunningVars.Write();
+            }
+        }
+
+        // Auto-Update Settings
+
+        public static bool AutoUpdateEnabled
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.AutoUpdateEnabled;
+            }
+            set
+            {
+                ConfigStorage.AutoUpdateEnabled = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static bool Diagnosis
+        public static string AutoUpdateCron
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.Diagnosis;
+                return ConfigStorage.AutoUpdateCron;
             }
             set
             {
-                ConfigStorage.Diagnosis = value;
+                ConfigStorage.AutoUpdateCron = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static bool StatusAutoRefresh
+        public static string AutoUpdateBetaPassword
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.StatusAutoRefresh;
+                return ConfigStorage.AutoUpdateBetaPassword;
             }
             set
             {
-                ConfigStorage.StatusAutoRefresh = value;
+                ConfigStorage.AutoUpdateBetaPassword = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static bool PerfMonitor
+        // SESE Auto-Update Settings
+
+        public static string SESEUpdateURL
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.PerfMonitor;
+                return ConfigStorage.SESEUpdateURL;
             }
             set
             {
-                ConfigStorage.PerfMonitor = value;
+                ConfigStorage.SESEUpdateURL = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static bool AutoUpdate
+        public static bool SESEAutoUpdateEnabled
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.AutoUpdate;
+                return ConfigStorage.SESEAutoUpdateEnabled;
             }
             set
             {
-                ConfigStorage.AutoUpdate = value;
-                ConfigStorage.Write();        
-            }
-        }
-
-        public static string AUUsername
-        {
-            get
-            {
-                ConfigStorage.Read();
-                return ConfigStorage.AUUsername;                
-            }
-            set
-            {
-                ConfigStorage.AUUsername = value;
-                ConfigStorage.Write();        
-            }
-        }
-
-        public static string AUPassword
-        {
-            get
-            {
-                ConfigStorage.Read();
-                string value = ConfigStorage.AUPassword;
-                return Encoding.UTF8.GetString(MachineKey.Unprotect(Convert.FromBase64String(value), "SteamPassword"));                
-            }
-            set
-            {
-                string val = Convert.ToBase64String(MachineKey.Protect(Encoding.UTF8.GetBytes(value), "SteamPassword"));
-                ConfigStorage.AUPassword = val;
-                ConfigStorage.Write();            
-            }
-        }
-
-        public static string AUInterval
-        {
-            get
-            {
-                ConfigStorage.Read();
-                return ConfigStorage.AUInterval;
-            }
-            set
-            {
-                ConfigStorage.AUInterval = value;
+                ConfigStorage.SESEAutoUpdateEnabled = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static string AUBetaName
+        public static bool SESEAutoUpdateUseDev
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.AUBetaName;
+                return ConfigStorage.SESEAutoUpdateUseDev;
             }
             set
             {
-                ConfigStorage.AUBetaName = value;
+                ConfigStorage.SESEAutoUpdateUseDev = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static string AUBetaPassword
+        public static string SESEAutoUpdateCron
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.AUBetaPassword;
+                return ConfigStorage.SESEAutoUpdateCron;
             }
             set
             {
-                ConfigStorage.AUBetaPassword = value;
+                ConfigStorage.SESEAutoUpdateCron = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static int SESEDelay
+        // Backups Settings
+        public static bool AutoBackupLvl1Enabled
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.SESEDelay;
+                return ConfigStorage.AutoBackupLvl1Enabled;
             }
             set
             {
-                ConfigStorage.SESEDelay = value;
+                ConfigStorage.AutoBackupLvl1Enabled = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static bool UseSESE
+        public static string AutoBackupLvl1Cron
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.UseSESE;
+                return ConfigStorage.AutoBackupLvl1Cron;
             }
             set
             {
-                ConfigStorage.UseSESE = value;
+                ConfigStorage.AutoBackupLvl1Cron = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static bool SESEDev
+        public static int AutoBackupLvl1NbToKeep
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.SESEDev;
+                return ConfigStorage.AutoBackupLvl1NbToKeep;
             }
             set
             {
-                ConfigStorage.SESEDev = value;
+                ConfigStorage.AutoBackupLvl1NbToKeep = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static bool AutoBackupLvl1
+        public static bool AutoBackupLvl2Enabled
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.AutoBackupLvl1;
+                return ConfigStorage.AutoBackupLvl2Enabled;
             }
             set
             {
-                ConfigStorage.AutoBackupLvl1 = value;
+                ConfigStorage.AutoBackupLvl2Enabled = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static string ABIntervalLvl1
+        public static string AutoBackupLvl2Cron
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.ABIntervalLvl1;
+                return ConfigStorage.AutoBackupLvl2Cron;
             }
             set
             {
-                ConfigStorage.ABIntervalLvl1 = value;
+                ConfigStorage.AutoBackupLvl2Cron = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static int ABNbToKeepLvl1
+        public static int AutoBackupLvl2NbToKeep
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.ABNbToKeepLvl1;
+                return ConfigStorage.AutoBackupLvl2NbToKeep;
             }
             set
             {
-                ConfigStorage.ABNbToKeepLvl1 = value;
+                ConfigStorage.AutoBackupLvl2NbToKeep = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static bool AutoBackupLvl2
+        public static bool AutoBackupLvl3Enabled
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.AutoBackupLvl2;
+                return ConfigStorage.AutoBackupLvl3Enabled;
             }
             set
             {
-                ConfigStorage.AutoBackupLvl2 = value;
+                ConfigStorage.AutoBackupLvl3Enabled = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static string ABIntervalLvl2
+        public static string AutoBackupLvl3Cron
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.ABIntervalLvl2;
+                return ConfigStorage.AutoBackupLvl3Cron;
             }
             set
             {
-                ConfigStorage.ABIntervalLvl2 = value;
+                ConfigStorage.AutoBackupLvl3Cron = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static int ABNbToKeepLvl2
+        public static int AutoBackupLvl3NbToKeep
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.ABNbToKeepLvl2;
+                return ConfigStorage.AutoBackupLvl3NbToKeep;
             }
             set
             {
-                ConfigStorage.ABNbToKeepLvl2 = value;
+                ConfigStorage.AutoBackupLvl3NbToKeep = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static bool AutoBackupLvl3
+        // Misc
+
+        public static bool DiagnosisEnabled
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.AutoBackupLvl3;
+                return ConfigStorage.DiagnosisEnabled;
             }
             set
             {
-                ConfigStorage.AutoBackupLvl3 = value;
+                ConfigStorage.DiagnosisEnabled = value;
                 ConfigStorage.Write();
             }
         }
-
-        public static string ABIntervalLvl3
-        {
-            get
-            {
-                ConfigStorage.Read();
-                return ConfigStorage.ABIntervalLvl3;
-            }
-            set
-            {
-                ConfigStorage.ABIntervalLvl3 = value;
-                ConfigStorage.Write();
-            }
-        }
-
-        public static int ABNbToKeepLvl3
-        {
-            get
-            {
-                ConfigStorage.Read();
-                return ConfigStorage.ABNbToKeepLvl3;
-            }
-            set
-            {
-                ConfigStorage.ABNbToKeepLvl3 = value;
-                ConfigStorage.Write();
-            }
-        }
-
 
         public static bool BlockDll
         {
@@ -485,49 +521,6 @@ namespace SESM.Tools.Helpers
                 ConfigStorage.LowPriorityStart = value;
                 ConfigStorage.Write();
             }
-        }
-
-        public static string SESEUpdateURL
-        {
-            get
-            {
-                ConfigStorage.Read();
-                return ConfigStorage.SESEUpdateURL;
-            }
-            set
-            {
-                ConfigStorage.SESEUpdateURL = value;
-                ConfigStorage.Write();
-            }
-        }
-
-        public static ArchType Arch
-        {
-            get
-            {
-                switch (ConfigStorage.Arch)
-                {
-                    case "x86":
-                        return ArchType.x86;
-                        break;
-                    case "x64":
-                        return ArchType.x64;
-                        break;
-                }
-                throw new SystemException("ArchError");                
-            }
-            set
-            {
-                switch (value)
-                {
-                    case ArchType.x86:
-                        ConfigStorage.Arch = "x86";
-                        break;
-                    case ArchType.x64:
-                        ConfigStorage.Arch = "x64";
-                        break;
-                }   
-            }
-        }
+        }        
     }
 }
