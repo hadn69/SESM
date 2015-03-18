@@ -3407,6 +3407,7 @@
     <Content Include="Content\logo.png" />
     <Content Include="Content\sesmLogo.png" />
     <Content Include="Content\site.css" />
+    <Content Include="MITLicense.txt" />
     <Content Include="Scripts\amcharts\amcharts.js" />
     <Content Include="Scripts\amcharts\exporting\amexport.js" />
     <Content Include="Scripts\amcharts\exporting\canvg.js" />
