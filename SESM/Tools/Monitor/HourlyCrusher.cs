@@ -28,8 +28,6 @@ namespace SESM.Tools.Monitor
                     _logger.Info("Getting perf entries of " + item.Name);
 
                     _logger.Info(item.PerfEntries.Count + " total perf entries");
-                    if(item.PerfEntries.Count == 0)
-                        continue;
 
                     List<EntityPerfEntry> perfEntries =
                         item.PerfEntries.Where(x => x.Timestamp <= timestamp && x.CPUUsagePeak == null)
@@ -37,6 +35,11 @@ namespace SESM.Tools.Monitor
                             .ToList();
 
                     _logger.Info(perfEntries.Count + " to process");
+                    if (perfEntries.Count == 0)
+                    {
+                        _logger.Info("No entry to process, skipping to next server");
+                        continue;
+                    }
 
                     _logger.Debug("Summary Results : ");
                     EntityPerfEntry perfEntry = new EntityPerfEntry();
@@ -48,32 +51,32 @@ namespace SESM.Tools.Monitor
                     perfEntry.CPUUsage = (int)Math.Round(perfEntries.Average(x => x.CPUUsage));
                     perfEntry.CPUUsagePeak = perfEntries.Max(x => x.CPUUsage);
                     perfEntry.CPUUsageTrough = perfEntries.Min(x => x.CPUUsage);
-                    _logger.Debug("CPUUsage : " + perfEntry.CPUUsage);
-                    _logger.Debug("CPUUsagePeak" + perfEntry.CPUUsagePeak);
-                    _logger.Debug("CPUUsageTrough" + perfEntry.CPUUsageTrough);
+                    _logger.Debug("  CPUUsage : " + perfEntry.CPUUsage);
+                    _logger.Debug("  CPUUsagePeak : " + perfEntry.CPUUsagePeak);
+                    _logger.Debug("  CPUUsageTrough : " + perfEntry.CPUUsageTrough);
 
                     perfEntries = perfEntries.OrderBy(x => x.CPUUsage).ToList();
 
                     perfEntry.CPUUsageQ1 = perfEntries[(int)Math.Ceiling(perfEntries.Count / 4.0)].CPUUsage;
                     perfEntry.CPUUsageQ3 = perfEntries[(int)Math.Ceiling(perfEntries.Count / 4.0 * 3)].CPUUsage;
-                    _logger.Debug("CPUUsageQ1" + perfEntry.CPUUsageQ1);
-                    _logger.Debug("CPUUsageQ3" + perfEntry.CPUUsageQ3);
+                    _logger.Debug("  CPUUsageQ1 : " + perfEntry.CPUUsageQ1);
+                    _logger.Debug("  CPUUsageQ3 : " + perfEntry.CPUUsageQ3);
 
                     // RAM
                     _logger.Debug("==RAM==");
                     perfEntry.RamUsage = (int)Math.Round(perfEntries.Average(x => x.RamUsage));
                     perfEntry.RamUsagePeak = perfEntries.Max(x => x.RamUsage);
                     perfEntry.RamUsageTrough = perfEntries.Min(x => x.RamUsage);
-                    _logger.Debug("RamUsage : " + perfEntry.RamUsage);
-                    _logger.Debug("RamUsagePeak" + perfEntry.RamUsagePeak);
-                    _logger.Debug("RamUsageTrough" + perfEntry.RamUsageTrough);
+                    _logger.Debug("  RamUsage : " + perfEntry.RamUsage);
+                    _logger.Debug("  RamUsagePeak : " + perfEntry.RamUsagePeak);
+                    _logger.Debug("  RamUsageTrough : " + perfEntry.RamUsageTrough);
 
                     perfEntries = perfEntries.OrderBy(x => x.RamUsage).ToList();
 
                     perfEntry.RamUsageQ1 = perfEntries[(int)Math.Ceiling(perfEntries.Count / 4.0)].RamUsage;
                     perfEntry.RamUsageQ3 = perfEntries[(int)Math.Ceiling(perfEntries.Count / 4.0 * 3)].RamUsage;
-                    _logger.Debug("RamUsageQ1" + perfEntry.RamUsageQ1);
-                    _logger.Debug("RamUsageQ3" + perfEntry.RamUsageQ3);
+                    _logger.Debug("  RamUsageQ1 : " + perfEntry.RamUsageQ1);
+                    _logger.Debug("  RamUsageQ3 : " + perfEntry.RamUsageQ3);
 
                     _logger.Info("Deleting the perf entries");
                     prfPrv.RemoveEntries(perfEntries);
