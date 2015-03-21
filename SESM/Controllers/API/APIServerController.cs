@@ -1111,7 +1111,7 @@ namespace SESM.Controllers.API
             // ==== GameMode ====
             if (string.IsNullOrWhiteSpace(Request.Form["GameMode"]))
                 return Content(XMLMessage.Error("SRV-SC-MISGM", "The GameMode field must be provided").ToString());
-            if (!Enum.TryParse(Request.Form["RefinerySpeedMultiplier"], out serverConfig.GameMode))
+            if (!Enum.TryParse(Request.Form["GameMode"], out serverConfig.GameMode))
                 return Content(XMLMessage.Error("SRV-SC-BADGM", "The GameMode field is invalid").ToString());
 
             // ==== EnableCopyPaste ====
@@ -1175,7 +1175,7 @@ namespace SESM.Controllers.API
             // ==== ClientCanSave ====
             if (string.IsNullOrWhiteSpace(Request.Form["ClientCanSave"]))
                 return Content(XMLMessage.Error("SRV-SC-MISCCS", "The ClientCanSave field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["ClientCanSave"], out serverConfig.CargoShipsEnabled))
+            if (!bool.TryParse(Request.Form["ClientCanSave"], out serverConfig.ClientCanSave))
                 return Content(XMLMessage.Error("SRV-SC-BADCCS", "The ClientCanSave field is invalid").ToString());
 
             // ==== Mods ====

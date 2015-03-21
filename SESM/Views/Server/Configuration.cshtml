@@ -518,9 +518,9 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Gamemode</label>
+                                            <label class="control-label col-md-6">GameMode</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpGamemode" class="make-switch" data-off-text="&nbsp;Survival&nbsp;" data-on-text="&nbsp;Creative&nbsp;">
+                                                <input type="checkbox" id="inpGameMode" class="make-switch" data-off-text="&nbsp;Survival&nbsp;" data-on-text="&nbsp;Creative&nbsp;">
                                             </div>
                                         </div>
                                     </div>
@@ -945,7 +945,7 @@
                 $('#inpRefinerySpeedMultiplier').prop("readonly", content.children("RefinerySpeedMultiplier").text() != "true");
 
                 // Construction
-                $("#inpGamemode").bootstrapSwitch("readonly", content.children("Gamemode").text() != "true");
+                $("#inpGameMode").bootstrapSwitch("readonly", content.children("GameMode").text() != "true");
                 $('#inpWelderSpeedMultiplier').prop("readonly", content.children("WelderSpeedMultiplier").text() != "true");
                 $('#inpGrinderSpeedMultiplier').prop("readonly", content.children("GrinderSpeedMultiplier").text() != "true");
                 $('#inpHackSpeedMultiplier').prop("readonly", content.children("HackSpeedMultiplier").text() != "true");
@@ -1081,11 +1081,11 @@
                         config.RefinerySpeedMultiplier = $('#inpRefinerySpeedMultiplier').val();
 
                     // Construction
-                    if (maskData.children("Gamemode").text() == "true") {
-                        if ($('#inpGamemode').is(":checked"))
-                            config.Gamemode = "Creative";
+                    if (maskData.children("GameMode").text() == "true") {
+                        if ($('#inpGameMode').is(":checked"))
+                            config.GameMode = "Creative";
                         else
-                            config.Gamemode = "Survival";
+                            config.GameMode = "Survival";
                     }
                     if (maskData.children("WelderSpeedMultiplier").text() == "true")
                         config.WelderSpeedMultiplier = $('#inpWelderSpeedMultiplier').val();
