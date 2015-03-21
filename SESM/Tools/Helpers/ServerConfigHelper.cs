@@ -575,6 +575,8 @@ namespace SESM.Tools.Helpers
 
                 if (sessionSettings.Element("VoxelGeneratorVersion") != null)
                     int.TryParse(sessionSettings.Element("VoxelGeneratorVersion").Value, out VoxelGeneratorVersion);
+                else
+                    VoxelGeneratorVersion = 0;
                 if (sessionSettings.Element("EnableOxygen") != null)
                     bool.TryParse(sessionSettings.Element("EnableOxygen").Value, out EnableOxygen);
 

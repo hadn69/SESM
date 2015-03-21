@@ -311,6 +311,26 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
+                                            <label class="control-label col-md-6">Ice Generation</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpVoxelGeneratorVersion">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Oxygen</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpEnableOxygen">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
                                             <label class="control-label col-md-6">Enable Tool Shake</label>
                                             <div class="col-md-6">
                                                 <input type="checkbox" id="inpEnableToolShake">
@@ -795,6 +815,12 @@
                 $('#inpEnvironmentHostility').val(content.children("EnvironmentHostility").text());
                 $('#inpCargoShipsEnabled').bootstrapSwitch('state', content.children("CargoShipsEnabled").text() == "true");
                 $('#inpEnableToolShake').bootstrapSwitch('state', content.children("EnableToolShake").text() == "true");
+                if (content.children("VoxelGeneratorVersion").text() == "0") {
+                    $("#inpVoxelGeneratorVersion").bootstrapSwitch('state', false);
+                } else if (content.children("VoxelGeneratorVersion").text() == "1") {
+                    $("#inpVoxelGeneratorVersion").bootstrapSwitch('state', true);
+                }
+                $('#inpEnableOxygen').bootstrapSwitch('state', content.children("EnableOxygen").text() == "true");
 
                 // Players
                 $('#inpAutoHealing').bootstrapSwitch('state', content.children("AutoHealing").text() == "true");
@@ -894,6 +920,8 @@
                 $('#inpEnvironmentHostility').prop("disabled", content.children("EnvironmentHostility").text() != "true");
                 $('#inpCargoShipsEnabled').bootstrapSwitch("readonly", content.children("CargoShipsEnabled").text() != "true");
                 $('#inpEnableToolShake').bootstrapSwitch("readonly", content.children("EnableToolShake").text() != "true");
+                $('#inpVoxelGeneratorVersion').bootstrapSwitch("readonly", content.children("VoxelGeneratorVersion").text() != "true");
+                $('#inpEnableOxygen').bootstrapSwitch("readonly", content.children("EnableOxygen").text() != "true");
 
                 // Players
                 $('#inpAutoHealing').bootstrapSwitch("readonly", content.children("AutoHealing").text() != "true");
@@ -991,6 +1019,14 @@
                         config.CargoShipsEnabled = $('#inpCargoShipsEnabled').is(":checked");
                     if (maskData.children("EnableToolShake").text() == "true")
                         config.EnableToolShake = $('#inpEnableToolShake').is(":checked");
+                    if (maskData.children("VoxelGeneratorVersion").text() == "true") {
+                        if ($('#inpVoxelGeneratorVersion').is(":checked"))
+                            config.VoxelGeneratorVersion = "1";
+                        else
+                            config.VoxelGeneratorVersion = "0";
+                    }
+                    if (maskData.children("EnableOxygen").text() == "true")
+                        config.EnableOxygen = $('#inpEnableOxygen').is(":checked");
 
                     // Players
                     if (maskData.children("AutoHealing").text() == "true")
