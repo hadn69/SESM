@@ -30,7 +30,7 @@ namespace SESM.DAL
         {
             try
             {
-                EntityServer testServ = _context.Servers.First(serv => server.Port == port || server.ServerExtenderPort == port);
+                EntityServer testServ = _context.Servers.First(serv => serv.Port == port || serv.ServerExtenderPort == port);
                 if (testServ == null)
                     return true;
 
