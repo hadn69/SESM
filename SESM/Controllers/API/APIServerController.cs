@@ -889,6 +889,8 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("RespawnShipDelete", serverConfig.RespawnShipDelete));
             response.AddToContent(new XElement("EnableToolShake", serverConfig.EnableToolShake));
             response.AddToContent(new XElement("EnableIngameScripts", serverConfig.EnableIngameScripts));
+            response.AddToContent(new XElement("VoxelGeneratorVersion", serverConfig.VoxelGeneratorVersion));
+            response.AddToContent(new XElement("EnableOxygen", serverConfig.EnableOxygen));
 
             return Content(response.ToString());
         }
@@ -967,6 +969,8 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("RespawnShipDelete", true));
             response.AddToContent(new XElement("EnableToolShake", true));
             response.AddToContent(new XElement("EnableIngameScripts", true));
+            response.AddToContent(new XElement("VoxelGeneratorVersion", true));
+            response.AddToContent(new XElement("EnableOxygen", true));
 
             return Content(response.ToString());
         }
@@ -1083,25 +1087,25 @@ namespace SESM.Controllers.API
             // ==== InventorySizeMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["InventorySizeMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISISM", "The InventorySizeMultiplier field must be provided").ToString());
-            if (!int.TryParse(Request.Form["InventorySizeMultiplier"], out serverConfig.InventorySizeMultiplier) || serverConfig.InventorySizeMultiplier < 1)
+            if (!double.TryParse(Request.Form["InventorySizeMultiplier"], out serverConfig.InventorySizeMultiplier) || serverConfig.InventorySizeMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADISM", "The InventorySizeMultiplier field is invalid").ToString());
 
             // ==== AssemblerSpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["AssemblerSpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISASM", "The AssemblerSpeedMultiplier field must be provided").ToString());
-            if (!int.TryParse(Request.Form["AssemblerSpeedMultiplier"], out serverConfig.AssemblerSpeedMultiplier) || serverConfig.AssemblerSpeedMultiplier < 1)
+            if (!double.TryParse(Request.Form["AssemblerSpeedMultiplier"], out serverConfig.AssemblerSpeedMultiplier) || serverConfig.AssemblerSpeedMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADASM", "The AssemblerSpeedMultiplier field is invalid").ToString());
 
             // ==== AssemblerEfficiencyMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["AssemblerEfficiencyMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISAEM", "The AssemblerEfficiencyMultiplier field must be provided").ToString());
-            if (!int.TryParse(Request.Form["AssemblerEfficiencyMultiplier"], out serverConfig.AssemblerEfficiencyMultiplier) || serverConfig.AssemblerEfficiencyMultiplier < 1)
+            if (!double.TryParse(Request.Form["AssemblerEfficiencyMultiplier"], out serverConfig.AssemblerEfficiencyMultiplier) || serverConfig.AssemblerEfficiencyMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADAEM", "The AssemblerEfficiencyMultiplier field is invalid").ToString());
 
             // ==== RefinerySpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["RefinerySpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISRSM", "The RefinerySpeedMultiplier field must be provided").ToString());
-            if (!int.TryParse(Request.Form["RefinerySpeedMultiplier"], out serverConfig.RefinerySpeedMultiplier) || serverConfig.RefinerySpeedMultiplier < 1)
+            if (!double.TryParse(Request.Form["RefinerySpeedMultiplier"], out serverConfig.RefinerySpeedMultiplier) || serverConfig.RefinerySpeedMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADRSM", "The RefinerySpeedMultiplier field is invalid").ToString());
 
             // ==== GameMode ====
@@ -1259,7 +1263,7 @@ namespace SESM.Controllers.API
             // ==== SpawnShipTimeMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["SpawnShipTimeMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISSSTM", "The SpawnShipTimeMultiplier field must be provided").ToString());
-            if (!int.TryParse(Request.Form["SpawnShipTimeMultiplier"], out serverConfig.SpawnShipTimeMultiplier) || serverConfig.SpawnShipTimeMultiplier < 0)
+            if (!double.TryParse(Request.Form["SpawnShipTimeMultiplier"], out serverConfig.SpawnShipTimeMultiplier) || serverConfig.SpawnShipTimeMultiplier < 0)
                 return Content(XMLMessage.Error("SRV-SC-BADSSTM", "The SpawnShipTimeMultiplier field is invalid").ToString());
 
             // ==== RespawnShipDelete ====
@@ -1279,6 +1283,18 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SC-MISETS", "The EnableIngameScripts field must be provided").ToString());
             if (!bool.TryParse(Request.Form["EnableIngameScripts"], out serverConfig.EnableIngameScripts))
                 return Content(XMLMessage.Error("SRV-SC-BADETS", "The EnableIngameScripts field is invalid").ToString());
+
+            // ==== VoxelGeneratorVersion ====
+            if (string.IsNullOrWhiteSpace(Request.Form["VoxelGeneratorVersion"]))
+                return Content(XMLMessage.Error("SRV-SC-MISVGV", "The VoxelGeneratorVersion field must be provided").ToString());
+            if (!int.TryParse(Request.Form["VoxelGeneratorVersion"], out serverConfig.VoxelGeneratorVersion) || serverConfig.VoxelGeneratorVersion < 0 || serverConfig.VoxelGeneratorVersion > 1)
+                return Content(XMLMessage.Error("SRV-SC-BADVGV", "The VoxelGeneratorVersion field is invalid").ToString());
+
+            // ==== EnableOxygen ====
+            if (string.IsNullOrWhiteSpace(Request.Form["EnableOxygen"]))
+                return Content(XMLMessage.Error("SRV-SC-MISEO", "The EnableOxygen field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["EnableOxygen"], out serverConfig.EnableOxygen))
+                return Content(XMLMessage.Error("SRV-SC-BADEO", "The EnableOxygen field is invalid").ToString());
 
             // ** PROCESS **
             server.Ip = serverConfig.IP;

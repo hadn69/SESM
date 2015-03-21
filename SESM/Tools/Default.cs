@@ -32,16 +32,16 @@ namespace SESM.Tools
         public static readonly int AutoSaveInMinutes = 5;
 
         // -- Production
-        public static readonly int InventorySizeMultiplier = 1;
-        public static readonly int AssemblerSpeedMultiplier = 1;
-        public static readonly int AssemblerEfficiencyMultiplier = 1;
-        public static readonly int RefinerySpeedMultiplier = 1;
+        public static readonly double InventorySizeMultiplier = 1;
+        public static readonly double AssemblerSpeedMultiplier = 1;
+        public static readonly double AssemblerEfficiencyMultiplier = 1;
+        public static readonly double RefinerySpeedMultiplier = 1;
 
         // -- Building
         public static readonly GameMode GameMode = GameMode.Survival;
         public static readonly bool EnableCopyPaste = true;
-        public static readonly int WelderSpeedMultiplier = 1;
-        public static readonly int GrinderSpeedMultiplier = 1;
+        public static readonly double WelderSpeedMultiplier = 1;
+        public static readonly double GrinderSpeedMultiplier = 1;
         public static readonly double HackSpeedMultiplier = 0.33;
         public static readonly bool DestructibleBlocks = true;
 
@@ -73,9 +73,11 @@ namespace SESM.Tools
         public static readonly bool ShowPlayerNamesOnHud = true;
         public static readonly bool ThrusterDamage = true;
 
-        public static readonly int SpawnShipTimeMultiplier = 1;
+        public static readonly double SpawnShipTimeMultiplier = 1;
         public static readonly bool RespawnShipDelete = true;
         public static readonly bool EnableToolShake = false;
         public static readonly bool EnableIngameScripts = true;
+        public static readonly int VoxelGeneratorVersion = 1;
+        public static readonly bool EnableOxygen = true;
     }
 }
