@@ -388,9 +388,9 @@
                         return;
                     }
 
-                    $("#inpAutoUpdateEnabled").bootstrapSwitch('state', root.children("Content").children("AutoUpdateEnabled").text() == "True");
+                    $("#inpAutoUpdateEnabled").bootstrapSwitch('state', root.children("Content").children("AutoUpdateEnabled").text() == "true");
                     $("#inpAutoUpdateCron").val(root.children("Content").children("AutoUpdateCron").text());
-                    $("#AutoUpdateBetaPassword").val(root.children("Content").children("AutoUpdateBetaPassword").text());
+                    $("#inpAutoUpdateBetaPassword").val(root.children("Content").children("AutoUpdateBetaPassword").text());
                     showView();
                     TestCron();
                     return;
