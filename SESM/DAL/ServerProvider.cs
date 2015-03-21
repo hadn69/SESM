@@ -30,7 +30,7 @@ namespace SESM.DAL
         {
             try
             {
-                EntityServer testServ = _context.Servers.First(serv => server.Port == port || server.ServerExtenderPort == port);
+                EntityServer testServ = _context.Servers.First(serv => serv.Port == port || serv.ServerExtenderPort == port);
                 if (testServ == null)
                     return true;
 
@@ -68,12 +68,13 @@ namespace SESM.DAL
 
         public void AddAdministrator(string[] listUsers, EntityServer server)
         {
+            UserProvider usrPrv = new UserProvider(_context);
+            server.Administrators.Clear();
+
             if (listUsers == null || listUsers.Length == 0)
                 return;
-            UserProvider usrPrv = new UserProvider(_context);
-            server.Administrators = null;
 
-            foreach(string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Administrators.Contains(usrPrv.GetUser(item))))
+            foreach (string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Administrators.Contains(usrPrv.GetUser(item))))
             {
                 server.Administrators.Add(usrPrv.GetUser(item));
             }
@@ -81,12 +82,13 @@ namespace SESM.DAL
 
         public void AddManagers(string[] listUsers, EntityServer server)
         {
-            if(listUsers == null || listUsers.Length == 0)
-                return;
             UserProvider usrPrv = new UserProvider(_context);
-            server.Managers = null;
+            server.Managers.Clear();
 
-            foreach(string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Managers.Contains(usrPrv.GetUser(item))))
+            if (listUsers == null || listUsers.Length == 0)
+                return;
+
+            foreach (string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Managers.Contains(usrPrv.GetUser(item))))
             {
                 server.Managers.Add(usrPrv.GetUser(item));
             }
@@ -94,12 +96,13 @@ namespace SESM.DAL
 
         public void AddUsers(string[] listUsers, EntityServer server)
         {
+            UserProvider usrPrv = new UserProvider(_context);
+            server.Users.Clear();
+
             if (listUsers == null || listUsers.Length == 0)
                 return;
-            UserProvider usrPrv = new UserProvider(_context);
-            server.Users = null;
 
-            foreach(string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Users.Contains(usrPrv.GetUser(item))))
+            foreach (string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Users.Contains(usrPrv.GetUser(item))))
             {
                 server.Users.Add(usrPrv.GetUser(item));
             }

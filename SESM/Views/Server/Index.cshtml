@@ -140,12 +140,12 @@
             if ($('tbody tr input:checkbox:checked').length == 0) {
                 $("#actionBtn").hide();
                 if (isSuperAdmin) {
-                    $("#btnDeleteServer").hide();
+                    $("#btnDeleteServers").hide();
                 }
             } else {
                 $("#actionBtn").show();
                 if (isSuperAdmin) {
-                    $("#btnDeleteServer").show();
+                    $("#btnDeleteServers").show();
                 }
             }
         });
@@ -162,13 +162,13 @@
                 table.find('.group-checkable').attr("checked", false);
                 $("#actionBtn").hide();
                 if (isSuperAdmin) {
-                    $("#btnDeleteServer").hide();
+                    $("#btnDeleteServers").hide();
                 }
             } else {
                 table.find('.group-checkable').attr("checked", true);
                 $("#actionBtn").show();
                 if (isSuperAdmin) {
-                    $("#btnDeleteServer").show();
+                    $("#btnDeleteServers").show();
                 }
             }
             $.uniform.update($('.group-checkable'));
@@ -259,6 +259,7 @@
 
                     if (root.children("Content").children("IsSuperAdmin").text() == "True") {
                         $("#btnCreateServer").show();
+
                         isSuperAdmin = true;
                     }
                 });
@@ -343,7 +344,7 @@
                             "</div>",
                             function (result) {
                                 if (result) {
-                                    $.post("/API/Server/StartServers",
+                                    $.post("/API/Server/DeleteServers",
                                     {
                                         ServerIDs: ids.join(";")
                                     },

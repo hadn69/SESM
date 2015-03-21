@@ -33,10 +33,10 @@ namespace SESM.Tools.Helpers
         public int AutoSaveInMinutes = Default.AutoSaveInMinutes;
 
         // -- Production
-        public int InventorySizeMultiplier = Default.InventorySizeMultiplier;
-        public int AssemblerSpeedMultiplier = Default.AssemblerSpeedMultiplier;
-        public int AssemblerEfficiencyMultiplier = Default.AssemblerEfficiencyMultiplier;
-        public int RefinerySpeedMultiplier = Default.RefinerySpeedMultiplier;
+        public double InventorySizeMultiplier = Default.InventorySizeMultiplier;
+        public double AssemblerSpeedMultiplier = Default.AssemblerSpeedMultiplier;
+        public double AssemblerEfficiencyMultiplier = Default.AssemblerEfficiencyMultiplier;
+        public double RefinerySpeedMultiplier = Default.RefinerySpeedMultiplier;
 
         // -- Building
         public GameMode GameMode = Default.GameMode;
@@ -73,10 +73,12 @@ namespace SESM.Tools.Helpers
         public bool WeaponsEnabled = Default.WeaponsEnabled;
         public bool ShowPlayerNamesOnHud = Default.ShowPlayerNamesOnHud;
         public bool ThrusterDamage = Default.ThrusterDamage;
-        public int SpawnShipTimeMultiplier = Default.SpawnShipTimeMultiplier;
+        public double SpawnShipTimeMultiplier = Default.SpawnShipTimeMultiplier;
         public bool RespawnShipDelete = Default.RespawnShipDelete;
         public bool EnableToolShake = Default.EnableToolShake;
         public bool EnableIngameScripts = Default.EnableIngameScripts;
+        public int VoxelGeneratorVersion = Default.VoxelGeneratorVersion;
+        public bool EnableOxygen = Default.EnableOxygen;
 
         public void Save(EntityServer serv)
         {
@@ -112,15 +114,18 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <PermanentDeath>" + PermanentDeath.ToString().ToLower() + "</PermanentDeath>");
             sb.AppendLine("    <AutoSaveInMinutes>" + AutoSaveInMinutes + "</AutoSaveInMinutes>");
             sb.AppendLine("    <SpawnShipTimeMultiplier>" + SpawnShipTimeMultiplier + "</SpawnShipTimeMultiplier>");
-            sb.AppendLine("    <DestructibleBlocks>" + DestructibleBlocks.ToString().ToLower() + "</DestructibleBlocks>");
-            sb.AppendLine("    <EnableIngameScripts>" + EnableIngameScripts.ToString().ToLower() + "</EnableIngameScripts>");
-            sb.AppendLine("    <ViewDistance>" + ViewDistance + "</ViewDistance>");
-            sb.AppendLine("    <EnableToolShake>" + EnableToolShake.ToString().ToLower() + "</EnableToolShake>");
             if (ProceduralDensity != 0)
             {
                 sb.AppendLine("    <ProceduralDensity>" + ProceduralDensity + "</ProceduralDensity>");
                 sb.AppendLine("    <ProceduralSeed>" + ProceduralSeed + "</ProceduralSeed>");
             }
+            sb.AppendLine("    <DestructibleBlocks>" + DestructibleBlocks.ToString().ToLower() + "</DestructibleBlocks>");
+            sb.AppendLine("    <EnableIngameScripts>" + EnableIngameScripts.ToString().ToLower() + "</EnableIngameScripts>");
+            if (VoxelGeneratorVersion != 0)
+                sb.AppendLine("    <VoxelGeneratorVersion>" + VoxelGeneratorVersion + "</VoxelGeneratorVersion>");
+            sb.AppendLine("    <EnableOxygen>" + EnableOxygen.ToString().ToLower() + "</EnableOxygen>");
+            sb.AppendLine("    <ViewDistance>" + ViewDistance + "</ViewDistance>");
+            sb.AppendLine("    <EnableToolShake>" + EnableToolShake.ToString().ToLower() + "</EnableToolShake>");
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
             sb.AppendLine("    <TypeId>MyObjectBuilder_ScenarioDefinition</TypeId>");
@@ -410,6 +415,28 @@ namespace SESM.Tools.Helpers
                 settingsNode.SelectSingleNode("descendant::EnableToolShake").InnerText =
                     EnableToolShake.ToString().ToLower();
 
+                if (VoxelGeneratorVersion != 0)
+                {
+                    valueNode = settingsNode.SelectSingleNode("descendant::VoxelGeneratorVersion");
+                    if (valueNode == null)
+                        settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "VoxelGeneratorVersion", null));
+                    settingsNode.SelectSingleNode("descendant::VoxelGeneratorVersion").InnerText =
+                        VoxelGeneratorVersion.ToString();
+                }
+                else
+                {
+                    valueNode = settingsNode.SelectSingleNode("descendant::VoxelGeneratorVersion");
+                    if (valueNode != null)
+                        settingsNode.RemoveChild(valueNode);
+                }
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableOxygen");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableOxygen", null));
+                settingsNode.SelectSingleNode("descendant::EnableOxygen").InnerText =
+                    EnableOxygen.ToString().ToLower();
+
 
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if (valueNode == null)
@@ -473,13 +500,13 @@ namespace SESM.Tools.Helpers
                 if (sessionSettings.Element("GameMode") != null)
                     Enum.TryParse(sessionSettings.Element("GameMode").Value, out GameMode);
                 if (sessionSettings.Element("InventorySizeMultiplier") != null)
-                    int.TryParse(sessionSettings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
+                    double.TryParse(sessionSettings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
                 if (sessionSettings.Element("AssemblerSpeedMultiplier") != null)
-                    int.TryParse(sessionSettings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
+                    double.TryParse(sessionSettings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
                 if (sessionSettings.Element("AssemblerEfficiencyMultiplier") != null)
-                    int.TryParse(sessionSettings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
+                    double.TryParse(sessionSettings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
                 if (sessionSettings.Element("RefinerySpeedMultiplier") != null)
-                    int.TryParse(sessionSettings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
+                    double.TryParse(sessionSettings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
                 if (sessionSettings.Element("OnlineMode") != null)
                     Enum.TryParse(sessionSettings.Element("OnlineMode").Value, out OnlineMode);
                 if (sessionSettings.Element("MaxPlayers") != null)
@@ -525,7 +552,7 @@ namespace SESM.Tools.Helpers
                 if (sessionSettings.Element("AutoSaveInMinutes") != null)
                     int.TryParse(sessionSettings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
                 if (sessionSettings.Element("SpawnShipTimeMultiplier") != null)
-                    int.TryParse(sessionSettings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
+                    double.TryParse(sessionSettings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
                 if (sessionSettings.Element("DestructibleBlocks") != null)
                     bool.TryParse(sessionSettings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
                 if (sessionSettings.Element("EnableIngameScripts") != null)
@@ -545,6 +572,14 @@ namespace SESM.Tools.Helpers
                         int.TryParse(sessionSettings.Element("ProceduralSeed").Value, out ProceduralSeed);
 
                 }
+
+                if (sessionSettings.Element("VoxelGeneratorVersion") != null)
+                    int.TryParse(sessionSettings.Element("VoxelGeneratorVersion").Value, out VoxelGeneratorVersion);
+                else
+                    VoxelGeneratorVersion = 0;
+                if (sessionSettings.Element("EnableOxygen") != null)
+                    bool.TryParse(sessionSettings.Element("EnableOxygen").Value, out EnableOxygen);
+
                 if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                     Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
                 if (root.Element("LoadWorld") != null)
@@ -615,13 +650,13 @@ namespace SESM.Tools.Helpers
             if (settings.Element("GameMode") != null)
                 Enum.TryParse(settings.Element("GameMode").Value, out GameMode);
             if (settings.Element("InventorySizeMultiplier") != null)
-                int.TryParse(settings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
+                double.TryParse(settings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
             if (settings.Element("AssemblerSpeedMultiplier") != null)
-                int.TryParse(settings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
+                double.TryParse(settings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
             if (settings.Element("AssemblerEfficiencyMultiplier") != null)
-                int.TryParse(settings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
+                double.TryParse(settings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
             if (settings.Element("RefinerySpeedMultiplier") != null)
-                int.TryParse(settings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
+                double.TryParse(settings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
             if (settings.Element("OnlineMode") != null)
                 Enum.TryParse(settings.Element("OnlineMode").Value, out OnlineMode);
             if (settings.Element("MaxPlayers") != null)
@@ -667,7 +702,7 @@ namespace SESM.Tools.Helpers
             if (settings.Element("AutoSaveInMinutes") != null)
                 int.TryParse(settings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
             if (settings.Element("SpawnShipTimeMultiplier") != null)
-                int.TryParse(settings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
+                double.TryParse(settings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
             if (settings.Element("DestructibleBlocks") != null)
                 bool.TryParse(settings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
             if (settings.Element("EnableIngameScripts") != null)
@@ -676,6 +711,10 @@ namespace SESM.Tools.Helpers
                 int.TryParse(settings.Element("ViewDistance").Value, out ViewDistance);
             if (settings.Element("EnableToolShake") != null)
                 bool.TryParse(settings.Element("EnableToolShake").Value, out EnableToolShake);
+            if (settings.Element("VoxelGeneratorVersion") != null)
+                int.TryParse(settings.Element("VoxelGeneratorVersion").Value, out VoxelGeneratorVersion);
+            if (settings.Element("EnableOxygen") != null)
+                bool.TryParse(settings.Element("EnableOxygen").Value, out EnableOxygen);
 
             Mods = new List<ulong>();
             if (root.Element("Mods") != null)

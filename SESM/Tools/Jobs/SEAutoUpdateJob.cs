@@ -22,7 +22,7 @@ namespace SESM.Tools.Jobs
 
         public static ReturnEnum Run(Logger logger, bool manualFire = true, bool useLocalZip = false, bool force = false)
         {
-            if (!SESMConfigHelper.AutoUpdateEnabled)
+            if (!manualFire && !SESMConfigHelper.AutoUpdateEnabled)
                 return ReturnEnum.AloneJob;
 
             if (SESMConfigHelper.SEUpdating)
@@ -124,7 +124,6 @@ namespace SESM.Tools.Jobs
                     Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
                 }
 
-                logger.Info("Updating SE Game Files ...");
                 if (useLocalZip)
                 {
                     logger.Info("Extracting SE Game Files ...");
@@ -135,6 +134,7 @@ namespace SESM.Tools.Jobs
                 }
                 else
                 {
+                    logger.Info("Updating SE Game Files ...");
                     SteamCMDHelper.Update(logger, !string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword));
 
                     logger.Info("Applying SE Game Files ...");
