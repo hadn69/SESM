@@ -25,6 +25,18 @@ namespace SESM
                 }
             );
 
+            // Misc API
+            routes.MapRoute(
+                name: "APIPerfMon",
+                url: "API/PerfMon/{action}",
+                defaults: new { controller = "APIPerfMon" },
+                constraints: new
+                {
+                    action = "GetPerfData|" +
+                             "CleanPerfData"
+                }
+            );
+
             // Settings API
             routes.MapRoute(
                 name: "APISettings",

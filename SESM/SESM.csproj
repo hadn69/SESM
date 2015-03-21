@@ -2685,6 +2685,7 @@
     <Compile Include="Controllers\API\APIAccountController.cs" />
     <Compile Include="Controllers\API\APIExplorerController.cs" />
     <Compile Include="Controllers\API\APIMapController.cs" />
+    <Compile Include="Controllers\API\APIPerfMonController.cs" />
     <Compile Include="Controllers\API\APIServerController.cs" />
     <Compile Include="Controllers\API\APISettingsController.cs" />
     <Compile Include="Controllers\API\APIMiscController.cs" />
