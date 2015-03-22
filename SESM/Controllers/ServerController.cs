@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
-using SESM.DTO;
 
 namespace SESM.Controllers
 {
@@ -23,6 +19,7 @@ namespace SESM.Controllers
         // GET: 1/Dashboard
         [HttpGet]
         [CheckAuth]
+        [ManagerAndAbove]
         public ActionResult Dashboard(int id)
         {
             return View();
@@ -31,6 +28,7 @@ namespace SESM.Controllers
         // GET: 1/Maps
         [HttpGet]
         [CheckAuth]
+        [ManagerAndAbove]
         public ActionResult Maps(int id)
         {
             return View();
@@ -39,30 +37,34 @@ namespace SESM.Controllers
         // GET: 1/Configuration
         [HttpGet]
         [CheckAuth]
+        [ManagerAndAbove]
         public ActionResult Configuration(int id)
         {
             return View();
         }
 
+        // GET: 1/Explorer
         [HttpGet]
         [CheckAuth]
-        // GET: 1/Explorer
+        [ManagerAndAbove]
         public ActionResult Explorer(int id)
         { 
             return View();
         }
 
+        // GET: 1/Settings
         [HttpGet]
         [CheckAuth]
-        // GET: 1/Settings
+        [ManagerAndAbove]
         public ActionResult Settings(int id)
         {
             return View();
         }
 
+        // GET: 1/Monitor
         [HttpGet]
         [CheckAuth]
-        // GET: 1/Monitor
+        [ManagerAndAbove]
         public ActionResult Monitor(int id)
         {
             return View();
