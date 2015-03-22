@@ -870,6 +870,7 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("ViewDistance", serverConfig.ViewDistance));
             response.AddToContent(new XElement("OnlineMode", serverConfig.OnlineMode));
             response.AddToContent(new XElement("ResetOwnership", serverConfig.ResetOwnership));
+            response.AddToContent(new XElement("GroupID", serverConfig.GroupID));
 
             XElement administrators = new XElement("Administrators");
             foreach (ulong adminitrator in serverConfig.Administrators)
@@ -959,6 +960,7 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("ViewDistance", true));
             response.AddToContent(new XElement("OnlineMode", true));
             response.AddToContent(new XElement("ResetOwnership", true));
+            response.AddToContent(new XElement("GroupID", true));
             response.AddToContent(new XElement("Administrators", true));
             response.AddToContent(new XElement("Banned", true));
             response.AddToContent(new XElement("AutoHealing", true));
@@ -1208,6 +1210,12 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SC-MISRO", "The ResetOwnership field must be provided").ToString());
             if (!bool.TryParse(Request.Form["ResetOwnership"], out serverConfig.ResetOwnership))
                 return Content(XMLMessage.Error("SRV-SC-BADRO", "The ResetOwnership field is invalid").ToString());
+
+            // ==== GroupID ====
+            if (string.IsNullOrWhiteSpace(Request.Form["GroupID"]))
+                return Content(XMLMessage.Error("SRV-SC-MISGRID", "The GroupID field must be provided").ToString());
+            if (!ulong.TryParse(Request.Form["GroupID"], out serverConfig.GroupID))
+                return Content(XMLMessage.Error("SRV-SC-BADGRID", "The GroupID field is invalid").ToString());
 
             // ==== Administrators ====
             serverConfig.Administrators.Clear();
