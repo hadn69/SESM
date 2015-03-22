@@ -173,8 +173,6 @@ namespace SESM
 
             // === GUI ===
 
-
-
             // Account
             routes.MapRoute(
                 name: "Account",
@@ -218,6 +216,7 @@ namespace SESM
                              "Configuration|" +
                              "Settings|" +
                              "Maps|" +
+                             "Monitor|" +
                              "Explorer",
                     id = @"\d+"
                 }

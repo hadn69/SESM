@@ -43,7 +43,7 @@ namespace SESM.Controllers.API
 
             foreach (EntityPerfEntry item in server.PerfEntries.Where(x => x.CPUUsagePeak == null))
             {
-                recent.Add(new XElement("PerfEntry", new XElement("Date", item.Timestamp.ToString()),
+                recent.Add(new XElement("PerfEntry", new XElement("Date", item.Timestamp.ToString("o")),
                                                      new XElement("CPU", item.CPUUsage),
                                                      new XElement("RAM", item.RamUsage)
                                                      ));
@@ -53,7 +53,7 @@ namespace SESM.Controllers.API
 
             foreach (EntityPerfEntry item in server.PerfEntries.Where(x => x.CPUUsagePeak != null))
             {
-                recent.Add(new XElement("PerfEntry", new XElement("Date", item.Timestamp.ToString()),
+                compiled.Add(new XElement("PerfEntry", new XElement("Date", item.Timestamp.ToString("o")),
                                                      new XElement("CPUAvg", item.CPUUsage),
                                                      new XElement("CPUPeak", item.CPUUsagePeak),
                                                      new XElement("CPUTrough", item.CPUUsageTrough),
@@ -67,14 +67,17 @@ namespace SESM.Controllers.API
                                                      ));
             }
 
+            response.AddToContent(recent);
+            response.AddToContent(compiled);
+
             return Content(response.ToString());
         }
 
-        // POST: API/PerfMon/CleanPerfData
+        // GET: API/PerfMon/CleanPerfData
         [HttpGet]
         public ActionResult CleanPerfData()
         {
-            _context.Database.ExecuteSqlCommand("truncate table SESM.dbo.EntityPerfEntries");
+            _context.Database.ExecuteSqlCommand("truncate table dbo.EntityPerfEntries");
             return Content(XMLMessage.Success("PM-CPD-OK", "The performance datas have been cleared").ToString());
         }
 

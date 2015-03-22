@@ -60,6 +60,14 @@ namespace SESM.Controllers
             return View();
         }
 
+        [HttpGet]
+        [CheckAuth]
+        // GET: 1/Monitor
+        public ActionResult Monitor(int id)
+        {
+            return View();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
