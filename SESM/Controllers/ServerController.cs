@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
-using SESM.DTO;
 
 namespace SESM.Controllers
 {
@@ -23,6 +19,7 @@ namespace SESM.Controllers
         // GET: 1/Dashboard
         [HttpGet]
         [CheckAuth]
+        [ManagerAndAbove]
         public ActionResult Dashboard(int id)
         {
             return View();
@@ -31,6 +28,7 @@ namespace SESM.Controllers
         // GET: 1/Maps
         [HttpGet]
         [CheckAuth]
+        [ManagerAndAbove]
         public ActionResult Maps(int id)
         {
             return View();
@@ -39,53 +37,36 @@ namespace SESM.Controllers
         // GET: 1/Configuration
         [HttpGet]
         [CheckAuth]
+        [ManagerAndAbove]
         public ActionResult Configuration(int id)
         {
             return View();
         }
 
+        // GET: 1/Explorer
         [HttpGet]
         [CheckAuth]
-        // GET: 1/Explorer
+        [ManagerAndAbove]
         public ActionResult Explorer(int id)
         { 
             return View();
         }
 
+        // GET: 1/Settings
         [HttpGet]
         [CheckAuth]
-        // GET: 1/Settings
+        [ManagerAndAbove]
         public ActionResult Settings(int id)
         {
             return View();
         }
 
-        // GET: Server/HourlyStats/5
+        // GET: 1/Monitor
         [HttpGet]
-        [LoggedOnly]
         [CheckAuth]
         [ManagerAndAbove]
-        public ActionResult HourlyStats(int id)
+        public ActionResult Monitor(int id)
         {
-            ServerProvider srvPrv = new ServerProvider(_context);
-            EntityServer serv = srvPrv.GetServer(id);
-            ViewData["ID"] = id;
-            List<EntityPerfEntry> perfEntries = serv.PerfEntries.Where(x => x.Timestamp >= DateTime.Now.AddHours(-2)).OrderBy(x => x.Timestamp).ToList();
-            ViewData["perfEntries"] = perfEntries;
-            return View();
-        }
-
-        [HttpGet]
-        [LoggedOnly]
-        [CheckAuth]
-        [ManagerAndAbove]
-        public ActionResult GlobalStats(int id)
-        {
-            ServerProvider srvPrv = new ServerProvider(_context);
-            EntityServer serv = srvPrv.GetServer(id);
-            ViewData["ID"] = id;
-            List<EntityPerfEntry> perfEntries = serv.PerfEntries.Where(x => x.CPUUsagePeak != null).OrderBy(x => x.Timestamp).ToList();
-            ViewData["perfEntries"] = perfEntries;
             return View();
         }
 

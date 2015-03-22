@@ -251,8 +251,7 @@ namespace SESM.DAL
         public bool IsAdminOrAbore(AccessLevel accessLevel)
         {
             return accessLevel == AccessLevel.SuperAdmin ||
-                    accessLevel == AccessLevel.Admin ||
-                    accessLevel == AccessLevel.Manager;
+                    accessLevel == AccessLevel.Admin;
         }
 
         public List<EntityServer> GetAllServers()

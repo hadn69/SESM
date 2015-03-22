@@ -25,6 +25,18 @@ namespace SESM
                 }
             );
 
+            // Misc API
+            routes.MapRoute(
+                name: "APIPerfMon",
+                url: "API/PerfMon/{action}",
+                defaults: new { controller = "APIPerfMon" },
+                constraints: new
+                {
+                    action = "GetPerfData|" +
+                             "CleanPerfData"
+                }
+            );
+
             // Settings API
             routes.MapRoute(
                 name: "APISettings",
@@ -161,8 +173,6 @@ namespace SESM
 
             // === GUI ===
 
-
-
             // Account
             routes.MapRoute(
                 name: "Account",
@@ -195,6 +205,13 @@ namespace SESM
                 defaults: new { controller = "Users", action = "Index" }
             );
 
+            // Stats
+            routes.MapRoute(
+                name: "Monitor",
+                url: "Monitor",
+                defaults: new { controller = "PerfMon", action = "Index" }
+            );
+
             // Other
             routes.MapRoute(
                 name: "Other",
@@ -206,6 +223,7 @@ namespace SESM
                              "Configuration|" +
                              "Settings|" +
                              "Maps|" +
+                             "Monitor|" +
                              "Explorer",
                     id = @"\d+"
                 }

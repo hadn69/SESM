@@ -18,7 +18,7 @@ namespace SESM.Controllers.ActionFilters
                 ServerProvider srvPrv = new ServerProvider(context);
                 EntityUser user = HttpContext.Current.Session["User"] as EntityUser;
                 AccessLevel accessLevel = srvPrv.GetAccessLevel(user.Id, int.Parse(filterContext.ActionParameters["id"].ToString()));
-                if (accessLevel == AccessLevel.Guest || accessLevel == AccessLevel.User)
+                if (!srvPrv.IsManagerOrAbore(accessLevel))
                 {
                     filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary
                     {

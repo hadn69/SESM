@@ -42,11 +42,11 @@ namespace SESM.Controllers.API
             foreach (EntityServer server in servers)
             {
                 response.AddToContent(new XElement("Server", new XElement("Name", server.Name),
-                                                            new XElement("ID", server.Id),
-                                                            new XElement("Public", server.IsPublic.ToString()),
-                                                            new XElement("State", srvPrv.GetState(server).ToString()),
-                                                            new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id))
-                                                            ));
+                                                             new XElement("ID", server.Id),
+                                                             new XElement("Public", server.IsPublic.ToString()),
+                                                             new XElement("State", srvPrv.GetState(server).ToString()),
+                                                             new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id))
+                                                             ));
             }
             return Content(response.ToString());
         }
@@ -870,6 +870,7 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("ViewDistance", serverConfig.ViewDistance));
             response.AddToContent(new XElement("OnlineMode", serverConfig.OnlineMode));
             response.AddToContent(new XElement("ResetOwnership", serverConfig.ResetOwnership));
+            response.AddToContent(new XElement("GroupID", serverConfig.GroupID));
 
             XElement administrators = new XElement("Administrators");
             foreach (ulong adminitrator in serverConfig.Administrators)
@@ -959,6 +960,7 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("ViewDistance", true));
             response.AddToContent(new XElement("OnlineMode", true));
             response.AddToContent(new XElement("ResetOwnership", true));
+            response.AddToContent(new XElement("GroupID", true));
             response.AddToContent(new XElement("Administrators", true));
             response.AddToContent(new XElement("Banned", true));
             response.AddToContent(new XElement("AutoHealing", true));
@@ -1111,7 +1113,7 @@ namespace SESM.Controllers.API
             // ==== GameMode ====
             if (string.IsNullOrWhiteSpace(Request.Form["GameMode"]))
                 return Content(XMLMessage.Error("SRV-SC-MISGM", "The GameMode field must be provided").ToString());
-            if (!Enum.TryParse(Request.Form["RefinerySpeedMultiplier"], out serverConfig.GameMode))
+            if (!Enum.TryParse(Request.Form["GameMode"], out serverConfig.GameMode))
                 return Content(XMLMessage.Error("SRV-SC-BADGM", "The GameMode field is invalid").ToString());
 
             // ==== EnableCopyPaste ====
@@ -1175,7 +1177,7 @@ namespace SESM.Controllers.API
             // ==== ClientCanSave ====
             if (string.IsNullOrWhiteSpace(Request.Form["ClientCanSave"]))
                 return Content(XMLMessage.Error("SRV-SC-MISCCS", "The ClientCanSave field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["ClientCanSave"], out serverConfig.CargoShipsEnabled))
+            if (!bool.TryParse(Request.Form["ClientCanSave"], out serverConfig.ClientCanSave))
                 return Content(XMLMessage.Error("SRV-SC-BADCCS", "The ClientCanSave field is invalid").ToString());
 
             // ==== Mods ====
@@ -1208,6 +1210,12 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SC-MISRO", "The ResetOwnership field must be provided").ToString());
             if (!bool.TryParse(Request.Form["ResetOwnership"], out serverConfig.ResetOwnership))
                 return Content(XMLMessage.Error("SRV-SC-BADRO", "The ResetOwnership field is invalid").ToString());
+
+            // ==== GroupID ====
+            if (string.IsNullOrWhiteSpace(Request.Form["GroupID"]))
+                return Content(XMLMessage.Error("SRV-SC-MISGRID", "The GroupID field must be provided").ToString());
+            if (!ulong.TryParse(Request.Form["GroupID"], out serverConfig.GroupID))
+                return Content(XMLMessage.Error("SRV-SC-BADGRID", "The GroupID field is invalid").ToString());
 
             // ==== Administrators ====
             serverConfig.Administrators.Clear();

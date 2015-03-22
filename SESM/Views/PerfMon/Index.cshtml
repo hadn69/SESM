@@ -1,0 +1,270 @@
+﻿@{
+    ViewBag.Title = "Servers Performance Monitor";
+
+    List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
+    breadCrumb.Add(new KeyValuePair<string, string>("Servers Performance Monitor", "/Monitor/"));
+    ViewBag.Breadcrumb = breadCrumb;
+
+    ViewBag.RefreshBtn = true;
+}
+
+<script src="/assets/global/plugins/flot/jquery.flot.min.js"></script>
+<script src="/assets/global/plugins/flot/jquery.flot.time.min.js"></script>
+<script src="/assets/global/plugins/flot/jquery.flot.fillbetween.min.js"></script>
+<div class="col-md-12" id="graphZone">
+</div>
+<script type="text/javascript">
+    function initPage() {
+        function sizeIEC(a, b, c, d, e) {
+            if (a < 1024)
+                return a + ' B';
+            return (b = Math, c = b.log, d = 1024, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2)
+                + '&nbsp;' + (e ? 'KMGTPEZY'[--e] + 'B' : 'B');
+        }
+
+        function sizeFormater(v, axis) {
+            v = parseFloat(v).toFixed(0);
+            return sizeIEC(v);
+        }
+
+        function percentFormater(v, axis) {
+            v = parseFloat(v).toFixed(2);
+            v = Number(v).toString();
+            return v + "%";
+        }
+
+        function pad(n, width, z) {
+            z = z || '0';
+            n = n + '';
+            return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+        }
+
+        function refreshGraphs() {
+            LockPage();
+            $.get("/API/Server/GetServers",
+            function (data) {
+                UnlockPage();
+                var root = $($.parseXML(data)).find("Response");
+
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    $("#btnRefreshList").children("i").removeClass("fa-spin");
+                    return;
+                }
+                $("#graphZone").empty();
+                root.children("Content").children("Server").each(function (index) {
+                    var item = $(this);
+
+                    var ID = item.children("ID").text();
+                    var Name = item.children("Name").text();
+
+                    $("#graphZone").append('<div class="portlet light bordered">' +
+                                                '<div class="portlet-title"><div class="caption"><i class="fa fa-database"></i>' + Name + '</div></div>' +
+                                                '<div class="portlet-body">' +
+                                                    '<h4>Recent Data</h4>' +
+                                                    '<div id="chartRecent' + ID + '" class="chart"></div>' +
+                                                    '<h4>Compiled Data</h4>' +
+                                                    '<div id="chartCompiled' + ID + '" class="chart"></div>' +
+                                                '</div>' +
+                                            '</div>');
+
+                    $.post("/API/PerfMon/GetPerfData",
+                    {
+                        ServerID: ID
+                    },
+                    function (data) {
+
+                        var root = $($.parseXML(data)).find("Response");
+
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+
+                        var recentData = [{ label: "CPU", data: [], color: "rgb(255,50,50)" },
+                            { label: "RAM", yaxis: 2, data: [], color: "rgb(50,50,255)" }];
+
+                        root.children("Content").children("Recent").children().each(function (index) {
+                            var item = $(this);
+
+                            var date = Date.parse(item.children("Date").text());
+
+                            recentData[0].data.push([date, Number(item.children("CPU").text())]);
+                            recentData[1].data.push([date, Number(item.children("RAM").text())]);
+                        });
+
+                        $.plot($("#chartRecent" + ID), recentData, {
+                            xaxis: {
+                                mode: "time",
+                                timeformat: "%H:%M"
+                            },
+                            series: {
+                                lines: {
+                                    show: true,
+                                    lineWidth: 2,
+                                    fill: true,
+                                    fillColor: {
+                                        colors: [{
+                                            opacity: 0.05
+                                        }, {
+                                            opacity: 0.01
+                                        }]
+                                    }
+                                },
+                                points: {
+                                    show: true,
+                                    radius: 3,
+                                    lineWidth: 1
+                                },
+                                shadowSize: 2
+                            },
+                            grid: {
+                                hoverable: true,
+                                clickable: true,
+                                tickColor: "#eee",
+                                borderColor: "#eee",
+                                borderWidth: 1
+                            },
+                            yaxes: [
+                                {
+                                    min: 0,
+                                    tickFormatter: percentFormater
+                                },
+                                {
+                                    min: 0,
+                                    alignTicksWithAxis: 1,
+                                    position: "right",
+                                    tickFormatter: sizeFormater
+                                }
+                            ]
+                        });
+
+                        var compiledData = [{ label: "CPU", data: [], lines: { show: true }, color: "rgb(255,50,50)" },
+                                            { id: "CPUT", data: [], lines: { show: true, lineWidth: 0, fill: false }, color: "rgb(255,50,50)" },
+                                            { id: "CPUQ1", data: [], lines: { show: true, lineWidth: 0, fill: 0.2 }, color: "rgb(255,50,50)", fillBetween: "CPUT" },
+                                            { id: "CPUAVG", data: [], lines: { show: true, lineWidth: 0.5, fill: 0.4, shadowSize: 0 }, color: "rgb(255,50,50)", fillBetween: "CPUQ1" },
+                                            { id: "CPUQ3", data: [], lines: { show: true, lineWidth: 0, fill: 0.4 }, color: "rgb(255,50,50)", fillBetween: "CPUAVG" },
+                                            { id: "CPUP", data: [], lines: { show: true, lineWidth: 0, fill: 0.2 }, color: "rgb(255,50,50)", fillBetween: "CPUQ3" },
+
+                                            { yaxis: 2, label: "RAM", data: [], lines: { show: true }, color: "rgb(50,50,255)" },
+                                            { yaxis: 2, id: "RAMT", data: [], lines: { show: true, lineWidth: 0, fill: false }, color: "rgb(50,50,255)" },
+                                            { yaxis: 2, id: "RAMQ1", data: [], lines: { show: true, lineWidth: 0, fill: 0.2 }, color: "rgb(50,50,255)", fillBetween: "RAMT" },
+                                            { yaxis: 2, id: "RAMAVG", data: [], lines: { show: true, lineWidth: 0.5, fill: 0.4, shadowSize: 0 }, color: "rgb(50,50,255)", fillBetween: "RAMQ1" },
+                                            { yaxis: 2, id: "RAMQ3", data: [], lines: { show: true, lineWidth: 0, fill: 0.4 }, color: "rgb(50,50,255)", fillBetween: "RAMAVG" },
+                                            { yaxis: 2, id: "RAMP", data: [], lines: { show: true, lineWidth: 0, fill: 0.2 }, color: "rgb(50,50,255)", fillBetween: "RAMQ3" }
+                        ];
+
+                        root.children("Content").children("Compiled").children().each(function (index) {
+                            var item = $(this);
+
+                            var date = Date.parse(item.children("Date").text());
+
+                            var CPUAvg = Number(item.children("CPUAvg").text());
+                            var CPUPeak = Number(item.children("CPUPeak").text());
+                            var CPUTrough = Number(item.children("CPUTrough").text());
+                            var CPUQ1 = Number(item.children("CPUQ1").text());
+                            var CPUQ3 = Number(item.children("CPUQ3").text());
+
+                            var RAMAvg = Number(item.children("RAMAvg").text());
+                            var RAMPeak = Number(item.children("RAMPeak").text());
+                            var RAMTrough = Number(item.children("RAMTrough").text());
+                            var RAMQ1 = Number(item.children("RAMQ1").text());
+                            var RAMQ3 = Number(item.children("RAMQ3").text());
+
+                            compiledData[0].data.push([date, Number(CPUAvg)]);
+                            compiledData[1].data.push([date, Number(CPUTrough)]);
+                            compiledData[2].data.push([date, Number(CPUQ1)]);
+                            compiledData[3].data.push([date, Number(CPUAvg)]);
+                            compiledData[4].data.push([date, Number(CPUQ3)]);
+                            compiledData[5].data.push([date, Number(CPUPeak)]);
+
+                            compiledData[6].data.push([date, Number(RAMAvg)]);
+                            compiledData[7].data.push([date, Number(RAMTrough)]);
+                            compiledData[8].data.push([date, Number(RAMQ1)]);
+                            compiledData[9].data.push([date, Number(RAMAvg)]);
+                            compiledData[10].data.push([date, Number(RAMQ3)]);
+                            compiledData[11].data.push([date, Number(RAMPeak)]);
+                        });
+
+                        $.plot($("#chartCompiled" + ID), compiledData, {
+                            xaxis: {
+                                mode: "time",
+                                timeformat: "%H:%M"
+                            },
+                            grid: {
+                                hoverable: true,
+                                clickable: true,
+                                tickColor: "#eee",
+                                borderColor: "#eee",
+                                borderWidth: 1
+                            },
+                            yaxes: [
+                                {
+                                    min: 0,
+                                    tickFormatter: percentFormater
+                                },
+                                {
+                                    min: 0,
+                                    alignTicksWithAxis: 1,
+                                    position: "right",
+                                    tickFormatter: sizeFormater
+                                }
+                            ]
+                        });
+
+                        function showTooltip(x, y, contents) {
+                            $('<div id="tooltip">' + contents + '</div>').css({
+                                position: 'absolute',
+                                display: 'none',
+                                top: y + 5,
+                                left: x + 15,
+                                border: '1px solid #333',
+                                padding: '4px',
+                                color: '#fff',
+                                'border-radius': '3px',
+                                'background-color': '#333',
+                                opacity: 0.80
+                            }).appendTo("body").fadeIn(200);
+                        }
+
+                        var currentPoint = null;
+                        var currentSerie = null;
+                        $("#chartRecent" + ID).bind("plothover", function (event, pos, item) {
+                            if (item) {
+                                if (currentPoint != item.dataIndex || currentSerie != item.seriesIndex) {
+                                    currentPoint = item.dataIndex;
+                                    currentSerie = item.seriesIndex;
+                                    $("#tooltip").remove();
+
+                                    var date = new Date(item.datapoint[0]);
+                                    date = pad(date.getHours(), 2) + ":" + pad(date.getMinutes(), 2);
+                                    var value = item.datapoint[1];
+
+                                    if (item.series.label == "RAM") {
+                                        value = sizeIEC(value);
+                                    }
+                                    if (item.series.label == "CPU") {
+                                        value = value + "%";
+                                    }
+
+                                    showTooltip(item.pageX, item.pageY, item.series.label + " usage at " + date + " : " + value);
+                                }
+                            } else {
+                                $("#tooltip").remove();
+                                currentPoint = null;
+                                currentSerie = null;
+                            }
+                        });
+
+                    });
+                });
+            });
+        }
+
+        refreshGraphs();
+
+        $("#btnRefresh").click(function () {
+            refreshGraphs();
+        });
+    }
+</script>
