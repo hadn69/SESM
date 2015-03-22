@@ -6,7 +6,7 @@
                 {
                     ServerID: serverID
                 },
-                function(data, status) {
+                function (data, status) {
                     var root = $($.parseXML(data)).find("Response");
 
                     if (root.children("Type").text() == "Error") {
@@ -46,68 +46,89 @@
         setInterval(updateQA, 10000);
         updateQA();
 
-        $("#btnQAStart").click(function() {
-            $.post("/API/Server/StartServers/",
-                {
-                    ServerIDs: serverID
-                },
-                function(data, status) {
-                    var root = $($.parseXML(data)).find("Response");
+        $("#btnQAStart").click(function () {
+            bootbox.confirm("Are you sure you want to start this server ?",
+            function (result) {
+                if (result) {
+                    $.post("/API/Server/StartServers/",
+                    {
+                        ServerIDs: serverID
+                    },
+                    function (data, status) {
+                        var root = $($.parseXML(data)).find("Response");
 
-                    if (root.children("Type").text() == "Error") {
-                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                        return;
-                    }
-                    toastr.success(serverName + " has been asked to start", "Server Started");
-                });
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+                        toastr.success(serverName + " has been started", "Server Started");
+                    });
+
+                }
+            });
         });
 
         $("#btnQAStop").click(function () {
-            $.post("/API/Server/StopServers/",
-                {
-                    ServerIDs: serverID
-                },
-                function (data, status) {
-                    var root = $($.parseXML(data)).find("Response");
+            bootbox.confirm("Are you sure you want to stop this server ?",
+            function (result) {
+                if (result) {
+                    $.post("/API/Server/StopServers/",
+                    {
+                        ServerIDs: serverID
+                    },
+                    function (data, status) {
+                        var root = $($.parseXML(data)).find("Response");
 
-                    if (root.children("Type").text() == "Error") {
-                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                        return;
-                    }
-                    toastr.success(serverName + " has been asked to stop", "Server Stopped");
-                });
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+                        toastr.success(serverName + " has been stopped", "Server Stopped");
+                    });
+                }
+            });
         });
 
         $("#btnQARestart").click(function () {
-            $.post("/API/Server/RestartServers/",
-                {
-                    ServerIDs: serverID
-                },
-                function (data, status) {
-                    var root = $($.parseXML(data)).find("Response");
+            bootbox.confirm("Are you sure you want to restart this server ?",
+            function (result) {
+                if (result) {
+                    $.post("/API/Server/RestartServers/",
+                    {
+                        ServerIDs: serverID
+                    },
+                    function (data, status) {
+                        var root = $($.parseXML(data)).find("Response");
 
-                    if (root.children("Type").text() == "Error") {
-                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                        return;
-                    }
-                    toastr.success(serverName + " has been asked to restart", "Server Restarted");
-                });
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+                        toastr.success(serverName + " has been restarted", "Server Restarted");
+                    });
+                }
+            });
         });
 
         $("#btnQAKill").click(function () {
-            $.post("/API/Server/KillServers/",
-                {
-                    ServerIDs: serverID
-                },
-                function (data, status) {
-                    var root = $($.parseXML(data)).find("Response");
+            bootbox.confirm("Are you sure you want to start this server ?",
+            function (result) {
+                if (result) {
+                    $.post("/API/Server/KillServers/",
+                    {
+                        ServerIDs: serverID
+                    },
+                    function (data, status) {
+                        var root = $($.parseXML(data)).find("Response");
 
-                    if (root.children("Type").text() == "Error") {
-                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                        return;
-                    }
-                    toastr.success(serverName + " has been asked to restart", "Server Restarted");
-                });
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+                        toastr.success(serverName + " has been killed", "Server Killed");
+                    });
+                }
+            });
         });
     }
 }
