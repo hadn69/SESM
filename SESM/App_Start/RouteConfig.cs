@@ -205,6 +205,13 @@ namespace SESM
                 defaults: new { controller = "Users", action = "Index" }
             );
 
+            // Stats
+            routes.MapRoute(
+                name: "Monitor",
+                url: "Monitor",
+                defaults: new { controller = "PerfMon", action = "Index" }
+            );
+
             // Other
             routes.MapRoute(
                 name: "Other",

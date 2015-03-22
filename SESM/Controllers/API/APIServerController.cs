@@ -42,11 +42,11 @@ namespace SESM.Controllers.API
             foreach (EntityServer server in servers)
             {
                 response.AddToContent(new XElement("Server", new XElement("Name", server.Name),
-                                                            new XElement("ID", server.Id),
-                                                            new XElement("Public", server.IsPublic.ToString()),
-                                                            new XElement("State", srvPrv.GetState(server).ToString()),
-                                                            new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id))
-                                                            ));
+                                                             new XElement("ID", server.Id),
+                                                             new XElement("Public", server.IsPublic.ToString()),
+                                                             new XElement("State", srvPrv.GetState(server).ToString()),
+                                                             new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id))
+                                                             ));
             }
             return Content(response.ToString());
         }

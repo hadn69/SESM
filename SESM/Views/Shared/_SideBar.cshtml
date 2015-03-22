@@ -6,7 +6,7 @@
     ServerProvider srvPrv = new ServerProvider(context);
     UserProvider usrPrv = new UserProvider(context);
 
-    EntityUser user = Session["User"] as EntityUser;
+    EntityUser user = HttpContext.Current.Session["User"] as EntityUser;
     int userID = user == null ? 0 : user.Id;
 
     bool isAdmin = false;
@@ -26,11 +26,12 @@
 
             managedServers = ((HashSet<EntityServer>)user.AdministratorOf);
             managedServers.UnionWith((HashSet<EntityServer>)user.ManagerOf);
+            managedServers = new HashSet<EntityServer>(managedServers.OrderBy(x => x.Name).ToList());
 
             publicServers = ((HashSet<EntityServer>)user.UserOf);
             publicServers.UnionWith(new HashSet<EntityServer>(srvPrv.GetAllPublicServers()));
-
             publicServers.ExceptWith(managedServers);
+            publicServers = new HashSet<EntityServer>(publicServers.OrderBy(x => x.Name).ToList());
         }
     }
 }
@@ -73,6 +74,9 @@
                                 <a href="/@item.Id/Maps/"><i class="icon-compass"></i> Maps Manager</a>
                             </li>
                             <li>
+                                <a href="/@item.Id/Monitor/"><i class="icon-graph"></i> Perf Monitor</a>
+                            </li>
+                            <li>
                                 <a href="/@item.Id/Status/"><i class="icon-screen-desktop"></i> Status Page</a>
                             </li>
                         </ul>
@@ -95,7 +99,12 @@
             <a href="/Users/">
                 <i class="icon-users"></i>
                 <span class="title">Users Manager</span>
-                <span class="arrow "></span>
+            </a>
+        </li>
+        <li>
+            <a href="/Monitor/">
+                <i class="icon-graph"></i>
+                <span class="title">Perf Monitor</span>
             </a>
         </li>
         <li>
@@ -112,7 +121,7 @@
                 </li>
                 <li>
                     <a href="/Settings/SE/">
-                        <i class="icon-graph"></i> Space Engineers
+                        <i class="icon-wrench"></i> Space Engineers
                     </a>
                 </li>
                 <li>

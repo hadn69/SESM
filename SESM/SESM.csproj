@@ -2643,8 +2643,6 @@
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\Users\Index.cshtml" />
     <Content Include="Views\Settings\Index.cshtml" />
-    <Content Include="Views\Server\HourlyStats.cshtml" />
-    <Content Include="Views\Server\GlobalStats.cshtml" />
     <Content Include="Views\Shared\_BreadCrumb.cshtml" />
     <Content Include="Views\Shared\_SideBar.cshtml" />
     <Content Include="Views\Settings\SESE.cshtml" />
@@ -2656,6 +2654,7 @@
     <Content Include="Views\Server\Dashboard.cshtml" />
     <Content Include="Views\Server\Settings.cshtml" />
     <Content Include="Views\Server\Monitor.cshtml" />
+    <Content Include="Views\PerfMon\Index.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -2822,7 +2821,6 @@
     <Folder Include="assets\global\plugins\angularjs\plugins\angular-file-upload\uploads\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\node\public\files\thumbnail\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\php\files\thumbnail\" />
-    <Folder Include="Views\PerfMon\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
