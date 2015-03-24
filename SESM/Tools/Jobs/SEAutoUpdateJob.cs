@@ -37,7 +37,7 @@ namespace SESM.Tools.Jobs
             int localVersion = SteamCMDHelper.GetInstalledVersion(logger);
             logger.Info(" - Local Version : " + localVersion);
 
-            int remoteVersion = SteamCMDHelper.GetAvailableVersion(SESMConfigHelper.SESEAutoUpdateUseDev, logger);
+            int remoteVersion = SteamCMDHelper.GetAvailableVersion(!string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword), logger);
             logger.Info(" - Remote Version : " + remoteVersion);
 
             // Test for update
