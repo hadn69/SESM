@@ -55,7 +55,7 @@ namespace SESM.Tools
             AutoUpdateBetaPassword = string.Empty;
 
             // SESE Auto-Update Settings
-            SESEUpdateURL = "https://api.github.com/repos/Tyrsis/SE-Community-Mod-API/releases";
+            SESEUpdateURL = "https://api.github.com/repos/SEServerExtender/SEServerExtender/releases";
             SESEAutoUpdateEnabled = false;
             SESEAutoUpdateUseDev = true;
             SESEAutoUpdateCron = "0 5/10 * * * ?";
