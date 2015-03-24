@@ -324,7 +324,7 @@
 
                         displaySize = fileSizeIEC(Size);
 
-                        table.DataTable().row.add([checkbox, icon, Name, displaySize, displayDate, actions]);
+                        table.DataTable().row.add([checkbox, icon, Name, displaySize, DateItem, actions]);
                     });
                     table.DataTable().draw();
                     table.find('input:checkbox').uniform();
@@ -569,7 +569,7 @@
             $("#downloadForm").submit();
         });
 
-        table.on('click', ".btnEdit", function () {
+        table.on('click', ".btnEdit", function (event) {
             event.preventDefault();
             var name = $(this).parents('tr').children('td:nth-child(3)').text();
             var path = "";

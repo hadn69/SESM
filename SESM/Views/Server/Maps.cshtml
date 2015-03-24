@@ -40,41 +40,43 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="form-group">
-                        <label class="control-label col-md-5">Scenario</label>
-                        <div class="col-md-7">
-                            <select class="form-control" id="inpSubTypeId">
-                                <option value="LoneSurvivor">Lone Survivor</option>
-                                <option value="EasyStart1">Easy Start 1</option>
-                                <option value="EasyStart2">Easy Start 1</option>
-                                <option value="CrashedRedShip">Crashed Red Ship</option>
-                                <option value="TwoPlatforms">Two Platforms</option>
-                                <option value="Asteroids">Asteroids Only</option>
-                                <option value="EmptyWorld">Empty World</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-md-5">Asteroid Amount</label>
-                        <div class="col-md-7">
-                            <div class="input-inline input-small">
-                                <input type="text" id="inpAsteroidAmount" class="form-control" value="8">
+                    <div class="form-body form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-md-5">Scenario</label>
+                            <div class="col-md-7 input-medium">
+                                <select class="form-control" id="inpSubTypeId">
+                                    <option value="LoneSurvivor">Lone Survivor</option>
+                                    <option value="EasyStart1">Easy Start 1</option>
+                                    <option value="EasyStart2">Easy Start 1</option>
+                                    <option value="CrashedRedShip">Crashed Red Ship</option>
+                                    <option value="TwoPlatforms">Two Platforms</option>
+                                    <option value="Asteroids">Asteroids Only</option>
+                                    <option value="EmptyWorld">Empty World</option>
+                                </select>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-md-5">Procedural Density</label>
-                        <div class="col-md-7">
-                            <div class="input-inline input-small">
-                                <input type="text" id="inpProceduralDensity" class="form-control" value="0.5">
+                        <div class="form-group">
+                            <label class="control-label col-md-5">Asteroid Amount</label>
+                            <div class="col-md-7">
+                                <div class="input-inline input-small">
+                                    <input type="text" id="inpAsteroidAmount" class="form-control" value="8">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-md-5">Procedural Seed</label>
-                        <div class="col-md-7">
-                            <div class="input-inline input-small">
-                                <input type="text" id="inpProceduralSeed" class="form-control" value="250193">
+                        <div class="form-group">
+                            <label class="control-label col-md-5">Procedural Density</label>
+                            <div class="col-md-7">
+                                <div class="input-inline input-small">
+                                    <input type="text" id="inpProceduralDensity" class="form-control" value="0.5">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-5">Procedural Seed</label>
+                            <div class="col-md-7">
+                                <div class="input-inline input-small">
+                                    <input type="text" id="inpProceduralSeed" class="form-control" value="250193">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -111,18 +113,30 @@
             </div>
             <div class="table-toolbar">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <button id="btnCreate" class="btn green">
                             <i class=" fa fa-plus"></i> New
                         </button>
+                        <button id="btnUpload" class="btn blue">
+                            <i class=" fa fa-upload"></i> Upload
+                        </button>
+                        <div class="pull-right" id="actionBtn" style="display: none;">
+                            <button id="btnDownloadMaps" class="btn yellow">
+                                <i class="fa fa-download"></i> Download
+                            </button>
+                            <button id="btnDeleteMaps" class="btn red">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+
             <table class="table table-striped table-bordered table-hover" id="mapTable">
                 <thead>
                     <tr>
                         <th class="table-checkbox">
-                            <input type="checkbox" class="group-checkable" />
+                            <input type="checkbox" id="chkCheckAll" />
                         </th>
                         <th>
                             Loaded
@@ -149,8 +163,20 @@
 </div>
 <script type="text/javascript">
     function initPage() {
-        var locTable = $('#mapTable');
+        function fileSizeIEC(a, b, c, d, e) {
+            if (a < 1024)
+                return a + ' B';
+            return (b = Math, c = b.log, d = 1024, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2)
+                + '&nbsp;' + (e ? 'KMGTPEZY'[--e] + 'B' : 'B');
+        }
+
+        var mapTable = $('#mapTable');
+
+        // Download
+
         $("#downloadFormServerID").val(serverID);
+
+        // Create
 
         $('#inpAsteroidAmount').TouchSpin({
             buttondown_class: 'btn blue',
@@ -177,20 +203,15 @@
             step: 1
         });
 
-        function fileSizeIEC(a, b, c, d, e) {
-            if (a < 1024)
-                return a + ' B';
-            return (b = Math, c = b.log, d = 1024, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2)
-                + '&nbsp;' + (e ? 'KMGTPEZY'[--e] + 'B' : 'B');
-        }
+        // Table
 
-        locTable.dataTable({
+        mapTable.dataTable({
             "columns": [{
                 "orderable": false,
-                "width": "5%"
+                "width": "3%"
             }, {
                 "orderable": false,
-                "width": "5%"
+                "width": "3%"
             }, {
                 "orderable": true
             }, {
@@ -216,6 +237,37 @@
             "order": [[1, "asc"]] // set second column as a default sort by asc
         });
 
+        function updateCheckboxes() {
+            $(".checkboxes").each(function () {
+                var item = $(this);
+                if (item.is(':checked')) {
+                    $(this).parents('tr').addClass("active");
+                } else {
+                    $(this).parents('tr').removeClass("active");
+                }
+            });
+            $.uniform.update();
+            if ($('.checkboxes:checked').length == 0) {
+                $("#actionBtn").stop(true).fadeOut("slow");
+            } else {
+                $("#actionBtn").stop(true).fadeIn("slow");
+            }
+        }
+
+        $('#chkCheckAll').change(function () {
+            $(".checkboxes").prop("checked", $(this).is(':checked'));
+            updateCheckboxes();
+        });
+
+        $('body').on('change', ".checkboxes", function (event) {
+            if ($('.checkboxes:checked').length == 0) {
+                $('#chkCheckAll').prop("checked", false);
+            } else {
+                $('#chkCheckAll').prop("checked", true);
+            }
+            updateCheckboxes();
+        });
+
         function refreshList() {
             LockPage();
             $.post("/API/Map/GetMaps",
@@ -232,7 +284,7 @@
                     return;
                 }
 
-                locTable.DataTable().clear();
+                mapTable.DataTable().clear();
                 root.children("Content").children("Map").each(function (index) {
                     var item = $(this);
                     var Loaded = item.children("Selected").text() == "true";
@@ -249,11 +301,11 @@
                         selectedField = '<i class="fa fa-check-circle"></i>';
                     }
 
-                    locTable.DataTable().row.add([chkbField, selectedField, DirName, MapName, fileSizeIEC(Size), Date]);
+                    mapTable.DataTable().row.add([chkbField, selectedField, DirName, MapName, fileSizeIEC(Size), Date]);
                 });
 
-                locTable.DataTable().draw();
-                locTable.find('input:checkbox').uniform();
+                mapTable.DataTable().draw();
+                mapTable.find('input:checkbox').uniform();
 
                 $('tr.odd, tr.even').contextmenu({
                     target: '#context-menu',
@@ -331,9 +383,9 @@
             $("#createModal").modal('show');
         });
 
-        $("#btnSaveCreate").click(function() {
+        $("#btnSaveCreate").click(function () {
             bootbox.confirm("The server will be (re)started. Are you sure you want to create this map ?",
-                function(result) {
+                function (result) {
                     if (result) {
                         LockPage();
                         $("#createModal").modal('hide');
