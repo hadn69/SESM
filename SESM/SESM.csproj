@@ -72,6 +72,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Quartz.2.2.4\lib\net40\Quartz.dll</HintPath>
     </Reference>
+    <Reference Include="SEComm, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SESEDlls\SEComm.dll</HintPath>
+    </Reference>
+    <Reference Include="SEModAPIInternal">
+      <HintPath>..\SESEDlls\SEModAPIInternal.dll</HintPath>
+    </Reference>
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -81,6 +88,8 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Channels" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Web.DynamicData" />
@@ -2687,6 +2696,7 @@
     <Compile Include="Controllers\API\APIMapController.cs" />
     <Compile Include="Controllers\API\APIPerfMonController.cs" />
     <Compile Include="Controllers\API\APIServerController.cs" />
+    <Compile Include="Controllers\API\APISESEController.cs" />
     <Compile Include="Controllers\API\APISettingsController.cs" />
     <Compile Include="Controllers\API\APIMiscController.cs" />
     <Compile Include="Controllers\API\APIUsersController.cs" />
@@ -2751,6 +2761,7 @@
     <Compile Include="Models\ServerEnums.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\API\XMLMessage.cs" />
+    <Compile Include="Tools\Helpers\SESEServiceHelper.cs" />
     <Compile Include="Tools\Jobs\AutoRestartJob.cs" />
     <Compile Include="Tools\Jobs\AutoStartJob.cs" />
     <Compile Include="Tools\Jobs\AutoBackupJob.cs" />

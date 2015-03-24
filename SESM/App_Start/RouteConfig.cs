@@ -163,6 +163,17 @@ namespace SESM
                 }
             );
 
+            // SESE API
+            routes.MapRoute(
+                name: "APISESE",
+                url: "API/SESE/{action}",
+                defaults: new { controller = "APISESE" },
+                constraints: new
+                {
+                    action = "TestWCF" 
+                }
+            );
+
             // API 404
             routes.MapRoute(
                 name: "404API",
