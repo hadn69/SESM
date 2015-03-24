@@ -2,7 +2,7 @@
     ViewBag.Title = "Server Maps";
 
     List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
-    breadCrumb.Add(new KeyValuePair<string, string>("Server", "/Server/"));
+    breadCrumb.Add(new KeyValuePair<string, string>("Servers", "/Servers/"));
     breadCrumb.Add(new KeyValuePair<string, string>(ViewBag.Server.Name, "/" + ViewBag.ServerID + "/Dashboard/"));
     breadCrumb.Add(new KeyValuePair<string, string>("Server Maps", "/" + ViewBag.ServerID + "/Maps/"));
     ViewBag.Breadcrumb = breadCrumb;
