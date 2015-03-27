@@ -108,8 +108,9 @@ namespace SESM
                 {
                     action = "GetMaps|" +
                              "SelectMap|" +
-                             "DeleteMap|" +
-                             "DownloadMap|" +
+                             "DeleteMaps|" +
+                             "DownloadMaps|" +
+                             "UploadMap|" +
                              "CreateMap|"
                 }
             );

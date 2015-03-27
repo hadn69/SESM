@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Web;
 using System.Web.Mvc;
 using System.Xml.Linq;
 using Ionic.Zip;
@@ -50,7 +52,7 @@ namespace SESM.Controllers.API
             ServerConfigHelper config = new ServerConfigHelper();
             config.Load(server);
 
-            foreach (string item in Directory.GetDirectories(PathHelper.GetSavesPath(server),"*",SearchOption.TopDirectoryOnly))
+            foreach (string item in Directory.GetDirectories(PathHelper.GetSavesPath(server), "*", SearchOption.TopDirectoryOnly))
             {
                 DirectoryInfo dirInfo = new DirectoryInfo(item);
 
@@ -127,7 +129,7 @@ namespace SESM.Controllers.API
 
             if (server.UseServerExtender)
             {
-                config.AutoSaveInMinutes = server.AutoSaveInMinutes ?? 5;
+                config.AutoSaveInMinutes = Convert.ToUInt32(server.AutoSaveInMinutes);
                 config.Save(server);
             }
 
@@ -137,22 +139,22 @@ namespace SESM.Controllers.API
 
             if (server.UseServerExtender)
             {
-                server.AutoSaveInMinutes = config.AutoSaveInMinutes;
+                server.AutoSaveInMinutes = Convert.ToInt32(config.AutoSaveInMinutes);
                 srvPrv.UpdateServer(server);
                 config.AutoSaveInMinutes = 0;
             }
 
             config.Save(server);
 
-            if(restartRequired)
+            if (restartRequired)
                 ServiceHelper.StartService(server);
 
             return Content(XMLMessage.Success("MAP-SM-OK", "The map have been selected").ToString());
         }
 
-        // POST: API/Map/DeleteMap
+        // POST: API/Map/DeleteMaps
         [HttpPost]
-        public ActionResult DeleteMap()
+        public ActionResult DeleteMaps()
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -176,40 +178,52 @@ namespace SESM.Controllers.API
             if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
                 return Content(XMLMessage.Error("MAP-DM-NOACCESS", "You don't have access to this server").ToString());
 
-            string MapDir = Request.Form["MapDir"];
-            if (string.IsNullOrWhiteSpace(MapDir))
-                return Content(XMLMessage.Error("SRV-DM-MISMD", "The MapDir field must be provided").ToString());
-            if (!Directory.Exists(PathHelper.GetSavePath(server, MapDir)) || MapDir.Contains(@"\") || MapDir.Contains("/"))
-                return Content(XMLMessage.Error("SRV-DM-BADMD", "The map " + MapDir + " don't exist").ToString());
+            string MapDirsString = Request.Form["MapDirs"];
+            if (string.IsNullOrWhiteSpace(MapDirsString))
+                return Content(XMLMessage.Error("MAP-DM-MISMD", "The MapDir field must be provided").ToString());
+
+            List<string> MapDirs = new List<string>();
+
+            foreach (string item in MapDirsString.Split(':'))
+            {
+                if (!Directory.Exists(PathHelper.GetSavePath(server, item)) || item.Contains(@"\") || item.Contains("/"))
+                {
+                    return Content(XMLMessage.Error("MAP-DM-INVALIDPATH", "One of the map dir provided is invalid").ToString());
+                }
+
+                MapDirs.Add(item);
+            }
 
             // ** PROCESS **
 
             ServerConfigHelper config = new ServerConfigHelper();
             config.Load(server);
-            
-            if (config.SaveName == MapDir)
-            {
-                ServiceState serviceState = srvPrv.GetState(server);
 
-                if (serviceState != ServiceState.Stopped && serviceState != ServiceState.Unknow)
+            foreach (string item in MapDirs)
+            {
+                if (config.SaveName == item)
                 {
-                    ServiceHelper.StopServiceAndWait(server);
-                    Thread.Sleep(5000);
-                    ServiceHelper.KillService(server);
+                    ServiceState serviceState = srvPrv.GetState(server);
+
+                    if (serviceState != ServiceState.Stopped && serviceState != ServiceState.Unknow)
+                    {
+                        ServiceHelper.StopServiceAndWait(server);
+                        Thread.Sleep(5000);
+                        ServiceHelper.KillService(server);
+                    }
+
+                    config.SaveName = string.Empty;
+                    config.Save(server);
                 }
 
-                config.SaveName = string.Empty;
-                config.Save(server);
+                Directory.Delete(PathHelper.GetSavePath(server, item), true);
             }
-
-            Directory.Delete(PathHelper.GetSavePath(server, MapDir), true);
-
-            return Content(XMLMessage.Success("MAP-DM-OK", "The map have been deleted").ToString());
+            return Content(XMLMessage.Success("MAP-DM-OK", "The map(s) have been deleted").ToString());
         }
 
-        // POST: API/Map/DownloadMap
+        // POST: API/Map/DownloadMaps
         [HttpPost]
-        public ActionResult DownloadMap()
+        public ActionResult DownloadMaps()
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -233,45 +247,54 @@ namespace SESM.Controllers.API
             if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
                 return Content(XMLMessage.Error("MAP-DWM-NOACCESS", "You don't have access to this server").ToString());
 
-            string MapDir = Request.Form["MapDir"];
-            if (string.IsNullOrWhiteSpace(MapDir))
-                return Content(XMLMessage.Error("SRV-DWM-MISMD", "The MapDir field must be provided").ToString());
-            if (!Directory.Exists(PathHelper.GetSavePath(server, MapDir)) || MapDir.Contains(@"\") || MapDir.Contains("/"))
-                return Content(XMLMessage.Error("SRV-DWM-BADMD", "The map " + MapDir + " don't exist").ToString());
+            string MapDirsString = Request.Form["MapDirs"];
+            if (string.IsNullOrWhiteSpace(MapDirsString))
+                return Content(XMLMessage.Error("MAP-DM-MISMD", "The MapDir field must be provided").ToString());
+
+            List<string> MapDirs = new List<string>();
+
+            foreach (string item in MapDirsString.Split(':'))
+            {
+                if (!Directory.Exists(PathHelper.GetSavePath(server, item)) || item.Contains(@"\") || item.Contains("/"))
+                {
+                    return Content(XMLMessage.Error("MAP-DM-INVALIDPATH", "One of the map dir provided is invalid").ToString());
+                }
+
+                MapDirs.Add(item);
+            }
 
             // ** PROCESS **
 
-            string sourceFolderPath = PathHelper.GetSavePath(server, MapDir) + @"\";
-            if (Directory.Exists(sourceFolderPath))
+            ServerConfigHelper config = new ServerConfigHelper();
+            config.Load(server);
+
+            Response.Clear();
+            Response.ContentType = "application/zip";
+            Response.AddHeader("Content-Disposition", String.Format("attachment; filename={0}", ((MapDirs.Count == 1) ? MapDirs[0] : (server.Name + "-Maps")) + ".zip"));
+            using (ZipFile zip = new ZipFile())
             {
-                Response.Clear();
-                Response.ContentType = "application/zip";
-                Response.AddHeader("Content-Disposition",
-                    String.Format("attachment; filename={0}", MapDir + ".zip"));
-
-                using (ZipFile zip = new ZipFile())
+                foreach (string item in MapDirs)
                 {
-                    zip.AddSelectedFiles("*", sourceFolderPath, string.Empty, true);
-                    if (server.UseServerExtender)
-                    {
-                        ServerConfigHelper config = new ServerConfigHelper();
-                        config.Load(server);
+                    string sourceFolderPath = PathHelper.GetSavePath(server, item) + @"\";
 
-                        if (config.SaveName == MapDir)
+                    zip.AddSelectedFiles("*", sourceFolderPath, (MapDirs.Count == 1) ? String.Empty : item, true);
+                    if (server.UseServerExtender && config.SaveName == item)
+                    {
+                        using (MemoryStream ms = new MemoryStream())
                         {
-                            zip.RemoveEntry("Sandbox.sbc");
-                            string text = System.IO.File.ReadAllText(sourceFolderPath + "Sandbox.sbc",
-                                new UTF8Encoding(false));
+                            zip.RemoveEntry(((MapDirs.Count == 1) ? String.Empty : item + "\\") + "Sandbox.sbc");
+
+                            string text = System.IO.File.ReadAllText(PathHelper.GetSavePath(server, item) + @"\Sandbox.sbc", new UTF8Encoding(false));
                             text = text.Replace("<AutoSaveInMinutes>0</AutoSaveInMinutes>",
                                 "<AutoSaveInMinutes>" + server.AutoSaveInMinutes + "</AutoSaveInMinutes>");
-                            zip.AddEntry("Sandbox.sbc", text, new UTF8Encoding(false));
+
+                            zip.AddEntry(((MapDirs.Count == 1) ? String.Empty : item + "\\") + "Sandbox.sbc", text, new UTF8Encoding(false));
                         }
                     }
-
-                    zip.Save(Response.OutputStream);
                 }
-                Response.End();
+                zip.Save(Response.OutputStream);
             }
+            Response.End();
             return null;
         }
 
@@ -300,7 +323,7 @@ namespace SESM.Controllers.API
 
             if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
                 return Content(XMLMessage.Error("MAP-CM-NOACCESS", "You don't have access to this server").ToString());
-            
+
             SubTypeId SubTypeId;
             if (string.IsNullOrWhiteSpace(Request.Form["SubTypeId"]))
                 return Content(XMLMessage.Error("MAP-CM-MISSTI", "The SubTypeId field must be provided").ToString());
@@ -349,6 +372,113 @@ namespace SESM.Controllers.API
             ServiceHelper.StartService(server);
 
             return Content(XMLMessage.Success("MAP-CM-OK", "The map have been created, the server is (re)starting ...").ToString());
+        }
+
+        // POST: API/Map/UploadMap        
+        [HttpPost]
+        public ActionResult UploadMap(HttpPostedFileBase ZipFile)
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("MAP-DWM-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("MAP-DWM-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("MAP-DWM-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("MAP-DWM-NOACCESS", "You don't have access to this server").ToString());
+
+            if (ZipFile == null)
+                return Content(XMLMessage.Error("MAP-UPM-MISZIP", "The zipFile parameter must be provided").ToString());
+
+            if (!Ionic.Zip.ZipFile.IsZipFile(ZipFile.InputStream, false))
+                return Content(XMLMessage.Error("MAP-UPM-BADZIP", "The provided file in not a zip file").ToString());
+
+            ZipFile.InputStream.Seek(0, SeekOrigin.Begin);
+
+            // ** PROCESS **
+            using (ZipFile zip = Ionic.Zip.ZipFile.Read(ZipFile.InputStream))
+            {
+                bool matchFound = false;
+                bool rootZip = false;
+                string rootPath = string.Empty;
+
+                foreach (ZipEntry item in zip)
+                {
+                    if (item.FileName == "Sandbox.sbc")
+                    {
+                        if (matchFound)
+                            return Content(XMLMessage.Error("MAP-UPM-MLPSBC", "Multiple Sandbox.sbc found").ToString());
+                        rootZip = true;
+                        matchFound = true;
+                    }
+                    else if (Regex.IsMatch(item.FileName, ".*/Sandbox.sbc$"))
+                    {
+                        if (matchFound)
+                            return Content(XMLMessage.Error("MAP-UPM-MLPSBC", "Multiple Sandbox.sbc found").ToString());
+                        matchFound = true;
+                        rootPath = Regex.Match(item.FileName, "(.*)/Sandbox.sbc$").Groups[1].Value;
+                    }
+                }
+
+                if (!matchFound)
+                    return Content(XMLMessage.Error("MAP-UPM-MISSBC", "No Sandbox.sbc found").ToString());
+
+                string dirName = string.Empty;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    zip[rootZip ? "Sandbox.sbc" : rootPath + "/Sandbox.sbc"].Extract(ms);
+                    ms.Position = 0;
+                    StreamReader sr = new StreamReader(ms);
+                    string sbc = sr.ReadToEnd();
+                    dirName = PathHelper.SanitizeFSName(Regex.Match(sbc, @"<SessionName>(.*)<\/SessionName>").Groups[1].Value);
+                }
+
+                if (Directory.Exists(PathHelper.GetSavePath(server, dirName)) && System.IO.File.Exists(PathHelper.GetSavePath(server, dirName) + @"\Sandbox.sbc"))
+                {
+                    int i = 2;
+                    string testDir;
+                    do
+                    {
+                        testDir = dirName + " (" + i + ")";
+                        i++;
+                    } while (Directory.Exists(PathHelper.GetSavePath(server, testDir)) && System.IO.File.Exists(PathHelper.GetSavePath(server, testDir) + @"\Sandbox.sbc"));
+                    dirName = testDir;
+                }
+
+                if (!Directory.Exists(PathHelper.GetSavePath(server, dirName)))
+                    Directory.CreateDirectory(PathHelper.GetSavePath(server, dirName));
+
+                if (rootZip)
+                {
+                    zip.ExtractAll(PathHelper.GetSavePath(server, dirName), ExtractExistingFileAction.OverwriteSilently);
+                }
+                else
+                {
+                    foreach (ZipEntry item in zip.EntriesSorted)
+                    {
+                        if (item.FileName.StartsWith(rootPath))
+                        {
+                            item.FileName = item.FileName.Substring(rootPath.Length);
+                            item.Extract(PathHelper.GetSavePath(server, dirName), ExtractExistingFileAction.OverwriteSilently);
+                        }
+                    }
+                }
+
+            }
+            return Content(XMLMessage.Success("MAP-UPM-OK", "The map have been uploaded").ToString());
         }
 
         protected override void Dispose(bool disposing)

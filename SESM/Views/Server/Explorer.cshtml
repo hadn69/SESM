@@ -480,10 +480,8 @@
         });
 
         $("#btnStartUpload").click(function () {
-            console.log(uploadZone);
             uploadZone.options.parallelUploads = uploadZone.getQueuedFiles().length;
             uploadZone.processQueue();
-            console.log(uploadZone);
         });
 
         $("#btnClearUpload").click(function () {

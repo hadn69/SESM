@@ -30,20 +30,20 @@ namespace SESM.Tools.Helpers
         // -- Misc
         public bool EnableSpectator = Default.EnableSpectator;
         public bool RealisticSound = Default.RealisticSound;
-        public int AutoSaveInMinutes = Default.AutoSaveInMinutes;
+        public uint AutoSaveInMinutes = Default.AutoSaveInMinutes;
 
         // -- Production
-        public double InventorySizeMultiplier = Default.InventorySizeMultiplier;
-        public double AssemblerSpeedMultiplier = Default.AssemblerSpeedMultiplier;
-        public double AssemblerEfficiencyMultiplier = Default.AssemblerEfficiencyMultiplier;
-        public double RefinerySpeedMultiplier = Default.RefinerySpeedMultiplier;
+        public float InventorySizeMultiplier = Default.InventorySizeMultiplier;
+        public float AssemblerSpeedMultiplier = Default.AssemblerSpeedMultiplier;
+        public float AssemblerEfficiencyMultiplier = Default.AssemblerEfficiencyMultiplier;
+        public float RefinerySpeedMultiplier = Default.RefinerySpeedMultiplier;
 
         // -- Building
         public GameMode GameMode = Default.GameMode;
         public bool EnableCopyPaste = Default.EnableCopyPaste;
-        public double WelderSpeedMultiplier = Default.WelderSpeedMultiplier;
-        public double GrinderSpeedMultiplier = Default.GrinderSpeedMultiplier;
-        public double HackSpeedMultiplier = Default.HackSpeedMultiplier;
+        public float WelderSpeedMultiplier = Default.WelderSpeedMultiplier;
+        public float GrinderSpeedMultiplier = Default.GrinderSpeedMultiplier;
+        public float HackSpeedMultiplier = Default.HackSpeedMultiplier;
         public bool DestructibleBlocks = Default.DestructibleBlocks;
 
         // -- Caps
@@ -73,7 +73,7 @@ namespace SESM.Tools.Helpers
         public bool WeaponsEnabled = Default.WeaponsEnabled;
         public bool ShowPlayerNamesOnHud = Default.ShowPlayerNamesOnHud;
         public bool ThrusterDamage = Default.ThrusterDamage;
-        public double SpawnShipTimeMultiplier = Default.SpawnShipTimeMultiplier;
+        public float SpawnShipTimeMultiplier = Default.SpawnShipTimeMultiplier;
         public bool RespawnShipDelete = Default.RespawnShipDelete;
         public bool EnableToolShake = Default.EnableToolShake;
         public bool EnableIngameScripts = Default.EnableIngameScripts;
@@ -500,13 +500,13 @@ namespace SESM.Tools.Helpers
                 if (sessionSettings.Element("GameMode") != null)
                     Enum.TryParse(sessionSettings.Element("GameMode").Value, out GameMode);
                 if (sessionSettings.Element("InventorySizeMultiplier") != null)
-                    double.TryParse(sessionSettings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
+                    float.TryParse(sessionSettings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
                 if (sessionSettings.Element("AssemblerSpeedMultiplier") != null)
-                    double.TryParse(sessionSettings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
+                    float.TryParse(sessionSettings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
                 if (sessionSettings.Element("AssemblerEfficiencyMultiplier") != null)
-                    double.TryParse(sessionSettings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
+                    float.TryParse(sessionSettings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
                 if (sessionSettings.Element("RefinerySpeedMultiplier") != null)
-                    double.TryParse(sessionSettings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
+                    float.TryParse(sessionSettings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
                 if (sessionSettings.Element("OnlineMode") != null)
                     Enum.TryParse(sessionSettings.Element("OnlineMode").Value, out OnlineMode);
                 if (sessionSettings.Element("MaxPlayers") != null)
@@ -538,21 +538,21 @@ namespace SESM.Tools.Helpers
                 if (sessionSettings.Element("ResetOwnership") != null)
                     bool.TryParse(sessionSettings.Element("ResetOwnership").Value, out ResetOwnership);
                 if (sessionSettings.Element("WelderSpeedMultiplier") != null)
-                    double.TryParse(sessionSettings.Element("WelderSpeedMultiplier").Value, out WelderSpeedMultiplier);
+                    float.TryParse(sessionSettings.Element("WelderSpeedMultiplier").Value, out WelderSpeedMultiplier);
                 if (sessionSettings.Element("GrinderSpeedMultiplier") != null)
-                    double.TryParse(sessionSettings.Element("GrinderSpeedMultiplier").Value, out GrinderSpeedMultiplier);
+                    float.TryParse(sessionSettings.Element("GrinderSpeedMultiplier").Value, out GrinderSpeedMultiplier);
                 if (sessionSettings.Element("RealisticSound") != null)
                     bool.TryParse(sessionSettings.Element("RealisticSound").Value, out RealisticSound);
                 if (sessionSettings.Element("ClientCanSave") != null)
                     bool.TryParse(sessionSettings.Element("ClientCanSave").Value, out ClientCanSave);
                 if (sessionSettings.Element("HackSpeedMultiplier") != null)
-                    double.TryParse(sessionSettings.Element("HackSpeedMultiplier").Value, out HackSpeedMultiplier);
+                    float.TryParse(sessionSettings.Element("HackSpeedMultiplier").Value, out HackSpeedMultiplier);
                 if (sessionSettings.Element("PermanentDeath") != null)
                     bool.TryParse(sessionSettings.Element("PermanentDeath").Value, out PermanentDeath);
                 if (sessionSettings.Element("AutoSaveInMinutes") != null)
-                    int.TryParse(sessionSettings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
+                    uint.TryParse(sessionSettings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
                 if (sessionSettings.Element("SpawnShipTimeMultiplier") != null)
-                    double.TryParse(sessionSettings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
+                    float.TryParse(sessionSettings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
                 if (sessionSettings.Element("DestructibleBlocks") != null)
                     bool.TryParse(sessionSettings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
                 if (sessionSettings.Element("EnableIngameScripts") != null)
@@ -650,13 +650,13 @@ namespace SESM.Tools.Helpers
             if (settings.Element("GameMode") != null)
                 Enum.TryParse(settings.Element("GameMode").Value, out GameMode);
             if (settings.Element("InventorySizeMultiplier") != null)
-                double.TryParse(settings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
+                float.TryParse(settings.Element("InventorySizeMultiplier").Value, out InventorySizeMultiplier);
             if (settings.Element("AssemblerSpeedMultiplier") != null)
-                double.TryParse(settings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
+                float.TryParse(settings.Element("AssemblerSpeedMultiplier").Value, out AssemblerSpeedMultiplier);
             if (settings.Element("AssemblerEfficiencyMultiplier") != null)
-                double.TryParse(settings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
+                float.TryParse(settings.Element("AssemblerEfficiencyMultiplier").Value, out AssemblerEfficiencyMultiplier);
             if (settings.Element("RefinerySpeedMultiplier") != null)
-                double.TryParse(settings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
+                float.TryParse(settings.Element("RefinerySpeedMultiplier").Value, out RefinerySpeedMultiplier);
             if (settings.Element("OnlineMode") != null)
                 Enum.TryParse(settings.Element("OnlineMode").Value, out OnlineMode);
             if (settings.Element("MaxPlayers") != null)
@@ -688,21 +688,21 @@ namespace SESM.Tools.Helpers
             if (settings.Element("ResetOwnership") != null)
                 bool.TryParse(settings.Element("ResetOwnership").Value, out ResetOwnership);
             if (settings.Element("WelderSpeedMultiplier") != null)
-                double.TryParse(settings.Element("WelderSpeedMultiplier").Value, out WelderSpeedMultiplier);
+                float.TryParse(settings.Element("WelderSpeedMultiplier").Value, out WelderSpeedMultiplier);
             if (settings.Element("GrinderSpeedMultiplier") != null)
-                double.TryParse(settings.Element("GrinderSpeedMultiplier").Value, out GrinderSpeedMultiplier);
+                float.TryParse(settings.Element("GrinderSpeedMultiplier").Value, out GrinderSpeedMultiplier);
             if (settings.Element("RealisticSound") != null)
                 bool.TryParse(settings.Element("RealisticSound").Value, out RealisticSound);
             if (settings.Element("ClientCanSave") != null)
                 bool.TryParse(settings.Element("ClientCanSave").Value, out ClientCanSave);
             if (settings.Element("HackSpeedMultiplier") != null)
-                double.TryParse(settings.Element("HackSpeedMultiplier").Value, out HackSpeedMultiplier);
+                float.TryParse(settings.Element("HackSpeedMultiplier").Value, out HackSpeedMultiplier);
             if (settings.Element("PermanentDeath") != null)
                 bool.TryParse(settings.Element("PermanentDeath").Value, out PermanentDeath);
             if (settings.Element("AutoSaveInMinutes") != null)
-                int.TryParse(settings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
+                uint.TryParse(settings.Element("AutoSaveInMinutes").Value, out AutoSaveInMinutes);
             if (settings.Element("SpawnShipTimeMultiplier") != null)
-                double.TryParse(settings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
+                float.TryParse(settings.Element("SpawnShipTimeMultiplier").Value, out SpawnShipTimeMultiplier);
             if (settings.Element("DestructibleBlocks") != null)
                 bool.TryParse(settings.Element("DestructibleBlocks").Value, out DestructibleBlocks);
             if (settings.Element("EnableIngameScripts") != null)

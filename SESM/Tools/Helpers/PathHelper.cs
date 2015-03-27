@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using SESM.DTO;
 
 namespace SESM.Tools.Helpers
@@ -73,6 +75,11 @@ namespace SESM.Tools.Helpers
         internal static string GetFSDirName(EntityServer server)
         {
             return GetPrefix() + "_" + server.Id + "_" + server.Name;
+        }
+
+        public static string SanitizeFSName(string FSName)
+        {
+            return Path.GetInvalidFileNameChars().Aggregate(FSName, (current, item) => current.Replace(item.ToString(), ""));
         }
     }
 }

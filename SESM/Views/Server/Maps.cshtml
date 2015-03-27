@@ -13,6 +13,8 @@
 <script src="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/bootstrap-contextmenu/bootstrap-contextmenu.js"></script>
 <script type="text/javascript" src="/Content/Js/TouchSpinMod.js"></script>
+<link href="/assets/global/plugins/dropzone/css/dropzone.css" rel="stylesheet">
+<script src="/assets/global/plugins/dropzone/dropzone.js"></script>
 <style>
     td:nth-child(2), th:nth-child(2) {
         text-align: center;
@@ -24,12 +26,36 @@
 </style>
 <!-- --- DOWNLOAD --- -->
 <div style="display: none">
-    <form id="downloadForm" method="POST" target="download_frame" action="/API/Map/DownloadMap/">
-        <input id="downloadFormMapDir" type="hidden" name="MapDir" value="" />
+    <form id="downloadForm" method="POST" target="download_frame" action="/API/Map/DownloadMaps/">
+        <input id="downloadFormMapDirs" type="hidden" name="MapDirs" value="" />
         <input id="downloadFormServerID" type="hidden" name="ServerID" value="" />
     </form>
 </div>
 <iframe id="download_frame" name="download_frame" style="display: none"></iframe>
+<!-- --- UPLOAD Modal --- -->
+<div class="modal fade" id="uploadModal" tabindex="-1" role="basic" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Upload Files</h4>
+            </div>
+            <div class="modal-body">
+                <div class="portlet-body form">
+                    <form action="/API/Map/UploadMap" class="dropzone" id="uploadDropzone" style="min-height:225px">
+                        <div class="fallback">
+                            <input name="ZipFile" type="file" multiple />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Close</button>
+                <button type="button" id="btnStartUpload" class="btn green">Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- --- Create Modal --- -->
 <div class="modal fade" id="createModal" tabindex="-1" role="basic" aria-hidden="true">
     <div class="modal-dialog">
@@ -176,6 +202,37 @@
 
         $("#downloadFormServerID").val(serverID);
 
+        // Upload
+        Dropzone.options.uploadDropzone = {
+            maxFiles: 1,
+            maxFilesize: 100,
+            paramName: "ZipFile",
+            clickable: true,
+            autoProcessQueue: false,
+            uploadMultiple: false,
+            acceptedFiles: ".zip",
+            init: function () {
+                uploadZone = this;
+                this.on("success", function (file, response) {
+                    var root = $($.parseXML(response)).find("Response");
+                    uploadZone.removeAllFiles(true);
+                    $("#uploadModal").modal('hide');
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        return;
+                    }
+                    refreshList();
+                    toastr.success(root.children("Content").text(), "Map Uploaded");
+                });
+                this.on("sending", function (file, xhr, formData) {
+                    formData.append("ServerID", serverID);
+                });
+            }
+        };
+        $("#btnUpload").click(function() {
+            $("#uploadModal").modal('show');
+        });
+
         // Create
 
         $('#inpAsteroidAmount').TouchSpin({
@@ -246,12 +303,15 @@
                     $(this).parents('tr').removeClass("active");
                 }
             });
-            $.uniform.update();
+
             if ($('.checkboxes:checked').length == 0) {
+                $('#chkCheckAll').prop("checked", false);
                 $("#actionBtn").stop(true).fadeOut("slow");
             } else {
+                $('#chkCheckAll').prop("checked", true);
                 $("#actionBtn").stop(true).fadeIn("slow");
             }
+            $.uniform.update();
         }
 
         $('#chkCheckAll').change(function () {
@@ -260,11 +320,6 @@
         });
 
         $('body').on('change', ".checkboxes", function (event) {
-            if ($('.checkboxes:checked').length == 0) {
-                $('#chkCheckAll').prop("checked", false);
-            } else {
-                $('#chkCheckAll').prop("checked", true);
-            }
             updateCheckboxes();
         });
 
@@ -306,6 +361,7 @@
 
                 mapTable.DataTable().draw();
                 mapTable.find('input:checkbox').uniform();
+                updateCheckboxes();
 
                 $('tr.odd, tr.even').contextmenu({
                     target: '#context-menu',
@@ -335,14 +391,13 @@
                                         }
 
                                         toastr.success("The Map have been selected", "Map Selected");
-
                                         refreshList();
                                     });
                                 }
                             });
                         }
                         else if (clicked == "Download") {
-                            $("#downloadFormMapDir").val(dirName);
+                            $("#downloadFormMapDirs").val(dirName);
                             $("#downloadForm").submit();
                         }
                         else if (clicked == "Delete") {
@@ -351,10 +406,10 @@
                             function (result) {
                                 if (result) {
                                     LockPage();
-                                    $.post("/API/Map/DeleteMap",
+                                    $.post("/API/Map/DeleteMaps",
                                     {
                                         ServerID: serverID,
-                                        MapDir: dirName
+                                        MapDirs: dirName
                                     },
                                     function (data) {
 
@@ -366,7 +421,6 @@
                                         }
 
                                         toastr.success("The Map have been deleted", "Map Deleted");
-
                                         refreshList();
                                     });
                                 }
@@ -383,19 +437,60 @@
             $("#createModal").modal('show');
         });
 
+        $("#btnStartUpload").click(function () {
+            uploadZone.processQueue();
+        });
+
         $("#btnSaveCreate").click(function () {
             bootbox.confirm("The server will be (re)started. Are you sure you want to create this map ?",
+            function (result) {
+                if (result) {
+                    LockPage();
+                    $("#createModal").modal('hide');
+                    $.post("/API/Map/CreateMap",
+                    {
+                        ServerID: serverID,
+                        SubTypeId: $("#inpSubTypeId").val(),
+                        AsteroidAmount: $("#inpAsteroidAmount").val(),
+                        ProceduralDensity: $("#inpProceduralDensity").val(),
+                        ProceduralSeed: $("#inpProceduralSeed").val()
+                    },
+                    function (data) {
+
+                        var root = $($.parseXML(data)).find("Response");
+
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+
+                        toastr.success("The Map is creating ... The process can take up to a few minutes.", "Map Creating");
+
+                        refreshList();
+                    });
+                }
+            });
+        });
+
+        function getCheckedVals() {
+            var retArray = [];
+            $(".checkboxes:checked").each(function () {
+                retArray.push($(this).val());
+            });
+            return retArray;
+        }
+
+        $("#btnDeleteMaps").click(function () {
+            var maps = getCheckedVals();
+            bootbox.confirm("Are you sure you want to delete those maps ?<br/>" +
+                "Note : if one of the maps is loaded and the server is running, it WILL be stopped",
                 function (result) {
                     if (result) {
                         LockPage();
-                        $("#createModal").modal('hide');
-                        $.post("/API/Map/CreateMap",
+                        $.post("/API/Map/DeleteMaps",
                         {
                             ServerID: serverID,
-                            SubTypeId: $("#inpSubTypeId").val(),
-                            AsteroidAmount: $("#inpAsteroidAmount").val(),
-                            ProceduralDensity: $("#inpProceduralDensity").val(),
-                            ProceduralSeed: $("#inpProceduralSeed").val()
+                            MapDirs: maps.join(':')
                         },
                         function (data) {
 
@@ -406,12 +501,18 @@
                                 return;
                             }
 
-                            toastr.success("The Map is creating ... The process can take up to a few minutes.", "Map Creating");
-
+                            toastr.success("The Maps have been deleted", "Maps Deleted");
                             refreshList();
                         });
                     }
                 });
+        });
+
+        $("#btnDownloadMaps").click(function () {
+            var maps = getCheckedVals();
+
+            $("#downloadFormMapDirs").val(maps.join(":"));
+            $("#downloadForm").submit();
         });
 
         $("#btnRefresh").click(function () {
