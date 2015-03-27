@@ -435,14 +435,14 @@ namespace SESM.Controllers.API
                     {
                         ServerConfigHelper config = new ServerConfigHelper();
                         config.Load(server);
-                        server.AutoSaveInMinutes = config.AutoSaveInMinutes;
+                        server.AutoSaveInMinutes = Convert.ToInt32(config.AutoSaveInMinutes);
                         srvPrv.UpdateServer(server);
                     }
                     else
                     {
                         ServerConfigHelper config = new ServerConfigHelper();
                         config.Load(server);
-                        config.AutoSaveInMinutes = server.AutoSaveInMinutes ?? 5;
+                        config.AutoSaveInMinutes = Convert.ToUInt32(server.AutoSaveInMinutes);
                         config.Save(server);
                     }
 
@@ -1083,31 +1083,31 @@ namespace SESM.Controllers.API
             // ==== AutoSaveInMinutes ====
             if (string.IsNullOrWhiteSpace(Request.Form["AutoSaveInMinutes"]))
                 return Content(XMLMessage.Error("SRV-SC-MISASIM", "The AutoSaveInMinutes field must be provided").ToString());
-            if (!int.TryParse(Request.Form["AutoSaveInMinutes"], out serverConfig.AutoSaveInMinutes) || serverConfig.AutoSaveInMinutes < 0)
+            if (!uint.TryParse(Request.Form["AutoSaveInMinutes"], out serverConfig.AutoSaveInMinutes))
                 return Content(XMLMessage.Error("SRV-SC-BADASIM", "The AutoSaveInMinutes field is invalid").ToString());
 
             // ==== InventorySizeMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["InventorySizeMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISISM", "The InventorySizeMultiplier field must be provided").ToString());
-            if (!double.TryParse(Request.Form["InventorySizeMultiplier"], out serverConfig.InventorySizeMultiplier) || serverConfig.InventorySizeMultiplier < 1)
+            if (!float.TryParse(Request.Form["InventorySizeMultiplier"], out serverConfig.InventorySizeMultiplier) || serverConfig.InventorySizeMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADISM", "The InventorySizeMultiplier field is invalid").ToString());
 
             // ==== AssemblerSpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["AssemblerSpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISASM", "The AssemblerSpeedMultiplier field must be provided").ToString());
-            if (!double.TryParse(Request.Form["AssemblerSpeedMultiplier"], out serverConfig.AssemblerSpeedMultiplier) || serverConfig.AssemblerSpeedMultiplier < 1)
+            if (!float.TryParse(Request.Form["AssemblerSpeedMultiplier"], out serverConfig.AssemblerSpeedMultiplier) || serverConfig.AssemblerSpeedMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADASM", "The AssemblerSpeedMultiplier field is invalid").ToString());
 
             // ==== AssemblerEfficiencyMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["AssemblerEfficiencyMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISAEM", "The AssemblerEfficiencyMultiplier field must be provided").ToString());
-            if (!double.TryParse(Request.Form["AssemblerEfficiencyMultiplier"], out serverConfig.AssemblerEfficiencyMultiplier) || serverConfig.AssemblerEfficiencyMultiplier < 1)
+            if (!float.TryParse(Request.Form["AssemblerEfficiencyMultiplier"], out serverConfig.AssemblerEfficiencyMultiplier) || serverConfig.AssemblerEfficiencyMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADAEM", "The AssemblerEfficiencyMultiplier field is invalid").ToString());
 
             // ==== RefinerySpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["RefinerySpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISRSM", "The RefinerySpeedMultiplier field must be provided").ToString());
-            if (!double.TryParse(Request.Form["RefinerySpeedMultiplier"], out serverConfig.RefinerySpeedMultiplier) || serverConfig.RefinerySpeedMultiplier < 1)
+            if (!float.TryParse(Request.Form["RefinerySpeedMultiplier"], out serverConfig.RefinerySpeedMultiplier) || serverConfig.RefinerySpeedMultiplier < 1)
                 return Content(XMLMessage.Error("SRV-SC-BADRSM", "The RefinerySpeedMultiplier field is invalid").ToString());
 
             // ==== GameMode ====
@@ -1125,19 +1125,19 @@ namespace SESM.Controllers.API
             // ==== WelderSpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["WelderSpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISWSM", "The WelderSpeedMultiplier field must be provided").ToString());
-            if (!double.TryParse(Request.Form["WelderSpeedMultiplier"], out serverConfig.WelderSpeedMultiplier) || serverConfig.WelderSpeedMultiplier < 0)
+            if (!float.TryParse(Request.Form["WelderSpeedMultiplier"], out serverConfig.WelderSpeedMultiplier) || serverConfig.WelderSpeedMultiplier < 0)
                 return Content(XMLMessage.Error("SRV-SC-BADWSM", "The WelderSpeedMultiplier field is invalid").ToString());
 
             // ==== GrinderSpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["GrinderSpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISGSM", "The GrinderSpeedMultiplier field must be provided").ToString());
-            if (!double.TryParse(Request.Form["GrinderSpeedMultiplier"], out serverConfig.GrinderSpeedMultiplier) || serverConfig.GrinderSpeedMultiplier < 0)
+            if (!float.TryParse(Request.Form["GrinderSpeedMultiplier"], out serverConfig.GrinderSpeedMultiplier) || serverConfig.GrinderSpeedMultiplier < 0)
                 return Content(XMLMessage.Error("SRV-SC-BADGSM", "The GrinderSpeedMultiplier field is invalid").ToString());
 
             // ==== HackSpeedMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["HackSpeedMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISHSM", "The HackSpeedMultiplier field must be provided").ToString());
-            if (!double.TryParse(Request.Form["HackSpeedMultiplier"], out serverConfig.HackSpeedMultiplier) || serverConfig.HackSpeedMultiplier < 0)
+            if (!float.TryParse(Request.Form["HackSpeedMultiplier"], out serverConfig.HackSpeedMultiplier) || serverConfig.HackSpeedMultiplier < 0)
                 return Content(XMLMessage.Error("SRV-SC-BADHSM", "The HackSpeedMultiplier field is invalid").ToString());
 
             // ==== DestructibleBlocks ====
@@ -1271,7 +1271,7 @@ namespace SESM.Controllers.API
             // ==== SpawnShipTimeMultiplier ====
             if (string.IsNullOrWhiteSpace(Request.Form["SpawnShipTimeMultiplier"]))
                 return Content(XMLMessage.Error("SRV-SC-MISSSTM", "The SpawnShipTimeMultiplier field must be provided").ToString());
-            if (!double.TryParse(Request.Form["SpawnShipTimeMultiplier"], out serverConfig.SpawnShipTimeMultiplier) || serverConfig.SpawnShipTimeMultiplier < 0)
+            if (!float.TryParse(Request.Form["SpawnShipTimeMultiplier"], out serverConfig.SpawnShipTimeMultiplier) || serverConfig.SpawnShipTimeMultiplier < 0)
                 return Content(XMLMessage.Error("SRV-SC-BADSSTM", "The SpawnShipTimeMultiplier field is invalid").ToString());
 
             // ==== RespawnShipDelete ====
@@ -1307,7 +1307,7 @@ namespace SESM.Controllers.API
             // ** PROCESS **
             server.Ip = serverConfig.IP;
             server.Port = serverConfig.ServerPort;
-            server.AutoSaveInMinutes = serverConfig.AutoSaveInMinutes;
+            server.AutoSaveInMinutes = Convert.ToInt32(serverConfig.AutoSaveInMinutes);
 
             srvPrv.UpdateServer(server);
 

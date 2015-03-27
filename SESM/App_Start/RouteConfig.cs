@@ -108,8 +108,9 @@ namespace SESM
                 {
                     action = "GetMaps|" +
                              "SelectMap|" +
-                             "DeleteMap|" +
-                             "DownloadMap|" +
+                             "DeleteMaps|" +
+                             "DownloadMaps|" +
+                             "UploadMap|" +
                              "CreateMap|"
                 }
             );
@@ -160,6 +161,17 @@ namespace SESM
                     action = "GetUsers|" +
                              "SetUser|" +
                              "DeleteUser"
+                }
+            );
+
+            // SESE API
+            routes.MapRoute(
+                name: "APISESE",
+                url: "API/SESE/{action}",
+                defaults: new { controller = "APISESE" },
+                constraints: new
+                {
+                    action = "TestWCF" 
                 }
             );
 

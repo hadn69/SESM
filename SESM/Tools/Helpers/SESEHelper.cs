@@ -11,40 +11,6 @@ namespace SESM.Tools.Helpers
 {
     public class SESEHelper
     {
-        /*public static string UpdateIsAvailable()
-        {
-            string[] files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
-            string data = GetGithubData();
-            if(files.Length == 0)
-            {
-                return GetLastURL(data, SESMConfigHelper.SESEAutoUpdateUseDev).ToString();
-            }
-            if(files.Length != 1)
-            {
-                List<FileInfo> fileInfos = files.Select(file => new FileInfo(file)).OrderBy(x => x.LastWriteTime).ToList();
-
-                for(int i = 1; i < fileInfos.Count; i++)
-                {
-                    try
-                    {
-                        File.Delete(fileInfos[i].FullName);
-                    }
-                    catch(Exception ex)
-                    {
-                        Logger exceptionLogger = LogManager.GetLogger("GenericExceptionLogger");
-                        exceptionLogger.Fatal("Caught Exception in UpdateIsAvailable when deleting " + fileInfos[i].Name, ex);
-                    }
-                }
-                files = Directory.GetFiles(SESMConfigHelper.SEDataPath, "SEServerExtender*.zip", SearchOption.TopDirectoryOnly);
-
-            }
-
-            string last = GetLastVersion(data, SESMConfigHelper.SESEAutoUpdateUseDev).ToString();
-            if(string.IsNullOrEmpty(last) || last == PathHelper.GetLastLeaf(files[0]))
-                return null;
-            return GetLastURL(data, SESMConfigHelper.SESEAutoUpdateUseDev);
-        }*/
-
         public static string GetLastRemoteURL(string data, bool useDev)
         {
             dynamic result;
@@ -90,7 +56,7 @@ namespace SESM.Tools.Helpers
                     Match extract = Regex.Match(item.assets[0].name, "^.*v(.*)-.*$");
                     if (extract.Groups.Count != 2)
                         return null;
-                    return new Version("0." + extract.Groups[1].Value);
+                    return new Version(extract.Groups[1].Value);
                 }
             }
             return new Version(0, 0);

@@ -29,25 +29,25 @@ namespace SESM.Tools
         // -- Misc
         public static readonly bool EnableSpectator = false;
         public static readonly bool RealisticSound = false;
-        public static readonly int AutoSaveInMinutes = 5;
+        public static readonly uint AutoSaveInMinutes = 5;
 
         // -- Production
-        public static readonly double InventorySizeMultiplier = 1;
-        public static readonly double AssemblerSpeedMultiplier = 1;
-        public static readonly double AssemblerEfficiencyMultiplier = 1;
-        public static readonly double RefinerySpeedMultiplier = 1;
+        public static readonly float InventorySizeMultiplier = 1;
+        public static readonly float AssemblerSpeedMultiplier = 1;
+        public static readonly float AssemblerEfficiencyMultiplier = 1;
+        public static readonly float RefinerySpeedMultiplier = 1;
 
         // -- Building
         public static readonly GameMode GameMode = GameMode.Survival;
         public static readonly bool EnableCopyPaste = true;
-        public static readonly double WelderSpeedMultiplier = 1;
-        public static readonly double GrinderSpeedMultiplier = 1;
-        public static readonly double HackSpeedMultiplier = 0.33;
+        public static readonly float WelderSpeedMultiplier = 1;
+        public static readonly float GrinderSpeedMultiplier = 1;
+        public static readonly float HackSpeedMultiplier = 0.33f;
         public static readonly bool DestructibleBlocks = true;
 
         // -- Caps
-        public static readonly int MaxPlayers = 4;
-        public static readonly int MaxFloatingObjects = 256;
+        public static readonly short MaxPlayers = 4;
+        public static readonly short MaxFloatingObjects = 256;
 
         // -- Maps
         public static readonly string WorldName = "SESM - MyMap";
@@ -73,7 +73,7 @@ namespace SESM.Tools
         public static readonly bool ShowPlayerNamesOnHud = true;
         public static readonly bool ThrusterDamage = true;
 
-        public static readonly double SpawnShipTimeMultiplier = 1;
+        public static readonly float SpawnShipTimeMultiplier = 1;
         public static readonly bool RespawnShipDelete = true;
         public static readonly bool EnableToolShake = false;
         public static readonly bool EnableIngameScripts = true;
