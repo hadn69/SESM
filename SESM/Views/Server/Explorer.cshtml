@@ -16,12 +16,17 @@
 <link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
 <link href="/assets/global/plugins/dropzone/css/dropzone.css" rel="stylesheet">
 <script src="/assets/global/plugins/dropzone/dropzone.js"></script>
+<script src="/assets/global/plugins/bootstrap-contextmenu/bootstrap-contextmenu.js"></script>
 <style type="text/css">
-    table td:nth-child(4) {
+    td:nth-child(2), th:nth-child(2) {
+        text-align: center;
+    }
+
+    td:nth-child(4), th:nth-child(4) {
         text-align: right;
     }
 
-    table td:nth-child(2):hover, table td:nth-child(3):hover {
+    td:nth-child(2):hover, td:nth-child(3):hover {
         cursor: pointer;
     }
 </style>
@@ -82,6 +87,31 @@
 </div>
 <div class="col-md-8 col-sm-12">
     <div class="portlet light" style="height: 400px;">
+        <!-- --- Context Menu --- -->
+        <div id="context-menu">
+            <ul class="dropdown-menu pull-left" role="menu">
+                <li>
+                    <a href="#">
+                        <i class="fa fa-edit"></i> Edit
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-font"></i> Rename
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-download"></i> Download
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa fa-trash"></i> Delete
+                    </a>
+                </li>
+            </ul>
+        </div>
         <div class="portlet-body" style="overflow-y: auto; overflow-x: hidden; height: 100%;">
             <div class="">
                 <div class="btn-group btn-group-solid">
@@ -104,7 +134,7 @@
                 <button type="button" class="btn blue" id="btnUpload">
                     <i class="fa fa-upload"></i> Upload
                 </button>
-                <div class="pull-right" id="selectedBtn" style="display:none">
+                <div class="pull-right" id="selectedBtn" style="display: none">
                     <button type="button" class="btn yellow " id="btnDownloadAll">
                         <i class="fa fa-download"></i> Download
                     </button>
@@ -117,28 +147,28 @@
             </div>
             <table class="table table-striped table-hover" id="tableDiv">
                 <thead>
-                <tr>
-                    <th class="table-checkbox">
-                        <input type="checkbox" class="group-checkable" data-set="#tableDiv .checkboxes"/>
-                    </th>
-                    <th>
-                    </th>
-                    <th>
-                        Name
-                    </th>
-                    <th>
-                        Size
-                    </th>
-                    <th>
-                        Last Edit
-                    </th>
-                    <th></th>
-                </tr>
+                    <tr>
+                        <th class="table-checkbox">
+                            <input type="checkbox" id="chkCheckAll" />
+                        </th>
+                        <th>
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Size
+                        </th>
+                        <th>
+                            Last Edit
+                        </th>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody></tbody>
             </table>
-            <br/>
-            <br/>
+            <br />
+            <br />
             <br />
         </div>
     </div>
@@ -198,11 +228,11 @@
             "columns": [
             {
                 "orderable": false,
-                "width": "5%"
+                "width": "3%"
             }, {
                 "orderable": false,
                 "type": "itemtype",
-                "width": "5%"
+                "width": "3%"
             }, {
                 "orderable": true,
                 "width": "40%"
@@ -219,117 +249,179 @@
             "order": [[2, "asc"]]
         });
 
-        table.find('.group-checkable').change(function () {
-            var set = $(this).attr("data-set");
-            var checked = $(this).is(":checked");
-            $(set).each(function () {
-                if (checked) {
-                    $(this).attr("checked", true);
+        function updateCheckboxes() {
+            $(".checkboxes").each(function () {
+                var item = $(this);
+                if (item.is(':checked')) {
                     $(this).parents('tr').addClass("active");
                 } else {
-                    $(this).attr("checked", false);
                     $(this).parents('tr').removeClass("active");
                 }
             });
-            $.uniform.update(set);
 
-            var activeCount = table.find("tr.active").length;
-            if (activeCount == 0) {
-                $("#selectedBtn").stop(true).fadeOut("slow");
+            if ($('.checkboxes:checked').length == 0) {
+                $('#chkCheckAll').prop("checked", false);
+                $("#actionBtn").stop(true).fadeOut("slow");
             } else {
-                $("#selectedBtn").stop(true).fadeIn("slow");
+                $('#chkCheckAll').prop("checked", true);
+                $("#actionBtn").stop(true).fadeIn("slow");
             }
+            $.uniform.update();
+        }
+
+        $('#chkCheckAll').change(function () {
+            $(".checkboxes").prop("checked", $(this).is(':checked'));
+            updateCheckboxes();
         });
 
-        table.on('change', 'tbody tr .checkboxes', function () {
-            $(this).parents('tr').toggleClass("active");
-
-            var activeCount = table.find("tr.active").length;
-            if (activeCount == 0) {
-                $("#selectedBtn").stop(true).fadeOut("slow");
-            } else {
-                $("#selectedBtn").stop(true).fadeIn("slow");
-            }
+        $('body').on('change', ".checkboxes", function (event) {
+            updateCheckboxes();
         });
+
+
 
         function loadList() {
             table.DataTable().clear();
             table.DataTable().draw();
             $.post("/API/Explorer/GetDirectoryContent/",
-                {
-                    ServerID: serverID,
-                    Path: currentPath
-                },
-                function (data) {
-                    var root = $($.parseXML(data)).find("Response");
+            {
+                ServerID: serverID,
+                Path: currentPath
+            },
+            function (data) {
+                var root = $($.parseXML(data)).find("Response");
 
-                    if (root.children("Type").text() == "Error") {
-                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                        return;
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    return;
+                }
+
+                table.DataTable().clear();
+                if (currentPath != "") {
+                    table.DataTable().row.add([null, "<span class=\"glyphicon glyphicon-arrow-up\"></span>",
+                        "Parent Folder", null, null, null]);
+                }
+
+                var total = root.children("Content").children("Item").length;
+
+                root.children("Content").children("Item").each(function (index) {
+                    var item = $(this);
+                    // Exploded item
+                    var Type = item.children("Type").text();
+                    var Name = item.children("Name").text();
+                    var Size = item.children("Size").text();
+                    var DateItem = item.children("Date").text();
+
+                    // Working vars
+                    var checkbox = "<input type=\"checkbox\" class=\"checkboxes\" />";
+                    var icon = "";
+                    var tempDate = "";
+                    var displayDate = "";
+                    var displaySize = "";
+                    var actions = "";
+
+                    if (index > total - 4 || total < 6) {
+                        actions += '<div class="btn-group dropup">';
+                    } else {
+                        actions += '<div class="btn-group dropdown">';
                     }
 
-                    table.DataTable().clear();
-                    if (currentPath != "") {
-                        table.DataTable().row.add([null, "<span class=\"glyphicon glyphicon-arrow-up\"></span>",
-                            "Parent Folder", null, null, null]);
+                    actions += '<button type="button" class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown">' +
+                                    '<span class="fa fa-cog"></span>' +
+                                '</button>' +
+                                '<ul class="dropdown-menu pull-right" role="menu">';
+
+                    if (Type == "Directory") {
+                        icon = '<i class="fa fa-folder"></i>';
                     }
-
-                    var total = root.children("Content").children("Item").length;
-
-                    root.children("Content").children("Item").each(function (index) {
-                        var item = $(this);
-                        // Exploded item
-                        var Type = item.children("Type").text();
-                        var Name = item.children("Name").text();
-                        var Size = item.children("Size").text();
-                        var DateItem = item.children("Date").text();
-
-                        // Working vars
-                        var checkbox = "<input type=\"checkbox\" class=\"checkboxes\" />";
-                        var icon = "";
-                        var tempDate = "";
-                        var displayDate = "";
-                        var displaySize = "";
-                        var actions = "";
-
-                        if (index > total - 4 || total < 6) {
-                            actions += '<div class="btn-group dropup">';
-                        } else {
-                            actions += '<div class="btn-group dropdown">';
+                    if (Type == "File") {
+                        icon = '<i class="fa fa-file"></i>';
+                        if (Size < 1024 * 512) {
+                            actions += '<li><a href="#" class="btnEdit"><i class="fa fa-edit"></i>&nbsp;Edit</a></li>';
                         }
+                    }
+                    actions += '<li><a href="#" class="btnRename"><i class="fa fa-font"></i>&nbsp;Rename</a></li>';
+                    actions += '<li><a href="#" class="btnDownload"><i class="fa fa-download"></i>&nbsp;Download</a></li>';
+                    actions += '<li><a href="#" class="btnDelete"><i class="fa fa-trash"></i>&nbsp;Delete</a></li>';
+                    actions += '</ul>';
+                    actions += '</div>';
 
-                        actions += '<button type="button" class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown">' +
-                                        '<span class="fa fa-cog"></span>' +
-                                    '</button>' +
-                                    '<ul class="dropdown-menu pull-right" role="menu">';
+                    tempDate = new Date(DateItem);
+                    displayDate = tempDate.getFullYear() + "-" + lpad(tempDate.getMonth(), 2) + "-" + lpad(tempDate.getDate(), 2) +
+                        " " + lpad(tempDate.getHours(), 2) + ":" + lpad(tempDate.getMinutes(), 2);
 
-                        if (Type == "Directory") {
-                            icon = '<i class="fa fa-folder"></i>';
-                        }
-                        if (Type == "File") {
-                            icon = '<i class="fa fa-file"></i>';
-                            if (Size < 1024 * 512) {
-                                actions += '<li><a href="#" class="btnEdit"><i class="fa fa-edit"></i>&nbsp;Edit</a></li>';
-                            }
-                        }
-                        actions += '<li><a href="#" class="btnRename"><i class="fa fa-font"></i>&nbsp;Rename</a></li>';
-                        actions += '<li><a href="#" class="btnDownload"><i class="fa fa-download"></i>&nbsp;Download</a></li>';
-                        actions += '<li><a href="#" class="btnDelete"><i class="fa fa-trash"></i>&nbsp;Delete</a></li>';
-                        actions += '</ul>';
-                        actions += '</div>';
+                    displaySize = fileSizeIEC(Size);
 
-                        tempDate = new Date(DateItem);
-                        displayDate = tempDate.getFullYear() + "-" + lpad(tempDate.getMonth(), 2) + "-" + lpad(tempDate.getDate(), 2) +
-                            " " + lpad(tempDate.getHours(), 2) + ":" + lpad(tempDate.getMinutes(), 2);
-
-                        displaySize = fileSizeIEC(Size);
-
-                        table.DataTable().row.add([checkbox, icon, Name, displaySize, DateItem, actions]);
-                    });
-                    table.DataTable().draw();
-                    table.find('input:checkbox').uniform();
-                    table.DataTable().columns.adjust().draw();
+                    table.DataTable().row.add([checkbox, icon, Name, displaySize, DateItem, actions]);
                 });
+                table.DataTable().draw();
+                table.find('input:checkbox').uniform();
+                updateCheckboxes();
+
+                $('tr.odd, tr.even').contextmenu({
+                    target: '#context-menu',
+                    onItem: function (context, e) {
+                        var dirName = $(context).children("td:nth-child(3)").text();
+
+                        var clicked = $(e.target).text().trim();
+
+                        if (clicked == "Load") {
+                            bootbox.confirm("Are you sure you want to select this map ?<br/>" +
+                                "Note : if the server is running, it WILL be restarted",
+                                function (result) {
+                                    if (result) {
+                                        LockPage();
+                                        $.post("/API/Map/SelectMap",
+                                            {
+                                                ServerID: serverID,
+                                                MapDir: dirName
+                                            },
+                                            function (data) {
+
+                                                var root = $($.parseXML(data)).find("Response");
+
+                                                if (root.children("Type").text() == "Error") {
+                                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                                    return;
+                                                }
+
+                                                toastr.success("The Map have been selected", "Map Selected");
+                                                refreshList();
+                                            });
+                                    }
+                                });
+                        } else if (clicked == "Download") {
+                            $("#downloadFormMapDirs").val(dirName);
+                            $("#downloadForm").submit();
+                        } else if (clicked == "Delete") {
+                            bootbox.confirm("Are you sure you want to delete this map ?<br/>" +
+                                "Note : if the server is running, it WILL be stopped",
+                                function (result) {
+                                    if (result) {
+                                        LockPage();
+                                        $.post("/API/Map/DeleteMaps",
+                                            {
+                                                ServerID: serverID,
+                                                MapDirs: dirName
+                                            },
+                                            function (data) {
+
+                                                var root = $($.parseXML(data)).find("Response");
+
+                                                if (root.children("Type").text() == "Error") {
+                                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                                    return;
+                                                }
+
+                                                toastr.success("The Map have been deleted", "Map Deleted");
+                                                refreshList();
+                                            });
+                                    }
+                                });
+                        }
+                    }
+                });
+            });
         }
 
         table.on('click', 'tbody tr td:nth-child(2), tbody tr td:nth-child(3)', function () {

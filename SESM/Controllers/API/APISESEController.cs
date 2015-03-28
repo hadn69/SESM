@@ -40,9 +40,9 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SESE-TW-NOSESE", "SESE isn't activated on this server.").ToString());
 
             // ** PROCESS **
-
+            /*
             SESEServiceHelper SESEService = new SESEServiceHelper(server.ServerExtenderPort);
-            SESEService.GetPlayerList();
+            SESEService.GetPlayerList();*/
             return null;
         }
 
