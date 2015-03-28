@@ -14,6 +14,65 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
 
     <style>
+        .fixed {
+            position: fixed;
+        }
+
+        /* sidebar */
+        .bs-docs-sidebar {
+            padding-left: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+            /* all links */
+            .bs-docs-sidebar .nav > li > a {
+                color: #999;
+                border-left: 2px solid transparent;
+                padding: 4px 20px;
+                font-size: 13px;
+                font-weight: 400;
+            }
+
+            /* nested links */
+            .bs-docs-sidebar .nav .nav > li > a {
+                padding-top: 1px;
+                padding-bottom: 1px;
+                padding-left: 30px;
+                font-size: 12px;
+            }
+
+            /* active & hover links */
+            .bs-docs-sidebar .nav > .active > a,
+            .bs-docs-sidebar .nav > li > a:hover,
+            .bs-docs-sidebar .nav > li > a:focus {
+                color: #563d7c;
+                text-decoration: none;
+                background-color: transparent;
+                border-left-color: #563d7c;
+            }
+            /* all active links */
+            .bs-docs-sidebar .nav > .active > a,
+            .bs-docs-sidebar .nav > .active:hover > a,
+            .bs-docs-sidebar .nav > .active:focus > a {
+                font-weight: 700;
+            }
+            /* nested active links */
+            .bs-docs-sidebar .nav .nav > .active > a,
+            .bs-docs-sidebar .nav .nav > .active:hover > a,
+            .bs-docs-sidebar .nav .nav > .active:focus > a {
+                font-weight: 500;
+            }
+            /* hide all (inactive) nested list */
+            .bs-docs-sidebar .nav ul.nav {
+                display: none;
+            }
+            /* show active nested list */
+            .bs-docs-sidebar .nav > .active > ul.nav {
+                display: block;
+            }
+    </style>
+    <style>
         @media (min-width: 1200px) {
             .container {
                 width: 90%;
@@ -102,474 +161,595 @@
 </head>
 <body>
     <div class="container">
-        <div class="col-md-12">
+        <nav class="col-md-2 bs-docs-sidebar pull-right">
+            <ul id="sidebar" class="nav nav-stacked fixed">
+                <li>
+                    <a href="#AccountAPI" class="autoScroll">Account</a>
+                    <ul class="nav nav-stacked">
+                        <li><a href="#AccountAPI-GetChallenge" class="autoScroll">GetChallenge</a></li>
+                        <li><a href="#AccountAPI-LogOut" class="autoScroll">LogOut</a></li>
+                        <li><a href="#AccountAPI-Authenticate" class="autoScroll">Authenticate</a></li>
+                        <li><a href="#AccountAPI-Register" class="autoScroll">Register</a></li>
+                        <li><a href="#AccountAPI-GetDetails" class="autoScroll">GetDetails</a></li>
+                        <li><a href="#AccountAPI-SetDetails" class="autoScroll">SetDetails</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#ExplorerAPI" class="autoScroll">Explore</a>
+                    <ul class="nav nav-stacked">
+                        <li><a href="#AccountAPI-GetDirectoryContent" class="autoScroll">GetDirectoryContent</a></li>
+                        <li><a href="#AccountAPI-GetDirectoryDirectories" class="autoScroll">GetDirectoryDirectories</a></li>
+                        <li><a href="#AccountAPI-Delete" class="autoScroll">Delete</a></li>
+                        <li><a href="#AccountAPI-Rename" class="autoScroll">Rename</a></li>
+                        <li><a href="#AccountAPI-Download" class="autoScroll">Download</a></li>
+                        <li><a href="#AccountAPI-NewFolder" class="autoScroll">NewFolder</a></li>
+                        <li><a href="#AccountAPI-NewFile" class="autoScroll">NewFile</a></li>
+                        <li><a href="#AccountAPI-Upload" class="autoScroll">Upload</a></li>
+                        <li><a href="#AccountAPI-GetFileContent" class="autoScroll">GetFileContent</a></li>
+                        <li><a href="#AccountAPI-SetFileContent" class="autoScroll">SetFileContent</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <div class="col-md-10" style="height: 100%">
             <div class="page-header">
                 <h1>SESM APIs Documentation</h1>
                 <p class="lead">Detailed Documentation of SESM APIs.</p>
             </div>
+            <!-- Account API -->
+            <div>
+                <h2 id="AccountAPI">Account API</h2>
+                <p>This API provide methods to manage user authentication and profile.</p>
+                <p>
+                    Base URL : <em>/API/Account/</em>
+                </p>
+                <h3>Methods Summary</h3>
+                <table class="table table-hover table-striped summaryTable" id="summaryAccountAPI">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GetChallenge</td>
+                            <td>GET</td>
+                            <td>Provide a one use challenge for the authentication process.</td>
+                        </tr>
+                        <tr>
+                            <td>LogOut</td>
+                            <td>GET</td>
+                            <td>Log out the current user.</td>
+                        </tr>
+                        <tr>
+                            <td>Authenticate</td>
+                            <td>POST</td>
+                            <td>Authenticate a user with login/password crendentials.</td>
+                        </tr>
+                        <tr>
+                            <td>Register</td>
+                            <td>POST</td>
+                            <td>Register a new user.</td>
+                        </tr>
+                        <tr>
+                            <td>GetDetails</td>
+                            <td>GET</td>
+                            <td>Get the current user profile details.</td>
+                        </tr>
+                        <tr>
+                            <td>SetDetails</td>
+                            <td>POST</td>
+                            <td>Set the current user profile details.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- GetChallenge -->
+                <div>
+                    <h3 id="AccountAPI-GetChallenge">GetChallenge</h3>
+                    <p>
+                        Type : <em>GET</em><br />
+                        URL : <em>/API/Account/GetChallenge</em><br />
+                        This web service return a one use challenge needed for the SESM authentication process.<br />
+                        For more information, see <a href="#AccountAPI-Authenticate" class="autoScroll">Authenticate</a>.
+                    </p>
+                    <h4>Successful Response Content</h4>
+                    <p>A MD5 Type String, acting as a challenge.</p>
 
-            <h2 id="AccountAPI">Account API</h2>
-            <p>This API provide methods to manage user authentication and profile.</p>
-            <p>
-                Base URL : <em>/API/Account/</em>
-            </p>
-            <h3>Methods Summary</h3>
-            <table class="table table-hover table-striped summaryTable" id="summaryAccountAPI">
-                <thead>
-                    <tr>
-                        <th>Method</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>GetChallenge</td>
-                        <td>GET</td>
-                        <td>Provide a one use challenge for the authentication process.</td>
-                    </tr>
-                    <tr>
-                        <td>LogOut</td>
-                        <td>GET</td>
-                        <td>Log out the current user.</td>
-                    </tr>
-                    <tr>
-                        <td>Authenticate</td>
-                        <td>POST</td>
-                        <td>Authenticate a user with login/password crendentials.</td>
-                    </tr>
-                    <tr>
-                        <td>Register</td>
-                        <td>POST</td>
-                        <td>Register a new user.</td>
-                    </tr>
-                    <tr>
-                        <td>GetDetails</td>
-                        <td>GET</td>
-                        <td>Get the current user profile details.</td>
-                    </tr>
-                    <tr>
-                        <td>SetDetails</td>
-                        <td>POST</td>
-                        <td>Set the current user profile details.</td>
-                    </tr>
-                </tbody>
-            </table>
+                    <h4>Response Codes</h4>
+                    <table class="table table-hover table-striped codeTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ACT-GC-OK</td>
+                                <td>Success</td>
+                                <td>The challenge was successfuly generated.</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-            <h3 id="AccountAPI-GetChallenge">GetChallenge</h3>
-            <p>
-                Type : <em>GET</em><br />
-                URL : <em>/API/Account/GetChallenge</em><br />
-                This web service return a one use challenge needed for the SESM authentication process.<br />
-                For more information, see <a href="#AccountAPI-Authenticate" class="autoScroll">Authenticate</a>.
-            </p>
-            <h4>Successful Response Content</h4>
-            <p>A MD5 Type String, acting as a challenge.</p>
-
-            <h4>Response Codes</h4>
-            <table class="table table-hover table-striped codeTable">
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>ACT-GC-OK</td>
-                        <td>Success</td>
-                        <td>The challenge was successfuly generated.</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h4>Response Exemple</h4>
-            <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;no&quot;?&gt;
+                    <h4>Response Exemple</h4>
+                    <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;no&quot;?&gt;
 &lt;Response&gt;
     &lt;Type&gt;Success&lt;/Type&gt;
     &lt;Timestamp&gt;2015-03-23T01:59:01.0460013+01:00&lt;/Timestamp&gt;
     &lt;ReturnCode&gt;ACT-GC-OK&lt;/ReturnCode&gt;
     &lt;Content&gt;b6d7726b257ba48a6c90667fb8cd2e29&lt;/Content&gt;
 &lt;/Response&gt;</code></pre>
+                </div>
+                <!-- LogOut -->
+                <div>
+                    <h3 id="AccountAPI-LogOut">LogOut</h3>
+                    <p>
+                        Type : <em>GET</em><br />
+                        URL : <em>/API/Account/LogOut</em><br />
+                        This web service will log out the current user.
+                    </p>
 
-            <h3 id="AccountAPI-LogOut">LogOut</h3>
-            <p>
-                Type : <em>GET</em><br />
-                URL : <em>/API/Account/LogOut</em><br />
-                This web service will log out the current user.
-            </p>
+                    <h4>Response Codes</h4>
+                    <table class="table table-hover table-striped codeTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ACT-LGO-NOTLOG</td>
+                                <td>Warning</td>
+                                <td>No user is logged in.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-LGO-OK</td>
+                                <td>Success</td>
+                                <td>The current user has been logged out.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Authenticate -->
+                <div>
+                    <h3 id="AccountAPI-Authenticate">Authenticate</h3>
+                    <p>
+                        Type : <em>POST</em><br />
+                        URL : <em>/API/Account/Authenticate</em><br />
+                        This web service provide a way to authenticate a user.<br />
+                        The process is sligtly different from a standard login/password form submit authentication.<br />
+                        <ol>
+                            <li>Call the <a href="#AccountAPI-GetChallenge" class="autoScroll">GetChallenge</a> API to obtain a one use challenge string</li>
+                            <li>Calculate the challenge response as folow : <var>SHA1(challenge + MD5(User_Password))</var></li>
+                            <li>Call the Authenticate API with the User login and the calculated challenge response</li>
+                        </ol>
+                    </p>
 
-            <h4>Response Codes</h4>
-            <table class="table table-hover table-striped codeTable">
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>ACT-LGO-NOTLOG</td>
-                        <td>Warning</td>
-                        <td>No user is logged in.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-LGO-OK</td>
-                        <td>Success</td>
-                        <td>The current user has been logged out.</td>
-                    </tr>
-                </tbody>
-            </table>
+                    <h4>POST Parameters</h4>
+                    <table class="table table-hover table-striped postTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Opt.</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Login</td>
+                                <td>String</td>
+                                <td></td>
+                                <td>The user's login.</td>
+                            </tr>
+                            <tr>
+                                <td>Password</td>
+                                <td>String</td>
+                                <td></td>
+                                <td>The challenge encoded password.</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-            <h3 id="AccountAPI-Authenticate">Authenticate</h3>
-            <p>
-                Type : <em>POST</em><br />
-                URL : <em>/API/Account/Authenticate</em><br />
-                This web service provide a way to authenticate a user.<br />
-                The process is sligtly different from a standard login/password form submit authentication.<br />
-                <ol>
-                    <li>Call the <a href="#AccountAPI-GetChallenge" class="autoScroll">GetChallenge</a> API to obtain a one use challenge string</li>
-                    <li>Calculate the challenge response as folow : <var>SHA1(challenge + MD5(User_Password))</var></li>
-                    <li>Call the Authenticate API with the User login and the calculated challenge response</li>
-                </ol>
-            </p>
+                    <h4>Response Codes</h4>
+                    <table class="table table-hover table-striped codeTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ACT-ATH-ALRLOG</td>
+                                <td>Error</td>
+                                <td>A user is already logged in.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-ATH-EXPCHLNG</td>
+                                <td>Error</td>
+                                <td>The server challenge has expired or haven't been generated.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-ATH-MISLGN</td>
+                                <td>Error</td>
+                                <td>The Login field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-ATH-MISPWD</td>
+                                <td>Error</td>
+                                <td>The Password field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-ATH-FAIL</td>
+                                <td>Error</td>
+                                <td>The provided login/password are incorrect.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-ATH-OK</td>
+                                <td>Success</td>
+                                <td>The user has been authenticated.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Register -->
+                <div>
+                    <h3 id="AccountAPI-Register">Register</h3>
+                    <p>
+                        Type : <em>POST</em><br />
+                        URL : <em>/API/Account/Register</em><br />
+                        This web service provide a way to register a new user.<br />
+                        It should only be used as a user way to create an account.
+                        To create a user as admin, see <a href="#UserAPI-CreateUser" class="autoScroll">CreateUser</a>.
+                    </p>
 
-            <h4>POST Parameters</h4>
-            <table class="table table-hover table-striped postTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Opt.</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Login</td>
-                        <td>String</td>
-                        <td></td>
-                        <td>The user's login.</td>
-                    </tr>
-                    <tr>
-                        <td>Password</td>
-                        <td>String</td>
-                        <td></td>
-                        <td>The challenge encoded password.</td>
-                    </tr>
-                </tbody>
-            </table>
+                    <h4>POST Parameters</h4>
+                    <table class="table table-hover table-striped postTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Opt.</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Login</td>
+                                <td>String</td>
+                                <td></td>
+                                <td>The user's login.</td>
+                            </tr>
+                            <tr>
+                                <td>Password</td>
+                                <td>String</td>
+                                <td></td>
+                                <td>The password's MD5.</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>String</td>
+                                <td></td>
+                                <td>The user's email.</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-            <h4>Response Codes</h4>
-            <table class="table table-hover table-striped codeTable">
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>ACT-ATH-ALRLOG</td>
-                        <td>Error</td>
-                        <td>A user is already logged in.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-ATH-EXPCHLNG</td>
-                        <td>Error</td>
-                        <td>The server challenge has expired or haven't been generated.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-ATH-MISLGN</td>
-                        <td>Error</td>
-                        <td>The Login field must be provided.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-ATH-MISPWD</td>
-                        <td>Error</td>
-                        <td>The Password field must be provided.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-ATH-FAIL</td>
-                        <td>Error</td>
-                        <td>The provided login/password are incorrect.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-ATH-OK</td>
-                        <td>Success</td>
-                        <td>The user has been authenticated.</td>
-                    </tr>
-                </tbody>
-            </table>
+                    <h4>Response Codes</h4>
+                    <table class="table table-hover table-striped codeTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ACT-REG-ALRLOG</td>
+                                <td>Error</td>
+                                <td>A user is already logged in.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-REG-MISLGN</td>
+                                <td>Error</td>
+                                <td>The Login field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-REG-MISPWD</td>
+                                <td>Error</td>
+                                <td>The Password field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-REG-BADPWD</td>
+                                <td>Error</td>
+                                <td>The password is not a valid MD5.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-REG-MISEML</td>
+                                <td>Error</td>
+                                <td>The Email field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-REG-BADEML</td>
+                                <td>Error</td>
+                                <td>The email is not valid.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-REG-USREXI</td>
+                                <td>Error</td>
+                                <td>User already exist.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-REG-OK</td>
+                                <td>Success</td>
+                                <td>The user has been registered successfuly.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- GetDetails -->
+                <div>
+                    <h3 id="AccountAPI-GetDetails">GetDetails</h3>
+                    <p>
+                        Type : <em>GET</em><br />
+                        URL : <em>/API/Account/GetDetails</em><br />
+                        This web service return the current user account details.
+                    </p>
 
-            <h3 id="AccountAPI-Register">Register</h3>
-            <p>
-                Type : <em>POST</em><br />
-                URL : <em>/API/Account/Register</em><br />
-                This web service provide a way to register a new user.<br />
-                It should only be used as a user way to create an account.
-                To create a user as admin, see <a href="#UserAPI-CreateUser" class="autoScroll">CreateUser</a>.
-            </p>
+                    <h4>Successful Response Content</h4>
+                    <p>The following propeties :</p>
+                    <table class="table table-hover table-striped responseTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Login</td>
+                                <td>String</td>
+                                <td>The user's login.</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>String</td>
+                                <td>The user's email.</td>
+                            </tr>
+                            <tr>
+                                <td>IsSuperAdmin</td>
+                                <td>Boolean</td>
+                                <td>true if the user is a super administrator, false if he isn't.</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-            <h4>POST Parameters</h4>
-            <table class="table table-hover table-striped postTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Opt.</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Login</td>
-                        <td>String</td>
-                        <td></td>
-                        <td>The user's login.</td>
-                    </tr>
-                    <tr>
-                        <td>Password</td>
-                        <td>String</td>
-                        <td></td>
-                        <td>The password's MD5.</td>
-                    </tr>
-                    <tr>
-                        <td>Email</td>
-                        <td>String</td>
-                        <td></td>
-                        <td>The user's email.</td>
-                    </tr>
-                </tbody>
-            </table>
+                    <h4>Response Codes</h4>
+                    <table class="table table-hover table-striped codeTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ACT-GTD-NOTLOG</td>
+                                <td>Warning</td>
+                                <td>No user is logged in.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-GTD-OK</td>
+                                <td>Success</td>
+                                <td>The detail have been successfuly retrived.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- SetDetails -->
+                <div>
+                    <h3 id="AccountAPI-SetDetails">SetDetails</h3>
+                    <p>
+                        Type : <em>POST</em><br />
+                        URL : <em>/API/Account/SetDetails</em><br />
+                        This web service provide a way to change the current user's account details.
+                    </p>
 
-            <h4>Response Codes</h4>
-            <table class="table table-hover table-striped codeTable">
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>ACT-REG-ALRLOG</td>
-                        <td>Error</td>
-                        <td>A user is already logged in.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-REG-MISLGN</td>
-                        <td>Error</td>
-                        <td>The Login field must be provided.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-REG-MISPWD</td>
-                        <td>Error</td>
-                        <td>The Password field must be provided.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-REG-BADPWD</td>
-                        <td>Error</td>
-                        <td>The password is not a valid MD5.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-REG-MISEML</td>
-                        <td>Error</td>
-                        <td>The Email field must be provided.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-REG-BADEML</td>
-                        <td>Error</td>
-                        <td>The email is not valid.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-REG-USREXI</td>
-                        <td>Error</td>
-                        <td>User already exist.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-REG-OK</td>
-                        <td>Success</td>
-                        <td>The user has been registered successfuly.</td>
-                    </tr>
-                </tbody>
-            </table>
+                    <h4>POST Parameters</h4>
+                    <table class="table table-hover table-striped postTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Opt.</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Login</td>
+                                <td>String</td>
+                                <td></td>
+                                <td>The user's login.</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>String</td>
+                                <td></td>
+                                <td>The user's email.</td>
+                            </tr>
+                            <tr>
+                                <td>OldPassword</td>
+                                <td>String</td>
+                                <td><span class="glyphicon glyphicon-ok-circle"></span></td>
+                                <td>The old password's MD5. Provide only if you want to change the current user's password. Required if you provide NewPassword</td>
+                            </tr>
+                            <tr>
+                                <td>NewPassword</td>
+                                <td>String</td>
+                                <td><span class="glyphicon glyphicon-ok-circle"></span></td>
+                                <td>The new password's MD5. Provide only if you want to change the current user's password. Required if you provide OldPassword</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-            <h3 id="AccountAPI-GetDetails">GetDetails</h3>
-            <p>
-                Type : <em>GET</em><br />
-                URL : <em>/API/Account/GetDetails</em><br />
-                This web service return the current user account details.
-            </p>
+                    <h4>Response Codes</h4>
+                    <table class="table table-hover table-striped codeTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ACT-STD-NOTLOG</td>
+                                <td>Error</td>
+                                <td>No user is logged in.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-STD-MISLGN</td>
+                                <td>Error</td>
+                                <td>The Login field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-STD-MISEML</td>
+                                <td>Error</td>
+                                <td>The EMail field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-STD-MISPWD</td>
+                                <td>Error</td>
+                                <td>One of OldPassword or NewPassword has been provided but not the other.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-STD-USREXI</td>
+                                <td>Error</td>
+                                <td>The user new login is already in use.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-STD-BADOPWD</td>
+                                <td>Error</td>
+                                <td>The old password is not a valid MD5.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-STD-BADNPWD</td>
+                                <td>Error</td>
+                                <td>The new password is not a valid MD5.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-STD-OPWDMIS</td>
+                                <td>Error</td>
+                                <td>The provided old password mismatch with the stored one.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-STD-BADEML</td>
+                                <td>Error</td>
+                                <td>The email provided is not valid.</td>
+                            </tr>
+                            <tr>
+                                <td>ACT-STD-OK</td>
+                                <td>Success</td>
+                                <td>The user account have been updated.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <h4>Successful Response Content</h4>
-            <p>The following propeties :</p>
-            <table class="table table-hover table-striped responseTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Login</td>
-                        <td>String</td>
-                        <td>The user's login.</td>
-                    </tr>
-                    <tr>
-                        <td>Email</td>
-                        <td>String</td>
-                        <td>The user's email.</td>
-                    </tr>
-                    <tr>
-                        <td>IsSuperAdmin</td>
-                        <td>Boolean</td>
-                        <td>true if the user is a super administrator, false if he isn't.</td>
-                    </tr>
-                </tbody>
-            </table>
+            <!-- Explorer API -->
+            <div>
+                <h2 id="ExplorerAPI">Explorer API</h2>
+                <p>This API provide methods to access and manager a server's files and folders.</p>
+                <p>
+                    Base URL : <em>/API/Explorer/</em>
+                </p>
+                <h3>Methods Summary</h3>
+                <table class="table table-hover table-striped summaryTable" id="summaryExplorerAPI">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GetDirectoryContent</td>
+                            <td>POST</td>
+                            <td>Get a list of files and folders present in a specified directory.</td>
+                        </tr>
+                        <tr>
+                            <td>GetDirectoryDirectories</td>
+                            <td>POST</td>
+                            <td>Get a list of folders present in a specified directory.</td>
+                        </tr>
+                        <tr>
+                            <td>Delete</td>
+                            <td>POST</td>
+                            <td>Delete a specified file or folder.</td>
+                        </tr>
+                        <tr>
+                            <td>Rename</td>
+                            <td>POST</td>
+                            <td>Rename a specified file or folder.</td>
+                        </tr>
+                        <tr>
+                            <td>Download</td>
+                            <td>POST</td>
+                            <td>Download one or more file or folders as a zip archive.</td>
+                        </tr>
+                        <tr>
+                            <td>NewFolder</td>
+                            <td>POST</td>
+                            <td>Create a new folder in a specified directory.</td>
+                        </tr>
+                        <tr>
+                            <td>NewFile</td>
+                            <td>POST</td>
+                            <td>Create a new file in a specified directory.</td>
+                        </tr>
+                        <tr>
+                            <td>Upload</td>
+                            <td>POST</td>
+                            <td>Upload one or more file to a directory and optionaly unzip an uploaded archive.</td>
+                        </tr>
+                        <tr>
+                            <td>GetFileContent</td>
+                            <td>POST</td>
+                            <td>Get the text content of a file.</td>
+                        </tr>
+                        <tr>
+                            <td>SetFileContent</td>
+                            <td>POST</td>
+                            <td>Set the text content of a file.</td>
+                        </tr>
 
-            <h4>Response Codes</h4>
-            <table class="table table-hover table-striped codeTable">
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>ACT-GTD-NOTLOG</td>
-                        <td>Warning</td>
-                        <td>No user is logged in.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-GTD-OK</td>
-                        <td>Success</td>
-                        <td>The detail have been successfuly retrived.</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h3 id="AccountAPI-SetDetails">SetDetails</h3>
-            <p>
-                Type : <em>POST</em><br />
-                URL : <em>/API/Account/SetDetails</em><br />
-                This web service provide a way to change the current user's account details.
-            </p>
-
-            <h4>POST Parameters</h4>
-            <table class="table table-hover table-striped postTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Opt.</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Login</td>
-                        <td>String</td>
-                        <td></td>
-                        <td>The user's login.</td>
-                    </tr>
-                    <tr>
-                        <td>Email</td>
-                        <td>String</td>
-                        <td></td>
-                        <td>The user's email.</td>
-                    </tr>
-                    <tr>
-                        <td>OldPassword</td>
-                        <td>String</td>
-                        <td><span class="glyphicon glyphicon-ok-circle"></span></td>
-                        <td>The old password's MD5. Provide only if you want to change the current user's password. Required if you provide NewPassword</td>
-                    </tr>
-                    <tr>
-                        <td>NewPassword</td>
-                        <td>String</td>
-                        <td><span class="glyphicon glyphicon-ok-circle"></span></td>
-                        <td>The new password's MD5. Provide only if you want to change the current user's password. Required if you provide OldPassword</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h4>Response Codes</h4>
-            <table class="table table-hover table-striped codeTable">
-                <thead>
-                    <tr>
-                        <th>Code</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>ACT-STD-NOTLOG</td>
-                        <td>Error</td>
-                        <td>No user is logged in.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-STD-MISLGN</td>
-                        <td>Error</td>
-                        <td>The Login field must be provided.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-STD-MISEML</td>
-                        <td>Error</td>
-                        <td>The EMail field must be provided.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-STD-MISPWD</td>
-                        <td>Error</td>
-                        <td>One of OldPassword or NewPassword has been provided but not the other.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-STD-USREXI</td>
-                        <td>Error</td>
-                        <td>The user new login is already in use.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-STD-BADOPWD</td>
-                        <td>Error</td>
-                        <td>The old password is not a valid MD5.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-STD-BADNPWD</td>
-                        <td>Error</td>
-                        <td>The new password is not a valid MD5.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-STD-OPWDMIS</td>
-                        <td>Error</td>
-                        <td>The provided old password mismatch with the stored one.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-STD-BADEML</td>
-                        <td>Error</td>
-                        <td>The email provided is not valid.</td>
-                    </tr>
-                    <tr>
-                        <td>ACT-STD-OK</td>
-                        <td>Success</td>
-                        <td>The user account have been updated.</td>
-                    </tr>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-    <script>
+<script>
+        $('body').scrollspy({
+            target: '.bs-docs-sidebar',
+            offset: 70
+        });
         $(function () {
             hljs.initHighlightingOnLoad();
+
             $('a.autoScroll').click(function () {
                 var href = $.attr(this, 'href');
                 console.log(href);
