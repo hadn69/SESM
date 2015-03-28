@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ServiceModel;
-using SEComm;
 
 namespace SESM.Tools.Helpers
 {
     public class SESEServiceHelper : IDisposable
     {
+        /*
         private IServerService _SESEService = null;
         public SESEServiceHelper(int port)
         {
@@ -31,11 +31,11 @@ namespace SESM.Tools.Helpers
             var test = _SESEService.GetPlayersOnline();
             int i = 111;
         }
-
+        */
         public void Dispose()
         {
-            ((ICommunicationObject)_SESEService).Close();
+            //((ICommunicationObject)_SESEService).Close();
         }
-
+        
     }
 }
