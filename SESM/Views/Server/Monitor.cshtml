@@ -74,13 +74,16 @@
                     var date = Date.parse(item.children("Date").text());
 
                     recentData[0].data.push([date, Number(item.children("CPU").text())]);
-                    recentData[1].data.push([date, Number(item.children("RAM").text())]);
+                    recentData[1].data.push([date, Number(item.children("RAM").text() * (1024 * 2))]);
                 });
 
                 $.plot($("#chartRecent"), recentData, {
                     xaxis: {
                         mode: "time",
                         timeformat: "%H:%M"
+                    },
+                    legend: {
+                        position: "nw"
                     },
                     series: {
                         lines: {
@@ -149,11 +152,11 @@
                     var CPUQ1 = Number(item.children("CPUQ1").text());
                     var CPUQ3 = Number(item.children("CPUQ3").text());
 
-                    var RAMAvg = Number(item.children("RAMAvg").text());
-                    var RAMPeak = Number(item.children("RAMPeak").text());
-                    var RAMTrough = Number(item.children("RAMTrough").text());
-                    var RAMQ1 = Number(item.children("RAMQ1").text());
-                    var RAMQ3 = Number(item.children("RAMQ3").text());
+                    var RAMAvg = Number(item.children("RAMAvg").text() * (1024 * 2));
+                    var RAMPeak = Number(item.children("RAMPeak").text() * (1024 * 2));
+                    var RAMTrough = Number(item.children("RAMTrough").text() * (1024 * 2));
+                    var RAMQ1 = Number(item.children("RAMQ1").text() * (1024 * 2));
+                    var RAMQ3 = Number(item.children("RAMQ3").text() * (1024 * 2));
 
                     compiledData[0].data.push([date, Number(CPUAvg)]);
                     compiledData[1].data.push([date, Number(CPUTrough)]);
@@ -174,6 +177,9 @@
                     xaxis: {
                         mode: "time",
                         timeformat: "%H:%M"
+                    },
+                    legend: {
+                        position: "nw"
                     },
                     grid: {
                         hoverable: true,

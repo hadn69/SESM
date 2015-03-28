@@ -411,7 +411,7 @@ namespace SESM.Tools.Helpers
 
             try
             {
-                SelectQuery query = new SelectQuery("select PercentProcessorTime, WorkingSet " +
+                SelectQuery query = new SelectQuery("select PercentProcessorTime, WorkingSetPrivate " +
                                                   "from Win32_PerfFormattedData_PerfProc_Process " +
                                                   "where IDProcess = " + pid);
 
@@ -421,7 +421,7 @@ namespace SESM.Tools.Helpers
                 enumerator.MoveNext();
                 ManagementObject managementObject = (ManagementObject)enumerator.Current;
                 ressources.CPU = int.Parse(managementObject["PercentProcessorTime"].ToString()) / Environment.ProcessorCount;
-                ressources.Memory = (int)Math.Floor(long.Parse(managementObject["WorkingSet"].ToString()) / (1024.0 * 2));
+                ressources.Memory = (int)Math.Floor(long.Parse(managementObject["WorkingSetPrivate"].ToString()) / (1024.0 * 2)); // /!\ RAM in MB
             }
             catch(Exception ex)
             {

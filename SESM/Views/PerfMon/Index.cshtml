@@ -11,6 +11,13 @@
 <script src="/assets/global/plugins/flot/jquery.flot.min.js"></script>
 <script src="/assets/global/plugins/flot/jquery.flot.time.min.js"></script>
 <script src="/assets/global/plugins/flot/jquery.flot.fillbetween.min.js"></script>
+<div class="col-md-12">
+    <div class="portlet light bordered">
+        <div class="portlet-body">
+            <button class="btn green" id="btnCleanup">Cleanup All Performance Data</button>
+        </div>
+    </div>
+</div>
 <div class="col-md-12" id="graphZone">
 </div>
 <script type="text/javascript">
@@ -73,7 +80,6 @@
                         ServerID: ID
                     },
                     function (data) {
-
                         var root = $($.parseXML(data)).find("Response");
 
                         if (root.children("Type").text() == "Error") {
@@ -90,13 +96,16 @@
                             var date = Date.parse(item.children("Date").text());
 
                             recentData[0].data.push([date, Number(item.children("CPU").text())]);
-                            recentData[1].data.push([date, Number(item.children("RAM").text())]);
+                            recentData[1].data.push([date, Number(item.children("RAM").text() * (1024 * 2))]);
                         });
 
                         $.plot($("#chartRecent" + ID), recentData, {
                             xaxis: {
                                 mode: "time",
                                 timeformat: "%H:%M"
+                            },
+                            legend: {
+                                position: "nw"
                             },
                             series: {
                                 lines: {
@@ -165,11 +174,11 @@
                             var CPUQ1 = Number(item.children("CPUQ1").text());
                             var CPUQ3 = Number(item.children("CPUQ3").text());
 
-                            var RAMAvg = Number(item.children("RAMAvg").text());
-                            var RAMPeak = Number(item.children("RAMPeak").text());
-                            var RAMTrough = Number(item.children("RAMTrough").text());
-                            var RAMQ1 = Number(item.children("RAMQ1").text());
-                            var RAMQ3 = Number(item.children("RAMQ3").text());
+                            var RAMAvg = Number(item.children("RAMAvg").text() * (1024 * 2));
+                            var RAMPeak = Number(item.children("RAMPeak").text() * (1024 * 2));
+                            var RAMTrough = Number(item.children("RAMTrough").text() * (1024 * 2));
+                            var RAMQ1 = Number(item.children("RAMQ1").text() * (1024 * 2));
+                            var RAMQ3 = Number(item.children("RAMQ3").text() * (1024 * 2));
 
                             compiledData[0].data.push([date, Number(CPUAvg)]);
                             compiledData[1].data.push([date, Number(CPUTrough)]);
@@ -190,6 +199,9 @@
                             xaxis: {
                                 mode: "time",
                                 timeformat: "%H:%M"
+                            },
+                            legend: {
+                                position: "nw"
                             },
                             grid: {
                                 hoverable: true,
@@ -262,6 +274,26 @@
         }
 
         refreshGraphs();
+
+        $("#btnCleanup").click(function () {
+            bootbox.confirm("Are you sure you want to delete all performance data ?",
+            function (result) {
+                if (result) {
+                    $.get("/API/PerfMon/CleanPerfData",
+                    function(data) {
+                        var root = $($.parseXML(data)).find("Response");
+
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+
+                        toastr.success(root.children("Content").text(), "Cleanup Complete");
+                        refreshGraphs();
+                    });
+                }
+            });
+        });
 
         $("#btnRefresh").click(function () {
             refreshGraphs();
