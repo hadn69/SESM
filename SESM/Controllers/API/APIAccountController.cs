@@ -30,7 +30,7 @@ namespace SESM.Controllers.API
             EntityUser user = Session["User"] as EntityUser;
             XMLMessage returnMessage = new XMLMessage();
 
-            if(user == null)
+            if (user == null)
                 returnMessage = XMLMessage.Warning("ACT-LGO-NOTLOG", "No user is logged in");
             else
                 returnMessage = XMLMessage.Success("ACT-LGO-OK", "User " + user.Login + " have been logged out");
@@ -48,31 +48,31 @@ namespace SESM.Controllers.API
             EntityUser user = Session["User"] as EntityUser;
 
             // ** ACCESS **
-            if(user != null)
+            if (user != null)
                 return Content(XMLMessage.Error("ACT-ATH-ALRLOG", "A user is already logged in (" + user.Login + ")").ToString());
 
             // ** PARSING **
             string login = Request.Form["Login"];
             string password = Request.Form["Password"];
 
-            if(challenge == null)
+            if (challenge == null)
                 return Content(XMLMessage.Error("ACT-ATH-EXPCHLNG", "The server challenge has expired or haven't been generated").ToString());
 
-            if(string.IsNullOrWhiteSpace(login))
+            if (string.IsNullOrWhiteSpace(login))
                 return Content(XMLMessage.Error("ACT-ATH-MISLGN", "The Login field must be provided").ToString());
 
-            if(string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(password))
                 return Content(XMLMessage.Error("ACT-ATH-MISPWD", "The Password field must be provided").ToString());
 
             UserProvider usrPrv = new UserProvider(_context);
             EntityUser usr = usrPrv.GetUser(login);
 
-            if(usr == null)
+            if (usr == null)
                 return Content(XMLMessage.Error("ACT-ATH-FAIL", "The provided login/password are incorrect").ToString());
 
             // ** PROCESS **
             // Expected value : SHA1(challenge + MD5(Password))
-            if(HashHelper.SHA1Hash(challenge + usr.Password.ToLower()) != password)
+            if (HashHelper.SHA1Hash(challenge + usr.Password.ToLower()) != password)
                 return Content(XMLMessage.Error("ACT-ATH-FAIL", "The provided login/password are incorrect").ToString());
 
             Session["User"] = usr;
@@ -87,7 +87,7 @@ namespace SESM.Controllers.API
             EntityUser user = Session["User"] as EntityUser;
 
             // ** ACCESS **
-            if(user != null)
+            if (user != null)
                 return Content(XMLMessage.Error("ACT-REG-ALRLOG", "A user is already logged in (" + user.Login + ")").ToString());
 
             // ** PARSING **
@@ -95,10 +95,10 @@ namespace SESM.Controllers.API
             string password = Request.Form["Password"];
             string eMail = Request.Form["Email"];
 
-            if(string.IsNullOrWhiteSpace(login))
+            if (string.IsNullOrWhiteSpace(login))
                 return Content(XMLMessage.Error("ACT-REG-MISLGN", "The Login field must be provided").ToString());
 
-            if(string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(password))
                 return Content(XMLMessage.Error("ACT-REG-MISPWD", "The Password field must be provided").ToString());
             if (!Regex.IsMatch(password, "^[0-9a-f]{32}$", RegexOptions.IgnoreCase))
                 return Content(XMLMessage.Error("ACT-REG-BADPWD", "The password " + password + " is not a valid MD5").ToString());
@@ -111,7 +111,7 @@ namespace SESM.Controllers.API
             UserProvider usrPrv = new UserProvider(_context);
             EntityUser usr = usrPrv.GetUser(login);
 
-            if(usr != null)
+            if (usr != null)
                 return Content(XMLMessage.Error("ACT-REG-USREXI", "User " + login + " already exist").ToString());
 
 
@@ -135,7 +135,7 @@ namespace SESM.Controllers.API
             EntityUser user = Session["User"] as EntityUser;
 
             // ** ACCESS **
-            if(user == null)
+            if (user == null)
                 return Content(XMLMessage.Error("ACT-GTD-NOTLOG", "No user is logged in").ToString());
 
             // ** PROCESS **
@@ -156,41 +156,41 @@ namespace SESM.Controllers.API
             EntityUser user = Session["User"] as EntityUser;
 
             // ** ACCESS **
-            if(user == null)
+            if (user == null)
                 return Content(XMLMessage.Error("ACT-STD-NOTLOG", "No user is logged in").ToString());
 
             // ** PARSING **
             string login = Request.Form["Login"];
-            if(string.IsNullOrWhiteSpace(login))
+            if (string.IsNullOrWhiteSpace(login))
                 return Content(XMLMessage.Error("ACT-STD-MISLGN", "The Login field must be provided").ToString());
 
             string eMail = Request.Form["Email"];
-            if(string.IsNullOrWhiteSpace(eMail))
+            if (string.IsNullOrWhiteSpace(eMail))
                 return Content(XMLMessage.Error("ACT-STD-MISEML", "The EMail field must be provided").ToString());
 
             string oldPassword = Request.Form["OldPassword"];
             string newPassword = Request.Form["NewPassword"];
-            if(string.IsNullOrWhiteSpace(oldPassword) != string.IsNullOrWhiteSpace(newPassword))
+            if (string.IsNullOrWhiteSpace(oldPassword) != string.IsNullOrWhiteSpace(newPassword))
                 return Content(XMLMessage.Error("ACT-STD-MISPWD", "One of OldPassword or NewPassword has been provided but not the other").ToString());
 
             UserProvider usrPrv = new UserProvider(_context);
 
-            if(user.Login != login && usrPrv.UserExist(login))
+            if (user.Login != login && usrPrv.UserExist(login))
                 return Content(XMLMessage.Error("ACT-STD-USREXI", "User " + login + " already exist").ToString());
 
-            if(!string.IsNullOrWhiteSpace(oldPassword))
+            if (!string.IsNullOrWhiteSpace(oldPassword))
             {
-                if(!Regex.IsMatch(oldPassword, "^[0-9a-f]{32}$", RegexOptions.IgnoreCase))
-                    return Content(XMLMessage.Error("ACT-STD-BADOPWD","The old password " + oldPassword + " is not a valid MD5").ToString());
+                if (!Regex.IsMatch(oldPassword, "^[0-9a-f]{32}$", RegexOptions.IgnoreCase))
+                    return Content(XMLMessage.Error("ACT-STD-BADOPWD", "The old password " + oldPassword + " is not a valid MD5").ToString());
 
-                if(!Regex.IsMatch(newPassword, "^[0-9a-f]{32}$", RegexOptions.IgnoreCase))
-                    return Content(XMLMessage.Error("ACT-STD-BADNPWD","The new password " + newPassword + " is not a valid MD5").ToString());
+                if (!Regex.IsMatch(newPassword, "^[0-9a-f]{32}$", RegexOptions.IgnoreCase))
+                    return Content(XMLMessage.Error("ACT-STD-BADNPWD", "The new password " + newPassword + " is not a valid MD5").ToString());
 
-                if(user.Password.ToUpper() != oldPassword.ToUpper())
+                if (user.Password.ToUpper() != oldPassword.ToUpper())
                     return Content(XMLMessage.Error("ACT-STD-OPWDMIS", "The provided old password mismatch with the stored one").ToString());
             }
 
-            if(!Regex.IsMatch(eMail, @"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(eMail, @"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$", RegexOptions.IgnoreCase))
                 return Content(XMLMessage.Error("ACT-STD-BADEML", "The email " + eMail + " is not valid").ToString());
 
             // ** PROCESS **
@@ -208,7 +208,7 @@ namespace SESM.Controllers.API
 
         protected override void Dispose(bool disposing)
         {
-            if(disposing)
+            if (disposing)
             {
                 _context.Dispose();
             }

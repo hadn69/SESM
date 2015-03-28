@@ -45,7 +45,8 @@ namespace SESM.Controllers.API
                                                              new XElement("ID", server.Id),
                                                              new XElement("Public", server.IsPublic.ToString()),
                                                              new XElement("State", srvPrv.GetState(server).ToString()),
-                                                             new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id))
+                                                             new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id)),
+                                                             new XElement("Type", server.UseServerExtender ? "SESE" : "SE")
                                                              ));
             }
             return Content(response.ToString());
@@ -85,6 +86,7 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("Public", server.IsPublic.ToString()));
             response.AddToContent(new XElement("State", srvPrv.GetState(server).ToString()));
             response.AddToContent(new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id)));
+            response.AddToContent(new XElement("Type", server.UseServerExtender ? "SESE" : "SE"));
 
             return Content(response.ToString());
         }
@@ -781,8 +783,8 @@ namespace SESM.Controllers.API
             // ** Process **
             try
             {
-                if(accessLevel != AccessLevel.Manager)
-                    srvPrv.AddAdministrator(webAdministratorsStr.Split(';'),server);
+                if (accessLevel != AccessLevel.Manager)
+                    srvPrv.AddAdministrator(webAdministratorsStr.Split(';'), server);
                 srvPrv.AddManagers(webManagersStr.Split(';'), server);
                 srvPrv.AddUsers(webUsersStr.Split(';'), server);
 
