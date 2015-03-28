@@ -4,6 +4,7 @@
 <script src="/assets/global/plugins/select2/select2.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/datatables/media/js/jquery.dataTables.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
 <style>
     tbody tr td:nth-child(2):hover {
         cursor: pointer;
@@ -58,6 +59,9 @@
                         <th style="display: none;">
                             Access Level
                         </th>
+                        <th style="display: none;">
+                            Server Type
+                        </th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -75,26 +79,13 @@
 
         table.dataTable({
             "language": {
-                "aria": {
-                    "sortAscending": ": activate to sort column ascending",
-                    "sortDescending": ": activate to sort column descending"
-                },
                 "emptyTable": "No server available",
-                "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-                "infoEmpty": "No entries found",
-                "infoFiltered": "(filtered1 from _MAX_ total entries)",
-                "lengthMenu": "Show _MENU_ entries",
                 "search": "Search :",
-                "zeroRecords": "No matching server found",
-                "paginate": {
-                    "previous": "Prev",
-                    "next": "Next",
-                    "last": "Last",
-                    "first": "First"
-                }
+                "zeroRecords": "No matching server found"
+                
             },
-
-            "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
+            "paging": false,
+            "info": false,
 
             "columns": [{
                 "orderable": false
@@ -104,19 +95,18 @@
                 "orderable": true
             }, {
                 "orderable": false
+            }, {
+                "orderable": false
             }],
-            "lengthMenu": [
-                [5, 10, 15, 20, -1],
-                [5, 10, 15, 20, "All"] // change per page values here
-            ],
             // set the initial value
-            "pageLength": 10,
-            "pagingType": "bootstrap_full_number",
             "columnDefs": [{
                 "searchable": false,
                 "targets": [0]
             }, {
                 "targets": [3],
+                "visible": false
+            }, {
+                "targets": [4],
                 "visible": false
             }],
             "order": [[1, "asc"]] // set second column as a default sort by asc
@@ -201,6 +191,7 @@
                     var Public = item.children("Public").text();
                     var State = item.children("State").text();
                     var AccessLevel = item.children("AccessLevel").text();
+                    var Type = item.children("Type").text();
 
                     var chkbField = "";
                     var statusField = "";
@@ -232,7 +223,7 @@
                             break;
                     }
 
-                    table.DataTable().row.add([chkbField, Name, statusField, AccessLevel]);
+                    table.DataTable().row.add([chkbField, Name, statusField, AccessLevel, Type]);
                 });
                 table.DataTable().draw();
                 $("#btnRefreshList").children("i").removeClass("fa-spin");
