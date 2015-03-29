@@ -143,7 +143,7 @@ namespace SESM.Controllers.API
 
             response.AddToContent(new XElement("Login", user.Login));
             response.AddToContent(new XElement("Email", user.Email));
-            response.AddToContent(new XElement("IsSuperAdmin", user.IsAdmin.ToString()));
+            response.AddToContent(new XElement("IsSuperAdmin", user.IsAdmin));
 
             return Content(response.ToString());
         }
