@@ -123,8 +123,8 @@ namespace SESM.Controllers.API
 
             usrPrv.AddUser(newUser);
 
-            Session["User"] = user;
-            return Content(XMLMessage.Success("ACT-REG-OK", "Register successful. Hello " + user.Login).ToString());
+            Session["User"] = newUser;
+            return Content(XMLMessage.Success("ACT-REG-OK", "Register successful. Hello " + newUser.Login).ToString());
         }
 
         // GET: API/Account/GetDetails
