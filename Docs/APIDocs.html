@@ -257,7 +257,16 @@
                     <h4>Successful Response Content</h4>
                     <p>A MD5 Type String, acting as a challenge.</p>
 
-                    <h4>Response Codes</h4>
+                    <h4>Response Exemple</h4>
+                    <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;Response&gt;
+    &lt;Type&gt;Success&lt;/Type&gt;
+    &lt;Timestamp&gt;2015-03-23T01:59:01.0460013+01:00&lt;/Timestamp&gt;
+    &lt;ReturnCode&gt;ACT-GC-OK&lt;/ReturnCode&gt;
+    &lt;Content&gt;b6d7726b257ba48a6c90667fb8cd2e29&lt;/Content&gt;
+&lt;/Response&gt;</code></pre>
+
+                    <h4>Successful Response Codes</h4>
                     <table class="table table-hover table-striped codeTable">
                         <thead>
                             <tr>
@@ -274,15 +283,6 @@
                             </tr>
                         </tbody>
                     </table>
-
-                    <h4>Response Exemple</h4>
-                    <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;no&quot;?&gt;
-&lt;Response&gt;
-    &lt;Type&gt;Success&lt;/Type&gt;
-    &lt;Timestamp&gt;2015-03-23T01:59:01.0460013+01:00&lt;/Timestamp&gt;
-    &lt;ReturnCode&gt;ACT-GC-OK&lt;/ReturnCode&gt;
-    &lt;Content&gt;b6d7726b257ba48a6c90667fb8cd2e29&lt;/Content&gt;
-&lt;/Response&gt;</code></pre>
                 </div>
                 <!-- LogOut -->
                 <div>
@@ -534,6 +534,19 @@
                         </tbody>
                     </table>
 
+                    <h4>Successful Response Exemple</h4>
+                    <pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;Response&gt;
+    &lt;Type&gt;Success&lt;/Type&gt;
+    &lt;Timestamp&gt;2015-03-23T01:59:01.0460013+01:00&lt;/Timestamp&gt;
+    &lt;ReturnCode&gt;ACT-GC-OK&lt;/ReturnCode&gt;
+    &lt;Content&gt;
+        &lt;Login&gt;Admin&lt;/Login&gt;
+        &lt;Email&gt;admin@test.lan&lt;/Email&gt;
+        &lt;IsSuperAdmin&gt;True&lt;/IsSuperAdmin&gt;
+    &lt;/Content&gt;
+&lt;/Response&gt;</code></pre>
+
                     <h4>Response Codes</h4>
                     <table class="table table-hover table-striped codeTable">
                         <thead>
@@ -736,13 +749,96 @@
                             <td>POST</td>
                             <td>Set the text content of a file.</td>
                         </tr>
-
                     </tbody>
                 </table>
+
+                <!-- SetDetails -->
+                <div>
+                    <h3 id="ExplorerAPI-GetDirectoryContent">GetDirectoryContent</h3>
+                    <p>
+                        Type : <em>POST</em><br />
+                        URL : <em>/API/Explorer/GetDirectoryContent</em><br />
+                        This web service provide a list of file and folders present in a specifyed directory.<br/>
+                    </p>
+
+                    <h4>POST Parameters</h4>
+                    <table class="table table-hover table-striped postTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Opt.</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ServerID</td>
+                                <td>Int</td>
+                                <td></td>
+                                <td>The server'ID.</td>
+                            </tr>
+                            <tr>
+                                <td>Path</td>
+                                <td>String</td>
+                                <td><span class="glyphicon glyphicon-ok-circle"></span></td>
+                                <td>The path of the folder you want to list, relative to the root of the server instance directory. If ommited, the root folder will be listed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Response Codes</h4>
+                    <table class="table table-hover table-striped codeTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>EXP-GDC-MISID</td>
+                                <td>Error</td>
+                                <td>The ServerID field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDC-BADID</td>
+                                <td>Error</td>
+                                <td>The ServerID is invalid.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDC-UKNSRV</td>
+                                <td>Error</td>
+                                <td>The server doesn't exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDC-NOACCESS</td>
+                                <td>Error</td>
+                                <td>You don't have access to this server.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDC-BADPTH</td>
+                                <td>Error</td>
+                                <td>The path provided is invalid.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDC-BADDIR</td>
+                                <td>Error</td>
+                                <td>The directory don't exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDC-OK</td>
+                                <td>Success</td>
+                                <td>The folder's content has been retrived.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-<script>
+    <script>
         $('body').scrollspy({
             target: '.bs-docs-sidebar',
             offset: 70
