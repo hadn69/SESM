@@ -344,7 +344,10 @@
                 $('tr.odd, tr.even').contextmenu({
                     target: '#context-menu',
                     before: function (e, element, target) {
+                        e.preventDefault();
                         var tr = $(e.target).parents("tr");
+                        if (tr.children("td:nth-child(2)").find("span").length != 0)
+                            return false;
                         this.getMenu().find("li:first-child").hide();
                         if (canEdit(tr))
                             this.getMenu().find("li:first-child").show();
