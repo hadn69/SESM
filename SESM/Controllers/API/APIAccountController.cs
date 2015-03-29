@@ -118,7 +118,7 @@ namespace SESM.Controllers.API
             // ** PROCESS **
             EntityUser newUser = new EntityUser();
             newUser.Login = login;
-            newUser.Password = password.ToUpper();
+            newUser.Password = password.ToLower();
             newUser.Email = eMail;
 
             usrPrv.AddUser(newUser);

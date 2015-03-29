@@ -160,7 +160,8 @@ namespace SESM
                 {
                     action = "GetUsers|" +
                              "SetUser|" +
-                             "DeleteUser"
+                             "DeleteUsers|" +
+                             "CreateUser"
                 }
             );
 
