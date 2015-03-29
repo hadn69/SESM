@@ -17,9 +17,51 @@
     td:nth-child(4), th:nth-child(4) {
         text-align: center;
     }
-
-
 </style>
+<!-- --- Create Modal --- -->
+<div class="modal fade" id="newModal" tabindex="-1" role="basic" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Create Map</h4>
+            </div>
+            <div class="modal-body form-horizontal">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Login</label>
+                        <div class="col-md-6">
+                            <input type="text" id="inpNewLogin" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-5">EMail</label>
+                        <div class="col-md-6">
+                            <input type="text" id="inpNewEmail" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Pasword</label>
+                        <div class="col-md-6">
+                            <input type="password" id="inpNewPassword" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-5">Super Admin</label>
+                        <div class="col-md-6">
+                            <input type="checkbox" id="inpNewIsAdmin">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn blue" id="btnSaveNew">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- --- Edit Modal --- -->
 <div class="modal fade" id="editModal" tabindex="-1" role="basic" aria-hidden="true">
     <div class="modal-dialog">
@@ -28,34 +70,34 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
                 <h4 class="modal-title">Create Map</h4>
             </div>
-            <div class="modal-body">
-                <input type="hidden" id="inpID" class="form-control">
+            <div class="modal-body form-horizontal">
+                <input type="hidden" id="inpEditID" class="form-control">
                 <div class="row">
                     <div class="form-group">
                         <label class="control-label col-md-5">Login</label>
-                        <div class="col-md-7">
-                            <input type="text" id="inpLogin" class="form-control">
+                        <div class="col-md-6">
+                            <input type="text" id="inpEditLogin" class="form-control">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-md-5">EMail</label>
-                        <div class="col-md-7">
-                            <input type="text" id="inpEmail" class="form-control">
+                        <div class="col-md-6">
+                            <input type="text" id="inpEditEmail" class="form-control">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-md-5">Change Pasword</label>
-                        <div class="col-md-7">
-                            <input type="password" id="inpPassword" class="form-control">
+                        <div class="col-md-6">
+                            <input type="password" id="inpEditPassword" class="form-control">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-md-5">Super Admin</label>
-                        <div class="col-md-7">
-                            <input type="checkbox" id="inpIsAdmin">
+                        <div class="col-md-6">
+                            <input type="checkbox" id="inpEditIsAdmin">
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="modal-footer">
@@ -82,11 +124,27 @@
                     </li>
                 </ul>
             </div>
+            <div class="table-toolbar">
+                <div class="row">
+                    <div class="col-md-6">
+                        <button id="btnCreateUser" class="btn green">
+                            <i class=" fa fa-plus"></i> New
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="btn-group pull-right" id="actionBtn" style="display: none;">
+                            <button id="btnDeleteUsers" class="btn red">
+                                <i class=" fa fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <table class="table table-striped table-bordered table-hover" id="userTable">
                 <thead>
                     <tr>
                         <th class="table-checkbox">
-                            <input type="checkbox" class="group-checkable" />
+                            <input type="checkbox" id="chkCheckAll" />
                         </th>
                         <th>
                             Login
@@ -109,7 +167,8 @@
     function initPage() {
         $.fn.bootstrapSwitch.defaults.onText = '<i class="fa fa-check"></i>';
         $.fn.bootstrapSwitch.defaults.offText = '<i class="fa fa-times"></i>';
-        $("#inpIsAdmin").bootstrapSwitch();
+        $("#inpNewIsAdmin").bootstrapSwitch();
+        $("#inpEditIsAdmin").bootstrapSwitch();
 
         var locTable = $('#userTable');
 
@@ -133,6 +192,43 @@
             "searching": false,
             "info": false
         });
+
+        function updateCheckboxes() {
+            $(".checkboxes").each(function () {
+                var item = $(this);
+                if (item.is(':checked')) {
+                    $(this).parents('tr').addClass("active");
+                } else {
+                    $(this).parents('tr').removeClass("active");
+                }
+            });
+
+            if ($('.checkboxes:checked').length == 0) {
+                $('#chkCheckAll').prop("checked", false);
+                $("#actionBtn").stop(true).fadeOut("slow");
+            } else {
+                $('#chkCheckAll').prop("checked", true);
+                $("#actionBtn").stop(true).fadeIn("slow");
+            }
+            $.uniform.update();
+        }
+
+        $('#chkCheckAll').change(function () {
+            $(".checkboxes").prop("checked", $(this).is(':checked'));
+            updateCheckboxes();
+        });
+
+        $('body').on('change', ".checkboxes", function (event) {
+            updateCheckboxes();
+        });
+
+        function getCheckedVals() {
+            var retArray = [];
+            $(".checkboxes:checked").each(function () {
+                retArray.push($(this).val());
+            });
+            return retArray;
+        }
 
         function refreshList() {
             LockPage();
@@ -169,6 +265,8 @@
                 locTable.DataTable().draw();
                 locTable.find('input:checkbox').uniform();
 
+                updateCheckboxes();
+
                 $('tr.odd, tr.even').contextmenu({
                     target: '#context-menu',
                     onItem: function (context, e) {
@@ -177,10 +275,10 @@
                         var clicked = $(e.target).text().trim();
 
                         if (clicked == "Edit") {
-                            $("#inpID").val(id);
-                            $("#inpLogin").val($(context).children("td:nth-child(2)").text());
-                            $("#inpEmail").val($(context).children("td:nth-child(3)").text());
-                            $("#inpIsAdmin").bootstrapSwitch('state', $(context).children("td:nth-child(4)").text().trim() != "");
+                            $("#inpEditID").val(id);
+                            $("#inpEditLogin").val($(context).children("td:nth-child(2)").text());
+                            $("#inpEditEmail").val($(context).children("td:nth-child(3)").text());
+                            $("#inpEditIsAdmin").bootstrapSwitch('state', $(context).children("td:nth-child(4)").text().trim() != "");
                             $("#editModal").modal('show');
                         }
                         else if (clicked == "Delete") {
@@ -188,9 +286,9 @@
                             function (result) {
                                 if (result) {
                                     LockPage();
-                                    $.post("/API/Users/DeleteUser",
+                                    $.post("/API/Users/DeleteUsers",
                                     {
-                                        UserID: id
+                                        UserIDs: id
                                     },
                                     function (data) {
                                         var root = $($.parseXML(data)).find("Response");
@@ -200,7 +298,7 @@
                                             return;
                                         }
 
-                                        toastr.success("The user have been deleted", "Map Deleted");
+                                        toastr.success("The user have been deleted", "User Deleted");
 
                                         refreshList();
                                     });
@@ -220,11 +318,11 @@
 
             $.post("/API/Users/SetUser",
             {
-                UserID: $("#inpID").val(),
-                Login: $("#inpLogin").val(),
-                Email: $("#inpEmail").val(),
-                IsAdmin: $("#inpIsAdmin").is(":checked"),
-                Password: $("#inpPassword").val() == "" ? "" : CryptoJS.MD5($("#inpPassword").val()).toString()
+                UserID: $("#inpEditID").val(),
+                Login: $("#inpEditLogin").val(),
+                Email: $("#inpEditEmail").val(),
+                IsAdmin: $("#inpEditIsAdmin").is(":checked"),
+                Password: $("#inpEditPassword").val() == "" ? "" : CryptoJS.MD5($("#inpEditPassword").val()).toString()
             },
             function (data) {
                 UnlockPage();
@@ -239,6 +337,62 @@
 
                 refreshList();
             });
+        });
+
+        $("#btnCreateUser").click(function () {
+            $("#newModal").modal('show');
+        });
+
+        $("#btnSaveNew").click(function() {
+            LockPage();
+            $("#newModal").modal('hide');
+
+            $.post("/API/Users/CreateUser",
+            {
+                Login: $("#inpNewLogin").val(),
+                Email: $("#inpNewEmail").val(),
+                IsAdmin: $("#inpNewIsAdmin").is(":checked"),
+                Password: CryptoJS.MD5($("#inpNewPassword").val()).toString()
+            },
+            function (data) {
+                UnlockPage();
+                var root = $($.parseXML(data)).find("Response");
+
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    return;
+                }
+
+                toastr.success("The user has been created successfuly.", "User Created");
+
+                refreshList();
+            });
+        });
+
+        $("#btnDeleteUsers").click(function() {
+            var users = getCheckedVals();
+            bootbox.confirm("Are you sure you want to delete those users ?",
+                function (result) {
+                    if (result) {
+                        LockPage();
+                        $.post("/API/Users/DeleteUsers",
+                        {
+                            UserIDs: users.join(';')
+                        },
+                        function (data) {
+
+                            var root = $($.parseXML(data)).find("Response");
+
+                            if (root.children("Type").text() == "Error") {
+                                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                return;
+                            }
+
+                            toastr.success("The users have been deleted", "Users Deleted");
+                            refreshList();
+                        });
+                    }
+                });
         });
 
         $("#btnRefresh").click(function () {

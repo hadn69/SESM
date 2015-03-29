@@ -4,6 +4,8 @@
 <script src="/assets/global/plugins/select2/select2.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/datatables/media/js/jquery.dataTables.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.css" />
+<script src="/assets/global/plugins/bootstrap-contextmenu/bootstrap-contextmenu.js"></script>
 <style>
     tbody tr td:nth-child(2):hover {
         cursor: pointer;
@@ -12,6 +14,36 @@
 <div class="col-md-12">
     <div class="portlet light bordered">
         <div class="portlet-body">
+            <!-- --- Context Menu --- -->
+            <div id="context-menu">
+                <ul class="dropdown-menu pull-left" role="menu">
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-play"></i> Start
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-stop"></i> Stop
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-repeat"></i> Restart
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-times"></i> Kill
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-trash"></i> Delete
+                        </a>
+                    </li>
+                </ul>
+            </div>
             <div class="table-toolbar">
                 <div class="row">
                     <div class="col-md-6">
@@ -47,7 +79,7 @@
                 <thead>
                     <tr>
                         <th class="table-checkbox">
-                            <input type="checkbox" class="group-checkable" data-set="#serverTable .checkboxes" />
+                            <input type="checkbox" id="chkCheckAll" />
                         </th>
                         <th>
                             Name
@@ -57,6 +89,9 @@
                         </th>
                         <th style="display: none;">
                             Access Level
+                        </th>
+                        <th style="display: none;">
+                            Server Type
                         </th>
                     </tr>
                 </thead>
@@ -75,26 +110,13 @@
 
         table.dataTable({
             "language": {
-                "aria": {
-                    "sortAscending": ": activate to sort column ascending",
-                    "sortDescending": ": activate to sort column descending"
-                },
                 "emptyTable": "No server available",
-                "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-                "infoEmpty": "No entries found",
-                "infoFiltered": "(filtered1 from _MAX_ total entries)",
-                "lengthMenu": "Show _MENU_ entries",
                 "search": "Search :",
-                "zeroRecords": "No matching server found",
-                "paginate": {
-                    "previous": "Prev",
-                    "next": "Next",
-                    "last": "Last",
-                    "first": "First"
-                }
-            },
+                "zeroRecords": "No matching server found"
 
-            "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
+            },
+            "paging": false,
+            "info": false,
 
             "columns": [{
                 "orderable": false
@@ -104,19 +126,18 @@
                 "orderable": true
             }, {
                 "orderable": false
+            }, {
+                "orderable": false
             }],
-            "lengthMenu": [
-                [5, 10, 15, 20, -1],
-                [5, 10, 15, 20, "All"] // change per page values here
-            ],
             // set the initial value
-            "pageLength": 10,
-            "pagingType": "bootstrap_full_number",
             "columnDefs": [{
                 "searchable": false,
                 "targets": [0]
             }, {
                 "targets": [3],
+                "visible": false
+            }, {
+                "targets": [4],
                 "visible": false
             }],
             "order": [[1, "asc"]] // set second column as a default sort by asc
@@ -124,59 +145,45 @@
 
         var isSuperAdmin = false;
 
-        table.find('.group-checkable').change(function () {
-            var set = $(this).attr("data-set");
-            var checked = $(this).is(":checked");
-            $(set).each(function () {
-                if (checked) {
-                    $(this).attr("checked", true);
+
+        function updateCheckboxes() {
+            $(".checkboxes").each(function () {
+                var item = $(this);
+                if (item.is(':checked')) {
                     $(this).parents('tr').addClass("active");
                 } else {
-                    $(this).attr("checked", false);
                     $(this).parents('tr').removeClass("active");
                 }
             });
-            $.uniform.update(set);
-            if ($('tbody tr input:checkbox:checked').length == 0) {
-                $("#actionBtn").hide();
+
+            if ($('.checkboxes:checked').length == 0) {
+                $('#chkCheckAll').prop("checked", false);
+                $("#actionBtn").stop(true).fadeOut("slow");
                 if (isSuperAdmin) {
-                    $("#btnDeleteServers").hide();
+                    $("#btnDeleteServers").stop(true).fadeOut("slow");
                 }
             } else {
-                $("#actionBtn").show();
+                $('#chkCheckAll').prop("checked", true);
+                $("#actionBtn").stop(true).fadeIn("slow");
                 if (isSuperAdmin) {
-                    $("#btnDeleteServers").show();
+                    $("#btnDeleteServers").stop(true).fadeIn("slow");
                 }
             }
+            $.uniform.update();
+        }
+
+        $('#chkCheckAll').change(function () {
+            $(".checkboxes").prop("checked", $(this).is(':checked'));
+            updateCheckboxes();
         });
 
-        table.on('change', 'tbody tr .checkboxes', function () {
-            var checked = $(this).is(":checked");
-            if (checked) {
-                $(this).parents('tr').addClass("active");
-            } else {
-                $(this).parents('tr').removeClass("active");
-            }
-
-            if ($('tbody tr input:checkbox:checked').length == 0) {
-                table.find('.group-checkable').attr("checked", false);
-                $("#actionBtn").hide();
-                if (isSuperAdmin) {
-                    $("#btnDeleteServers").hide();
-                }
-            } else {
-                table.find('.group-checkable').attr("checked", true);
-                $("#actionBtn").show();
-                if (isSuperAdmin) {
-                    $("#btnDeleteServers").show();
-                }
-            }
-            $.uniform.update($('.group-checkable'));
+        $('body').on('change', ".checkboxes", function (event) {
+            updateCheckboxes();
         });
 
-        table.on('click', 'tbody tr td:nth-child(2)', function () {
+        table.on('click', 'tbody tr td:nth-child(2), tbody tr td:nth-child(3)', function () {
             var id = $(this).parent().children().first().find('input').val();
-                window.location.href = "/" + id + "/Dashboard/";
+            window.location.href = "/" + id + "/Dashboard/";
         });
 
         $(".dataTables_filter").addClass("pull-right");
@@ -201,17 +208,15 @@
                     var Public = item.children("Public").text();
                     var State = item.children("State").text();
                     var AccessLevel = item.children("AccessLevel").text();
+                    var Type = item.children("Type").text();
 
-                    var chkbField = "";
-                    var statusField = "";
+                    var chkbField;
+                    var statusField;
 
                     if (AccessLevel != "None" && AccessLevel != "Guest" && AccessLevel != "User") {
-                        if (checkedIDs != null && $.inArray(ID, checkedIDs) > -1) {
-                            chkbField = '<input type="checkbox" class="checkboxes" value="' + ID + '" checked />';
-                        }
-                        else {
-                            chkbField = '<input type="checkbox" class="checkboxes" value="' + ID + '" />';
-                        }
+                        chkbField = '<input type="checkbox" class="checkboxes" value="' + ID + '" />';
+                    } else {
+                        chkbField = '<input type="checkbox" style="display: none;" class="checkboxes" value="' + ID + '" />';
                     }
 
                     switch (State) {
@@ -232,51 +237,208 @@
                             break;
                     }
 
-                    table.DataTable().row.add([chkbField, Name, statusField, AccessLevel]);
+                    table.DataTable().row.add([chkbField, Name, statusField, AccessLevel, Type]);
                 });
                 table.DataTable().draw();
                 $("#btnRefreshList").children("i").removeClass("fa-spin");
                 table.find('input:checkbox').uniform();
-                $("tbody input:checked").each(function () {
-                    $(this).parents('tr').addClass("active");
+
+                $(".checkboxes").each(function () {
+                    if ($.inArray($(this).val(), checkedIDs) != -1)
+                        $(this).prop('checked', true);
+                });
+                updateCheckboxes();
+
+                $('tr.odd, tr.even').contextmenu({
+                    target: '#context-menu',
+                    before: function (e, element, target) {
+                        this.getMenu().find("li").hide();
+                        e.preventDefault();
+                        if ($(e.target).parents("tr").find("input:checkbox").css('display') == "none")
+                            return false;
+
+                        var status = $(e.target).parents("tr").children("td:nth-child(3)").text().trim();
+
+                        if (status == "Unknow" || status == "Stopped")
+                            this.getMenu().find("li:nth-child(1)").show();
+                        if (status == "Unknow" || status == "Running")
+                            this.getMenu().find("li:nth-child(2)").show();
+                        if (status == "Unknow" || status == "Running")
+                            this.getMenu().find("li:nth-child(3)").show();
+                        if (status == "Unknow" || status == "Starting" || status == "Running" || status == "Stopping")
+                            this.getMenu().find("li:nth-child(4)").show();
+                        if (isSuperAdmin)
+                            this.getMenu().find("li:nth-child(5)").show();
+                        return true;
+                    },
+                    onItem: function (context, e) {
+                        var serverID = $(context).children("td:nth-child(1)").find("input").val();
+
+                        var clicked = $(e.target).text().trim();
+
+                        if (clicked == "Start") {
+                            bootbox.confirm("Are you sure you want to start this server ?",
+                                function (result) {
+                                    if (result) {
+                                        $.post("/API/Server/StartServers",
+                                            {
+                                                ServerIDs: serverID
+                                            },
+                                            function (data) {
+
+                                                var root = $($.parseXML(data)).find("Response");
+
+                                                if (root.children("Type").text() == "Error") {
+                                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                                    return;
+                                                }
+
+                                                toastr.success("The server has been started", "Server Started");
+                                                softRefresh();
+                                            });
+                                    }
+                                });
+                        } else if (clicked == "Stop") {
+                            bootbox.confirm("Are you sure you want to stop this server ?",
+                                function (result) {
+                                    if (result) {
+                                        $.post("/API/Server/StopServers",
+                                            {
+                                                ServerIDs: serverID
+                                            },
+                                            function (data) {
+
+                                                var root = $($.parseXML(data)).find("Response");
+
+                                                if (root.children("Type").text() == "Error") {
+                                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                                    return;
+                                                }
+
+                                                toastr.success("The server has been stopped", "Server Stopped");
+                                                softRefresh();
+                                            });
+                                    }
+                                });
+                        } else if (clicked == "Restart") {
+                            bootbox.confirm("Are you sure you want to restart this server ?",
+                                function (result) {
+                                    if (result) {
+                                        $.post("/API/Server/RestartServers",
+                                            {
+                                                ServerIDs: serverID
+                                            },
+                                            function (data) {
+
+                                                var root = $($.parseXML(data)).find("Response");
+
+                                                if (root.children("Type").text() == "Error") {
+                                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                                    return;
+                                                }
+
+                                                toastr.success("The server has been restarted", "Server Restarted");
+                                                softRefresh();
+                                            });
+                                    }
+                                });
+                        } else if (clicked == "Kill") {
+                            bootbox.confirm("Are you sure you want to kill this server ?<br/>" +
+                                "Warning : this may lead to save corruption !",
+                                function (result) {
+                                    if (result) {
+                                        $.post("/API/Server/KillServers",
+                                            {
+                                                ServerIDs: serverID
+                                            },
+                                            function (data) {
+
+                                                var root = $($.parseXML(data)).find("Response");
+
+                                                if (root.children("Type").text() == "Error") {
+                                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                                    return;
+                                                }
+
+                                                toastr.success("The server has been killed", "Server Killed");
+                                                softRefresh();
+                                            });
+                                    }
+                                });
+                        } else if (clicked == "Delete") {
+                            bootbox.confirm("Are you sure you want to delete this server ?<br/>" +
+                            "Warning : This will permanantly delete the server configuration, saves, backups and any other related files. !",
+                            function (result) {
+                                if (result) {
+                                    bootbox.confirm("Are you <strong>really really</strong> sure you want to delete this server ?<br/>" +
+                                    "Warning : This action is irreversible!",
+                                    function (result) {
+                                        if (result) {
+                                            $.post("/API/Server/DeleteServers",
+                                            {
+                                                ServerIDs: serverID
+                                            },
+                                            function (data) {
+
+                                                var root = $($.parseXML(data)).find("Response");
+
+                                                if (root.children("Type").text() == "Error") {
+                                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                                    return;
+                                                }
+
+                                                toastr.success("The server has been deleted", "Server deleted");
+                                                softRefresh();
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }
                 });
 
             });
             $.get("/API/Account/GetDetails",
-                {},
-                function (data) {
-                    var root = $($.parseXML(data)).find("Response");
+            function (data) {
+                var root = $($.parseXML(data)).find("Response");
 
-                    if (root.children("ReturnCode").text() == "ACT-GTD-NOTLOG") {
-                        return;
-                    }
+                if (root.children("ReturnCode").text() == "ACT-GTD-NOTLOG") {
+                    return;
+                }
 
-                    if (root.children("Type").text() == "Error") {
-                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                        $("#btnRefreshList").children("i").removeClass("fa-spin");
-                        return;
-                    }
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    $("#btnRefreshList").children("i").removeClass("fa-spin");
+                    return;
+                }
 
-                    if (root.children("Content").children("IsSuperAdmin").text() == "True") {
-                        $("#btnCreateServer").show();
-
-                        isSuperAdmin = true;
-                    }
-                });
+                if (root.children("Content").children("IsSuperAdmin").text() == "true") {
+                    $("#btnCreateServer").stop(true).fadeIn("slow");
+                    isSuperAdmin = true;
+                } else {
+                    $("#btnCreateServer").stop(true).fadeOut("slow");
+                    isSuperAdmin = false;
+                }
+            });
         }
 
         refereshList();
-        $("#btnRefreshList").click(function () {
-            var ids = getCheckedIds();
+
+        setInterval(softRefresh, 10000);
+        function softRefresh() {
+            var ids = getCheckedVals();
             refereshList(ids);
+        }
+
+        $("#btnRefreshList").click(function () {
+            softRefresh();
         });
 
-        function getCheckedIds() {
-            var oTable = table.dataTable();
-            var rowcollection = oTable.$(".checkboxes:checked", { "page": "all" });
+        function getCheckedVals() {
             var retArray = [];
-            rowcollection.each(function (index, item) {
-                retArray.push($(item).val());
+            $(".checkboxes:checked").each(function () {
+                retArray.push($(this).val());
             });
             return retArray;
         }
@@ -303,7 +465,7 @@
                                     return;
                                 }
                                 toastr.success(root.children("Content").text(), "Server Created");
-                                refereshList();
+                                softRefresh();
                             });
                         }
                     }
@@ -354,7 +516,7 @@
                                             return;
                                         }
                                         toastr.success(root.children("Content").text(), "Server(s) Started");
-                                        refereshList();
+                                        softRefresh();
                                     });
                                 }
                             });
@@ -389,7 +551,7 @@
                                 return;
                             }
                             toastr.success(root.children("Content").text(), "Server(s) Started");
-                            refereshList();
+                            softRefresh();
                         });
                     }
                 });
@@ -414,7 +576,7 @@
                         {
                             ServerIDs: ids.join(";")
                         },
-                        function (data, status) {
+                        function (data) {
                             var root = $($.parseXML(data)).find("Response");
 
                             if (root.children("Type").text() == "Error") {
@@ -422,7 +584,7 @@
                                 return;
                             }
                             toastr.success(root.children("Content").text(), "Server(s) Stopped");
-                            refereshList();
+                            softRefresh();
                         });
                     }
                 });
@@ -444,7 +606,6 @@
                 "<input type=\"checkbox\" id=\"chkbxRestart\" name=\"chkbxRestart\"/><label for=\"chkbxRestart\">Restart only running server(s)</label>",
                 function (result) {
                     if (result) {
-                        $("#btnRestartServers").children("i").addClass("fa-spin");
                         toastr.success(names.join(", ") + " restart initiated, it may take up to a few minutes.", "Server(s) Restart Initiated");
                         $.post("/API/Server/RestartServers",
                         {
@@ -460,8 +621,7 @@
                                 return;
                             }
                             toastr.success(root.children("Content").text(), "Server(s) Restart Complete");
-                            refereshList();
-                            $("#btnRestartServers").children("i").removeClass("fa-spin");
+                            softRefresh();
                         });
                     }
                 });
@@ -499,7 +659,7 @@
                                 return;
                             }
                             toastr.success(root.children("Content").text(), "Server(s) Killed");
-                            refereshList();
+                            softRefresh();
                         });
                     }
                 });

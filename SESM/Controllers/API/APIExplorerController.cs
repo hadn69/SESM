@@ -31,18 +31,18 @@ namespace SESM.Controllers.API
 
             // ** PARSING / ACCESS **
             if(string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID field must be provided").ToString());
+                return Content(XMLMessage.Error("EXP-GDC-MISID", "The ServerID field must be provided").ToString());
 
             if(!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID is invalid").ToString());
+                return Content(XMLMessage.Error("EXP-GDC-BADID", "The ServerID is invalid").ToString());
 
             EntityServer server = srvPrv.GetServer(serverId);
 
             if(server == null)
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
+                return Content(XMLMessage.Error("EXP-GDC-UKNSRV", "The server doesn't exist").ToString());
 
             if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
+                return Content(XMLMessage.Error("EXP-GDC-NOACCESS", "You don't have access to this server").ToString());
 
             string path = Request.Form["Path"];
             if(string.IsNullOrWhiteSpace(path))
@@ -55,13 +55,13 @@ namespace SESM.Controllers.API
             }
 
             if(!path.Contains(PathHelper.GetInstancePath(server)))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The directory isn't accessible for you, bad boy !").ToString());
+                return Content(XMLMessage.Error("EXP-GDC-BADPTH", "The directory isn't accessible for you, bad boy !").ToString());
 
             if(!Directory.Exists(path))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The directory don't exist").ToString());
+                return Content(XMLMessage.Error("EXP-GDC-BADDIR", "The directory don't exist").ToString());
 
             // ** PROCESS **
-            XMLMessage response = new XMLMessage("XXX-XXX-XXX");
+            XMLMessage response = new XMLMessage("EXP-GDC-OK");
 
             IEnumerable<NodeInfo> directories = FSHelper.GetDirectories(path);
 

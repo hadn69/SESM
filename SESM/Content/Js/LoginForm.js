@@ -169,19 +169,17 @@
                 Password: CryptoJS.MD5($("#RegisterPassword").val()).toString(),
                 Email: $("#RegisterEMail").val()
             },
-                function (data, status) {
-                    var root = $($.parseXML(data)).find("Response");
+            function (data) {
+                var root = $($.parseXML(data)).find("Response");
 
-                    if (root.children("Type").text() == "Error") {
-                        $("#RegisterErrorText").html(root.children("Content").text());
-                        $('#RegisterError').show();
-                        return;
-                    }
-                    window.location.href = "/Server";
-                });
+                if (root.children("Type").text() == "Error") {
+                    $("#RegisterErrorText").html(root.children("Content").text());
+                    $('#RegisterError').show();
+                    return;
+                }
+                window.location.href = "/Servers";
+            });
         }
-
-
 
         jQuery('#register-btn').click(function () {
             jQuery('.login-form').hide();

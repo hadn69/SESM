@@ -26,9 +26,9 @@
         text-align: right;
     }
 
-    td:nth-child(2):hover, td:nth-child(3):hover {
-        cursor: pointer;
-    }
+        td:nth-child(2):hover, td:nth-child(3):hover, td:nth-child(4):hover, td:nth-child(5):hover {
+            cursor: pointer;
+        }
 </style>
 <!-- --- DOWNLOAD --- -->
 <div style="display: none">
@@ -78,7 +78,7 @@
     </div>
 </div>
 <div class="col-md-4 col-sm-12">
-    <div class="portlet light" style="height: 400px;">
+    <div class="portlet light" style="height: 600px;">
         <div class="portlet-body" style="height: 100%;">
             <div id="treeDiv" style="overflow: auto; height:100%;">
             </div>
@@ -86,7 +86,7 @@
     </div>
 </div>
 <div class="col-md-8 col-sm-12">
-    <div class="portlet light" style="height: 400px;">
+    <div class="portlet light" style="height: 600px;">
         <!-- --- Context Menu --- -->
         <div id="context-menu">
             <ul class="dropdown-menu pull-left" role="menu">
@@ -134,7 +134,7 @@
                 <button type="button" class="btn blue" id="btnUpload">
                     <i class="fa fa-upload"></i> Upload
                 </button>
-                <div class="pull-right" id="selectedBtn" style="display: none">
+                <div class="pull-right" id="actionBtn" style="display: none">
                     <button type="button" class="btn yellow " id="btnDownloadAll">
                         <i class="fa fa-download"></i> Download
                     </button>
@@ -162,14 +162,11 @@
                         <th>
                             Last Edit
                         </th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
-            <br />
-            <br />
-            <br />
+            <p>Hint : Right-click on a line for more option</p>
         </div>
     </div>
 </div>
@@ -179,7 +176,7 @@
             if (a < 1024)
                 return a + ' B';
             return (b = Math, c = b.log, d = 1024, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2)
-                + '&nbsp;' + (e ? 'KMGTPEZY'[--e] + 'B' : 'B');
+                + ' ' + (e ? 'KMGTPEZY'[--e] + 'B' : 'B');
         }
         function isEmptyOrSpaces(str) {
             return str === null || str.match(/^\s*$/) !== null;
@@ -235,16 +232,13 @@
                 "width": "3%"
             }, {
                 "orderable": true,
-                "width": "40%"
+                "width": "69%"
+            }, {
+                "orderable": true,
+                "width": "10%"
             }, {
                 "orderable": true,
                 "width": "15%"
-            }, {
-                "orderable": true,
-                "width": "23%"
-            }, {
-                "orderable": false,
-                "width": "5%"
             }],
             "order": [[2, "asc"]]
         });
@@ -278,7 +272,16 @@
             updateCheckboxes();
         });
 
-
+        function canEdit(tr) {
+            if (tr.children("td:nth-child(2)").html() == '<i class="fa fa-file"></i>') {
+                var size = tr.children("td:nth-child(4)").text();
+                var splittedSize = size.split(" ");
+                if (splittedSize[1] == "B" || (splittedSize[1] == "KB" && splittedSize[0] < 512)) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         function loadList() {
             table.DataTable().clear();
@@ -318,33 +321,13 @@
                     var tempDate = "";
                     var displayDate = "";
                     var displaySize = "";
-                    var actions = "";
-
-                    if (index > total - 4 || total < 6) {
-                        actions += '<div class="btn-group dropup">';
-                    } else {
-                        actions += '<div class="btn-group dropdown">';
-                    }
-
-                    actions += '<button type="button" class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown">' +
-                                    '<span class="fa fa-cog"></span>' +
-                                '</button>' +
-                                '<ul class="dropdown-menu pull-right" role="menu">';
 
                     if (Type == "Directory") {
                         icon = '<i class="fa fa-folder"></i>';
                     }
                     if (Type == "File") {
                         icon = '<i class="fa fa-file"></i>';
-                        if (Size < 1024 * 512) {
-                            actions += '<li><a href="#" class="btnEdit"><i class="fa fa-edit"></i>&nbsp;Edit</a></li>';
-                        }
                     }
-                    actions += '<li><a href="#" class="btnRename"><i class="fa fa-font"></i>&nbsp;Rename</a></li>';
-                    actions += '<li><a href="#" class="btnDownload"><i class="fa fa-download"></i>&nbsp;Download</a></li>';
-                    actions += '<li><a href="#" class="btnDelete"><i class="fa fa-trash"></i>&nbsp;Delete</a></li>';
-                    actions += '</ul>';
-                    actions += '</div>';
 
                     tempDate = new Date(DateItem);
                     displayDate = tempDate.getFullYear() + "-" + lpad(tempDate.getMonth(), 2) + "-" + lpad(tempDate.getDate(), 2) +
@@ -352,7 +335,7 @@
 
                     displaySize = fileSizeIEC(Size);
 
-                    table.DataTable().row.add([checkbox, icon, Name, displaySize, DateItem, actions]);
+                    table.DataTable().row.add([checkbox, icon, Name, displaySize, DateItem]);
                 });
                 table.DataTable().draw();
                 table.find('input:checkbox').uniform();
@@ -360,79 +343,41 @@
 
                 $('tr.odd, tr.even').contextmenu({
                     target: '#context-menu',
+                    before: function (e, element, target) {
+                        var tr = $(e.target).parents("tr");
+                        this.getMenu().find("li:first-child").hide();
+                        if (canEdit(tr))
+                            this.getMenu().find("li:first-child").show();
+                        return true;
+                    },
                     onItem: function (context, e) {
                         var dirName = $(context).children("td:nth-child(3)").text();
 
                         var clicked = $(e.target).text().trim();
 
-                        if (clicked == "Load") {
-                            bootbox.confirm("Are you sure you want to select this map ?<br/>" +
-                                "Note : if the server is running, it WILL be restarted",
-                                function (result) {
-                                    if (result) {
-                                        LockPage();
-                                        $.post("/API/Map/SelectMap",
-                                            {
-                                                ServerID: serverID,
-                                                MapDir: dirName
-                                            },
-                                            function (data) {
-
-                                                var root = $($.parseXML(data)).find("Response");
-
-                                                if (root.children("Type").text() == "Error") {
-                                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                                    return;
-                                                }
-
-                                                toastr.success("The Map have been selected", "Map Selected");
-                                                refreshList();
-                                            });
-                                    }
-                                });
+                        if (clicked == "Edit") {
+                            editFile($(context));
+                        } else if (clicked == "Rename") {
+                            renameItem($(context));
                         } else if (clicked == "Download") {
-                            $("#downloadFormMapDirs").val(dirName);
-                            $("#downloadForm").submit();
+                            downloadItem($(context));
                         } else if (clicked == "Delete") {
-                            bootbox.confirm("Are you sure you want to delete this map ?<br/>" +
-                                "Note : if the server is running, it WILL be stopped",
-                                function (result) {
-                                    if (result) {
-                                        LockPage();
-                                        $.post("/API/Map/DeleteMaps",
-                                            {
-                                                ServerID: serverID,
-                                                MapDirs: dirName
-                                            },
-                                            function (data) {
-
-                                                var root = $($.parseXML(data)).find("Response");
-
-                                                if (root.children("Type").text() == "Error") {
-                                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                                    return;
-                                                }
-
-                                                toastr.success("The Map have been deleted", "Map Deleted");
-                                                refreshList();
-                                            });
-                                    }
-                                });
+                            deleteItem($(context));
                         }
                     }
                 });
             });
         }
 
-        table.on('click', 'tbody tr td:nth-child(2), tbody tr td:nth-child(3)', function () {
+        table.on('click', 'tbody tr td:nth-child(2), tbody tr td:nth-child(3), tbody tr td:nth-child(4), tbody tr td:nth-child(5)', function () {
             var type = "file";
-            if ($(this).parents('tr').children(':nth-child(2)').find('i, span').hasClass("fa-folder")) {
+            var tr = $(this).parents('tr');
+            if (tr.children(':nth-child(2)').find('i, span').hasClass("fa-folder")) {
                 type = "dir";
-            } else if ($(this).parents('tr').children(':nth-child(2)').find('i, span').hasClass("glyphicon-arrow-up")) {
+            } else if (tr.children(':nth-child(2)').find('i, span').hasClass("glyphicon-arrow-up")) {
                 type = "up";
             }
 
-            console.log(currentNode);
             if (type == "up" || type == "dir") {
                 table.DataTable().clear();
                 table.DataTable().draw();
@@ -448,6 +393,11 @@
                 else {
                     $('#treeDiv').jstree(true).select_node(currentPath + "\\" + $(this).text());
                 }
+            } else if (type == "file") {
+                if (canEdit(tr))
+                    editFile(tr);
+                else
+                    downloadItem(tr);
             }
         });
 
@@ -646,22 +596,10 @@
 
         $("#downloadFormServerID").val(serverID);
 
-        table.on('click', ".btnDownload", function (event) {
-            event.preventDefault();
-            var name = $(this).parents('tr').children('td:nth-child(3)').text();
-            var path = "";
-            if (isEmptyOrSpaces(currentPath)) {
-                path = name;
-            } else {
-                path = currentPath + "\\" + name;
-            }
-            $("#downloadFormPaths").val(path);
-            $("#downloadForm").submit();
-        });
-
-        table.on('click', ".btnEdit", function (event) {
-            event.preventDefault();
-            var name = $(this).parents('tr').children('td:nth-child(3)').text();
+        function editFile(trLine) {
+            if (!canEdit(trLine))
+                return;
+            var name = trLine.children('td:nth-child(3)').text();
             var path = "";
             if (isEmptyOrSpaces(currentPath)) {
                 path = name;
@@ -719,11 +657,22 @@
                 });
 
             });
-        });
+        }
 
-        table.on('click', ".btnRename", function (event) {
-            event.preventDefault();
-            var name = $(this).parents('tr').children('td:nth-child(3)').text();
+        function downloadItem(trLine) {
+            var name = trLine.children('td:nth-child(3)').text();
+            var path = "";
+            if (isEmptyOrSpaces(currentPath)) {
+                path = name;
+            } else {
+                path = currentPath + "\\" + name;
+            }
+            $("#downloadFormPaths").val(path);
+            $("#downloadForm").submit();
+        }
+
+        function renameItem(trLine) {
+            var name = trLine.children('td:nth-child(3)').text();
 
             var path = "";
             if (isEmptyOrSpaces(currentPath)) {
@@ -750,32 +699,31 @@
 
                             if (name != newName) {
                                 $.post("/API/Explorer/Rename",
-                                    {
-                                        ServerID: serverID,
-                                        Path: path,
-                                        NewName: newName
-                                    },
-                                    function (data) {
-                                        var root = $($.parseXML(data)).find("Response");
+                                {
+                                    ServerID: serverID,
+                                    Path: path,
+                                    NewName: newName
+                                },
+                                function (data) {
+                                    var root = $($.parseXML(data)).find("Response");
 
-                                        if (root.children("Type").text() == "Error") {
-                                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                            return;
-                                        }
+                                    if (root.children("Type").text() == "Error") {
+                                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                        return;
+                                    }
 
-                                        toastr.success(root.children("Content").text(), "Item Renamed");
-                                        loadList();
-                                    });
+                                    toastr.success(root.children("Content").text(), "Item Renamed");
+                                    loadList();
+                                });
                             }
                         }
                     }
                 }
             });
-        });
+        }
 
-        table.on('click', ".btnDelete", function (event) {
-            event.preventDefault();
-            var name = $(this).parents('tr').children('td:nth-child(3)').text();
+        function deleteItem(trLine){
+            var name = trLine.children('td:nth-child(3)').text();
 
             var path = "";
             if (isEmptyOrSpaces(currentPath)) {
@@ -815,7 +763,7 @@
                     }
                 }
             });
-        });
+        }
 
         // -- Tree --
 
