@@ -100,18 +100,18 @@ namespace SESM.Controllers.API
             // ** PARSING / ACCESS **
             int serverId = -1;
             if(string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID field must be provided").ToString());
+                return Content(XMLMessage.Error("EXP-GDD-MISID", "The ServerID field must be provided").ToString());
 
             if(!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID is invalid").ToString());
+                return Content(XMLMessage.Error("EXP-GDD-BADID", "The ServerID is invalid").ToString());
 
             EntityServer server = srvPrv.GetServer(serverId);
 
             if(server == null)
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
+                return Content(XMLMessage.Error("EXP-GDD-UKNSRV", "The server doesn't exist").ToString());
 
             if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
+                return Content(XMLMessage.Error("EXP-GDD-NOACCESS", "You don't have access to this server").ToString());
 
             string path = Request.Form["Path"];
             if(string.IsNullOrWhiteSpace(path))
@@ -124,13 +124,13 @@ namespace SESM.Controllers.API
             }
 
             if(!path.Contains(PathHelper.GetInstancePath(server)))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The directory isn't accessible for you, bad boy !").ToString());
+                return Content(XMLMessage.Error("EXP-GDD-BADPTH", "The directory isn't accessible for you, bad boy !").ToString());
 
             if(!Directory.Exists(path))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The directory don't exist").ToString());
+                return Content(XMLMessage.Error("EXP-GDD-BADDIR", "The directory don't exist").ToString());
 
             // ** PROCESS **
-            XMLMessage response = new XMLMessage("XXX-XXX-XXX");
+            XMLMessage response = new XMLMessage("EXP-GDD-OK");
 
             IEnumerable<NodeInfo> directories = FSHelper.GetDirectories(path);
 
@@ -154,18 +154,18 @@ namespace SESM.Controllers.API
             // ** PARSING / ACCESS **
             int serverId = -1;
             if(string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID field must be provided").ToString());
+                return Content(XMLMessage.Error("EXP-DEL-MISID", "The ServerID field must be provided").ToString());
 
             if(!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID is invalid").ToString());
+                return Content(XMLMessage.Error("EXP-DEL-BADID", "The ServerID is invalid").ToString());
 
             EntityServer server = srvPrv.GetServer(serverId);
 
             if(server == null)
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
+                return Content(XMLMessage.Error("EXP-DEL-UKNSRV", "The server doesn't exist").ToString());
 
             if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
+                return Content(XMLMessage.Error("EXP-DEL-NOACCESS", "You don't have access to this server").ToString());
 
             string[] paths = Request.Form["Paths"].Split(':');
 
@@ -176,10 +176,10 @@ namespace SESM.Controllers.API
                 paths[i] = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), paths[i]));
 
                 if(!paths[i].Contains(PathHelper.GetInstancePath(server)))
-                    return Content(XMLMessage.Error("XXX-XXX-XXX", "The object isn't accessible for you, bad boy !").ToString());
+                    return Content(XMLMessage.Error("EXP-DEL-BADPTH", "The object isn't accessible for you, bad boy !").ToString());
 
                 if(!(Directory.Exists(paths[i]) || System.IO.File.Exists(paths[i])))
-                    return Content(XMLMessage.Error("XXX-XXX-XXX", "The object don't exist").ToString());
+                    return Content(XMLMessage.Error("EXP-DEL-BADEX", "The object don't exist").ToString());
             }
 
             // ** PROCESS **
@@ -206,7 +206,7 @@ namespace SESM.Controllers.API
                     }
                 }
             }
-            return Content(XMLMessage.Success("XXX-XXX-XXX", "Object(s) deleted").ToString());
+            return Content(XMLMessage.Success("EXP-DEL-OK", "Object(s) deleted").ToString());
         }
 
         // POST: API/Explorer/Rename
