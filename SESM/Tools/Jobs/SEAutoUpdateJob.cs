@@ -34,14 +34,41 @@ namespace SESM.Tools.Jobs
             logger.Info("Force : " + force.ToString().ToUpper());
             logger.Info("Checking Versions ...");
 
-            int localVersion = SteamCMDHelper.GetInstalledVersion(logger);
-            logger.Info(" - Local Version : " + localVersion);
+            int? localVersion = null;
+            int? remoteVersion = null;
+            for (int i = 0; i < 3; i++)
+            {
+                if (localVersion == null)
+                {
+                    logger.Info("Retrieving local version : ");
+                    localVersion = SteamCMDHelper.GetInstalledVersion(logger);
+                }
 
-            int remoteVersion = SteamCMDHelper.GetAvailableVersion(!string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword), logger);
+                if (remoteVersion == null)
+                {
+                    logger.Info("Retrieving remote version : ");
+                    remoteVersion =
+                        SteamCMDHelper.GetAvailableVersion(
+                            !string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword), logger);
+                }
+
+                if (localVersion == null || remoteVersion == null)
+                    logger.Info("Fail retrieving one of the version (try " + (i + 1) + " of 3)");
+                else
+                    break;
+
+            }
+            if (localVersion == null || remoteVersion == null)
+            {
+                logger.Info("Fail retrieving one of the version (too much try), steam CMD problem");
+                return ReturnEnum.Error;
+            }
+
+            logger.Info(" - Local Version : " + localVersion);
             logger.Info(" - Remote Version : " + remoteVersion);
 
             // Test for update
-            if (!useLocalZip && !force && localVersion.CompareTo(remoteVersion) >= 0)
+            if (!useLocalZip && !force && localVersion >= remoteVersion)
             {
                 logger.Info("No Update Available, Exiting ...");
                 return ReturnEnum.NothingToDo;

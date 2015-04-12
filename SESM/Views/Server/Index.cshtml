@@ -475,7 +475,7 @@
         });
 
         $("#btnDeleteServers").click(function () {
-            var ids = getCheckedIds();
+            var ids = getCheckedVals();
             var names = [];
             table.DataTable().rows().nodes().to$().each(function (index, value) {
                 var name = $(value).children(":nth-child(2)").text();
@@ -484,49 +484,49 @@
                 }
             });
             bootbox.confirm("<div class=\"note note-danger\">" +
-                "<h4 class=\"block\"><i class=\"fa fa-warning\"></i> <strong>Warning</strong></h4>" +
-                "<p>Deleting server(s) will permanantly delete the server configuration, saves, backups and any other related files.<br/>" +
-                "<strong>This action is irreversible !</strong></p>" +
-                "</div>" +
-                "Are you sure you want to delete the folowing server(s) : <br/><br/>" +
-                "<ul>" +
-                "<li>" + names.join("</li><li>") + "</li>" +
-                "</ul>",
-                function (result) {
-                    if (result) {
-                        bootbox.confirm("<div class=\"note note-danger\">" +
-                            "<h4 class=\"block\"><i class=\"fa fa-warning\"></i> <strong>Last Warning</strong></h4>" +
-                            "<p>" +
-                            "Are you really, really, sure you want to delete the folowing server(s) : <br/><br/>" +
-                            "<ul>" +
-                            "<li>" + names.join("</li><li>") + "</li>" +
-                            "</ul>" +
-                            "<strong>This action is irreversible ! I.R.R.E.V.E.R.S.I.B.L.E !!!!</strong></p>" +
-                            "</div>",
-                            function (result) {
-                                if (result) {
-                                    $.post("/API/Server/DeleteServers",
-                                    {
-                                        ServerIDs: ids.join(";")
-                                    },
-                                    function (data, status) {
-                                        var root = $($.parseXML(data)).find("Response");
+            "<h4 class=\"block\"><i class=\"fa fa-warning\"></i> <strong>Warning</strong></h4>" +
+            "<p>Deleting server(s) will permanantly delete the server configuration, saves, backups and any other related files.<br/>" +
+            "<strong>This action is irreversible !</strong></p>" +
+            "</div>" +
+            "Are you sure you want to delete the folowing server(s) : <br/><br/>" +
+            "<ul>" +
+            "<li>" + names.join("</li><li>") + "</li>" +
+            "</ul>",
+            function (result) {
+                if (result) {
+                    bootbox.confirm("<div class=\"note note-danger\">" +
+                    "<h4 class=\"block\"><i class=\"fa fa-warning\"></i> <strong>Last Warning</strong></h4>" +
+                    "<p>" +
+                    "Are you really, really, sure you want to delete the folowing server(s) : <br/><br/>" +
+                    "<ul>" +
+                    "<li>" + names.join("</li><li>") + "</li>" +
+                    "</ul>" +
+                    "<strong>This action is irreversible ! I.R.R.E.V.E.R.S.I.B.L.E !!!!</strong></p>" +
+                    "</div>",
+                    function (result) {
+                        if (result) {
+                            $.post("/API/Server/DeleteServers",
+                            {
+                                ServerIDs: ids.join(";")
+                            },
+                            function (data, status) {
+                                var root = $($.parseXML(data)).find("Response");
 
-                                        if (root.children("Type").text() == "Error") {
-                                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                            return;
-                                        }
-                                        toastr.success(root.children("Content").text(), "Server(s) Started");
-                                        softRefresh();
-                                    });
+                                if (root.children("Type").text() == "Error") {
+                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                    return;
                                 }
+                                toastr.success(root.children("Content").text(), "Server(s) Started");
+                                softRefresh();
                             });
-                    }
-                });
+                        }
+                    });
+                }
+            });
         });
 
         $("#btnStartServers").click(function () {
-            var ids = getCheckedIds();
+            var ids = getCheckedVals();
             var names = [];
             table.DataTable().rows().nodes().to$().each(function (index, value) {
                 var name = $(value).children(":nth-child(2)").text();
@@ -559,7 +559,7 @@
         });
 
         $("#btnStopServers").click(function () {
-            var ids = getCheckedIds();
+            var ids = getCheckedVals();
             var names = [];
             table.DataTable().rows().nodes().to$().each(function (index, value) {
                 var name = $(value).children(":nth-child(2)").text();
@@ -592,7 +592,7 @@
         });
 
         $("#btnRestartServers").click(function () {
-            var ids = getCheckedIds();
+            var ids = getCheckedVals();
             var names = [];
             table.DataTable().rows().nodes().to$().each(function (index, value) {
                 var name = $(value).children(":nth-child(2)").text();
@@ -629,7 +629,7 @@
         });
 
         $("#btnKillServers").click(function () {
-            var ids = getCheckedIds();
+            var ids = getCheckedVals();
             var names = [];
             table.DataTable().rows().nodes().to$().each(function (index, value) {
                 var name = $(value).children(":nth-child(2)").text();

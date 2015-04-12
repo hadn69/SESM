@@ -373,15 +373,43 @@ namespace SESM.Controllers.API
 
             // ** PROCESS **
             Logger logger = LogManager.GetLogger("SEGetVersionLogger");
-            int localVersion = SteamCMDHelper.GetInstalledVersion(logger);
+            int? localVersion = null;
 
-            int remoteVersion = SteamCMDHelper.GetAvailableVersion(!string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword), logger);
-            
+            int? remoteVersion = null;
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (localVersion == null)
+                {
+                    logger.Info("Retrieving local version : ");
+                    localVersion = SteamCMDHelper.GetInstalledVersion(logger);
+                }
+
+                if (remoteVersion == null)
+                {
+                    logger.Info("Retrieving remote version : ");
+                    remoteVersion =
+                        SteamCMDHelper.GetAvailableVersion(
+                            !string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword), logger);
+                }
+
+                if (localVersion == null || remoteVersion == null)
+                    logger.Info("Fail retrieving one of the version (try " + (i + 1) + " of 3)");
+                else
+                    break;
+
+            }
+
+            if (localVersion == null || remoteVersion == null)
+            {
+                return Content(XMLMessage.Error("SET-GSEV-FAIL", "Fail retieving one of the version. See SEGetVersion log for more info").ToString());
+            }
+
             XMLMessage response = new XMLMessage("SET-GSEV-OK");
 
             response.AddToContent(new XElement("Local", localVersion.ToString()));
             response.AddToContent(new XElement("Remote", remoteVersion.ToString()));
-            response.AddToContent(new XElement("Diff", localVersion.CompareTo(remoteVersion)));
+            response.AddToContent(new XElement("Diff", localVersion - remoteVersion));
 
             return Content(response.ToString());
         }

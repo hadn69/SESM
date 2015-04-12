@@ -122,7 +122,7 @@ namespace SESM.Tools.Helpers
             return output;
         }
 
-        public static int GetInstalledVersion(Logger logger = null)
+        public static int? GetInstalledVersion(Logger logger = null)
         {
             string output = ExecuteSteamCMD(logger, " +login Anonymous"
                                                     + " +force_install_dir " + PathHelper.GetSyncDirPath()
@@ -144,17 +144,17 @@ namespace SESM.Tools.Helpers
                     catch (Exception ex)
                     {
                         logger?.Error("Failed parsing int :", ex);
-                        return 0;
+                        return null;
                     }
                 }
                 logger?.Error("Missing keyword !");
-                return 0;
+                return null;
             }
             logger?.Error("Missing keyword !");
-            return 0;
+            return null;
         }
 
-        public static int GetAvailableVersion(bool dev, Logger logger = null)
+        public static int? GetAvailableVersion(bool dev, Logger logger = null)
         {
             string output = ExecuteSteamCMD(logger, " +login Anonymous"
                                                     + " +force_install_dir " + PathHelper.GetSyncDirPath()
@@ -181,7 +181,7 @@ namespace SESM.Tools.Helpers
                 }
             }
             logger?.Error("Missing keyword !");
-            return 0;
+            return null;
         }
 
         public static void Update(Logger logger, bool dev)
