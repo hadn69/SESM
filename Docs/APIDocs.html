@@ -177,16 +177,16 @@
                 <li>
                     <a href="#ExplorerAPI" class="autoScroll">Explore</a>
                     <ul class="nav nav-stacked">
-                        <li><a href="#AccountAPI-GetDirectoryContent" class="autoScroll">GetDirectoryContent</a></li>
-                        <li><a href="#AccountAPI-GetDirectoryDirectories" class="autoScroll">GetDirectoryDirectories</a></li>
-                        <li><a href="#AccountAPI-Delete" class="autoScroll">Delete</a></li>
-                        <li><a href="#AccountAPI-Rename" class="autoScroll">Rename</a></li>
-                        <li><a href="#AccountAPI-Download" class="autoScroll">Download</a></li>
-                        <li><a href="#AccountAPI-NewFolder" class="autoScroll">NewFolder</a></li>
-                        <li><a href="#AccountAPI-NewFile" class="autoScroll">NewFile</a></li>
-                        <li><a href="#AccountAPI-Upload" class="autoScroll">Upload</a></li>
-                        <li><a href="#AccountAPI-GetFileContent" class="autoScroll">GetFileContent</a></li>
-                        <li><a href="#AccountAPI-SetFileContent" class="autoScroll">SetFileContent</a></li>
+                        <li><a href="#ExplorerAPI-GetDirectoryContent" class="autoScroll">GetDirectoryContent</a></li>
+                        <li><a href="#ExplorerAPI-GetDirectoryDirectories" class="autoScroll">GetDirectoryDirectories</a></li>
+                        <li><a href="#ExplorerAPI-Delete" class="autoScroll">Delete</a></li>
+                        <li><a href="#ExplorerAPI-Rename" class="autoScroll">Rename</a></li>
+                        <li><a href="#ExplorerAPI-Download" class="autoScroll">Download</a></li>
+                        <li><a href="#ExplorerAPI-NewFolder" class="autoScroll">NewFolder</a></li>
+                        <li><a href="#ExplorerAPI-NewFile" class="autoScroll">NewFile</a></li>
+                        <li><a href="#ExplorerAPI-Upload" class="autoScroll">Upload</a></li>
+                        <li><a href="#ExplorerAPI-GetFileContent" class="autoScroll">GetFileContent</a></li>
+                        <li><a href="#ExplorerAPI-SetFileContent" class="autoScroll">SetFileContent</a></li>
                     </ul>
                 </li>
             </ul>
@@ -529,7 +529,7 @@
                             <tr>
                                 <td>IsSuperAdmin</td>
                                 <td>Boolean</td>
-                                <td>true if the user is a super administrator, false if he isn't.</td>
+                                <td><strong>true</strong> if the user is a super administrator, <strong>false</strong> if he isn't.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -752,13 +752,13 @@
                     </tbody>
                 </table>
 
-                <!-- SetDetails -->
+                <!-- GetDirectoryContent -->
                 <div>
                     <h3 id="ExplorerAPI-GetDirectoryContent">GetDirectoryContent</h3>
                     <p>
                         Type : <em>POST</em><br />
                         URL : <em>/API/Explorer/GetDirectoryContent</em><br />
-                        This web service provide a list of file and folders present in a specifyed directory.<br/>
+                        This web service provide a list of file and folders present in a specifyed directory.<br />
                     </p>
 
                     <h4>POST Parameters</h4>
@@ -776,7 +776,7 @@
                                 <td>ServerID</td>
                                 <td>Int</td>
                                 <td></td>
-                                <td>The server'ID.</td>
+                                <td>The server's ID.</td>
                             </tr>
                             <tr>
                                 <td>Path</td>
@@ -786,6 +786,45 @@
                             </tr>
                         </tbody>
                     </table>
+
+                    <h4>Successful Response Content</h4>
+                    <p>
+                        A collection of <strong>Item</strong> object with the following propeties :
+                    </p>
+                    <table class="table table-hover table-striped responseTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Type</td>
+                                <td>String</td>
+                                <td><strong>Directory</strong> if directory, <strong>File</strong> if file.</td>
+                            </tr>
+                            <tr>
+                                <td>Name</td>
+                                <td>String</td>
+                                <td>The item's name.</td>
+                            </tr>
+                            <tr>
+                                <td>Size</td>
+                                <td>Boolean</td>
+                                <td>The item size in Bytes. If the item is a folder, it will be the sum of all the files contained in the folder and it's sub folders.</td>
+                            </tr>
+                            <tr>
+                                <td>Date</td>
+                                <td>String</td>
+                                <td>The item's last write date. Format : <strong>yyyy/MM/dd-HH:mm:ss</strong>.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Successful Response Exemple</h4>
+                    <pre><code>WIP</code></pre>
 
                     <h4>Response Codes</h4>
                     <table class="table table-hover table-striped codeTable">
@@ -829,6 +868,198 @@
                             </tr>
                             <tr>
                                 <td>EXP-GDC-OK</td>
+                                <td>Success</td>
+                                <td>The folder's content has been retrived.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- GetDirectoryDirectories -->
+                <div>
+                    <h3 id="ExplorerAPI-GetDirectoryDirectories">GetDirectoryDirectories</h3>
+                    <p>
+                        Type : <em>POST</em><br />
+                        URL : <em>/API/Explorer/GetDirectoryDirectories</em><br />
+                        This web service provide a list of folders present in a specifyed directory.<br />
+                    </p>
+
+                    <h4>POST Parameters</h4>
+                    <table class="table table-hover table-striped postTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Opt.</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ServerID</td>
+                                <td>Int</td>
+                                <td></td>
+                                <td>The server's ID.</td>
+                            </tr>
+                            <tr>
+                                <td>Path</td>
+                                <td>String</td>
+                                <td><span class="glyphicon glyphicon-ok-circle"></span></td>
+                                <td>The path of the folder you want to list, relative to the root of the server instance directory. If ommited, the root folder will be listed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Successful Response Content</h4>
+                    <p>
+                        A collection of <strong>Item</strong> object with the following propeties :
+                    </p>
+                    <table class="table table-hover table-striped responseTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>String</td>
+                                <td>The item's name.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Successful Response Exemple</h4>
+                    <pre><code>WIP</code></pre>
+
+                    <h4>Response Codes</h4>
+                    <table class="table table-hover table-striped codeTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>EXP-GDD-MISID</td>
+                                <td>Error</td>
+                                <td>The ServerID field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDD-BADID</td>
+                                <td>Error</td>
+                                <td>The ServerID is invalid.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDD-UKNSRV</td>
+                                <td>Error</td>
+                                <td>The server doesn't exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDD-NOACCESS</td>
+                                <td>Error</td>
+                                <td>You don't have access to this server.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDD-BADPTH</td>
+                                <td>Error</td>
+                                <td>The path provided is invalid.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDD-BADDIR</td>
+                                <td>Error</td>
+                                <td>The directory don't exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-GDD-OK</td>
+                                <td>Success</td>
+                                <td>The folder's content has been retrived.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Delete -->
+                <div>
+                    <h3 id="ExplorerAPI-Delete">Delete</h3>
+                    <p>
+                        Type : <em>POST</em><br />
+                        URL : <em>/API/Explorer/Delete</em><br />
+                        This web service provide a way to delete one or more file/folder.<br />
+                    </p>
+
+                    <h4>POST Parameters</h4>
+                    <table class="table table-hover table-striped postTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Opt.</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ServerID</td>
+                                <td>Int</td>
+                                <td></td>
+                                <td>The server's ID.</td>
+                            </tr>
+                            <tr>
+                                <td>Paths</td>
+                                <td>String</td>
+                                <td><span class="glyphicon glyphicon-ok-circle"></span></td>
+                                <td>The relative paths of the folder/file you want to delete, comma (<strong>:</strong>) separated.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Response Codes</h4>
+                    <table class="table table-hover table-striped codeTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>EXP-DEL-MISID</td>
+                                <td>Error</td>
+                                <td>The ServerID field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DEL-BADID</td>
+                                <td>Error</td>
+                                <td>The ServerID is invalid.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DEL-UKNSRV</td>
+                                <td>Error</td>
+                                <td>The server doesn't exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DEL-NOACCESS</td>
+                                <td>Error</td>
+                                <td>You don't have access to this server.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DEL-BADPTH</td>
+                                <td>Error</td>
+                                <td>One of the provided paths is invalid.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DEL-BADEX</td>
+                                <td>Error</td>
+                                <td>One of the object don't exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DEL-OK</td>
                                 <td>Success</td>
                                 <td>The folder's content has been retrived.</td>
                             </tr>
