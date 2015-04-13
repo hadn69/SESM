@@ -30,11 +30,16 @@ namespace SESM.Controllers.API
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(_context);
+            UserProvider usrPrv = new UserProvider(_context);
 
             EntityUser user = Session["User"] as EntityUser;
+            
             int userID = user == null ? 0 : user.Id;
+            EntityUser usr = usrPrv.GetUser(userID);
+            
 
             List<EntityServer> servers = srvPrv.GetServers(user);
+            Dictionary<EntityServer, ServiceState> serversState = srvPrv.GetState(servers);
 
             // ** PROCESS **
             XMLMessage response = new XMLMessage("SRV-GSS-OK");
@@ -44,8 +49,8 @@ namespace SESM.Controllers.API
                 response.AddToContent(new XElement("Server", new XElement("Name", server.Name),
                                                              new XElement("ID", server.Id),
                                                              new XElement("Public", server.IsPublic.ToString()),
-                                                             new XElement("State", srvPrv.GetState(server).ToString()),
-                                                             new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id)),
+                                                             new XElement("State", serversState[server].ToString()),
+                                                             new XElement("AccessLevel", srvPrv.GetAccessLevel(usr, server)),
                                                              new XElement("Type", server.UseServerExtender ? "SESE" : "SE")
                                                              ));
             }

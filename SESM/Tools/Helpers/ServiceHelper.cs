@@ -306,7 +306,7 @@ namespace SESM.Tools.Helpers
         /// Kill a process, and all of its children, grandchildren, etc.
         /// </summary>
         /// <param name="pid">Process ID.</param>
-        private static void KillProcessAndChildren(int pid)
+        public static void KillProcessAndChildren(int pid)
         {
             ManagementObjectSearcher searcher = new ManagementObjectSearcher
               ("Select * From Win32_Process Where ParentProcessID=" + pid);
@@ -344,26 +344,23 @@ namespace SESM.Tools.Helpers
 
         public static void KillAllServices()
         {
-            foreach(Process proc in Process.GetProcessesByName("SpaceEngineersDedicated"))
-            {
-                try
-                {
-                    KillProcessAndChildren(proc.Id);
-                }
-                catch(Exception) { }
-            }
-            KillAllSESEServices();
+            KillAllProcesses("SpaceEngineersDedicated");
         }
 
         public static void KillAllSESEServices()
         {
-            foreach(Process proc in Process.GetProcessesByName("SEServerExtender"))
+            KillAllProcesses("SEServerExtender");
+        }
+
+        public static void KillAllProcesses(string processName)
+        {
+            foreach(Process proc in Process.GetProcessesByName(processName))
             {
                 try
                 {
                     KillProcessAndChildren(proc.Id);
                 }
-                catch(Exception) { }
+                catch (Exception) { }
             }
         }
 
