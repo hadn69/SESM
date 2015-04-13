@@ -71,55 +71,68 @@ namespace SESM.Tools.Helpers
 
         private static string ExecuteSteamCMD(Logger logger, string arguments, int duration = GetInfoDuration)
         {
-            // Check and DL SteamCMD
-            CheckSteamCMD(logger);
-
-            // Getting Info
-            Process si = new Process();
-            si.StartInfo.WorkingDirectory = PathHelper.GetSteamCMDPath();
-            si.StartInfo.UseShellExecute = false;
-            si.StartInfo.FileName = SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe";
-            si.StartInfo.Arguments = arguments;
-            si.StartInfo.CreateNoWindow = false;
-            si.StartInfo.RedirectStandardInput = true;
-            si.StartInfo.RedirectStandardOutput = true;
-            si.StartInfo.RedirectStandardError = false;
-
-            logger?.Info("Starting SteamCMD (" + GetInfoDuration + " secs Max)");
-            logger?.Debug("Arguments : " + si.StartInfo.Arguments);
-            si.Start();
-
-            DateTime endTime = DateTime.Now.AddSeconds(duration);
-            string output = string.Empty;
-
-            logger?.Debug("Start of SteamCMD output :");
-            while (!si.HasExited && DateTime.Now <= endTime)
+            try
             {
-                string val = si.StandardOutput.ReadLine();
-                if (val == null)
-                    continue;
-                output += val + "\n";
-                logger?.Debug("    " + val);
-            }
-            logger?.Debug("End of SteamCMD output");
+                // Check and DL SteamCMD
+                CheckSteamCMD(logger);
 
-            if (si.HasExited)
-                logger?.Info("Process closed itself gracefully");
-            else
-            {
-                logger?.Warn("Process execution timeout");
-                try
+                // Getting Info
+                Process si = new Process
                 {
-                    si.Kill();
-                    logger?.Info("Killing process sucessful");
-                    Thread.Sleep(2000);
-                }
-                catch (Exception ex)
+                    StartInfo =
+                    {
+                        WorkingDirectory = PathHelper.GetSteamCMDPath(),
+                        UseShellExecute = false,
+                        FileName = SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe",
+                        Arguments = arguments,
+                        CreateNoWindow = false,
+                        RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = false
+                    }
+                };
+
+                logger?.Info("Starting SteamCMD (" + GetInfoDuration + " secs Max)");
+                logger?.Debug("Arguments : " + si.StartInfo.Arguments);
+                si.Start();
+
+                DateTime endTime = DateTime.Now.AddSeconds(duration);
+                string output = string.Empty;
+
+                logger?.Debug("Start of SteamCMD output :");
+                while (!si.HasExited && DateTime.Now <= endTime)
                 {
-                    logger?.Error("Error while killing process", ex);
+                    string val = si.StandardOutput.ReadLine();
+                    if (val == null)
+                        continue;
+                    output += val + "\n";
+                    logger?.Debug("    " + val);
                 }
+                logger?.Debug("End of SteamCMD output");
+
+                if (si.HasExited)
+                    logger?.Info("Process closed itself gracefully");
+                else
+                {
+                    logger?.Warn("Process execution timeout");
+                    try
+                    {
+                        ServiceHelper.KillProcessAndChildren(si.Id);
+                        logger?.Info("Killing process sucessful");
+                        Thread.Sleep(2000);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.Error("Error while killing process", ex);
+                    }
+                }
+                return output;
             }
-            return output;
+            catch (Exception ex)
+            {
+                logger?.Fatal("Exception executing steamcmd : ", ex);
+            }
+            return null;
         }
 
         public static int? GetInstalledVersion(Logger logger = null)
