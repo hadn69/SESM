@@ -565,7 +565,7 @@ namespace SESM.Controllers.API
                     server.AutoRestartCron = autoRestartCron;
 
                     IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
-                    scheduler.DeleteJob(SEAutoUpdateJob.GetJobKey());
+                    scheduler.DeleteJob(AutoRestartJob.GetJobKey(server));
 
                     if (server.IsAutoRestartEnabled)
                     {
@@ -587,11 +587,11 @@ namespace SESM.Controllers.API
 
                 srvPrv.UpdateServer(server);
 
-                return Content(XMLMessage.Success("SRV-SSESESET-OK", "The server Jobs settings have been updated").ToString());
+                return Content(XMLMessage.Success("SRV-SJS-OK", "The server Jobs settings have been updated").ToString());
             }
             catch (Exception ex)
             {
-                return Content(XMLMessage.Error("SRV-SSESESET-EX", "Exception :" + ex).ToString());
+                return Content(XMLMessage.Error("SRV-SJS-EX", "Exception :" + ex).ToString());
             }
         }
 
@@ -961,7 +961,7 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("WorldSizeKm", true));
             response.AddToContent(new XElement("PermanentDeath", true));
             response.AddToContent(new XElement("CargoShipsEnabled", true));
-            response.AddToContent(new XElement("RemoveTrash", isAdmin));
+            response.AddToContent(new XElement("RemoveTrash", true));
             response.AddToContent(new XElement("ClientCanSave", true));
             response.AddToContent(new XElement("Mods", true));
             response.AddToContent(new XElement("ViewDistance", true));
@@ -1051,12 +1051,6 @@ namespace SESM.Controllers.API
                     return Content(XMLMessage.Error("SRV-SC-MISMAXFO", "The MaxFloatingObjects field must be provided").ToString());
                 if (!int.TryParse(Request.Form["MaxFloatingObjects"], out serverConfig.MaxFloatingObjects) || serverConfig.MaxFloatingObjects < 1)
                     return Content(XMLMessage.Error("SRV-SC-BADMAXFO", "The MaxFloatingObjects field is invalid").ToString());
-
-                // ==== RemoveTrash ====
-                if (string.IsNullOrWhiteSpace(Request.Form["RemoveTrash"]))
-                    return Content(XMLMessage.Error("SRV-SC-MISRT", "The RemoveTrash field must be provided").ToString());
-                if (!bool.TryParse(Request.Form["RemoveTrash"], out serverConfig.RemoveTrash))
-                    return Content(XMLMessage.Error("SRV-SC-BADRT", "The RemoveTrash field is invalid").ToString());
             }
 
             // ==== ServerName ====
@@ -1180,6 +1174,12 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SC-MISCSE", "The CargoShipsEnabled field must be provided").ToString());
             if (!bool.TryParse(Request.Form["CargoShipsEnabled"], out serverConfig.CargoShipsEnabled))
                 return Content(XMLMessage.Error("SRV-SC-BADCSE", "The CargoShipsEnabled field is invalid").ToString());
+
+            // ==== RemoveTrash ====
+            if (string.IsNullOrWhiteSpace(Request.Form["RemoveTrash"]))
+                return Content(XMLMessage.Error("SRV-SC-MISRT", "The RemoveTrash field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["RemoveTrash"], out serverConfig.RemoveTrash))
+                return Content(XMLMessage.Error("SRV-SC-BADRT", "The RemoveTrash field is invalid").ToString());
 
             // ==== ClientCanSave ====
             if (string.IsNullOrWhiteSpace(Request.Form["ClientCanSave"]))

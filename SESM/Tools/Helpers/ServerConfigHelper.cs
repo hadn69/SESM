@@ -740,13 +740,11 @@ namespace SESM.Tools.Helpers
         {
             int locMaxplayer = MaxPlayers;
             int locMaxFloatingObjects = MaxFloatingObjects;
-            bool locRemoveTrash = RemoveTrash;
 
             bool ret = LoadFromSave(path);
 
             MaxPlayers = locMaxplayer;
             MaxFloatingObjects = locMaxFloatingObjects;
-            RemoveTrash = locRemoveTrash;
 
             return ret;
         }
