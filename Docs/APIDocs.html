@@ -73,11 +73,7 @@
             }
     </style>
     <style>
-        @media (min-width: 1200px) {
-            .container {
-                width: 90%;
-            }
-        }
+
         /*-- Method Summary Table --*/
 
         .summaryTable tr td:hover {
@@ -160,7 +156,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container-fluid">
         <nav class="col-md-2 bs-docs-sidebar pull-right">
             <ul id="sidebar" class="nav nav-stacked fixed">
                 <li>
@@ -187,6 +183,85 @@
                         <li><a href="#ExplorerAPI-Upload" class="autoScroll">Upload</a></li>
                         <li><a href="#ExplorerAPI-GetFileContent" class="autoScroll">GetFileContent</a></li>
                         <li><a href="#ExplorerAPI-SetFileContent" class="autoScroll">SetFileContent</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#MapAPI" class="autoScroll">Map</a>
+                    <ul class="nav nav-stacked">
+                        <li><a href="#MapAPI-GetMaps" class="autoScroll">GetMaps</a></li>
+                        <li><a href="#MapAPI-SelectMap" class="autoScroll">SelectMap</a></li>
+                        <li><a href="#MapAPI-DeleteMaps" class="autoScroll">DeleteMaps</a></li>
+                        <li><a href="#MapAPI-DownloadMaps" class="autoScroll">DownloadMaps</a></li>
+                        <li><a href="#MapAPI-CreateMap" class="autoScroll">CreateMap</a></li>
+                        <li><a href="#MapAPI-UploadMap" class="autoScroll">UploadMap</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#MiscAPI" class="autoScroll">Misc</a>
+                    <ul class="nav nav-stacked">
+                        <li><a href="#MiscAPI-IsCronValid" class="autoScroll">IsCronValid</a></li>
+                        <li><a href="#MiscAPI-GetNextCronDates" class="autoScroll">GetNextCronDates</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#PerfMonAPI" class="autoScroll">Perf Mon</a>
+                    <ul class="nav nav-stacked">
+                        <li><a href="#PerfMonAPI-GetPerfData" class="autoScroll">GetPerfData</a></li>
+                        <li><a href="#PerfMonAPI-CleanPerfData" class="autoScroll">CleanPerfData</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#ServerAPI" class="autoScroll">Server</a>
+                    <ul class="nav nav-stacked">
+                        <li><a href="#ServerAPI-GetServers" class="autoScroll">GetServers</a></li>
+                        <li><a href="#ServerAPI-GetServer" class="autoScroll">GetServer</a></li>
+                        <li><a href="#ServerAPI-CreateServer" class="autoScroll">CreateServer</a></li>
+                        <li><a href="#ServerAPI-DeleteServers" class="autoScroll">DeleteServers</a></li>
+                        <li><a href="#ServerAPI-GetSettings" class="autoScroll">GetSettings</a></li>
+                        <li><a href="#ServerAPI-SetSettings" class="autoScroll">SetSettings</a></li>
+                        <li><a href="#ServerAPI-GetSESESettings" class="autoScroll">GetSESESettings</a></li>
+                        <li><a href="#ServerAPI-SetSESESettings" class="autoScroll">SetSESESettings</a></li>
+                        <li><a href="#ServerAPI-GetJobsSettings" class="autoScroll">GetJobsSettings</a></li>
+                        <li><a href="#ServerAPI-SetJobsSettings" class="autoScroll">SetJobsSettings</a></li>
+                        <li><a href="#ServerAPI-GetBackupsSettings" class="autoScroll">GetBackupsSettings</a></li>
+                        <li><a href="#ServerAPI-SetBackupsSettings" class="autoScroll">SetBackupsSettings</a></li>
+                        <li><a href="#ServerAPI-GetAccessSettings" class="autoScroll">GetAccessSettings</a></li>
+                        <li><a href="#ServerAPI-SetAccessSettings" class="autoScroll">SetAccessSettings</a></li>
+                        <li><a href="#ServerAPI-StartServers" class="autoScroll">StartServers</a></li>
+                        <li><a href="#ServerAPI-StopServers" class="autoScroll">StopServers</a></li>
+                        <li><a href="#ServerAPI-RestartServers" class="autoScroll">RestartServers</a></li>
+                        <li><a href="#ServerAPI-KillServers" class="autoScroll">KillServers</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#SettingsAPI" class="autoScroll">Server</a>
+                    <ul class="nav nav-stacked">
+                        <li><a href="#SettingsAPI-GetSESMSettings" class="autoScroll">GetSESMSettings</a></li>
+                        <li><a href="#SettingsAPI-SetSESMSettings" class="autoScroll">SetSESMSettings</a></li>
+                        <li><a href="#SettingsAPI-GetBackupsSettings" class="autoScroll">GetBackupsSettings</a></li>
+                        <li><a href="#SettingsAPI-SetBackupsSettings" class="autoScroll">SetBackupsSettings</a></li>
+                        <li><a href="#SettingsAPI-GetSEStatus" class="autoScroll">GetSEStatus</a></li>
+                        <li><a href="#SettingsAPI-GetSEVersion" class="autoScroll">GetSEVersion</a></li>
+                        <li><a href="#SettingsAPI-GetSESettings" class="autoScroll">GetSESettings</a></li>
+                        <li><a href="#SettingsAPI-SetSESettings" class="autoScroll">SetSESettings</a></li>
+                        <li><a href="#SettingsAPI-UploadSE" class="autoScroll">UploadSE</a></li>
+                        <li><a href="#SettingsAPI-UpdateSE" class="autoScroll">UpdateSE</a></li>
+                        <li><a href="#SettingsAPI-GetSESEStatus" class="autoScroll">GetSESEStatus</a></li>
+                        <li><a href="#SettingsAPI-GetSESEVersion" class="autoScroll">GetSESEVersion</a></li>
+                        <li><a href="#SettingsAPI-GetSESESettings" class="autoScroll">GetSESESettings</a></li>
+                        <li><a href="#SettingsAPI-SetSESESettings" class="autoScroll">SetSESESettings</a></li>
+                        <li><a href="#SettingsAPI-UploadSESE" class="autoScroll">UploadSESE</a></li>
+                        <li><a href="#SettingsAPI-UpdateSESE" class="autoScroll">UpdateSESE</a></li>
+                        <li><a href="#SettingsAPI-DeleteSESE" class="autoScroll">DeleteSESE</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#UserAPI" class="autoScroll">User</a>
+                    <ul class="nav nav-stacked">
+                        <li><a href="#UserAPI-GetUsers" class="autoScroll">GetUsers</a></li>
+                        <li><a href="#UserAPI-SetUser" class="autoScroll">SetUser</a></li>
+                        <li><a href="#UserAPI-DeleteUsers" class="autoScroll">DeleteUsers</a></li>
+                        <li><a href="#UserAPI-CreateUser" class="autoScroll">CreateUser</a></li>
                     </ul>
                 </li>
             </ul>
@@ -245,6 +320,7 @@
                         </tr>
                     </tbody>
                 </table>
+
                 <!-- GetChallenge -->
                 <div>
                     <h3 id="AccountAPI-GetChallenge">GetChallenge</h3>
@@ -284,6 +360,7 @@
                         </tbody>
                     </table>
                 </div>
+
                 <!-- LogOut -->
                 <div>
                     <h3 id="AccountAPI-LogOut">LogOut</h3>
@@ -316,6 +393,7 @@
                         </tbody>
                     </table>
                 </div>
+
                 <!-- Authenticate -->
                 <div>
                     <h3 id="AccountAPI-Authenticate">Authenticate</h3>
@@ -400,6 +478,7 @@
                         </tbody>
                     </table>
                 </div>
+
                 <!-- Register -->
                 <div>
                     <h3 id="AccountAPI-Register">Register</h3>
@@ -496,6 +575,7 @@
                         </tbody>
                     </table>
                 </div>
+
                 <!-- GetDetails -->
                 <div>
                     <h3 id="AccountAPI-GetDetails">GetDetails</h3>
@@ -570,6 +650,7 @@
                         </tbody>
                     </table>
                 </div>
+
                 <!-- SetDetails -->
                 <div>
                     <h3 id="AccountAPI-SetDetails">SetDetails</h3>
@@ -1013,7 +1094,7 @@
                                 <td>Paths</td>
                                 <td>String</td>
                                 <td><span class="glyphicon glyphicon-ok-circle"></span></td>
-                                <td>The relative paths of the folder/file you want to delete, comma (<strong>:</strong>) separated.</td>
+                                <td>The relative paths of the folders/files you want to delete, comma (<strong>:</strong>) separated.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1061,10 +1142,397 @@
                             <tr>
                                 <td>EXP-DEL-OK</td>
                                 <td>Success</td>
-                                <td>The folder's content has been retrived.</td>
+                                <td>The object(s) have been deleted.</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Rename -->
+                <div>
+                    <h3 id="ExplorerAPI-Rename">Rename</h3>
+                    <p>
+                        Type : <em>POST</em><br />
+                        URL : <em>/API/Explorer/Rename</em><br />
+                        This web service provide a way to rename a file/folder.<br />
+                    </p>
+
+                    <h4>POST Parameters</h4>
+                    <table class="table table-hover table-striped postTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Opt.</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ServerID</td>
+                                <td>Int</td>
+                                <td></td>
+                                <td>The server's ID.</td>
+                            </tr>
+                            <tr>
+                                <td>Path</td>
+                                <td>String</td>
+                                <td><span class="glyphicon glyphicon-ok-circle"></span></td>
+                                <td>The relative path of the folder/file you want to delete, comma (<strong>:</strong>) separated.</td>
+                            </tr>
+                            <tr>
+                                <td>NewName</td>
+                                <td>String</td>
+                                <td><span class="glyphicon glyphicon-ok-circle"></span></td>
+                                <td>The object new name.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Response Codes</h4>
+                    <table class="table table-hover table-striped codeTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>EXP-RNM-MISID</td>
+                                <td>Error</td>
+                                <td>The ServerID field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-BADID</td>
+                                <td>Error</td>
+                                <td>The ServerID is invalid.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-UKNSRV</td>
+                                <td>Error</td>
+                                <td>The server doesn't exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-NOACCESS</td>
+                                <td>Error</td>
+                                <td>You don't have access to this server.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-BADPTH</td>
+                                <td>Error</td>
+                                <td>The provided path is invalid.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-BADEX</td>
+                                <td>Error</td>
+                                <td>The object don't exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-BADNAM</td>
+                                <td>Error</td>
+                                <td>The new name is invalid.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-DIREX</td>
+                                <td>Error</td>
+                                <td>A directory or a file with the same name already exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-DEX</td>
+                                <td>Error</td>
+                                <td>The directory failed to be renamed (exception).</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-FILEX</td>
+                                <td>Error</td>
+                                <td>A directory or a file with the same name already exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-BADDLL</td>
+                                <td>Error</td>
+                                <td>The new name can't end with <strong>.dll</strong> (checked only of the <strong>BlockDll</strong> config parameter is set to <strong>True</strong>).</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-FEX</td>
+                                <td>Error</td>
+                                <td>The file failed to be renamed (exception).</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-OK</td>
+                                <td>Success</td>
+                                <td>The object(s) have been deleted.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-RNM-TRD</td>
+                                <td>Error</td>
+                                <td>The object(s) have been deleted.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Download -->
+                <div>
+                    <h3 id="ExplorerAPI-Download">Download</h3>
+                </div>
+
+                <!-- NewFolder -->
+                <div>
+                    <h3 id="ExplorerAPI-NewFolder">NewFolder</h3>
+                </div>
+
+                <!-- NewFile -->
+                <div>
+                    <h3 id="ExplorerAPI-NewFile">NewFile</h3>
+                </div>
+
+                <!-- Upload -->
+                <div>
+                    <h3 id="ExplorerAPI-Upload">Upload</h3>
+                </div>
+
+                <!-- GetFileContent -->
+                <div>
+                    <h3 id="ExplorerAPI-GetFileContent">GetFileContent</h3>
+                </div>
+
+                <!-- SetFileContent -->
+                <div>
+                    <h3 id="ExplorerAPI-SetFileContent">SetFileContent</h3>
+                </div>
+            </div>
+
+            <!-- Map API -->
+            <div>
+                <h2 id="MapAPI">Map API</h2>
+
+                <!-- GetMaps -->
+                <div>
+                    <h3 id="MapAPI-GetMaps">GetMaps</h3>
+                </div>
+                <!-- SelectMap -->
+                <div>
+                    <h3 id="MapAPI-SelectMap">SelectMap</h3>
+                </div>
+                <!-- DeleteMaps -->
+                <div>
+                    <h3 id="MapAPI-DeleteMaps">DeleteMaps</h3>
+                </div>
+                <!-- DownloadMaps -->
+                <div>
+                    <h3 id="MapAPI-DownloadMaps">DownloadMaps</h3>
+                </div>
+                <!-- CreateMap -->
+                <div>
+                    <h3 id="MapAPI-CreateMap">CreateMap</h3>
+                </div>
+                <!-- UploadMap -->
+                <div>
+                    <h3 id="MapAPI-UploadMap">UploadMap</h3>
+                </div>
+            </div>
+
+            <!-- Misc API -->
+            <div>
+                <h2 id="MiscAPI">Misc API</h2>
+
+                <!-- IsCronValid -->
+                <div>
+                    <h3 id="MiscAPI-IsCronValid">IsCronValid</h3>
+                </div>
+                <!-- GetNextCronDates -->
+                <div>
+                    <h3 id="MiscAPI-GetNextCronDates">GetNextCronDates</h3>
+                </div>
+            </div>
+
+            <!-- Perf Mon API -->
+            <div>
+                <h2 id="PerfMonAPI">Perf Mon API</h2>
+
+                <!-- GetPerfData -->
+                <div>
+                    <h3 id="PerfMonAPI-GetPerfData">GetPerfData</h3>
+                </div>
+                <!-- CleanPerfData -->
+                <div>
+                    <h3 id="PerfMonAPI-CleanPerfData">CleanPerfData</h3>
+                </div>
+            </div>
+
+            <!-- Server API -->
+            <div>
+                <h2 id="ServerAPI">Server API</h2>
+
+                <!-- GetServers -->
+                <div>
+                    <h3 id="ServerAPI-GetServers">GetServers</h3>
+                </div>
+                <!-- GetServer -->
+                <div>
+                    <h3 id="ServerAPI-GetServer">GetServer</h3>
+                </div>
+                <!-- CreateServer -->
+                <div>
+                    <h3 id="ServerAPI-CreateServer">CreateServer</h3>
+                </div>
+                <!-- DeleteServers -->
+                <div>
+                    <h3 id="ServerAPI-DeleteServers">DeleteServers</h3>
+                </div>
+                <!-- GetSettings -->
+                <div>
+                    <h3 id="ServerAPI-GetSettings">GetSettings</h3>
+                </div>
+                <!-- SetSettings -->
+                <div>
+                    <h3 id="ServerAPI-SetSettings">SetSettings</h3>
+                </div>
+                <!-- GetSESESettings -->
+                <div>
+                    <h3 id="ServerAPI-GetSESESettings">GetSESESettings</h3>
+                </div>
+                <!-- SetSESESettings -->
+                <div>
+                    <h3 id="ServerAPI-SetSESESettings">SetSESESettings</h3>
+                </div>
+                <!-- GetJobsSettings -->
+                <div>
+                    <h3 id="ServerAPI-GetJobsSettings">GetJobsSettings</h3>
+                </div>
+                <!-- SetJobsSettings -->
+                <div>
+                    <h3 id="ServerAPI-SetJobsSettings">SetJobsSettings</h3>
+                </div>
+                <!-- GetBackupsSettings -->
+                <div>
+                    <h3 id="ServerAPI-GetBackupsSettings">GetBackupsSettings</h3>
+                </div>
+                <!-- SetBackupsSettings -->
+                <div>
+                    <h3 id="ServerAPI-SetBackupsSettings">SetBackupsSettings</h3>
+                </div>
+                <!-- GetAccessSettings -->
+                <div>
+                    <h3 id="ServerAPI-GetAccessSettings">GetAccessSettings</h3>
+                </div>
+                <!-- SetAccessSettings -->
+                <div>
+                    <h3 id="ServerAPI-SetAccessSettings">SetAccessSettings</h3>
+                </div>
+                <!-- StartServers -->
+                <div>
+                    <h3 id="ServerAPI-StartServers">StartServers</h3>
+                </div>
+                <!-- StopServers -->
+                <div>
+                    <h3 id="ServerAPI-StopServers">StopServers</h3>
+                </div>
+                <!-- RestartServers -->
+                <div>
+                    <h3 id="ServerAPI-RestartServers">RestartServers</h3>
+                </div>
+                <!-- KillServers -->
+                <div>
+                    <h3 id="ServerAPI-KillServers">KillServers</h3>
+                </div>
+            </div>
+
+            <!-- Settings API -->
+            <div>
+                <h2 id="SettingsAPI">Settings API</h2>
+
+                <!-- GetSESMSettings -->
+                <div>
+                    <h3 id="SettingsAPI-GetSESMSettings">GetSESMSettings</h3>
+                </div>
+                <!-- SetSESMSettings -->
+                <div>
+                    <h3 id="SettingsAPI-SetSESMSettings">SetSESMSettings</h3>
+                </div>
+                <!-- GetBackupsSettings -->
+                <div>
+                    <h3 id="SettingsAPI-GetBackupsSettings">GetBackupsSettings</h3>
+                </div>
+                <!-- SetBackupsSettings -->
+                <div>
+                    <h3 id="SettingsAPI-SetBackupsSettings">SetBackupsSettings</h3>
+                </div>
+                <!-- GetSEStatus -->
+                <div>
+                    <h3 id="SettingsAPI-GetSEStatus">GetSEStatus</h3>
+                </div>
+                <!-- GetSEVersion -->
+                <div>
+                    <h3 id="SettingsAPI-GetSEVersion">GetSEVersion</h3>
+                </div>
+                <!-- GetSESettings -->
+                <div>
+                    <h3 id="SettingsAPI-GetSESettings">GetSESettings</h3>
+                </div>
+                <!-- SetSESettings -->
+                <div>
+                    <h3 id="SettingsAPI-SetSESettings">SetSESettings</h3>
+                </div>
+                <!-- UploadSE -->
+                <div>
+                    <h3 id="SettingsAPI-UploadSE">UploadSE</h3>
+                </div>
+                <!-- UpdateSE -->
+                <div>
+                    <h3 id="SettingsAPI-UpdateSE">UpdateSE</h3>
+                </div>
+                <!-- GetSESEStatus -->
+                <div>
+                    <h3 id="SettingsAPI-GetSESEStatus">GetSESEStatus</h3>
+                </div>
+                <!-- GetSESEVersion -->
+                <div>
+                    <h3 id="SettingsAPI-GetSESEVersion">GetSESEVersion</h3>
+                </div>
+                <!-- GetSESESettings -->
+                <div>
+                    <h3 id="SettingsAPI-GetSESESettings">GetSESESettings</h3>
+                </div>
+                <!-- SetSESESettings -->
+                <div>
+                    <h3 id="SettingsAPI-SetSESESettings">SetSESESettings</h3>
+                </div>
+                <!-- UploadSESE -->
+                <div>
+                    <h3 id="SettingsAPI-UploadSESE">UploadSESE</h3>
+                </div>
+                <!-- UpdateSESE -->
+                <div>
+                    <h3 id="SettingsAPI-UpdateSESE">UpdateSESE</h3>
+                </div>
+                <!-- DeleteSESE -->
+                <div>
+                    <h3 id="SettingsAPI-DeleteSESE">DeleteSESE</h3>
+                </div>
+            </div>
+
+            <!-- User API -->
+            <div>
+                <h2 id="UserAPI">User API</h2>
+
+                <!-- GetUsers -->
+                <div>
+                    <h3 id="UserAPI-GetUsers">GetUsers</h3>
+                </div>
+                <!-- SetUser -->
+                <div>
+                    <h3 id="UserAPI-SetUser">SetUser</h3>
+                </div>
+                <!-- DeleteUsers -->
+                <div>
+                    <h3 id="UserAPI-DeleteUsers">DeleteUsers</h3>
+                </div>
+                <!-- CreateUser -->
+                <div>
+                    <h3 id="UserAPI-CreateUser">CreateUser</h3>
                 </div>
             </div>
         </div>

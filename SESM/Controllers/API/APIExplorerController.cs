@@ -255,7 +255,7 @@ namespace SESM.Controllers.API
                 DirectoryInfo di = new DirectoryInfo(path);
                 oldname = di.Name;
                 path = di.Parent.FullName;
-                if(Directory.Exists(path + "\\" + newName))
+                if(Directory.Exists(path + "\\" + newName) || System.IO.File.Exists(path + "\\" + newName))
                     return Content(XMLMessage.Error("EXP-RNM-DIREX", "Invalid new name, a directory with the same name already exist").ToString());
                 try
                 {
@@ -272,7 +272,7 @@ namespace SESM.Controllers.API
                 FileInfo fi = new FileInfo(path);
                 oldname = fi.Name;
                 path = fi.DirectoryName;
-                if(System.IO.File.Exists(path + "\\" + newName))
+                if(Directory.Exists(path + "\\" + newName) || System.IO.File.Exists(path + "\\" + newName))
                     return Content(XMLMessage.Error("EXP-RNM-FILEX", "Invalid new name, a file with the same name already exist").ToString());
                 try
                 {
