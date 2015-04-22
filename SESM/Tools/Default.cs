@@ -59,6 +59,7 @@ namespace SESM.Tools
         public static readonly bool ClientCanSave = false;
         public static readonly List<ulong> Mods = new List<ulong>();
         public static readonly int ViewDistance = 20000;
+        public static readonly bool EnableEncounters = true;
 
         // -- Access
         public static readonly OnlineMode OnlineMode = OnlineMode.PUBLIC;
@@ -79,5 +80,6 @@ namespace SESM.Tools
         public static readonly bool EnableIngameScripts = true;
         public static readonly int VoxelGeneratorVersion = 1;
         public static readonly bool EnableOxygen = true;
+        public static readonly bool Enable3rdPersonView = true;
     }
 }

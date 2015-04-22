@@ -563,7 +563,7 @@ namespace SESM.Controllers.API
             ServerProvider srvPrv = new ServerProvider(_context);
 
             // ** ACCESS **
-            if(user == null || !user.IsAdmin)
+            if (user == null || !user.IsAdmin)
                 return Content(XMLMessage.Error("SET-GSESES-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
@@ -582,14 +582,14 @@ namespace SESM.Controllers.API
             EntityUser user = Session["User"] as EntityUser;
 
             // ** ACCESS **
-            if(user == null || !user.IsAdmin)
+            if (user == null || !user.IsAdmin)
                 return Content(XMLMessage.Error("SET-GSESEV-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
             Version localVersion = SESEHelper.GetLocalVersion();
 
             Version remoteVersion = SESEHelper.GetLastRemoteVersion(SESMConfigHelper.SESEAutoUpdateUseDev);
-            if(remoteVersion == null)
+            if (remoteVersion == null)
                 return Content(XMLMessage.Error("SET-GSESEV-CONERR", "Error retrieving the github SESE Data").ToString());
 
             XMLMessage response = new XMLMessage("SET-GSESEV-OK");
@@ -609,7 +609,7 @@ namespace SESM.Controllers.API
             EntityUser user = Session["User"] as EntityUser;
 
             // ** ACCESS **
-            if(user == null || !user.IsAdmin)
+            if (user == null || !user.IsAdmin)
                 return Content(XMLMessage.Error("SET-GSESES-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
@@ -631,39 +631,39 @@ namespace SESM.Controllers.API
             EntityUser user = Session["User"] as EntityUser;
 
             // ** ACCESS **
-            if(user == null || !user.IsAdmin)
+            if (user == null || !user.IsAdmin)
                 return Content(XMLMessage.Error("SET-SSESES-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PARSING **
             string githubURL = Request.Form["GithubURL"];
-            if(string.IsNullOrWhiteSpace(githubURL))
+            if (string.IsNullOrWhiteSpace(githubURL))
                 return Content(XMLMessage.Error("SET-SSESES-MISGIT", "The Github URL must be provided").ToString());
 
-            if(!Regex.IsMatch(githubURL, @"^https?:\/\/api\.github\.com\/repos\/.*$", RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(githubURL, @"^https?:\/\/api\.github\.com\/repos\/.*$", RegexOptions.IgnoreCase))
                 return Content(XMLMessage.Error("SET-SSESES-BADGIT", "The Github URL is invalid").ToString());
 
 
             bool dev = true;
-            if(string.IsNullOrWhiteSpace(Request.Form["Dev"]))
+            if (string.IsNullOrWhiteSpace(Request.Form["Dev"]))
                 return Content(XMLMessage.Error("SET-SSESES-MISDEV", "The Dev field must be provided").ToString());
 
-            if(!bool.TryParse(Request.Form["Dev"], out dev))
+            if (!bool.TryParse(Request.Form["Dev"], out dev))
                 return Content(XMLMessage.Error("SET-SSESES-BADDEV", "The Dev field must be equalt to \"True\" or \"False\"").ToString());
 
 
             bool autoUpdateEnabled = false;
-            if(string.IsNullOrWhiteSpace(Request.Form["AutoUpdateEnabled"]))
+            if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateEnabled"]))
                 return Content(XMLMessage.Error("SET-SSESES-MISAUE", "The AutoUpdateEnabled field must be provided").ToString());
 
-            if(!bool.TryParse(Request.Form["AutoUpdateEnabled"], out autoUpdateEnabled))
+            if (!bool.TryParse(Request.Form["AutoUpdateEnabled"], out autoUpdateEnabled))
                 return Content(XMLMessage.Error("SET-SSESES-BADAUE", "The AutoUpdateEnabled field must be equalt to \"True\" or \"False\"").ToString());
 
 
             string autoUpdateCron = Request.Form["AutoUpdateCron"];
-            if(string.IsNullOrWhiteSpace(Request.Form["AutoUpdateCron"]))
+            if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateCron"]))
                 return Content(XMLMessage.Error("SET-SSESES-MISAUC", "The AutoUpdateCron field must be provided").ToString());
 
-            if(!CronExpression.IsValidExpression(autoUpdateCron))
+            if (!CronExpression.IsValidExpression(autoUpdateCron))
                 return Content(XMLMessage.Error("SET-SSESES-BADAUC", "The AutoUpdateCron field is invalid").ToString());
 
             // ** PROCESS **
@@ -702,10 +702,10 @@ namespace SESM.Controllers.API
             EntityUser user = Session["User"] as EntityUser;
 
             // ** PARSING **
-            if(ZipFile == null)
+            if (ZipFile == null)
                 return Content(XMLMessage.Error("SET-UPSESE-MISZIP", "The zipFile parameter must be provided").ToString());
 
-            if(!Ionic.Zip.ZipFile.IsZipFile(ZipFile.InputStream, false))
+            if (!Ionic.Zip.ZipFile.IsZipFile(ZipFile.InputStream, false))
                 return Content(XMLMessage.Error("SET-UPSESE-BADZIP", "The provided file in not a zip file").ToString());
 
             ZipFile.InputStream.Seek(0, SeekOrigin.Begin);
@@ -716,8 +716,8 @@ namespace SESM.Controllers.API
                         Content(XMLMessage.Error("SET-UPSESE-NOTSESE", "The provided zip don't contain SESE").ToString());
             }
             // ** ACCESS **
-            if(user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-UPSESE-NOACCESS","The current user don't have enough right for this action").ToString());
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-UPSESE-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             SESEHelper.CleanupUpdate();
 
@@ -730,9 +730,9 @@ namespace SESM.Controllers.API
             Logger logger = LogManager.GetLogger("SESEManualUpdateLogger");
             ReturnEnum result = SESEAutoUpdateJob.Run(logger, true, true);
 
-            if(result != ReturnEnum.Success)
+            if (result != ReturnEnum.Success)
                 return Content(XMLMessage.Warning("SET-UPSESE-NOK", "An error occured : " + result.ToString()).ToString());
-                
+
 
             return Content(XMLMessage.Success("SET-UPSESE-OK", "SESE Update applied").ToString());
         }
@@ -747,7 +747,7 @@ namespace SESM.Controllers.API
             // ** PARSING **
             bool force = false;
             if (!string.IsNullOrWhiteSpace(Request.Form["Force"]))
-                if(!bool.TryParse(Request.Form["Force"], out force))
+                if (!bool.TryParse(Request.Form["Force"], out force))
                     return Content(XMLMessage.Error("SET-UPDSESE-NOACCESS", "The value provided in the Force field is not valid").ToString());
 
             // ** ACCESS **
@@ -757,8 +757,8 @@ namespace SESM.Controllers.API
             // ** PROCESS **
             Logger logger = LogManager.GetLogger("SESEManualUpdateLogger");
             ReturnEnum result = SESEAutoUpdateJob.Run(logger, true, false, force);
-            
-            if(result != ReturnEnum.Success)
+
+            if (result != ReturnEnum.Success)
                 return Content(XMLMessage.Warning("SET-UPDSESE-NOK", "An error occured : " + result.ToString()).ToString());
 
             return Content(XMLMessage.Success("SET-UPDSESE-OK", "SESE Update applied").ToString());
@@ -773,7 +773,7 @@ namespace SESM.Controllers.API
             ServerProvider srvPrv = new ServerProvider(_context);
 
             // ** ACCESS **
-            if(user == null || !user.IsAdmin)
+            if (user == null || !user.IsAdmin)
                 return Content(XMLMessage.Error("SET-DELSESE-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
@@ -784,14 +784,14 @@ namespace SESM.Controllers.API
                 ServiceHelper.StopService(server);
             }
 
-            foreach(EntityServer server in serverList)
+            foreach (EntityServer server in serverList)
             {
                 ServiceHelper.WaitForStopped(server);
             }
             Thread.Sleep(10000);
             ServiceHelper.KillAllSESEServices();
             Thread.Sleep(2000);
-            if(System.IO.File.Exists(SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe"))
+            if (System.IO.File.Exists(SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe"))
                 System.IO.File.Delete(SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe");
 
             return Content(XMLMessage.Success("SET-DELSESE-OK", "SESE deleted").ToString());
@@ -801,7 +801,7 @@ namespace SESM.Controllers.API
 
         protected override void Dispose(bool disposing)
         {
-            if(disposing)
+            if (disposing)
             {
                 _context.Dispose();
             }

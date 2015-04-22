@@ -337,6 +337,14 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Encounters</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpEnableEncounters">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -401,6 +409,17 @@
                                             <label class="control-label col-md-6">Show Player Names On Hud</label>
                                             <div class="col-md-6">
                                                 <input type="checkbox" id="inpShowPlayerNamesOnHud">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Force 3rd Person View</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpEnable3rdPersonView">
                                             </div>
                                         </div>
                                     </div>
@@ -829,6 +848,7 @@
                     $("#inpVoxelGeneratorVersion").bootstrapSwitch('state', true);
                 }
                 $('#inpEnableOxygen').bootstrapSwitch('state', content.children("EnableOxygen").text() == "true");
+                $('#inpEnableEncounters').bootstrapSwitch('state', content.children("EnableEncounters").text() == "true");
 
                 // Players
                 $('#inpAutoHealing').bootstrapSwitch('state', content.children("AutoHealing").text() == "true");
@@ -837,6 +857,7 @@
                 $('#inpEnableSpectator').bootstrapSwitch('state', content.children("EnableSpectator").text() == "true");
                 $('#inpPermanentDeath').bootstrapSwitch('state', content.children("PermanentDeath").text() == "true");
                 $('#inpShowPlayerNamesOnHud').bootstrapSwitch('state', content.children("ShowPlayerNamesOnHud").text() == "true");
+                $('#inpEnable3rdPersonView').bootstrapSwitch('state', content.children("Enable3rdPersonView").text() == "true");
 
                 // Mods
                 var mods = [];
@@ -931,6 +952,7 @@
                 $('#inpEnableToolShake').bootstrapSwitch("readonly", content.children("EnableToolShake").text() != "true");
                 $('#inpVoxelGeneratorVersion').bootstrapSwitch("readonly", content.children("VoxelGeneratorVersion").text() != "true");
                 $('#inpEnableOxygen').bootstrapSwitch("readonly", content.children("EnableOxygen").text() != "true");
+                $('#inpEnableEncounters').bootstrapSwitch("readonly", content.children("EnableEncounters").text() != "true");
 
                 // Players
                 $('#inpAutoHealing').bootstrapSwitch("readonly", content.children("AutoHealing").text() != "true");
@@ -939,6 +961,7 @@
                 $('#inpEnableSpectator').bootstrapSwitch("readonly", content.children("EnableSpectator").text() != "true");
                 $('#inpPermanentDeath').bootstrapSwitch("readonly", content.children("PermanentDeath").text() != "true");
                 $('#inpShowPlayerNamesOnHud').bootstrapSwitch("readonly", content.children("ShowPlayerNamesOnHud").text() != "true");
+                $('#inpEnable3rdPersonView').bootstrapSwitch("readonly", content.children("Enable3rdPersonView").text() != "true");
 
                 // Mods
                 $('#inpMods').prop("readonly", content.children("Mods").text() != "true");
@@ -1037,6 +1060,8 @@
                     }
                     if (maskData.children("EnableOxygen").text() == "true")
                         config.EnableOxygen = $('#inpEnableOxygen').is(":checked");
+                    if (maskData.children("EnableEncounters").text() == "true")
+                        config.EnableEncounters = $('#inpEnableEncounters').is(":checked");
 
                     // Players
                     if (maskData.children("AutoHealing").text() == "true")
@@ -1051,6 +1076,8 @@
                         config.PermanentDeath = $('#inpPermanentDeath').is(":checked");
                     if (maskData.children("ShowPlayerNamesOnHud").text() == "true")
                         config.ShowPlayerNamesOnHud = $('#inpShowPlayerNamesOnHud').is(":checked");
+                    if (maskData.children("Enable3rdPersonView").text() == "true")
+                        config.Enable3rdPersonView = $('#inpEnable3rdPersonView').is(":checked");
 
                     // Mods
                     if (maskData.children("Mods").text() == "true") {

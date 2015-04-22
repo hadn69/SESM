@@ -255,7 +255,7 @@ namespace SESM.Controllers.API
                 DirectoryInfo di = new DirectoryInfo(path);
                 oldname = di.Name;
                 path = di.Parent.FullName;
-                if(Directory.Exists(path + "\\" + newName))
+                if(Directory.Exists(path + "\\" + newName) || System.IO.File.Exists(path + "\\" + newName))
                     return Content(XMLMessage.Error("EXP-RNM-DIREX", "Invalid new name, a directory with the same name already exist").ToString());
                 try
                 {
@@ -272,7 +272,7 @@ namespace SESM.Controllers.API
                 FileInfo fi = new FileInfo(path);
                 oldname = fi.Name;
                 path = fi.DirectoryName;
-                if(System.IO.File.Exists(path + "\\" + newName))
+                if(Directory.Exists(path + "\\" + newName) || System.IO.File.Exists(path + "\\" + newName))
                     return Content(XMLMessage.Error("EXP-RNM-FILEX", "Invalid new name, a file with the same name already exist").ToString());
                 try
                 {
@@ -303,23 +303,23 @@ namespace SESM.Controllers.API
             // ** PARSING / ACCESS **
             int serverId = -1;
             if(string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID field must be provided").ToString());
+                return Content(XMLMessage.Error("EXP-DL-MISID", "The ServerID field must be provided").ToString());
 
             if(!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The ServerID is invalid").ToString());
+                return Content(XMLMessage.Error("EXP-DL-BADID", "The ServerID is invalid").ToString());
 
             EntityServer server = srvPrv.GetServer(serverId);
 
             if(server == null)
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The server doesn't exist").ToString());
+                return Content(XMLMessage.Error("EXP-DL-UKNSRV", "The server doesn't exist").ToString());
 
             if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "You don't have access to this server").ToString());
+                return Content(XMLMessage.Error("EXP-DL-NOACCESS", "You don't have access to this server").ToString());
 
             string[] paths = Request.Form["Paths"].Split(':');
 
-            if (paths.Length == 1 && String.IsNullOrWhiteSpace(paths[0]))
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "The Paths field must be provided").ToString());
+            if (paths.Length == 1 && string.IsNullOrWhiteSpace(paths[0]))
+                return Content(XMLMessage.Error("EXP-DL-MISPTH", "The Paths field must be provided").ToString());
 
             for (int i = 0; i < paths.Length; i++)
             {
@@ -328,10 +328,10 @@ namespace SESM.Controllers.API
                 paths[i] = Path.GetFullPath(Path.Combine(PathHelper.GetInstancePath(server), paths[i]));
 
                 if(!paths[i].Contains(PathHelper.GetInstancePath(server)))
-                    return Content(XMLMessage.Error("XXX-XXX-XXX", "The object isn't accessible for you, bad boy !").ToString());
+                    return Content(XMLMessage.Error("EXP-DL-BADPTH", "The object isn't accessible for you, bad boy !").ToString());
 
                 if(!(Directory.Exists(paths[i]) || System.IO.File.Exists(paths[i])))
-                    return Content(XMLMessage.Error("XXX-XXX-XXX", "The object don't exist").ToString());
+                    return Content(XMLMessage.Error("EXP-DL-BADEX", "The object don't exist").ToString());
             }
 
             // ** PROCESS **
@@ -406,7 +406,7 @@ namespace SESM.Controllers.API
             }
             catch(Exception ex)
             {
-                return Content(XMLMessage.Error("XXX-XXX-XXX", "Error Occured (ex : " + ex.Message + ")").ToString());
+                return Content(XMLMessage.Error("EXP-DL-EX", "Error Occured (ex : " + ex.Message + ")").ToString());
             }
         }
 
