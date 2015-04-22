@@ -60,6 +60,7 @@ namespace SESM.Tools.Helpers
         public bool ClientCanSave = Default.ClientCanSave;
         public List<ulong> Mods = Default.Mods;
         public int ViewDistance = Default.ViewDistance;
+        public bool EnableEncounters = Default.EnableEncounters;
 
         // -- Access
         public OnlineMode OnlineMode = Default.OnlineMode;
@@ -79,6 +80,7 @@ namespace SESM.Tools.Helpers
         public bool EnableIngameScripts = Default.EnableIngameScripts;
         public int VoxelGeneratorVersion = Default.VoxelGeneratorVersion;
         public bool EnableOxygen = Default.EnableOxygen;
+        public bool Enable3rdPersonView = Default.Enable3rdPersonView;
 
         public void Save(EntityServer serv)
         {
@@ -121,11 +123,15 @@ namespace SESM.Tools.Helpers
             }
             sb.AppendLine("    <DestructibleBlocks>" + DestructibleBlocks.ToString().ToLower() + "</DestructibleBlocks>");
             sb.AppendLine("    <EnableIngameScripts>" + EnableIngameScripts.ToString().ToLower() + "</EnableIngameScripts>");
+            sb.AppendLine("    <ViewDistance>" + ViewDistance + "</ViewDistance>");
+            sb.AppendLine("    <EnableToolShake>" + EnableToolShake.ToString().ToLower() + "</EnableToolShake>");
             if (VoxelGeneratorVersion != 0)
                 sb.AppendLine("    <VoxelGeneratorVersion>" + VoxelGeneratorVersion + "</VoxelGeneratorVersion>");
             sb.AppendLine("    <EnableOxygen>" + EnableOxygen.ToString().ToLower() + "</EnableOxygen>");
-            sb.AppendLine("    <ViewDistance>" + ViewDistance + "</ViewDistance>");
-            sb.AppendLine("    <EnableToolShake>" + EnableToolShake.ToString().ToLower() + "</EnableToolShake>");
+            if (!Enable3rdPersonView)
+                sb.AppendLine("    <Enable3rdPersonView>" + Enable3rdPersonView.ToString().ToLower() + "</Enable3rdPersonView>");
+            if (!EnableEncounters)
+                sb.AppendLine("    <EnableEncounters>" + EnableEncounters.ToString().ToLower() + "</EnableEncounters>");
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
             sb.AppendLine("    <TypeId>MyObjectBuilder_ScenarioDefinition</TypeId>");
@@ -267,8 +273,6 @@ namespace SESM.Tools.Helpers
                     settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableCopyPaste", null));
                 settingsNode.SelectSingleNode("descendant::EnableCopyPaste").InnerText =
                     EnableCopyPaste.ToString().ToLower();
-
-
 
 
                 valueNode = settingsNode.SelectSingleNode("descendant::WeaponsEnabled");
@@ -438,6 +442,38 @@ namespace SESM.Tools.Helpers
                     EnableOxygen.ToString().ToLower();
 
 
+                if(Enable3rdPersonView)
+                {
+                    valueNode = settingsNode.SelectSingleNode("descendant::Enable3rdPersonView");
+                    if (valueNode == null)
+                        settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "Enable3rdPersonView", null));
+                    settingsNode.SelectSingleNode("descendant::Enable3rdPersonView").InnerText =
+                        Enable3rdPersonView.ToString().ToLower();
+                }
+                else
+                {
+                    valueNode = settingsNode.SelectSingleNode("descendant::Enable3rdPersonView");
+                    if (valueNode != null)
+                        settingsNode.RemoveChild(valueNode);
+                }
+
+
+                if (EnableEncounters)
+                {
+                    valueNode = settingsNode.SelectSingleNode("descendant::EnableEncounters");
+                    if (valueNode == null)
+                        settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableEncounters", null));
+                    settingsNode.SelectSingleNode("descendant::EnableEncounters").InnerText =
+                        EnableEncounters.ToString().ToLower();
+                }
+                else
+                {
+                    valueNode = settingsNode.SelectSingleNode("descendant::EnableEncounters");
+                    if (valueNode != null)
+                        settingsNode.RemoveChild(valueNode);
+                }
+
+
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if (valueNode == null)
                     root.AppendChild(doc.CreateNode(XmlNodeType.Element, "Mods", null));
@@ -579,6 +615,14 @@ namespace SESM.Tools.Helpers
                     VoxelGeneratorVersion = 0;
                 if (sessionSettings.Element("EnableOxygen") != null)
                     bool.TryParse(sessionSettings.Element("EnableOxygen").Value, out EnableOxygen);
+                if (sessionSettings.Element("Enable3rdPersonView") != null)
+                    bool.TryParse(sessionSettings.Element("Enable3rdPersonView").Value, out Enable3rdPersonView);
+                else
+                    Enable3rdPersonView = true;
+                if (sessionSettings.Element("EnableEncounters") != null)
+                    bool.TryParse(sessionSettings.Element("EnableEncounters").Value, out EnableEncounters);
+                else
+                    EnableEncounters = true;
 
                 if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                     Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
@@ -715,6 +759,10 @@ namespace SESM.Tools.Helpers
                 int.TryParse(settings.Element("VoxelGeneratorVersion").Value, out VoxelGeneratorVersion);
             if (settings.Element("EnableOxygen") != null)
                 bool.TryParse(settings.Element("EnableOxygen").Value, out EnableOxygen);
+            if (settings.Element("Enable3rdPersonView") != null)
+                bool.TryParse(settings.Element("Enable3rdPersonView").Value, out Enable3rdPersonView);
+            if (settings.Element("EnableEncounters") != null)
+                bool.TryParse(settings.Element("EnableEncounters").Value, out EnableEncounters);
 
             Mods = new List<ulong>();
             if (root.Element("Mods") != null)

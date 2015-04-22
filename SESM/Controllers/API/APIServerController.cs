@@ -899,6 +899,8 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("EnableIngameScripts", serverConfig.EnableIngameScripts));
             response.AddToContent(new XElement("VoxelGeneratorVersion", serverConfig.VoxelGeneratorVersion));
             response.AddToContent(new XElement("EnableOxygen", serverConfig.EnableOxygen));
+            response.AddToContent(new XElement("Enable3rdPersonView", serverConfig.Enable3rdPersonView));
+            response.AddToContent(new XElement("EnableEncounters", serverConfig.EnableEncounters));
 
             return Content(response.ToString());
         }
@@ -980,6 +982,8 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("EnableIngameScripts", true));
             response.AddToContent(new XElement("VoxelGeneratorVersion", true));
             response.AddToContent(new XElement("EnableOxygen", true));
+            response.AddToContent(new XElement("Enable3rdPersonView", true));
+            response.AddToContent(new XElement("EnableEncounters", true));
 
             return Content(response.ToString());
         }
@@ -1310,6 +1314,18 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SC-MISEO", "The EnableOxygen field must be provided").ToString());
             if (!bool.TryParse(Request.Form["EnableOxygen"], out serverConfig.EnableOxygen))
                 return Content(XMLMessage.Error("SRV-SC-BADEO", "The EnableOxygen field is invalid").ToString());
+
+            // ==== Enable3rdPersonView ====
+            if (string.IsNullOrWhiteSpace(Request.Form["Enable3rdPersonView"]))
+                return Content(XMLMessage.Error("SRV-SC-MISE3PV", "The Enable3rdPersonView field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["Enable3rdPersonView"], out serverConfig.Enable3rdPersonView))
+                return Content(XMLMessage.Error("SRV-SC-BADE3PV", "The Enable3rdPersonView field is invalid").ToString());
+
+            // ==== EnableEncounters ====
+            if (string.IsNullOrWhiteSpace(Request.Form["EnableEncounters"]))
+                return Content(XMLMessage.Error("SRV-SC-MISEE", "The EnableEncounters field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["EnableEncounters"], out serverConfig.EnableEncounters))
+                return Content(XMLMessage.Error("SRV-SC-BADEE", "The EnableEncounters field is invalid").ToString());
 
             // ** PROCESS **
             server.Ip = serverConfig.IP;
