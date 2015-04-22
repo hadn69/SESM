@@ -73,7 +73,6 @@
             }
     </style>
     <style>
-
         /*-- Method Summary Table --*/
 
         .summaryTable tr td:hover {
@@ -234,7 +233,7 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="#SettingsAPI" class="autoScroll">Server</a>
+                    <a href="#SettingsAPI" class="autoScroll">Settings</a>
                     <ul class="nav nav-stacked">
                         <li><a href="#SettingsAPI-GetSESMSettings" class="autoScroll">GetSESMSettings</a></li>
                         <li><a href="#SettingsAPI-SetSESMSettings" class="autoScroll">SetSESMSettings</a></li>
@@ -1093,7 +1092,7 @@
                             <tr>
                                 <td>Paths</td>
                                 <td>String</td>
-                                <td><span class="glyphicon glyphicon-ok-circle"></span></td>
+                                <td></td>
                                 <td>The relative paths of the folders/files you want to delete, comma (<strong>:</strong>) separated.</td>
                             </tr>
                         </tbody>
@@ -1276,6 +1275,96 @@
                 <!-- Download -->
                 <div>
                     <h3 id="ExplorerAPI-Download">Download</h3>
+                    <p>
+                        Type : <em>POST</em><br />
+                        URL : <em>/API/Explorer/Download</em><br />
+                        This web service provide a way to download one or more file/folder.<br />
+                        If a folder or more thant one file is provided in the list of paths to download, the object will be compressed in a zip archive.<br />
+                        If the first path is a file at the root of the server, the archive will be named with the folowing pattern :<br />
+                        <strong>ServerName-yyyyMMddHHmm</strong><br />
+                        Else, the first path will be used to determine the archive name.<br />
+                        The name of the first file's parent directory, or the name of the folder itself if it is the first path will be used with the folowing patern:<br />
+                        <strong>ServerName-FolderName-yyyyMMddHHmm</strong>
+                    </p>
+
+                    <h4>POST Parameters</h4>
+                    <table class="table table-hover table-striped postTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Opt.</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ServerID</td>
+                                <td>Int</td>
+                                <td></td>
+                                <td>The server's ID.</td>
+                            </tr>
+                            <tr>
+                                <td>Paths</td>
+                                <td>String</td>
+                                <td></td>
+                                <td>The relative paths of the folders/files you want to download, comma (<strong>:</strong>) separated.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Response Codes</h4>
+                    <table class="table table-hover table-striped codeTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>EXP-DL-MISID</td>
+                                <td>Error</td>
+                                <td>The ServerID field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DL-BADID</td>
+                                <td>Error</td>
+                                <td>The ServerID is invalid.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DL-UKNSRV</td>
+                                <td>Error</td>
+                                <td>The server doesn't exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DL-NOACCESS</td>
+                                <td>Error</td>
+                                <td>You don't have access to this server.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DL-MISPTH</td>
+                                <td>Error</td>
+                                <td>The Paths field must be provided.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DL-BADPTH</td>
+                                <td>Error</td>
+                                <td>One of the provided paths is invalid.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DL-BADEX</td>
+                                <td>Error</td>
+                                <td>One of the object don't exist.</td>
+                            </tr>
+                            <tr>
+                                <td>EXP-DL-EX</td>
+                                <td>Error</td>
+                                <td>An exception occured.</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- NewFolder -->
@@ -1308,6 +1397,53 @@
             <div>
                 <h2 id="MapAPI">Map API</h2>
 
+                <p>This API provide methods to manage a server's maps.</p>
+                <p>
+                    Base URL : <em>/API/Map/</em>
+                </p>
+                <h3>Methods Summary</h3>
+                <table class="table table-hover table-striped summaryTable" id="summaryMapAPI">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GetMaps</td>
+                            <td>POST</td>
+                            <td>Get a list of maps, including folder name, internal name and size.</td>
+                        </tr>
+                        <tr>
+                            <td>SelectMap</td>
+                            <td>POST</td>
+                            <td>Set a map as active for the server to start to.</td>
+                        </tr>
+                        <tr>
+                            <td>DeleteMaps</td>
+                            <td>POST</td>
+                            <td>Delete one or more maps.</td>
+                        </tr>
+                        <tr>
+                            <td>DownloadMaps</td>
+                            <td>POST</td>
+                            <td>Dowload one or more maps.</td>
+                        </tr>
+                        <tr>
+                            <td>DownloadMaps</td>
+                            <td>POST</td>
+                            <td>Set the parametters for a server to start and create a new map.</td>
+                        </tr>
+                        <tr>
+                            <td>UploadMap</td>
+                            <td>POST</td>
+                            <td>Upload a map.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
                 <!-- GetMaps -->
                 <div>
                     <h3 id="MapAPI-GetMaps">GetMaps</h3>
@@ -1338,6 +1474,33 @@
             <div>
                 <h2 id="MiscAPI">Misc API</h2>
 
+                <p>This API provide methods used as utilities trought SESM. Those are just informative and don't have any effect on any server.</p>
+                <p>
+                    Base URL : <em>/API/Misc/</em>
+                </p>
+                <h3>Methods Summary</h3>
+                <table class="table table-hover table-striped summaryTable" id="summaryMiscAPI">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>IsCronValid</td>
+                            <td>POST</td>
+                            <td>Validate a Quartz.Net Cron.</td>
+                        </tr>
+                        <tr>
+                            <td>GetNextCronDates</td>
+                            <td>POST</td>
+                            <td>Provide the next 10 datetime at which the cron will fire.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
                 <!-- IsCronValid -->
                 <div>
                     <h3 id="MiscAPI-IsCronValid">IsCronValid</h3>
@@ -1351,6 +1514,33 @@
             <!-- Perf Mon API -->
             <div>
                 <h2 id="PerfMonAPI">Perf Mon API</h2>
+
+                <p>This API provide methods to read an managed performance datas</p>
+                <p>
+                    Base URL : <em>/API/PerfMon/</em>
+                </p>
+                <h3>Methods Summary</h3>
+                <table class="table table-hover table-striped summaryTable" id="summaryPerfMonAPI">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GetPerfData</td>
+                            <td>POST</td>
+                            <td>Return a server's performance datas.</td>
+                        </tr>
+                        <tr>
+                            <td>CleanPerfData</td>
+                            <td>POST</td>
+                            <td>Delete all servers performance datas.</td>
+                        </tr>
+                    </tbody>
+                </table>
 
                 <!-- GetPerfData -->
                 <div>
@@ -1517,6 +1707,43 @@
             <!-- User API -->
             <div>
                 <h2 id="UserAPI">User API</h2>
+
+                <p>This API provide methods to mange users.</p>
+                <p>
+                    Base URL : <em>/API/User/</em>
+                </p>
+                <h3>Methods Summary</h3>
+                <table class="table table-hover table-striped summaryTable" id="summaryUserAPI">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GetUsers</td>
+                            <td>POST</td>
+                            <td>Return a list of SESM users.</td>
+                        </tr>
+                        <tr>
+                            <td>SetUser</td>
+                            <td>POST</td>
+                            <td>Change a user login, email or password.</td>
+                        </tr>
+                        <tr>
+                            <td>DeleteUsers</td>
+                            <td>POST</td>
+                            <td>delete one or more users.</td>
+                        </tr>
+                        <tr>
+                            <td>CreateUser</td>
+                            <td>POST</td>
+                            <td>Create a user.</td>
+                        </tr>
+                    </tbody>
+                </table>
 
                 <!-- GetUsers -->
                 <div>

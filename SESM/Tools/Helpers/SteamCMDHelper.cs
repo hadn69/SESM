@@ -30,8 +30,7 @@ namespace SESM.Tools.Helpers
                         Directory.CreateDirectory(PathHelper.GetSyncDirPath());
                     try
                     {
-                        WebRequest objRequest =
-                            HttpWebRequest.Create("http://media.steampowered.com/installer/steamcmd.zip");
+                        WebRequest objRequest = HttpWebRequest.Create("http://media.steampowered.com/installer/steamcmd.zip");
                         WebResponse objResponse = objRequest.GetResponse();
                         MemoryStream memoryStream = new MemoryStream();
                         objResponse.GetResponseStream().CopyTo(memoryStream);
@@ -173,6 +172,11 @@ namespace SESM.Tools.Helpers
                                                     + " +force_install_dir " + PathHelper.GetSyncDirPath()
                                                     + " +app_info_print " + AppId
                                                     + " +quit");
+            if (output.Contains("Login Failure"))
+            {
+                logger?.Error("Login Failure !");
+                return null;
+            }
 
             if (output.Contains("\"branches\""))
             {
