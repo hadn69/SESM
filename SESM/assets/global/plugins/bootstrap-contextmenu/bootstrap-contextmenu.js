@@ -59,7 +59,7 @@
 				.on('click.context.data-api', items, $.proxy(this.onItem, this, $(e.currentTarget)))
 				.trigger('shown.bs.context', relatedTarget);
 
-			// Delegating the `closemenu` only on the currently opened menu.
+		    // Delegating the `closemenu` only on the currently opened menu.
 			// This prevents other opened menus from closing.
 			$('html')
 				.on('click.context.data-api', $menu.selector, $.proxy(this.closemenu, this));
@@ -67,7 +67,8 @@
 			return false;
 		}
 
-		,closemenu: function(e) {
+		, closemenu: function (e) {
+
 			var $menu
 				, evt
 				, items
@@ -105,7 +106,8 @@
 		}
 
 		,listen: function () {
-			this.$element.on('contextmenu.context.data-api', this.scopes, $.proxy(this.show, this));
+		    this.$element.on('contextmenu.context.data-api', this.scopes, $.proxy(this.show, this));
+		    this.$element.on('taphold.context.data-api', this.scopes, $.proxy(this.show, this));
 			$('html').on('click.context.data-api', $.proxy(this.closemenu, this));
 			$('html').on('keydown.context.data-api', $.proxy(this.keydown, this));
 		}

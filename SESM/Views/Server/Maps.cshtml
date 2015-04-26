@@ -23,6 +23,16 @@
     td:nth-child(5), th:nth-child(5) {
         text-align: right;
     }
+
+    .blockSelect {
+        -moz-user-select: -moz-none;
+        -moz-user-select: none;
+        -o-user-selec: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
 </style>
 <!-- --- DOWNLOAD --- -->
 <div style="display: none">
@@ -184,12 +194,17 @@
                 </thead>
                 <tbody></tbody>
             </table>
-            <p>Hint : Right-click on a line for more options</p>
+            <p>Hint : Right-click (Desktop) / Long-Press (Mobile) on a line for more options</p>
         </div>
     </div>
 </div>
 <script type="text/javascript">
     function initPage() {
+        function is_touch_device() {
+            return 'ontouchstart' in window // works on most browsers
+                || 'onmsgesturechange' in window; // works on ie10
+        };
+
         function fileSizeIEC(a, b, c, d, e) {
             if (a < 1024)
                 return a + ' B';
@@ -363,6 +378,10 @@
                 mapTable.DataTable().draw();
                 mapTable.find('input:checkbox').uniform();
                 updateCheckboxes();
+
+                if (is_touch_device()) {
+                    $('td').attr('unselectable', 'on').addClass('blockSelect');
+                }
 
                 $('tr.odd, tr.even').contextmenu({
                     target: '#context-menu',

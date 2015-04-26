@@ -36,7 +36,7 @@ namespace SESM.Tools.Jobs
 
             int? localVersion = null;
             int? remoteVersion = null;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 5; i++)
             {
                 if (localVersion == null)
                 {
@@ -53,7 +53,10 @@ namespace SESM.Tools.Jobs
                 }
 
                 if (localVersion == null || remoteVersion == null)
-                    logger.Info("Fail retrieving one of the version (try " + (i + 1) + " of 3)");
+                {
+                    logger.Info("Fail retrieving one of the version (try " + (i + 1) + " of 5), waiting and retrying ...");
+                    Thread.Sleep(2000);
+                }
                 else
                     break;
 
