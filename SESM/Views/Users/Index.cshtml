@@ -17,6 +17,16 @@
     td:nth-child(4), th:nth-child(4) {
         text-align: center;
     }
+
+    .blockSelect {
+        -moz-user-select: -moz-none;
+        -moz-user-select: none;
+        -o-user-selec: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
 </style>
 <!-- --- Create Modal --- -->
 <div class="modal fade" id="newModal" tabindex="-1" role="basic" aria-hidden="true">
@@ -159,12 +169,17 @@
                 </thead>
                 <tbody></tbody>
             </table>
-            <p>Hint : Right-click on a line for more options</p>
+            <p>Hint : Right-click (Desktop) / Long-Press (Mobile) on a line for more options</p>
         </div>
     </div>
 </div>
 <script type="text/javascript">
     function initPage() {
+        function is_touch_device() {
+            return 'ontouchstart' in window // works on most browsers
+                || 'onmsgesturechange' in window; // works on ie10
+        };
+
         $.fn.bootstrapSwitch.defaults.onText = '<i class="fa fa-check"></i>';
         $.fn.bootstrapSwitch.defaults.offText = '<i class="fa fa-times"></i>';
         $("#inpNewIsAdmin").bootstrapSwitch();
@@ -267,6 +282,10 @@
 
                 updateCheckboxes();
 
+                if (is_touch_device()) {
+                    $('td').attr('unselectable', 'on').addClass('blockSelect');
+                }
+
                 $('tr.odd, tr.even').contextmenu({
                     target: '#context-menu',
                     onItem: function (context, e) {
@@ -343,7 +362,7 @@
             $("#newModal").modal('show');
         });
 
-        $("#btnSaveNew").click(function() {
+        $("#btnSaveNew").click(function () {
             LockPage();
             $("#newModal").modal('hide');
 
@@ -369,7 +388,7 @@
             });
         });
 
-        $("#btnDeleteUsers").click(function() {
+        $("#btnDeleteUsers").click(function () {
             var users = getCheckedVals();
             bootbox.confirm("Are you sure you want to delete those users ?",
                 function (result) {
