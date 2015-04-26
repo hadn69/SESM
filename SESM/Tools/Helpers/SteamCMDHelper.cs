@@ -136,10 +136,17 @@ namespace SESM.Tools.Helpers
 
         public static int? GetInstalledVersion(Logger logger = null)
         {
-            string output = ExecuteSteamCMD(logger, " +login Anonymous"
+            string output = ExecuteSteamCMD(logger, " +@ShutdownOnFailedCommand 1"
                                                     + " +force_install_dir " + PathHelper.GetSyncDirPath()
+                                                    + " +login Anonymous"
                                                     + " +app_status " + AppId
                                                     + " +quit");
+
+            if (output.Contains("Login Failure"))
+            {
+                logger?.Error("Login Failure !");
+                return null;
+            }
 
             if (output.Contains("install state:"))
             {
@@ -168,8 +175,12 @@ namespace SESM.Tools.Helpers
 
         public static int? GetAvailableVersion(bool dev, Logger logger = null)
         {
-            string output = ExecuteSteamCMD(logger, " +login Anonymous"
+            string output = ExecuteSteamCMD(logger, " +@ShutdownOnFailedCommand 1"
                                                     + " +force_install_dir " + PathHelper.GetSyncDirPath()
+                                                    + " +login Anonymous"
+                                                    + " +app_info_request " + AppId
+                                                    + " +app_info_update" // Try to force info update
+                                                    + " +app_info_update 1"
                                                     + " +app_info_print " + AppId
                                                     + " +quit");
             if (output.Contains("Login Failure"))

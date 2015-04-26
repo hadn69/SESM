@@ -2291,7 +2291,6 @@
     <Content Include="Content\Img\Background\bgStar3.jpg" />
     <Content Include="Content\Js\jquery.mobile.custom.js" />
     <Content Include="Content\Js\jquery.mobile.custom.min.js" />
-    <Content Include="Content\Js\JqueryLongpress.js" />
     <Content Include="Content\Js\LoginForm.js" />
     <Content Include="Content\Js\md5-min.js" />
     <Content Include="Content\Js\QuickActions.js" />
