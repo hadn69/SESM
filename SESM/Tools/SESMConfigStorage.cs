@@ -9,13 +9,20 @@ namespace SESM.Tools
         public string DBConnString { get; set; }
         public string Prefix { get; set; }
         public string SESavePath { get; set; }
+        public string MESavePath { get; set; }
         public string SEDataPath { get; set; }
+        public string MEDataPath { get; set; }
         public string Arch { get; set; }
         
-        // Auto-Update Settings
-        public bool AutoUpdateEnabled { get; set; }
-        public string AutoUpdateCron { get; set; }
-        public string AutoUpdateBetaPassword { get; set; }
+        // SE Auto-Update Settings
+        public bool SEAutoUpdateEnabled { get; set; }
+        public string SEAutoUpdateCron { get; set; }
+        public string SEAutoUpdateBetaPassword { get; set; }
+
+        // SE Auto-Update Settings
+        public bool MEAutoUpdateEnabled { get; set; }
+        public string MEAutoUpdateCron { get; set; }
+        public string MEAutoUpdateBetaPassword { get; set; }
 
         // SESE Auto-Update Settings
         public string SESEUpdateURL { get; set; }
@@ -46,13 +53,20 @@ namespace SESM.Tools
             DBConnString = @"Server=.\SQLEXPRESS;Database=SESM;User Id=sa;Password=MyPassword;MultipleActiveResultSets=true;";
             Prefix = "SESM";
             SESavePath = @"C:\ProgramData\SpaceEngineersDedicated\";
+            MESavePath = @"C:\ProgramData\MedievalEngineersDedicated\";
             SEDataPath = @"C:\SpaceEngineers\";
+            MEDataPath = @"C:\MedievalEngineers\";
             Arch = "x64";
             
-            // Auto-Update Settings
-            AutoUpdateEnabled = true;
-            AutoUpdateCron = "0 0/10 * * * ?";
-            AutoUpdateBetaPassword = string.Empty;
+            // SE Auto-Update Settings
+            SEAutoUpdateEnabled = true;
+            SEAutoUpdateCron = "0 0/10 * * * ?";
+            SEAutoUpdateBetaPassword = string.Empty;
+
+            // ME Auto-Update Settings
+            SEAutoUpdateEnabled = false;
+            SEAutoUpdateCron = "0 5/10 * * * ?";
+            SEAutoUpdateBetaPassword = string.Empty;
 
             // SESE Auto-Update Settings
             SESEUpdateURL = "https://api.github.com/repos/SEServerExtender/SEServerExtender/releases";

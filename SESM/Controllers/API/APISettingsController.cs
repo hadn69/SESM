@@ -70,15 +70,27 @@ namespace SESM.Controllers.API
 
             string SESavePath = Request.Form["SESavePath"];
             if (string.IsNullOrWhiteSpace(SESavePath))
-                return Content(XMLMessage.Error("SRV-SSESMS-MISSP", "The SESavePath field must be provided").ToString());
+                return Content(XMLMessage.Error("SRV-SSESMS-MISSSP", "The SESavePath field must be provided").ToString());
             if (!SESavePath.EndsWith(@"\"))
-                return Content(XMLMessage.Error("SRV-SSESMS-BADSP", "The SESavePath field must end with \\").ToString());
+                return Content(XMLMessage.Error("SRV-SSESMS-BADSSP", "The SESavePath field must end with \\").ToString());
 
             string SEDataPath = Request.Form["SEDataPath"];
             if (string.IsNullOrWhiteSpace(SEDataPath))
-                return Content(XMLMessage.Error("SRV-SSESMS-MISSP", "The SEDataPath field must be provided").ToString());
+                return Content(XMLMessage.Error("SRV-SSESMS-MISSDP", "The SEDataPath field must be provided").ToString());
             if (!SEDataPath.EndsWith(@"\"))
-                return Content(XMLMessage.Error("SRV-SSESMS-BADSP", "The SEDataPath field must end with \\").ToString());
+                return Content(XMLMessage.Error("SRV-SSESMS-BADSDP", "The SEDataPath field must end with \\").ToString());
+
+            string MESavePath = Request.Form["MESavePath"];
+            if (string.IsNullOrWhiteSpace(MESavePath))
+                return Content(XMLMessage.Error("SRV-SSESMS-MISMSP", "The MESavePath field must be provided").ToString());
+            if (!SESavePath.EndsWith(@"\"))
+                return Content(XMLMessage.Error("SRV-SSESMS-BADMSP", "The MESavePath field must end with \\").ToString());
+
+            string MEDataPath = Request.Form["MEDataPath"];
+            if (string.IsNullOrWhiteSpace(MEDataPath))
+                return Content(XMLMessage.Error("SRV-SSESMS-MISMDP", "The MEDataPath field must be provided").ToString());
+            if (!SEDataPath.EndsWith(@"\"))
+                return Content(XMLMessage.Error("SRV-SSESMS-BADMDP", "The MEDataPath field must end with \\").ToString());
 
             ArchType Arch;
             if (string.IsNullOrWhiteSpace(Request.Form["Arch"]))
@@ -136,17 +148,26 @@ namespace SESM.Controllers.API
                     Directory.Move(SESMConfigHelper.SEDataPath, SEDataPath);
                 }
 
+                if (MESavePath != SESMConfigHelper.MESavePath)
+                {
+                    Directory.Move(SESMConfigHelper.MESavePath, MESavePath);
+                }
+
+                if (MEDataPath != SESMConfigHelper.MEDataPath)
+                {
+                    Directory.Move(SESMConfigHelper.MEDataPath, MEDataPath);
+                }
+
                 SESMConfigHelper.Prefix = Prefix;
                 SESMConfigHelper.SESavePath = SESavePath;
                 SESMConfigHelper.SEDataPath = SEDataPath;
+                SESMConfigHelper.MESavePath = MESavePath;
+                SESMConfigHelper.MEDataPath = MEDataPath;
                 SESMConfigHelper.Arch = Arch;
 
                 foreach (EntityServer server in SEServer)
                 {
-                    if (server.UseServerExtender)
-                        ServiceHelper.RegisterServerExtenderService(server);
-                    else
-                        ServiceHelper.RegisterService(server);
+                    ServiceHelper.RegisterService(server);
                 }
 
                 foreach (EntityServer server in SERunningServer)
@@ -382,15 +403,15 @@ namespace SESM.Controllers.API
                 if (localVersion == null)
                 {
                     logger.Info("Retrieving local version : ");
-                    localVersion = SteamCMDHelper.GetInstalledVersion(logger);
+                    localVersion = SteamCMDHelper.GetSEInstalledVersion(logger);
                 }
 
                 if (remoteVersion == null)
                 {
                     logger.Info("Retrieving remote version : ");
                     remoteVersion =
-                        SteamCMDHelper.GetAvailableVersion(
-                            !string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword), logger);
+                        SteamCMDHelper.GetSEAvailableVersion(
+                            !string.IsNullOrWhiteSpace(SESMConfigHelper.SEAutoUpdateBetaPassword), logger);
                 }
 
                 if (localVersion == null || remoteVersion == null)
@@ -431,9 +452,9 @@ namespace SESM.Controllers.API
             // ** PROCESS **
             XMLMessage response = new XMLMessage("SET-GSES-OK");
 
-            response.AddToContent(new XElement("AutoUpdateEnabled", SESMConfigHelper.AutoUpdateEnabled));
-            response.AddToContent(new XElement("AutoUpdateCron", SESMConfigHelper.AutoUpdateCron));
-            response.AddToContent(new XElement("AutoUpdateBetaPassword", SESMConfigHelper.AutoUpdateBetaPassword));
+            response.AddToContent(new XElement("AutoUpdateEnabled", SESMConfigHelper.SEAutoUpdateEnabled));
+            response.AddToContent(new XElement("AutoUpdateCron", SESMConfigHelper.SEAutoUpdateCron));
+            response.AddToContent(new XElement("AutoUpdateBetaPassword", SESMConfigHelper.SEAutoUpdateBetaPassword));
 
             return Content(response.ToString());
         }
@@ -466,15 +487,15 @@ namespace SESM.Controllers.API
             string autoUpdateBetaPassword = Request.Form["AutoUpdateBetaPassword"];
 
             // ** PROCESS **
-            SESMConfigHelper.AutoUpdateEnabled = autoUpdateEnabled;
-            SESMConfigHelper.AutoUpdateCron = autoUpdateCron;
-            SESMConfigHelper.AutoUpdateBetaPassword = autoUpdateBetaPassword;
+            SESMConfigHelper.SEAutoUpdateEnabled = autoUpdateEnabled;
+            SESMConfigHelper.SEAutoUpdateCron = autoUpdateCron;
+            SESMConfigHelper.SEAutoUpdateBetaPassword = autoUpdateBetaPassword;
 
             // Deleting the Job
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.DeleteJob(SEAutoUpdateJob.GetJobKey());
 
-            if (SESMConfigHelper.AutoUpdateEnabled)
+            if (SESMConfigHelper.SEAutoUpdateEnabled)
             {
                 // Instantiating the job
                 IJobDetail SEAutoUpdateJobDetail = JobBuilder.Create<SESEAutoUpdateJob>()

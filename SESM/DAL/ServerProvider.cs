@@ -49,20 +49,20 @@ namespace SESM.DAL
         public int GetNextAvailablePort(string ip = "")
         {
             if (string.IsNullOrWhiteSpace(ip))
-                ip = Default.IP;
+                ip = SEDefault.IP;
 
             if (!_context.Servers.Any(server => server.Ip == ip))
-                return Default.ServerPort;
+                return SEDefault.ServerPort;
             return _context.Servers.Where(server => server.Ip == ip).Select(server => server.Port).Max() + 1;
         }
 
         public int GetNextAvailableSESEPort(string ip = "")
         {
             if (string.IsNullOrWhiteSpace(ip))
-                ip = Default.IP;
+                ip = SEDefault.IP;
 
             if (!_context.Servers.Any(server => server.Ip == ip))
-                return Default.ServerExtenderPort;
+                return SEDefault.ServerExtenderPort;
             return _context.Servers.Where(server => server.Ip == ip).Select(server => server.ServerExtenderPort).Max() + 1;
         }
 
@@ -294,6 +294,16 @@ namespace SESM.DAL
         public List<EntityServer> GetAllServers()
         {
             return _context.Servers.ToList();
+        }
+
+        public List<EntityServer> GetAllSEServers()
+        {
+            return _context.Servers.Where(item => item.ServerType == EnumServerType.SpaceEngineers).ToList();
+        }
+
+        public List<EntityServer> GetAllMEServers()
+        {
+            return _context.Servers.Where(item => item.ServerType == EnumServerType.MedievalEngineers).ToList();
         }
 
         public List<EntityServer> GetAllSESEServers()

@@ -19,6 +19,7 @@ namespace SESM.DTO
         public bool IsAutoStartEnabled { get; set; }
         public int? AutoSaveInMinutes { get; set; }
         public EnumProcessPriority ProcessPriority { get; set; }
+        public EnumServerType ServerType { get; set; }
 
         private ICollection<EntityUser> _administrators;
         public virtual ICollection<EntityUser> Administrators

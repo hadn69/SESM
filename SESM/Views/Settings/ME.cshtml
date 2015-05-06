@@ -1,0 +1,499 @@
+﻿@{
+    ViewBag.Title = "Space Engineers Settings";
+
+    List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
+    breadCrumb.Add(new KeyValuePair<string, string>("Global Setting", "/Settings/"));
+    breadCrumb.Add(new KeyValuePair<string, string>("Space Engineers Settings", "/Settings/SE/"));
+    ViewBag.Breadcrumb = breadCrumb;
+
+    ViewBag.RefreshBtn = true;
+}
+<link href="/assets/global/plugins/dropzone/css/dropzone.css" rel="stylesheet">
+<script src="/assets/global/plugins/dropzone/dropzone.js"></script>
+<div class="col-md-12" id="state-SE">
+    <div class="portlet light">
+        <div class="portlet-body text-center">
+            <h4>SE is actualy used on <span id="nbServer">0</span> server(s)</h4>
+            <h4 id="isRunning" class="hidden">An SE Update is running</h4>
+        </div>
+    </div>
+</div>
+<div class="col-md-6"  id="VersionPanel">
+    <div class="row">
+        <div class="col-md-12" id="Status-SE">
+            <div class="alert alert-danger text-center">
+                <h3>Loading</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="Local-SE">
+            <div class="dashboard-stat blue-madison">
+                <div class="visual">
+                    <i class="fa fa-database"></i>
+                </div>
+                <div class="details">
+                    <div class="number">
+                        0
+                    </div>
+                    <div class="desc">
+                        Local Version
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="remote-SE">
+            <div class="dashboard-stat blue-madison">
+                <div class="visual">
+                    <i class="fa fa-globe"></i>
+                </div>
+                <div class="details">
+                    <div class="number">
+                        0
+                    </div>
+                    <div class="desc">
+                        Online Version
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="btn-group btn-group btn-group-justified">
+                <a href="#" class="btn blue" id="btnUpdate">
+                    Update
+                </a>
+                <a href="#" class="btn yellow" id="btnForceUpdate">
+                    Force Update
+                </a>
+            </div>
+            <br />
+        </div>
+    </div>
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="fa fa-upload"></i>
+                <span class="caption-subject bold uppercase"> Manual Game Files Upload</span>
+            </div>
+        </div>
+        <div class="portlet-body form">
+            <form action="/API/Settings/UploadSE" class="dropzone" id="uploadDropzone">
+                <div class="fallback">
+                    <input name="ZipFile" type="file" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="col-md-6" id="SettingsPanel">
+    <div class="portlet light bordered">
+        <div class="portlet-body form">
+            <form action="#" class="form-horizontal">
+                <div class="form-body">
+                    <div class="alert alert-danger display-hide" id="validationAlert">
+                        <button class="close" data-close="alert"></button>
+                        You have some errors. Please check below.
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Auto-Update</label>
+                        <div class="col-md-8 center-block">
+                            <input type="checkbox" id="inpAutoUpdateEnabled" name="AutoUpdateEnabled" class="make-switch" data-on-text="&nbsp;Enabled&nbsp;&nbsp;" data-off-text="&nbsp;Disabled&nbsp;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Auto-Update Cron</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-clock-o"></i>
+                                </span>
+                                <div class="input-icon right">
+                                    <input type="text" class="form-control" placeholder="Ex : 0 0 * * * ?" id="inpAutoUpdateCron" name="AutoUpdateCron">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Beta Password</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-lock"></i>
+                                </span>
+                                <div class="input-icon right">
+                                    <input type="text" class="form-control" name="AutoUpdateBetaPassword" id="inpAutoUpdateBetaPassword">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <div class="row">
+                        <div class="col-md-offset-4 col-md-8">
+                            <button type="button" class="btn blue" id="btnUpdateSettings">Save Settings</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions" style="display:none;" id="CronDetails">
+                    <div class="row">
+                        <div class="col-md-12">
+                            With this cron, the next SE Auto Updates will be at :<br /><br />
+                            <ul class="list-group"></ul>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function initPage() {
+        var animationDelay = 0;
+        var statusLoaded = false;
+        var versionLoaded = false;
+        var settingsLoaded = false;
+        var uploadZone;
+
+        Dropzone.options.uploadDropzone = {
+            maxFiles: 1,
+            maxFilesize: 500,
+            paramName: "ZipFile",
+            clickable: true,
+            acceptedFiles: ".zip",
+            accept: function (file, done) {
+                bootbox.confirm("<br/>Are you sure you want to upload SE ? <br/>" +
+                    "If ther is any running server they will be stopped then restarted for the update to take place !",
+                    function (result) {
+                        if (result) {
+                            done();
+                        } else {
+                            done("Upload Cancelled");
+                            uploadZone.removeAllFiles(true);
+                        }
+                    });
+            },
+            init: function () {
+                uploadZone = this;
+                this.on("success", function (file, response) {
+                    var root = $($.parseXML(response)).find("Response");
+                    uploadZone.removeAllFiles(true);
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        return;
+                    }
+                    if (root.children("Type").text() == "Warning") {
+                        toastr.warning(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        return;
+                    }
+                    toastr.success(root.children("Content").text(), "SE Updated");
+                });
+            }
+        };
+
+        var isCronValid = true;
+        $.validator.addMethod("cron", function (value, element) {
+            return isCronValid;
+        }, "Wrong Cron");
+        $("form").validate({
+            errorElement: 'span', //default input error message container
+            errorClass: 'help-block help-block-error', // default input error message class
+            focusInvalid: false, // do not focus the last invalid input
+            ignore: "",
+            rules: {
+                AutoUpdateEnabled: {
+                    required: true
+                },
+                AutoUpdateCron: {
+                    required: true,
+                    cron: true
+                },
+                AutoUpdateBetaPassword: {
+                }
+            },
+
+            invalidHandler: function (event, validator) { //display error alert on form submit
+                $("#validationAlert").show();
+                Metronic.scrollTo($("#validationAlert"), -200);
+            },
+
+            errorPlacement: function (error, element) { // render error placement for each input type
+                var icon = $(element).parent('.input-icon').children('i');
+                icon.addClass("fa-warning");
+                icon.attr("data-original-title", error.text()).tooltip({ 'container': 'body' });
+            },
+
+            highlight: function (element) { // hightlight error inputs
+                $(element).closest('.form-group').removeClass("has-success").addClass('has-error'); // set error class to the control group
+            },
+
+            unhighlight: function (element) { // revert the change done by hightlight
+
+            },
+
+            success: function (label, element) {
+                var icon = $(element).parent('.input-icon').children('i');
+                $(element).closest('.form-group').removeClass('has-error').addClass('has-success'); // set success class to the control group
+                icon.removeClass("fa-warning");
+            }
+        });
+
+        function showView() {
+            if (statusLoaded && versionLoaded && settingsLoaded) {
+                UnlockPage();
+            }
+        }
+        function TestCron() {
+            $("#CronDetails").hide(animationDelay);
+            $.post("/API/Misc/IsCronValid",
+                {
+                    Cron: $("#inpAutoUpdateCron").val()
+                },
+                function (data, status) {
+                    isCronValid = false;
+
+                    var root = $($.parseXML(data)).find("Response");
+
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        $("form").valid();
+                        return;
+                    }
+
+                    isCronValid = root.children("Content").text() == "True";
+                    $("form").valid();
+                    if (isCronValid) {
+                        $.post("/API/Misc/GetNextCronDates",
+                            {
+                                Cron: $("#inpAutoUpdateCron").val()
+                            },
+                            function (data, status) {
+
+                                var root = $($.parseXML(data)).find("Response");
+
+                                if (root.children("Type").text() == "Error") {
+                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                    return;
+                                }
+
+                                $("#CronDetails").find("ul").empty();
+
+                                root.children("Content").children().each(function (index, value) {
+                                    var date = new Date($(this).text());
+                                    $("#CronDetails").find("ul").append("<li class=\"list-group-item\">" + date.toLocaleString() + "</li>");
+                                });
+
+                                $("#CronDetails").show(animationDelay);
+                            });
+                    }
+                });
+        }
+        function refresh() {
+            LockPage();
+
+            statusLoaded = false;
+            versionLoaded = false;
+            settingsLoaded = false;
+
+            $.get("/API/Settings/GetSEStatus",
+                {},
+                function (data) {
+                    statusLoaded = true;
+
+                    var root = $($.parseXML(data)).find("Response");
+
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        showView();
+                        return;
+                    }
+
+                    $("#isRunning").hide(0);
+                    if (root.children("Content").children("UpdateRunning").text() == "true") {
+                        $("#isRunning").show(0);
+                    }
+
+                    $("#nbServer").text(root.children("Content").children("NbServer").text());
+
+                    showView();
+                    return;
+                });
+
+            $.get("/API/Settings/GetSEVersion",
+                {},
+                function (data) {
+                    versionLoaded = true;
+
+                    var root = $($.parseXML(data)).find("Response");
+
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        showView();
+                        return;
+                    }
+
+                    $("#btnUpdate").hide(0);
+
+                    $("#Status-SE").children(".alert")
+                        .removeClass("alert-success")
+                        .removeClass("alert-info")
+                        .removeClass("alert-danger")
+                        .removeClass("alert-warning");
+
+                    $("#Local-SE").find(".number").last().html(root.children("Content").children("Local").text());
+                    $("#remote-SE").find(".number").last().html(root.children("Content").children("Remote").text());
+
+                    if (root.children("Content").children("Local").text() == "0.0.0.0") {
+                        $("#Status-SE").find("h3").html("Space Engineers is not installed");
+                        $("#Status-SE").find(".alert").addClass("alert-info");
+                        $("#Local-SE").find(".number").last().html("N/A");
+                        $("#btnUpdate").show(0);
+
+                        showView();
+                        return;
+                    }
+                    $("#btnDelete").show(0);
+                    if (root.children("Content").children("Diff").text() < 0) {
+                        $("#Status-SE").find("h3").html("An update is available !");
+                        $("#Status-SE").children(".alert").addClass("alert-warning");
+                        $("#btnUpdate").show(0);
+                    }
+                    else if (root.children("Content").children("Diff").text() == 0) {
+                        $("#Status-SE").find("h3").html("Space Engineers is up to date !");
+                        $("#Status-SE").children(".alert").addClass("alert-success");
+                    }
+                    else if (root.children("Content").children("Diff").text() > 0) {
+                        $("#Status-SE").find("h3").html("You are more up-to-date than the update feed !<br/>(Are you from the future ?)");
+                        $("#Status-SE").children(".alert").addClass("alert-danger");
+                    }
+
+                    showView();
+                    return;
+                });
+
+            $.get("/API/Settings/GetSESettings",
+                {},
+                function (data) {
+                    settingsLoaded = true;
+
+                    var root = $($.parseXML(data)).find("Response");
+
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        showView();
+                        return;
+                    }
+
+                    $("#inpAutoUpdateEnabled").bootstrapSwitch('state', root.children("Content").children("AutoUpdateEnabled").text() == "true");
+                    $("#inpAutoUpdateCron").val(root.children("Content").children("AutoUpdateCron").text());
+                    $("#inpAutoUpdateBetaPassword").val(root.children("Content").children("AutoUpdateBetaPassword").text());
+                    showView();
+                    TestCron();
+                    return;
+                });
+        }
+
+        refresh();
+        $("#btnRefresh").click(function () {
+            refresh();
+        });
+
+        
+
+        $("#inpAutoUpdateCron").focusout(function () {
+            TestCron();
+        });
+
+        $("#btnUpdateSettings").click(function () {
+            if ($("form").valid()) {
+                $("#btnUpdateSettings").prop('disabled', true);
+                $.post("/API/Settings/SetSESettings",
+                {
+                    AutoUpdateEnabled: $("#inpAutoUpdateEnabled").is(':checked'),
+                    AutoUpdateCron: $("#inpAutoUpdateCron").val(),
+                    AutoUpdateBetaPassword: $("#inpAutoUpdateBetaPassword").val()
+                },
+                function (data) {
+                    $("#btnUpdateSettings").prop('disabled', false);
+
+                    var root = $($.parseXML(data)).find("Response");
+
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        showView();
+                        return;
+                    }
+
+                    toastr.success(root.children("Content").text(), "Settings Updated");
+                });
+
+            }
+        });
+
+        $("#btnUpdate").click(function () {
+            bootbox.confirm("Are you sure you want to try to update SE ?<br/> " +
+            "Note : If an update is found, all running server will be restarted.",
+            function (result) {
+                if (result) {
+                    toastr.warning("This process can take up to several minutes", "SE Update Started");
+                    $("#btnUpdate").prop('disabled', true);
+                    $("#btnForceUpdate").prop('disabled', true);
+                    $("#btnDelete").prop('disabled', true);
+                    $.post("/API/Settings/UpdateSE",
+                    {
+                        Force: "false"
+                    },
+                    function (data) {
+                        $("#btnUpdate").prop('disabled', false);
+                        $("#btnForceUpdate").prop('disabled', false);
+                        $("#btnDelete").prop('disabled', false);
+
+                        var root = $($.parseXML(data)).find("Response");
+
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+                        refresh();
+                        toastr.success(root.children("Content").text(), "SE Update");
+                    });
+                }
+            });
+        });
+
+        $("#btnForceUpdate").click(function () {
+            bootbox.confirm("Are you sure you want to force an update?<br/> " +
+            "Note : All running server WILL be restarted.",
+            function (result) {
+                if (result) {
+                    toastr.warning("This process can take up to several minutes", "SE Force Update Started");
+                    $("#btnUpdate").prop('disabled', true);
+                    $("#btnForceUpdate").prop('disabled', true);
+                    $("#btnDelete").prop('disabled', true);
+                    $.post("/API/Settings/UpdateSE",
+                    {
+                        Force: "true"
+                    },
+                    function (data) {
+                        $("#btnUpdate").prop('disabled', false);
+                        $("#btnForceUpdate").prop('disabled', false);
+                        $("#btnDelete").prop('disabled', false);
+
+                        var root = $($.parseXML(data)).find("Response");
+
+                        if (root.children("Type").text() == "Error") {
+                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                            return;
+                        }
+                        refresh();
+                        toastr.success(root.children("Content").text(), "SE Force Update");
+                    });
+                }
+            });
+        });
+    }
+</script>

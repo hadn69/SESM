@@ -3,7 +3,7 @@ using SESM.Models;
 
 namespace SESM.Tools
 {
-    public static class Default
+    public static class SEDefault
     {
         // SESM Grade
         public static readonly bool UseServerExtender = false;
@@ -21,7 +21,7 @@ namespace SESM.Tools
 
         // New Map Grade
         public static readonly int AsteroidAmount = 4;
-        public static readonly SubTypeId ScenarioType = SubTypeId.EasyStart1;
+        public static readonly SESubTypeId ScenarioType = SESubTypeId.EasyStart1;
         public static readonly float ProceduralDensity = 0;
         public static readonly int ProceduralSeed = 0;
 

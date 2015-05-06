@@ -1,28 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Media.Animation;
+using MahApps.Metro.Controls;
+using SESMInstallerV2.Pages;
 
 namespace SESMInstallerV2
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
+        public Page CurrentPage;
         public MainWindow()
         {
             InitializeComponent();
+
+            Intro intro = new Intro();
+            CurrentPage = intro;
+            frame.Content = CurrentPage;
+
+            intro.NextPageClicked += Intro_NextPageClicked;
+        }
+
+        private void Intro_NextPageClicked()
+        {
+            DoubleAnimation da = new DoubleAnimation
+            {
+                From = 10,
+                To = -500,
+                Duration = new Duration(TimeSpan.FromSeconds(5))
+            };
+            TranslateTransform tt = new TranslateTransform();
+            CurrentPage.BeginAnimation(TranslateTransform.XProperty, da);
         }
     }
 }

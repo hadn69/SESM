@@ -9,80 +9,80 @@ using SESM.Models;
 
 namespace SESM.Tools.Helpers
 {
-    public class ServerConfigHelper
+    public class SEServerConfigHelper : ServerConfigHelperBase
     {
         // Server Grade
-        public string SaveName = Default.SaveName;
-        public string IP = Default.IP;
-        public int SteamPort = Default.SteamPort;
-        public int ServerPort = Default.ServerPort;
-        public string ServerName = Default.ServerName;
-        public bool IgnoreLastSession = Default.IgnoreLastSession;
-        public bool PauseGameWhenEmpty = Default.PauseGameWhenEmpty;
+        public new string SaveName = SEDefault.SaveName;
+        public string IP = SEDefault.IP;
+        public int SteamPort = SEDefault.SteamPort;
+        public new int ServerPort = SEDefault.ServerPort;
+        public string ServerName = SEDefault.ServerName;
+        public bool IgnoreLastSession = SEDefault.IgnoreLastSession;
+        public bool PauseGameWhenEmpty = SEDefault.PauseGameWhenEmpty;
 
         // New Map Grade
-        public int AsteroidAmount = Default.AsteroidAmount;
-        public SubTypeId ScenarioType = Default.ScenarioType;
-        public float ProceduralDensity = Default.ProceduralDensity;
-        public int ProceduralSeed = Default.ProceduralSeed;
+        public int AsteroidAmount = SEDefault.AsteroidAmount;
+        public SESubTypeId ScenarioType = SEDefault.ScenarioType;
+        public float ProceduralDensity = SEDefault.ProceduralDensity;
+        public int ProceduralSeed = SEDefault.ProceduralSeed;
 
         // Map Grade
         // -- Misc
-        public bool EnableSpectator = Default.EnableSpectator;
-        public bool RealisticSound = Default.RealisticSound;
-        public uint AutoSaveInMinutes = Default.AutoSaveInMinutes;
+        public bool EnableSpectator = SEDefault.EnableSpectator;
+        public bool RealisticSound = SEDefault.RealisticSound;
+        public new uint AutoSaveInMinutes = SEDefault.AutoSaveInMinutes;
 
         // -- Production
-        public float InventorySizeMultiplier = Default.InventorySizeMultiplier;
-        public float AssemblerSpeedMultiplier = Default.AssemblerSpeedMultiplier;
-        public float AssemblerEfficiencyMultiplier = Default.AssemblerEfficiencyMultiplier;
-        public float RefinerySpeedMultiplier = Default.RefinerySpeedMultiplier;
+        public float InventorySizeMultiplier = SEDefault.InventorySizeMultiplier;
+        public float AssemblerSpeedMultiplier = SEDefault.AssemblerSpeedMultiplier;
+        public float AssemblerEfficiencyMultiplier = SEDefault.AssemblerEfficiencyMultiplier;
+        public float RefinerySpeedMultiplier = SEDefault.RefinerySpeedMultiplier;
 
         // -- Building
-        public GameMode GameMode = Default.GameMode;
-        public bool EnableCopyPaste = Default.EnableCopyPaste;
-        public float WelderSpeedMultiplier = Default.WelderSpeedMultiplier;
-        public float GrinderSpeedMultiplier = Default.GrinderSpeedMultiplier;
-        public float HackSpeedMultiplier = Default.HackSpeedMultiplier;
-        public bool DestructibleBlocks = Default.DestructibleBlocks;
+        public GameMode GameMode = SEDefault.GameMode;
+        public bool EnableCopyPaste = SEDefault.EnableCopyPaste;
+        public float WelderSpeedMultiplier = SEDefault.WelderSpeedMultiplier;
+        public float GrinderSpeedMultiplier = SEDefault.GrinderSpeedMultiplier;
+        public float HackSpeedMultiplier = SEDefault.HackSpeedMultiplier;
+        public bool DestructibleBlocks = SEDefault.DestructibleBlocks;
 
         // -- Caps
-        public int MaxPlayers = Default.MaxPlayers;
-        public int MaxFloatingObjects = Default.MaxFloatingObjects;
+        public int MaxPlayers = SEDefault.MaxPlayers;
+        public int MaxFloatingObjects = SEDefault.MaxFloatingObjects;
 
         // -- Maps
-        public string WorldName = Default.WorldName;
-        public EnvironmentHostility EnvironmentHostility = Default.EnvironmentHostility;
-        public int WorldSizeKm = Default.WorldSizeKm;
-        public bool PermanentDeath = Default.PermanentDeath;
-        public bool CargoShipsEnabled = Default.CargoShipsEnabled;
-        public bool RemoveTrash = Default.RemoveTrash;
-        public bool ClientCanSave = Default.ClientCanSave;
-        public List<ulong> Mods = Default.Mods;
-        public int ViewDistance = Default.ViewDistance;
-        public bool EnableEncounters = Default.EnableEncounters;
+        public string WorldName = SEDefault.WorldName;
+        public EnvironmentHostility EnvironmentHostility = SEDefault.EnvironmentHostility;
+        public int WorldSizeKm = SEDefault.WorldSizeKm;
+        public bool PermanentDeath = SEDefault.PermanentDeath;
+        public bool CargoShipsEnabled = SEDefault.CargoShipsEnabled;
+        public bool RemoveTrash = SEDefault.RemoveTrash;
+        public bool ClientCanSave = SEDefault.ClientCanSave;
+        public List<ulong> Mods = SEDefault.Mods;
+        public int ViewDistance = SEDefault.ViewDistance;
+        public bool EnableEncounters = SEDefault.EnableEncounters;
 
         // -- Access
-        public OnlineMode OnlineMode = Default.OnlineMode;
-        public bool ResetOwnership = Default.ResetOwnership;
-        public ulong GroupID = Default.GroupID;
-        public List<ulong> Administrators = Default.Administrators;
-        public List<ulong> Banned = Default.Banned;
+        public OnlineMode OnlineMode = SEDefault.OnlineMode;
+        public bool ResetOwnership = SEDefault.ResetOwnership;
+        public ulong GroupID = SEDefault.GroupID;
+        public List<ulong> Administrators = SEDefault.Administrators;
+        public List<ulong> Banned = SEDefault.Banned;
 
         // -- Gameplay
-        public bool AutoHealing = Default.AutoHealing;
-        public bool WeaponsEnabled = Default.WeaponsEnabled;
-        public bool ShowPlayerNamesOnHud = Default.ShowPlayerNamesOnHud;
-        public bool ThrusterDamage = Default.ThrusterDamage;
-        public float SpawnShipTimeMultiplier = Default.SpawnShipTimeMultiplier;
-        public bool RespawnShipDelete = Default.RespawnShipDelete;
-        public bool EnableToolShake = Default.EnableToolShake;
-        public bool EnableIngameScripts = Default.EnableIngameScripts;
-        public int VoxelGeneratorVersion = Default.VoxelGeneratorVersion;
-        public bool EnableOxygen = Default.EnableOxygen;
-        public bool Enable3rdPersonView = Default.Enable3rdPersonView;
+        public bool AutoHealing = SEDefault.AutoHealing;
+        public bool WeaponsEnabled = SEDefault.WeaponsEnabled;
+        public bool ShowPlayerNamesOnHud = SEDefault.ShowPlayerNamesOnHud;
+        public bool ThrusterDamage = SEDefault.ThrusterDamage;
+        public float SpawnShipTimeMultiplier = SEDefault.SpawnShipTimeMultiplier;
+        public bool RespawnShipDelete = SEDefault.RespawnShipDelete;
+        public bool EnableToolShake = SEDefault.EnableToolShake;
+        public bool EnableIngameScripts = SEDefault.EnableIngameScripts;
+        public int VoxelGeneratorVersion = SEDefault.VoxelGeneratorVersion;
+        public bool EnableOxygen = SEDefault.EnableOxygen;
+        public bool Enable3rdPersonView = SEDefault.Enable3rdPersonView;
 
-        public void Save(EntityServer serv)
+        public override void Save(EntityServer serv)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("<?xml version=\"1.0\"?>");
@@ -505,7 +505,7 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public bool Load(EntityServer server)
+        public override bool Load(EntityServer server)
         {
             bool confLoad = LoadFromServConf(PathHelper.GetConfigurationFilePath(server));
             bool saveLoad = false;
@@ -520,7 +520,7 @@ namespace SESM.Tools.Helpers
         /// </summary>
         /// <param name="path">the full path to the config file</param>
         /// <returns>true if the load succeded, false if not</returns>
-        public bool LoadFromServConf(string path)
+        public override bool LoadFromServConf(string path)
         {
             try
             {
@@ -682,7 +682,7 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        public bool LoadFromSave(string path)
+        public override bool LoadFromSave(string path)
         {
             if (!File.Exists(path))
                 return false;
@@ -784,7 +784,7 @@ namespace SESM.Tools.Helpers
             return true;
         }
 
-        public bool LoadFromSaveManager(string path)
+        public override bool LoadFromSaveManager(string path)
         {
             int locMaxplayer = MaxPlayers;
             int locMaxFloatingObjects = MaxFloatingObjects;

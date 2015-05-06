@@ -21,6 +21,46 @@
         user-select: none;
     }
 </style>
+<!-- --- New Modal --- -->
+<div class="modal fade" id="newModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"></button>
+                <h4 class="modal-title">New Server</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-body form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-md-5">Server Name</label>
+                            <div class="col-md-7">
+                                <div class="input-inline input-medium">
+                                    <input type="text" id="inpServerName" class="form-control" placeholder="Server_Name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-5">Server Type</label>
+                            <div class="col-md-7">
+                                <div class="input-inline input-medium">
+                                    <select id="inpServerType" class="form-control">
+                                        <option value="SE" selected>Space Engineers</option>
+                                        <option value="ME">Medieval Engineers</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn blue" id="btnSaveCreate">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="col-md-12">
     <div class="portlet light bordered">
         <div class="portlet-body">
@@ -60,7 +100,7 @@
                         <button id="btnRefreshList" class="btn blue">
                             <i class="fa fa-refresh"></i> Refresh
                         </button>
-                        <button id="btnCreateServer" class="btn green" style="display: none;">
+                        <button id="btnCreateServer" class="btn green" style="display: none;" data-toggle="modal" data-target="#newModal">
                             <i class=" fa fa-plus"></i> New
                         </button>
                         <button id="btnDeleteServers" class="btn red" style="display: none;">
@@ -463,34 +503,29 @@
             return retArray;
         }
 
-        $("#btnCreateServer").click(function () {
-            bootbox.dialog({
-                title: "New Server",
-                message: "<form class=\"bootbox-form\"><input id=\"impNewServ\" class=\"bootbox-input bootbox-input-text form-control\" autocomplete=\"off\" type=\"text\" placeholder=\"Server_Name\"></form>",
-                buttons: {
-                    success: {
-                        label: "Create",
-                        className: "btn-success",
-                        callback: function () {
-                            var name = $('#impNewServ').val();
-                            $.post("/API/Server/CreateServer",
-                            {
-                                ServerName: name
-                            },
-                            function (data) {
-                                var root = $($.parseXML(data)).find("Response");
+        $("#btnSaveCreate").click(function () {
 
-                                if (root.children("Type").text() == "Error") {
-                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                    return;
-                                }
-                                toastr.success(root.children("Content").text(), "Server Created");
-                                softRefresh();
-                            });
-                        }
-                    }
+            var name = $('#inpServerName').val();
+            var type = $('#inpServerType').val();
+
+
+            $.post("/API/Server/CreateServer",
+            {
+                ServerName: name,
+                Servertype: type
+            },
+            function (data) {
+                var root = $($.parseXML(data)).find("Response");
+
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    return;
                 }
+                $("#newModal").modal('hide');
+                toastr.success(root.children("Content").text(), "Server Created");
+                softRefresh();
             });
+
         });
 
         $("#btnDeleteServers").click(function () {

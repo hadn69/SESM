@@ -49,7 +49,13 @@ namespace SESM.Controllers.API
             // ** PROCESS **
             XMLMessage response = new XMLMessage("MAP-GM-OK");
 
-            ServerConfigHelper config = new ServerConfigHelper();
+            ServerConfigHelperBase config;
+
+            if (server.ServerType == EnumServerType.SpaceEngineers)
+                config = new SEServerConfigHelper();
+            else
+                config = new MEServerConfigHelper();
+
             config.Load(server);
 
             foreach (string item in Directory.GetDirectories(PathHelper.GetSavesPath(server), "*", SearchOption.TopDirectoryOnly))
@@ -124,7 +130,13 @@ namespace SESM.Controllers.API
                 ServiceHelper.KillService(server);
             }
 
-            ServerConfigHelper config = new ServerConfigHelper();
+            ServerConfigHelperBase config;
+
+            if (server.ServerType == EnumServerType.SpaceEngineers)
+                config = new SEServerConfigHelper();
+            else
+                config = new MEServerConfigHelper();
+
             config.Load(server);
 
             if (server.UseServerExtender)
@@ -196,7 +208,13 @@ namespace SESM.Controllers.API
 
             // ** PROCESS **
 
-            ServerConfigHelper config = new ServerConfigHelper();
+            ServerConfigHelperBase config;
+
+            if (server.ServerType == EnumServerType.SpaceEngineers)
+                config = new SEServerConfigHelper();
+            else
+                config = new MEServerConfigHelper();
+
             config.Load(server);
 
             foreach (string item in MapDirs)
@@ -265,7 +283,13 @@ namespace SESM.Controllers.API
 
             // ** PROCESS **
 
-            ServerConfigHelper config = new ServerConfigHelper();
+            ServerConfigHelperBase config;
+
+            if (server.ServerType == EnumServerType.SpaceEngineers)
+                config = new SEServerConfigHelper();
+            else
+                config = new MEServerConfigHelper();
+
             config.Load(server);
 
             Response.Clear();
@@ -298,7 +322,7 @@ namespace SESM.Controllers.API
             return null;
         }
 
-        // POST: API/Map/CreateMap
+        // POST: API/Map/SECreateMap
         [HttpPost]
         public ActionResult CreateMap()
         {
@@ -324,7 +348,7 @@ namespace SESM.Controllers.API
             if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
                 return Content(XMLMessage.Error("MAP-CM-NOACCESS", "You don't have access to this server").ToString());
 
-            SubTypeId SubTypeId;
+            SESubTypeId SubTypeId;
             if (string.IsNullOrWhiteSpace(Request.Form["SubTypeId"]))
                 return Content(XMLMessage.Error("MAP-CM-MISSTI", "The SubTypeId field must be provided").ToString());
             if (!Enum.TryParse(Request.Form["SubTypeId"], out SubTypeId))
@@ -358,7 +382,7 @@ namespace SESM.Controllers.API
                 ServiceHelper.KillService(server);
             }
 
-            ServerConfigHelper config = new ServerConfigHelper();
+            SEServerConfigHelper config = new SEServerConfigHelper();
             config.Load(server);
 
             config.ScenarioType = SubTypeId;

@@ -33,10 +33,10 @@ namespace SESM.Controllers.API
             UserProvider usrPrv = new UserProvider(_context);
 
             EntityUser user = Session["User"] as EntityUser;
-            
+
             int userID = user == null ? 0 : user.Id;
             EntityUser usr = usrPrv.GetUser(userID);
-            
+
 
             List<EntityServer> servers = srvPrv.GetServers(user);
             Dictionary<EntityServer, ServiceState> serversState = srvPrv.GetState(servers);
@@ -51,7 +51,7 @@ namespace SESM.Controllers.API
                                                              new XElement("Public", server.IsPublic.ToString()),
                                                              new XElement("State", serversState[server].ToString()),
                                                              new XElement("AccessLevel", srvPrv.GetAccessLevel(usr, server)),
-                                                             new XElement("Type", server.UseServerExtender ? "SESE" : "SE")
+                                                             new XElement("Type", server.ServerType == EnumServerType.SpaceEngineers ? server.UseServerExtender ? "SESE" : "SE" : "ME")
                                                              ));
             }
             return Content(response.ToString());
@@ -91,7 +91,7 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("Public", server.IsPublic.ToString()));
             response.AddToContent(new XElement("State", srvPrv.GetState(server).ToString()));
             response.AddToContent(new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id)));
-            response.AddToContent(new XElement("Type", server.UseServerExtender ? "SESE" : "SE"));
+            response.AddToContent(new XElement("Type", server.ServerType == EnumServerType.SpaceEngineers ? server.UseServerExtender ? "SESE" : "SE" : "ME"));
 
             return Content(response.ToString());
         }
@@ -111,22 +111,46 @@ namespace SESM.Controllers.API
             int userID = user == null ? 0 : user.Id;
 
             // ** PARSING / ACCESS **
-            string serverName = Request.Form["ServerName"];
+            string ServerName = Request.Form["ServerName"];
 
-            if (string.IsNullOrWhiteSpace(serverName))
+            if (string.IsNullOrWhiteSpace(ServerName))
                 return Content(XMLMessage.Error("SRV-CRS-MISNAME", "The ServerName field must be provided").ToString());
 
-            if (!Regex.IsMatch(serverName, @"^[a-zA-Z0-9_.-]+$"))
-                return Content(XMLMessage.Error("SRV-CRS-BADNAME", "The Name must be only composed of letters, numbers, dots, dashs and underscores").ToString());
+            if (!Regex.IsMatch(ServerName, @"^[a-zA-Z0-9_.-]+$"))
+                return Content(XMLMessage.Error("SRV-CRS-BADNAME", "The ServerName must be only composed of letters, numbers, dots, dashs and underscores").ToString());
+
+            if (!srvPrv.IsNameAvaialble(ServerName))
+                return Content(XMLMessage.Error("SRV-CRS-NAMEUSE", "The server " + ServerName + " Already Exist").ToString());
+
+            string ServerType = Request.Form["ServerType"];
+
+            if (string.IsNullOrWhiteSpace(ServerType))
+                return Content(XMLMessage.Error("SRV-CRS-MISTYPE", "The ServerType field must be provided").ToString());
+
+            if (!(ServerType == "SE" || ServerType == "ME"))
+                return Content(XMLMessage.Error("SRV-CRS-BADTYPE", "The ServerType must be either SE or ME").ToString());
+
+            EnumServerType ServerTypeParsed = EnumServerType.SpaceEngineers;
+
+            switch (ServerType)
+            {
+                case "SE":
+                    ServerTypeParsed = EnumServerType.SpaceEngineers;
+                    break;
+                case "ME":
+                    ServerTypeParsed = EnumServerType.MedievalEngineers;
+                    break;
+            }
 
             // ** PROCESS **
             EntityServer server = new EntityServer
             {
-                Name = serverName,
-                Ip = Default.IP,
-                IsPublic = Default.IsPublic,
+                Name = ServerName,
+                Ip = SEDefault.IP,
+                IsPublic = SEDefault.IsPublic,
                 Port = srvPrv.GetNextAvailablePort(),
-                ServerExtenderPort = srvPrv.GetNextAvailableSESEPort()
+                ServerExtenderPort = srvPrv.GetNextAvailableSESEPort(),
+                ServerType = ServerTypeParsed
             };
             srvPrv.CreateServer(server);
 
@@ -134,14 +158,20 @@ namespace SESM.Controllers.API
             Directory.CreateDirectory(PathHelper.GetInstancePath(server) + @"Mods");
             Directory.CreateDirectory(PathHelper.GetInstancePath(server) + @"Backups");
 
-            ServerConfigHelper configHelper = new ServerConfigHelper();
+            ServerConfigHelperBase configHelper;
+
+            if (server.ServerType == EnumServerType.SpaceEngineers)
+                configHelper = new SEServerConfigHelper();
+            else
+                configHelper = new MEServerConfigHelper();
+
             configHelper.IP = server.Ip;
             configHelper.ServerPort = server.Port;
 
             configHelper.Save(server);
             ServiceHelper.RegisterService(server);
 
-            return Content(XMLMessage.Success("SRV-CRS-OK", "The server " + serverName + " was created").ToString());
+            return Content(XMLMessage.Success("SRV-CRS-OK", "The server " + ServerName + " was created").ToString());
         }
 
         // POST: API/Server/DeleteServers
@@ -321,10 +351,7 @@ namespace SESM.Controllers.API
 
                     Directory.Move(oldpath, newpath);
 
-                    if (server.UseServerExtender)
-                        ServiceHelper.RegisterServerExtenderService(server);
-                    else
-                        ServiceHelper.RegisterService(server);
+                    ServiceHelper.RegisterService(server);
                 }
                 server.IsPublic = serverPublic;
                 server.ProcessPriority = serverProcessPriority;
@@ -440,14 +467,14 @@ namespace SESM.Controllers.API
                 {
                     if (useServerExtender)
                     {
-                        ServerConfigHelper config = new ServerConfigHelper();
+                        SEServerConfigHelper config = new SEServerConfigHelper();
                         config.Load(server);
                         server.AutoSaveInMinutes = Convert.ToInt32(config.AutoSaveInMinutes);
                         srvPrv.UpdateServer(server);
                     }
                     else
                     {
-                        ServerConfigHelper config = new ServerConfigHelper();
+                        SEServerConfigHelper config = new SEServerConfigHelper();
                         config.Load(server);
                         config.AutoSaveInMinutes = Convert.ToUInt32(server.AutoSaveInMinutes);
                         config.Save(server);
@@ -455,10 +482,7 @@ namespace SESM.Controllers.API
 
                     server.UseServerExtender = useServerExtender;
                     ServiceHelper.UnRegisterService(server);
-                    if (server.UseServerExtender)
-                        ServiceHelper.RegisterServerExtenderService(server);
-                    else
-                        ServiceHelper.RegisterService(server);
+                    ServiceHelper.RegisterService(server);
                 }
 
                 server.ServerExtenderPort = serverExtenderPort;
@@ -805,11 +829,11 @@ namespace SESM.Controllers.API
 
         #endregion
 
-        #region Server Configuration
+        #region SE Server Configuration
 
-        // POST: API/Server/GetConfiguration
+        // POST: API/Server/SEGetConfiguration
         [HttpPost]
-        public ActionResult GetConfiguration()
+        public ActionResult SEGetConfiguration()
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -835,7 +859,7 @@ namespace SESM.Controllers.API
 
             // ** PROCESS **
             // Loading the server config
-            ServerConfigHelper serverConfig = new ServerConfigHelper();
+            SEServerConfigHelper serverConfig = new SEServerConfigHelper();
             serverConfig.Load(server);
 
             XMLMessage response = new XMLMessage("SRV-GC-OK");
@@ -905,9 +929,9 @@ namespace SESM.Controllers.API
             return Content(response.ToString());
         }
 
-        // POST: API/Server/GetConfigurationRights
+        // POST: API/Server/SEGetConfigurationRights
         [HttpPost]
-        public ActionResult GetConfigurationRights()
+        public ActionResult SEGetConfigurationRights()
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -988,9 +1012,9 @@ namespace SESM.Controllers.API
             return Content(response.ToString());
         }
 
-        // POST: API/Server/SetConfiguration
+        // POST: API/Server/SESetConfiguration
         [HttpPost]
-        public ActionResult SetConfiguration()
+        public ActionResult SESetConfiguration()
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -1018,7 +1042,7 @@ namespace SESM.Controllers.API
             bool isAdmin = accessLevel != AccessLevel.Manager;
 
             // Loading the server config
-            ServerConfigHelper serverConfig = new ServerConfigHelper();
+            SEServerConfigHelper serverConfig = new SEServerConfigHelper();
             serverConfig.Load(server);
 
             if (isAdmin)
