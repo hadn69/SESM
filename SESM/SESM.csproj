@@ -2656,13 +2656,14 @@
     <Content Include="Views\Settings\SESE.cshtml" />
     <Content Include="Views\Error\404.cshtml" />
     <Content Include="Views\Server\Explorer.cshtml" />
-    <Content Include="Views\Server\Configuration.cshtml" />
-    <Content Include="Views\Server\Maps.cshtml" />
+    <Content Include="Views\Server\SEConfiguration.cshtml" />
+    <Content Include="Views\Server\SEMaps.cshtml" />
     <Content Include="Views\Settings\SE.cshtml" />
     <Content Include="Views\Server\Dashboard.cshtml" />
-    <Content Include="Views\Server\Settings.cshtml" />
     <Content Include="Views\Server\Monitor.cshtml" />
     <Content Include="Views\PerfMon\Index.cshtml" />
+    <Content Include="Views\Settings\ME.cshtml" />
+    <Content Include="Views\Server\Settings.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />

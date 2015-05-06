@@ -27,15 +27,27 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label">Data Path</label>
+                        <label class="col-md-4 control-label">SE Data Path</label>
                         <div class="col-md-8">
                             <input type="text" class="form-control" placeholder="Ex : C:\SpaceEngineers\" id="inpSEDataPath">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label">Save Path</label>
+                        <label class="col-md-4 control-label">SE Save Path</label>
                         <div class="col-md-8">
                             <input type="text" class="form-control" placeholder="Ex : C:\ProgramData\SpaceEngineersDedicated\" id="inpSESavePath">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">ME Data Path</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" placeholder="Ex : C:\MedievalEngineers\" id="inpMEDataPath">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">ME Save Path</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" placeholder="Ex : C:\ProgramData\MedievalEngineersDedicated\" id="inpMESavePath">
                         </div>
                     </div>
                     <div class="form-group">
@@ -225,6 +237,8 @@
                 $('#inpPrefix').val(content.children("Prefix").text());
                 $('#inpSEDataPath').val(content.children("SEDataPath").text());
                 $('#inpSESavePath').val(content.children("SESavePath").text());
+                $('#inpMEDataPath').val(content.children("MEDataPath").text());
+                $('#inpMESavePath').val(content.children("MESavePath").text());
                 $('#inpArch').bootstrapSwitch('state', content.children("Arch").text() == "x86");
             });
 
@@ -272,6 +286,8 @@
                         Prefix: $("#inpPrefix").val(),
                         SESavePath: $("#inpSESavePath").val(),
                         SEDataPath: $("#inpSEDataPath").val(),
+                        MESavePath: $("#inpMESavePath").val(),
+                        MEDataPath: $("#inpMEDataPath").val(),
                         Arch: $('#inpArch').is(":checked") ? "x86" : "x64"
                     },
                     function (data) {

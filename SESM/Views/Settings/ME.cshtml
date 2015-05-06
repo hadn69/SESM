@@ -1,33 +1,33 @@
 ﻿@{
-    ViewBag.Title = "Space Engineers Settings";
+    ViewBag.Title = "Medieval Engineers Settings";
 
     List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
     breadCrumb.Add(new KeyValuePair<string, string>("Global Setting", "/Settings/"));
-    breadCrumb.Add(new KeyValuePair<string, string>("Space Engineers Settings", "/Settings/SE/"));
+    breadCrumb.Add(new KeyValuePair<string, string>("Medieval Engineers Settings", "/Settings/ME/"));
     ViewBag.Breadcrumb = breadCrumb;
 
     ViewBag.RefreshBtn = true;
 }
 <link href="/assets/global/plugins/dropzone/css/dropzone.css" rel="stylesheet">
 <script src="/assets/global/plugins/dropzone/dropzone.js"></script>
-<div class="col-md-12" id="state-SE">
+<div class="col-md-12" id="state-ME">
     <div class="portlet light">
         <div class="portlet-body text-center">
-            <h4>SE is actualy used on <span id="nbServer">0</span> server(s)</h4>
-            <h4 id="isRunning" class="hidden">An SE Update is running</h4>
+            <h4>ME is actualy used on <span id="nbServer">0</span> server(s)</h4>
+            <h4 id="isRunning" class="hidden">An ME Update is running</h4>
         </div>
     </div>
 </div>
 <div class="col-md-6"  id="VersionPanel">
     <div class="row">
-        <div class="col-md-12" id="Status-SE">
+        <div class="col-md-12" id="Status-ME">
             <div class="alert alert-danger text-center">
                 <h3>Loading</h3>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="Local-SE">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="Local-ME">
             <div class="dashboard-stat blue-madison">
                 <div class="visual">
                     <i class="fa fa-database"></i>
@@ -43,7 +43,7 @@
             </div>
         </div>
 
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="remote-SE">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="remote-ME">
             <div class="dashboard-stat blue-madison">
                 <div class="visual">
                     <i class="fa fa-globe"></i>
@@ -80,7 +80,7 @@
             </div>
         </div>
         <div class="portlet-body form">
-            <form action="/API/Settings/UploadSE" class="dropzone" id="uploadDropzone">
+            <form action="/API/Settings/UploadME" class="dropzone" id="uploadDropzone">
                 <div class="fallback">
                     <input name="ZipFile" type="file" />
                 </div>
@@ -141,7 +141,7 @@
                 <div class="form-actions" style="display:none;" id="CronDetails">
                     <div class="row">
                         <div class="col-md-12">
-                            With this cron, the next SE Auto Updates will be at :<br /><br />
+                            With this cron, the next ME Auto Updates will be at :<br /><br />
                             <ul class="list-group"></ul>
                         </div>
                     </div>
@@ -166,7 +166,7 @@
             clickable: true,
             acceptedFiles: ".zip",
             accept: function (file, done) {
-                bootbox.confirm("<br/>Are you sure you want to upload SE ? <br/>" +
+                bootbox.confirm("<br/>Are you sure you want to upload ME ? <br/>" +
                     "If ther is any running server they will be stopped then restarted for the update to take place !",
                     function (result) {
                         if (result) {
@@ -190,7 +190,7 @@
                         toastr.warning(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
                         return;
                     }
-                    toastr.success(root.children("Content").text(), "SE Updated");
+                    toastr.success(root.children("Content").text(), "ME Updated");
                 });
             }
         };
@@ -299,7 +299,7 @@
             versionLoaded = false;
             settingsLoaded = false;
 
-            $.get("/API/Settings/GetSEStatus",
+            $.get("/API/Settings/GetMEStatus",
                 {},
                 function (data) {
                     statusLoaded = true;
@@ -323,7 +323,7 @@
                     return;
                 });
 
-            $.get("/API/Settings/GetSEVersion",
+            $.get("/API/Settings/GetMEVersion",
                 {},
                 function (data) {
                     versionLoaded = true;
@@ -338,19 +338,19 @@
 
                     $("#btnUpdate").hide(0);
 
-                    $("#Status-SE").children(".alert")
+                    $("#Status-ME").children(".alert")
                         .removeClass("alert-success")
                         .removeClass("alert-info")
                         .removeClass("alert-danger")
                         .removeClass("alert-warning");
 
-                    $("#Local-SE").find(".number").last().html(root.children("Content").children("Local").text());
-                    $("#remote-SE").find(".number").last().html(root.children("Content").children("Remote").text());
+                    $("#Local-ME").find(".number").last().html(root.children("Content").children("Local").text());
+                    $("#remote-ME").find(".number").last().html(root.children("Content").children("Remote").text());
 
                     if (root.children("Content").children("Local").text() == "0.0.0.0") {
-                        $("#Status-SE").find("h3").html("Space Engineers is not installed");
-                        $("#Status-SE").find(".alert").addClass("alert-info");
-                        $("#Local-SE").find(".number").last().html("N/A");
+                        $("#Status-ME").find("h3").html("Medieval Engineers is not installed");
+                        $("#Status-ME").find(".alert").addClass("alert-info");
+                        $("#Local-ME").find(".number").last().html("N/A");
                         $("#btnUpdate").show(0);
 
                         showView();
@@ -358,25 +358,24 @@
                     }
                     $("#btnDelete").show(0);
                     if (root.children("Content").children("Diff").text() < 0) {
-                        $("#Status-SE").find("h3").html("An update is available !");
-                        $("#Status-SE").children(".alert").addClass("alert-warning");
+                        $("#Status-ME").find("h3").html("An update is available !");
+                        $("#Status-ME").children(".alert").addClass("alert-warning");
                         $("#btnUpdate").show(0);
                     }
                     else if (root.children("Content").children("Diff").text() == 0) {
-                        $("#Status-SE").find("h3").html("Space Engineers is up to date !");
-                        $("#Status-SE").children(".alert").addClass("alert-success");
+                        $("#Status-ME").find("h3").html("Medieval Engineers is up to date !");
+                        $("#Status-ME").children(".alert").addClass("alert-success");
                     }
                     else if (root.children("Content").children("Diff").text() > 0) {
-                        $("#Status-SE").find("h3").html("You are more up-to-date than the update feed !<br/>(Are you from the future ?)");
-                        $("#Status-SE").children(".alert").addClass("alert-danger");
+                        $("#Status-ME").find("h3").html("You are more up-to-date than the update feed !<br/>(Are you from the future ?)");
+                        $("#Status-ME").children(".alert").addClass("alert-danger");
                     }
 
                     showView();
                     return;
                 });
 
-            $.get("/API/Settings/GetSESettings",
-                {},
+            $.get("/API/Settings/GetMESettings",
                 function (data) {
                     settingsLoaded = true;
 
@@ -411,7 +410,7 @@
         $("#btnUpdateSettings").click(function () {
             if ($("form").valid()) {
                 $("#btnUpdateSettings").prop('disabled', true);
-                $.post("/API/Settings/SetSESettings",
+                $.post("/API/Settings/SetMESettings",
                 {
                     AutoUpdateEnabled: $("#inpAutoUpdateEnabled").is(':checked'),
                     AutoUpdateCron: $("#inpAutoUpdateCron").val(),
@@ -435,15 +434,15 @@
         });
 
         $("#btnUpdate").click(function () {
-            bootbox.confirm("Are you sure you want to try to update SE ?<br/> " +
+            bootbox.confirm("Are you sure you want to try to update ME ?<br/> " +
             "Note : If an update is found, all running server will be restarted.",
             function (result) {
                 if (result) {
-                    toastr.warning("This process can take up to several minutes", "SE Update Started");
+                    toastr.warning("This process can take up to several minutes", "ME Update Started");
                     $("#btnUpdate").prop('disabled', true);
                     $("#btnForceUpdate").prop('disabled', true);
                     $("#btnDelete").prop('disabled', true);
-                    $.post("/API/Settings/UpdateSE",
+                    $.post("/API/Settings/UpdateME",
                     {
                         Force: "false"
                     },
@@ -459,7 +458,7 @@
                             return;
                         }
                         refresh();
-                        toastr.success(root.children("Content").text(), "SE Update");
+                        toastr.success(root.children("Content").text(), "ME Update");
                     });
                 }
             });
@@ -470,11 +469,11 @@
             "Note : All running server WILL be restarted.",
             function (result) {
                 if (result) {
-                    toastr.warning("This process can take up to several minutes", "SE Force Update Started");
+                    toastr.warning("This process can take up to several minutes", "ME Force Update Started");
                     $("#btnUpdate").prop('disabled', true);
                     $("#btnForceUpdate").prop('disabled', true);
                     $("#btnDelete").prop('disabled', true);
-                    $.post("/API/Settings/UpdateSE",
+                    $.post("/API/Settings/UpdateME",
                     {
                         Force: "true"
                     },
@@ -490,7 +489,7 @@
                             return;
                         }
                         refresh();
-                        toastr.success(root.children("Content").text(), "SE Force Update");
+                        toastr.success(root.children("Content").text(), "ME Force Update");
                     });
                 }
             });

@@ -27,6 +27,14 @@ namespace SESM.Controllers
 
         [HttpGet]
         [SuperAdmin]
+        public ActionResult ME()
+        {
+
+            return View();
+        }
+
+        [HttpGet]
+        [SuperAdmin]
         public ActionResult SESE()
         {
 

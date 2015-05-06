@@ -129,8 +129,8 @@ namespace SESM.Tools.Jobs
 
                 logger.Info("Waiting 10 secs for grace periode ...");
                 Thread.Sleep(10000);
-                logger.Info("Killing any remaining SE process");
-                ServiceHelper.KillAllServices();
+                logger.Info("Killing any remaining SE/SESE process");
+                ServiceHelper.KillAllSEServices();
                 logger.Info("Waiting 10 secs for kills to finish ...");
                 Thread.Sleep(10000);
 

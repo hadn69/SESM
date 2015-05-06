@@ -64,9 +64,9 @@ namespace SESM.Tools
             SEAutoUpdateBetaPassword = string.Empty;
 
             // ME Auto-Update Settings
-            SEAutoUpdateEnabled = false;
-            SEAutoUpdateCron = "0 5/10 * * * ?";
-            SEAutoUpdateBetaPassword = string.Empty;
+            MEAutoUpdateEnabled = false;
+            MEAutoUpdateCron = "0 5/10 * * * ?";
+            MEAutoUpdateBetaPassword = string.Empty;
 
             // SESE Auto-Update Settings
             SESEUpdateURL = "https://api.github.com/repos/SEServerExtender/SEServerExtender/releases";

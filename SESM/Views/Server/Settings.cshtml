@@ -22,7 +22,7 @@
                             Server
                         </a>
                     </li>
-                    <li>
+                    <li style="display: none;">
                         <a href="#tab_SESE" data-toggle="tab">
                             SE Server Extender
                         </a>
@@ -321,6 +321,9 @@
             }
 
             accessLevel = root.children("Content").children("AccessLevel").text();
+            if (root.children("Content").children("Type").text() == "SE" || root.children("Content").children("Type").text() == "SESE")
+                $('a[href="#tab_SESE"]').parents("li").show();
+
         });
 
 

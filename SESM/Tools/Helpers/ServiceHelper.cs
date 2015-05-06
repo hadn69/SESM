@@ -362,12 +362,24 @@ namespace SESM.Tools.Helpers
 
         public static void KillAllServices()
         {
+            KillAllSEServices();
+            KillAllMEServices();
+        }
+
+        public static void KillAllSEServices()
+        {
             KillAllProcesses("SpaceEngineersDedicated");
+            KillAllSESEServices();
         }
 
         public static void KillAllSESEServices()
         {
             KillAllProcesses("SEServerExtender");
+        }
+
+        public static void KillAllMEServices()
+        {
+            KillAllProcesses("MedievalEngineersDedicated");
         }
 
         public static void KillAllProcesses(string processName)

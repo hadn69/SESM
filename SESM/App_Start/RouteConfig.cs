@@ -56,6 +56,13 @@ namespace SESM
                              "UploadSE|" +
                              "UpdateSE|" +
 
+                             "GetMEStatus|" +
+                             "GetMEVersion|" +
+                             "GetMESettings|" +
+                             "SetMESettings|" +
+                             "UploadME|" +
+                             "UpdateME|" +
+
                              "GetSESEStatus|" +
                              "GetSESEVersion|" +
                              "GetSESESettings|" +
@@ -207,6 +214,7 @@ namespace SESM
                 {
                     action = "Index|" +
                              "SE|" +
+                             "ME|" +
                              "SESE"
                 }
             );
