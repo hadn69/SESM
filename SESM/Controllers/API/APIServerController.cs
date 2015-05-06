@@ -1381,6 +1381,378 @@ namespace SESM.Controllers.API
 
         #endregion
 
+        #region SE Server Configuration
+
+        // POST: API/Server/MEGetConfiguration
+        [HttpPost]
+        public ActionResult MEGetConfiguration()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-GC-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-GC-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-GC-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("SRV-GC-NOACCESS", "You don't have access to this server").ToString());
+
+            // ** PROCESS **
+            // Loading the server config
+            MEServerConfigHelper serverConfig = new MEServerConfigHelper();
+            serverConfig.Load(server);
+
+            XMLMessage response = new XMLMessage("SRV-GC-OK");
+
+            response.AddToContent(new XElement("IP", serverConfig.IP));
+            response.AddToContent(new XElement("SteamPort", serverConfig.SteamPort));
+            response.AddToContent(new XElement("ServerPort", serverConfig.ServerPort));
+            response.AddToContent(new XElement("ServerName", serverConfig.ServerName));
+            response.AddToContent(new XElement("IgnoreLastSession", serverConfig.IgnoreLastSession));
+            response.AddToContent(new XElement("PauseGameWhenEmpty", serverConfig.PauseGameWhenEmpty));
+            response.AddToContent(new XElement("EnableSpectator", serverConfig.EnableSpectator));
+            response.AddToContent(new XElement("AutoSaveInMinutes", serverConfig.AutoSaveInMinutes));
+            response.AddToContent(new XElement("GameMode", serverConfig.GameMode));
+            response.AddToContent(new XElement("EnableCopyPaste", serverConfig.EnableCopyPaste));
+            response.AddToContent(new XElement("MaxPlayers", serverConfig.MaxPlayers));
+            response.AddToContent(new XElement("WorldName", serverConfig.WorldName));
+            response.AddToContent(new XElement("ClientCanSave", serverConfig.ClientCanSave));
+
+            XElement mods = new XElement("Mods");
+            foreach (ulong mod in serverConfig.Mods)
+                mods.Add(new XElement("Mod", mod));
+            response.AddToContent(mods);
+
+            response.AddToContent(new XElement("OnlineMode", serverConfig.OnlineMode));
+            response.AddToContent(new XElement("GroupID", serverConfig.GroupID));
+
+            XElement administrators = new XElement("Administrators");
+            foreach (ulong adminitrator in serverConfig.Administrators)
+                administrators.Add(new XElement("Adminitrator", adminitrator));
+            response.AddToContent(administrators);
+
+            XElement banned = new XElement("Banned");
+            foreach (ulong ban in serverConfig.Banned)
+                banned.Add(new XElement("Ban", ban));
+            response.AddToContent(banned);
+
+            response.AddToContent(new XElement("ClientCanSave", serverConfig.ClientCanSave));
+            response.AddToContent(new XElement("EnableStructuralSimulation", serverConfig.EnableStructuralSimulation));
+            response.AddToContent(new XElement("MaxActiveFracturePieces", serverConfig.MaxActiveFracturePieces));
+            response.AddToContent(new XElement("EnableBarbarians", serverConfig.EnableBarbarians));
+            response.AddToContent(new XElement("MaximumBots", serverConfig.MaximumBots));
+            response.AddToContent(new XElement("GameDayInRealMinutes", serverConfig.GameDayInRealMinutes));
+            response.AddToContent(new XElement("DayNightRatio", serverConfig.DayNightRatio));
+            response.AddToContent(new XElement("EnableAnimals", serverConfig.EnableAnimals));
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Server/MEGetConfigurationRights
+        [HttpPost]
+        public ActionResult MEGetConfigurationRights()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-GCR-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-GCR-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-GCR-UKNSRV", "The server doesn't exist").ToString());
+
+            AccessLevel accessLevel = srvPrv.GetAccessLevel(userID, server.Id);
+            if (!srvPrv.IsManagerOrAbore(accessLevel))
+                return Content(XMLMessage.Error("SRV-GCR-NOACCESS", "You don't have access to this server").ToString());
+
+            // ** PROCESS **
+            bool isAdmin = accessLevel != AccessLevel.Manager;
+
+            XMLMessage response = new XMLMessage("SRV-GCR-OK");
+
+            response.AddToContent(new XElement("IP", isAdmin));
+            response.AddToContent(new XElement("SteamPort", isAdmin));
+            response.AddToContent(new XElement("ServerPort", isAdmin));
+            response.AddToContent(new XElement("ServerName", true));
+            response.AddToContent(new XElement("IgnoreLastSession", true));
+            response.AddToContent(new XElement("PauseGameWhenEmpty", true));
+            response.AddToContent(new XElement("EnableSpectator", true));
+            response.AddToContent(new XElement("AutoSaveInMinutes", true));
+            response.AddToContent(new XElement("GameMode", true));
+            response.AddToContent(new XElement("EnableCopyPaste", true));
+            response.AddToContent(new XElement("MaxPlayers", isAdmin));
+            response.AddToContent(new XElement("WorldName", true));
+            response.AddToContent(new XElement("ClientCanSave", true));
+            response.AddToContent(new XElement("Mods", true));
+            response.AddToContent(new XElement("OnlineMode", true));
+            response.AddToContent(new XElement("GroupID", true));
+            response.AddToContent(new XElement("Administrators", true));
+            response.AddToContent(new XElement("Banned", true));
+            response.AddToContent(new XElement("EnableStructuralSimulation", true));
+            response.AddToContent(new XElement("MaxActiveFracturePieces", isAdmin));
+            response.AddToContent(new XElement("EnableBarbarians", true));
+            response.AddToContent(new XElement("MaximumBots", isAdmin));
+            response.AddToContent(new XElement("GameDayInRealMinutes", true));
+            response.AddToContent(new XElement("DayNightRatio",true));
+            response.AddToContent(new XElement("EnableAnimals", true));
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Server/MESetConfiguration
+        [HttpPost]
+        public ActionResult MESetConfiguration()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("SRV-SC-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("SRV-SC-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("SRV-SC-UKNSRV", "The server doesn't exist").ToString());
+
+            AccessLevel accessLevel = srvPrv.GetAccessLevel(userID, server.Id);
+            if (!srvPrv.IsManagerOrAbore(accessLevel))
+                return Content(XMLMessage.Error("SRV-SC-NOACCESS", "You don't have access to this server").ToString());
+
+            bool isAdmin = accessLevel != AccessLevel.Manager;
+
+            // Loading the server config
+            MEServerConfigHelper serverConfig = new MEServerConfigHelper();
+            serverConfig.Load(server);
+
+            if (isAdmin)
+            {
+                // ==== IP ====
+                if (string.IsNullOrWhiteSpace(Request.Form["IP"]))
+                    return Content(XMLMessage.Error("SRV-SC-MISIP", "The IP field must be provided").ToString());
+                if (!Regex.IsMatch(Request.Form["IP"], @"^((\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])$"))
+                    return Content(XMLMessage.Error("SRV-SC-BADIP", "The IP field is invalid").ToString());
+                serverConfig.IP = Request.Form["IP"];
+
+                // ==== SteamPort ====
+                if (string.IsNullOrWhiteSpace(Request.Form["SteamPort"]))
+                    return Content(XMLMessage.Error("SRV-SC-MISSTMPRT", "The SteamPort field must be provided").ToString());
+                if (!int.TryParse(Request.Form["SteamPort"], out serverConfig.SteamPort) || serverConfig.SteamPort < 1 || serverConfig.SteamPort > 65535)
+                    return Content(XMLMessage.Error("SRV-SC-BADSTMPRT", "The SteamPort field is invalid").ToString());
+
+                // ==== ServerPort ====
+                if (string.IsNullOrWhiteSpace(Request.Form["ServerPort"]))
+                    return Content(XMLMessage.Error("SRV-SC-MISSRVPRT", "The ServerPort field must be provided").ToString());
+                if (!int.TryParse(Request.Form["ServerPort"], out serverConfig.ServerPort) || serverConfig.ServerPort < 1 || serverConfig.ServerPort > 65535)
+                    return Content(XMLMessage.Error("SRV-SC-BADSRVPRT", "The ServerPort field is invalid").ToString());
+                if (!srvPrv.IsPortAvailable(serverConfig.ServerPort, server))
+                    return Content(XMLMessage.Error("SRV-SC-EXSRVPRT", "The ServerPort is already in use").ToString());
+
+                // ==== MaxPlayers ====
+                if (string.IsNullOrWhiteSpace(Request.Form["MaxPlayers"]))
+                    return Content(XMLMessage.Error("SRV-SC-MISMAXPL", "The MaxPlayers field must be provided").ToString());
+                if (!int.TryParse(Request.Form["MaxPlayers"], out serverConfig.MaxPlayers) || serverConfig.MaxPlayers < 1)
+                    return Content(XMLMessage.Error("SRV-SC-BADMAXPL", "The MaxPlayers field is invalid").ToString());
+
+                // ==== MaxActiveFracturePieces ====
+                if (string.IsNullOrWhiteSpace(Request.Form["MaxActiveFracturePieces"]))
+                    return Content(XMLMessage.Error("SRV-SC-MISMAXAFP", "The MaxActiveFracturePieces field must be provided").ToString());
+                if (!uint.TryParse(Request.Form["MaxActiveFracturePieces"], out serverConfig.MaxActiveFracturePieces) || serverConfig.MaxActiveFracturePieces < 0)
+                    return Content(XMLMessage.Error("SRV-SC-BADMAXAFP", "The MaxActiveFracturePieces field is invalid").ToString());
+
+                // ==== MaximumBots ====
+                if (string.IsNullOrWhiteSpace(Request.Form["MaximumBots"]))
+                    return Content(XMLMessage.Error("SRV-SC-MISMAXB", "The MaximumBots field must be provided").ToString());
+                if (!uint.TryParse(Request.Form["MaximumBots"], out serverConfig.MaximumBots) || serverConfig.MaximumBots < 0)
+                    return Content(XMLMessage.Error("SRV-SC-BADMAXB", "The MaximumBots field is invalid").ToString());
+            }
+
+            // ==== ServerName ====
+            if (!string.IsNullOrWhiteSpace(Request.Form["ServerName"]))
+                serverConfig.ServerName = Request.Form["ServerName"];
+
+            // ==== EnableStructuralSimulation ====
+            if (string.IsNullOrWhiteSpace(Request.Form["EnableStructuralSimulation"]))
+                return Content(XMLMessage.Error("SRV-SC-MISESS", "The EnableStructuralSimulation field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["EnableStructuralSimulation"], out serverConfig.EnableStructuralSimulation))
+                return Content(XMLMessage.Error("SRV-SC-BADESS", "The EnableStructuralSimulation field is invalid").ToString());
+
+            // ==== PauseGameWhenEmpty ====
+            if (string.IsNullOrWhiteSpace(Request.Form["PauseGameWhenEmpty"]))
+                return Content(XMLMessage.Error("SRV-SC-MISPGWE", "The PauseGameWhenEmpty field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["PauseGameWhenEmpty"], out serverConfig.PauseGameWhenEmpty))
+                return Content(XMLMessage.Error("SRV-SC-BADPGWE", "The PauseGameWhenEmpty field is invalid").ToString());
+
+            // ==== EnableSpectator ====
+            if (string.IsNullOrWhiteSpace(Request.Form["EnableSpectator"]))
+                return Content(XMLMessage.Error("SRV-SC-MISES", "The EnableSpectator field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["EnableSpectator"], out serverConfig.EnableSpectator))
+                return Content(XMLMessage.Error("SRV-SC-BADES", "The EnableSpectator field is invalid").ToString());
+
+            // ==== AutoSaveInMinutes ====
+            if (string.IsNullOrWhiteSpace(Request.Form["AutoSaveInMinutes"]))
+                return Content(XMLMessage.Error("SRV-SC-MISASIM", "The AutoSaveInMinutes field must be provided").ToString());
+            if (!uint.TryParse(Request.Form["AutoSaveInMinutes"], out serverConfig.AutoSaveInMinutes))
+                return Content(XMLMessage.Error("SRV-SC-BADASIM", "The AutoSaveInMinutes field is invalid").ToString());
+
+            // ==== GameMode ====
+            if (string.IsNullOrWhiteSpace(Request.Form["GameMode"]))
+                return Content(XMLMessage.Error("SRV-SC-MISGM", "The GameMode field must be provided").ToString());
+            if (!Enum.TryParse(Request.Form["GameMode"], out serverConfig.GameMode))
+                return Content(XMLMessage.Error("SRV-SC-BADGM", "The GameMode field is invalid").ToString());
+
+            // ==== EnableCopyPaste ====
+            if (string.IsNullOrWhiteSpace(Request.Form["EnableCopyPaste"]))
+                return Content(XMLMessage.Error("SRV-SC-MISECP", "The EnableCopyPaste field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["EnableCopyPaste"], out serverConfig.EnableCopyPaste))
+                return Content(XMLMessage.Error("SRV-SC-BADECP", "The EnableCopyPaste field is invalid").ToString());
+
+            // ==== WorldName ====
+            if (!string.IsNullOrWhiteSpace(Request.Form["WorldName"]))
+                serverConfig.WorldName = Request.Form["WorldName"];
+
+
+            // ==== ClientCanSave ====
+            if (string.IsNullOrWhiteSpace(Request.Form["ClientCanSave"]))
+                return Content(XMLMessage.Error("SRV-SC-MISCCS", "The ClientCanSave field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["ClientCanSave"], out serverConfig.ClientCanSave))
+                return Content(XMLMessage.Error("SRV-SC-BADCCS", "The ClientCanSave field is invalid").ToString());
+
+            // ==== Mods ====
+            serverConfig.Mods.Clear();
+            foreach (string mod in Request.Form["Mods"].Split(';'))
+            {
+                if (!string.IsNullOrWhiteSpace(mod))
+                {
+                    ulong modParsed;
+                    if (!ulong.TryParse(mod, out modParsed))
+                        return Content(XMLMessage.Error("SRV-SC-BADMOD", "The Mods field is invalid").ToString());
+                    serverConfig.Mods.Add(modParsed);
+                }
+            }
+
+            // ==== OnlineMode ====
+            if (string.IsNullOrWhiteSpace(Request.Form["OnlineMode"]))
+                return Content(XMLMessage.Error("SRV-SC-MISOM", "The OnlineMode field must be provided").ToString());
+            if (!Enum.TryParse(Request.Form["OnlineMode"], out serverConfig.OnlineMode))
+                return Content(XMLMessage.Error("SRV-SC-BADOM", "The OnlineMode field is invalid").ToString());
+
+            // ==== GroupID ====
+            if (string.IsNullOrWhiteSpace(Request.Form["GroupID"]))
+                return Content(XMLMessage.Error("SRV-SC-MISGRID", "The GroupID field must be provided").ToString());
+            if (!ulong.TryParse(Request.Form["GroupID"], out serverConfig.GroupID))
+                return Content(XMLMessage.Error("SRV-SC-BADGRID", "The GroupID field is invalid").ToString());
+
+            // ==== EnableBarbarians ====
+            if (string.IsNullOrWhiteSpace(Request.Form["EnableBarbarians"]))
+                return Content(XMLMessage.Error("SRV-SC-MISEB", "The EnableBarbarians field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["EnableBarbarians"], out serverConfig.EnableBarbarians))
+                return Content(XMLMessage.Error("SRV-SC-BADEB", "The EnableBarbarians field is invalid").ToString());
+
+            // ==== GameDayInRealMinutes ====
+            if (string.IsNullOrWhiteSpace(Request.Form["GameDayInRealMinutes"]))
+                return Content(XMLMessage.Error("SRV-SC-MISEB", "The GameDayInRealMinutes field must be provided").ToString());
+            if (!uint.TryParse(Request.Form["GameDayInRealMinutes"], out serverConfig.GameDayInRealMinutes))
+                return Content(XMLMessage.Error("SRV-SC-BADEB", "The GameDayInRealMinutes field is invalid").ToString());
+
+            // ==== DayNightRatio ====
+            if (string.IsNullOrWhiteSpace(Request.Form["DayNightRatio"]))
+                return Content(XMLMessage.Error("SRV-SC-MISDNR", "The DayNightRatio field must be provided").ToString());
+            if (!double.TryParse(Request.Form["DayNightRatio"], out serverConfig.DayNightRatio))
+                return Content(XMLMessage.Error("SRV-SC-BADDNR", "The DayNightRatio field is invalid").ToString());
+
+            // ==== EnableAnimals ====
+            if (string.IsNullOrWhiteSpace(Request.Form["EnableAnimals"]))
+                return Content(XMLMessage.Error("SRV-SC-MISEA", "The EnableAnimals field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["EnableAnimals"], out serverConfig.EnableAnimals))
+                return Content(XMLMessage.Error("SRV-SC-BADEA", "The EnableAnimals field is invalid").ToString());
+
+            // ==== Administrators ====
+            serverConfig.Administrators.Clear();
+            foreach (string adm in Request.Form["Administrators"].Split(';'))
+            {
+                if (!string.IsNullOrWhiteSpace(adm))
+                {
+                    ulong admParsed;
+                    if (!ulong.TryParse(adm, out admParsed))
+                        return
+                            Content(XMLMessage.Error("SRV-SC-BADADM", "The Administrators field is invalid").ToString());
+                    serverConfig.Administrators.Add(admParsed);
+                }
+            }
+
+            // ==== Banned ====
+            serverConfig.Banned.Clear();
+            foreach (string ban in Request.Form["Banned"].Split(';'))
+            {
+                if (!string.IsNullOrWhiteSpace(ban))
+                {
+                    ulong banParsed;
+                    if (!ulong.TryParse(ban, out banParsed))
+                        return Content(XMLMessage.Error("SRV-SC-BADBAN", "The Banned field is invalid").ToString());
+                    serverConfig.Banned.Add(banParsed);
+                }
+            }
+
+            // ** PROCESS **
+            server.Ip = serverConfig.IP;
+            server.Port = serverConfig.ServerPort;
+            server.AutoSaveInMinutes = Convert.ToInt32(serverConfig.AutoSaveInMinutes);
+
+            srvPrv.UpdateServer(server);
+
+            bool restartRequired = false;
+            if (srvPrv.GetState(server) != ServiceState.Stopped)
+            {
+                restartRequired = true;
+                ServiceHelper.StopServiceAndWait(server);
+            }
+
+            if (server.UseServerExtender)
+                serverConfig.AutoSaveInMinutes = 0;
+
+            serverConfig.Save(server);
+
+            if (restartRequired)
+            {
+                ServiceHelper.StartService(server);
+                return Content(XMLMessage.Success("SRV-SC-OK", "The server configuration has been updated, the server is restarting ...").ToString());
+            }
+
+            return Content(XMLMessage.Success("SRV-SC-OK", "The server configuration has been updated").ToString());
+        }
+
+        #endregion
+
         #region Power Cycle
 
         // POST: API/Server/StartServers

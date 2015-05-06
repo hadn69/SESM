@@ -12,7 +12,6 @@
 <script src="/assets/global/plugins/datatables/media/js/jquery.dataTables.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/bootstrap-contextmenu/bootstrap-contextmenu.js"></script>
-<script type="text/javascript" src="/Content/Js/TouchSpinMod.js"></script>
 <link href="/assets/global/plugins/dropzone/css/dropzone.css" rel="stylesheet">
 <script src="/assets/global/plugins/dropzone/dropzone.js"></script>
 <style>
@@ -81,38 +80,20 @@
                             <label class="control-label col-md-5">Scenario</label>
                             <div class="col-md-7 input-medium">
                                 <select class="form-control" id="inpSubTypeId">
-                                    <option value="LoneSurvivor">Lone Survivor</option>
-                                    <option value="EasyStart1">Easy Start 1</option>
-                                    <option value="EasyStart2">Easy Start 2</option>
-                                    <option value="CrashedRedShip">Crashed Red Ship</option>
-                                    <option value="TwoPlatforms">Two Platforms</option>
-                                    <option value="Asteroids">Asteroids Only</option>
-                                    <option value="EmptyWorld">Empty World</option>
+                                    <option value="Quickstart">Quickstart</option>
+                                    <option value="PreviewDestructionMap">Preview Destruction Map</option>
+                                    <option value="TestLab1_Neverland">TestLab1 Neverland</option>
+                                    <option value="TestLab2_Castle">TestLab2 Castle</option>
+                                    <option value="TestLab3_Integrity">TestLab3 Integrity</option>
+                                    <option value="LargeTerrain">Large Terrain</option>
+                                    <option value="NormalTerrain">Normal Terrain</option>
+                                    <option value="SmallTerrain">Small Terrain</option>
+                                    <option value="VerySmallTerrain">Very Small Terrain</option>
+                                    <option value="GenerateTerrain">Generate Terrain</option>
+                                    <option value="GenerateFromMaps">Generate From Maps</option>
+                                    <option value="TestTrees">Test Trees</option>
+                                    <option value="BattleBaseMap2">Battle Base Map 2</option>
                                 </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-5">Asteroid Amount</label>
-                            <div class="col-md-7">
-                                <div class="input-inline input-small">
-                                    <input type="text" id="inpAsteroidAmount" class="form-control" value="8">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-5">Procedural Density</label>
-                            <div class="col-md-7">
-                                <div class="input-inline input-small">
-                                    <input type="text" id="inpProceduralDensity" class="form-control" value="0.5">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-md-5">Procedural Seed</label>
-                            <div class="col-md-7">
-                                <div class="input-inline input-small">
-                                    <input type="text" id="inpProceduralSeed" class="form-control" value="250193">
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -247,33 +228,6 @@
         };
         $("#btnUpload").click(function () {
             $("#uploadModal").modal('show');
-        });
-
-        // Create
-
-        $('#inpAsteroidAmount').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 0,
-            max: 2000,
-            step: 1
-        });
-
-        $('#inpProceduralDensity').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 0,
-            max: 1,
-            decimals: 2,
-            step: 0.1
-        });
-
-        $('#inpProceduralSeed').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 0,
-            max: 2147483646,
-            step: 1
         });
 
         // Table
@@ -467,13 +421,10 @@
                 if (result) {
                     LockPage();
                     $("#createModal").modal('hide');
-                    $.post("/API/Map/SECreateMap",
+                    $.post("/API/Map/MECreateMap",
                     {
                         ServerID: serverID,
-                        SubTypeId: $("#inpSubTypeId").val(),
-                        AsteroidAmount: $("#inpAsteroidAmount").val(),
-                        ProceduralDensity: $("#inpProceduralDensity").val(),
-                        ProceduralSeed: $("#inpProceduralSeed").val()
+                        SubTypeId: $("#inpSubTypeId").val()
                     },
                     function (data) {
 

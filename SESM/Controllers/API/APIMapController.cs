@@ -324,7 +324,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Map/SECreateMap
         [HttpPost]
-        public ActionResult CreateMap()
+        public ActionResult SECreateMap()
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -335,42 +335,42 @@ namespace SESM.Controllers.API
             // ** PARSING / ACCESS **
             int serverId = -1;
             if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("MAP-CM-MISID", "The ServerID field must be provided").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-MISID", "The ServerID field must be provided").ToString());
 
             if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("MAP-CM-BADID", "The ServerID is invalid").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-BADID", "The ServerID is invalid").ToString());
 
             EntityServer server = srvPrv.GetServer(serverId);
 
             if (server == null)
-                return Content(XMLMessage.Error("MAP-CM-UKNSRV", "The server doesn't exist").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-UKNSRV", "The server doesn't exist").ToString());
 
             if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("MAP-CM-NOACCESS", "You don't have access to this server").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-NOACCESS", "You don't have access to this server").ToString());
 
             SESubTypeId SubTypeId;
             if (string.IsNullOrWhiteSpace(Request.Form["SubTypeId"]))
-                return Content(XMLMessage.Error("MAP-CM-MISSTI", "The SubTypeId field must be provided").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-MISSTI", "The SubTypeId field must be provided").ToString());
             if (!Enum.TryParse(Request.Form["SubTypeId"], out SubTypeId))
-                return Content(XMLMessage.Error("MAP-CM-MISSTI", "The SubTypeId is invalid").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-MISSTI", "The SubTypeId is invalid").ToString());
 
             int AsteroidAmount;
             if (string.IsNullOrWhiteSpace(Request.Form["AsteroidAmount"]))
-                return Content(XMLMessage.Error("MAP-CM-MISAA", "The AsteroidAmount field must be provided").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-MISAA", "The AsteroidAmount field must be provided").ToString());
             if (!int.TryParse(Request.Form["AsteroidAmount"], out AsteroidAmount) || AsteroidAmount < 0)
-                return Content(XMLMessage.Error("MAP-CM-MISAA", "The AsteroidAmount is invalid").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-MISAA", "The AsteroidAmount is invalid").ToString());
 
             float ProceduralDensity;
             if (string.IsNullOrWhiteSpace(Request.Form["ProceduralDensity"]))
-                return Content(XMLMessage.Error("MAP-CM-MISPD", "The ProceduralDensity field must be provided").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-MISPD", "The ProceduralDensity field must be provided").ToString());
             if (!float.TryParse(Request.Form["ProceduralDensity"], out ProceduralDensity) || ProceduralDensity < 0 || ProceduralDensity > 1)
-                return Content(XMLMessage.Error("MAP-CM-MISPD", "The ProceduralDensity is invalid").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-MISPD", "The ProceduralDensity is invalid").ToString());
 
             int ProceduralSeed;
             if (string.IsNullOrWhiteSpace(Request.Form["ProceduralSeed"]))
-                return Content(XMLMessage.Error("MAP-CM-MISPS", "The ProceduralSeed field must be provided").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-MISPS", "The ProceduralSeed field must be provided").ToString());
             if (!int.TryParse(Request.Form["ProceduralSeed"], out ProceduralSeed) || ProceduralDensity < 0)
-                return Content(XMLMessage.Error("MAP-CM-MISPS", "The ProceduralSeed is invalid").ToString());
+                return Content(XMLMessage.Error("MAP-SCM-MISPS", "The ProceduralSeed is invalid").ToString());
 
             // ** PROCESS **
             ServiceState serviceState = srvPrv.GetState(server);
@@ -395,7 +395,63 @@ namespace SESM.Controllers.API
 
             ServiceHelper.StartService(server);
 
-            return Content(XMLMessage.Success("MAP-CM-OK", "The map have been created, the server is (re)starting ...").ToString());
+            return Content(XMLMessage.Success("MAP-SCM-OK", "The map have been created, the server is (re)starting ...").ToString());
+        }
+
+        // POST: API/Map/MECreateMap
+        [HttpPost]
+        public ActionResult MECreateMap()
+        {
+            // ** INIT **
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityUser user = Session["User"] as EntityUser;
+            int userID = user == null ? 0 : user.Id;
+
+            // ** PARSING / ACCESS **
+            int serverId = -1;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
+                return Content(XMLMessage.Error("MAP-MCM-MISID", "The ServerID field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerID"], out serverId))
+                return Content(XMLMessage.Error("MAP-MCM-BADID", "The ServerID is invalid").ToString());
+
+            EntityServer server = srvPrv.GetServer(serverId);
+
+            if (server == null)
+                return Content(XMLMessage.Error("MAP-MCM-UKNSRV", "The server doesn't exist").ToString());
+
+            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
+                return Content(XMLMessage.Error("MAP-MCM-NOACCESS", "You don't have access to this server").ToString());
+
+            MESubTypeId SubTypeId;
+            if (string.IsNullOrWhiteSpace(Request.Form["SubTypeId"]))
+                return Content(XMLMessage.Error("MAP-MCM-MISSTI", "The SubTypeId field must be provided").ToString());
+            if (!Enum.TryParse(Request.Form["SubTypeId"], out SubTypeId))
+                return Content(XMLMessage.Error("MAP-MCM-MISSTI", "The SubTypeId is invalid").ToString());
+
+            // ** PROCESS **
+            ServiceState serviceState = srvPrv.GetState(server);
+
+            if (serviceState != ServiceState.Stopped && serviceState != ServiceState.Unknow)
+            {
+                ServiceHelper.StopServiceAndWait(server);
+                Thread.Sleep(5000);
+                ServiceHelper.KillService(server);
+            }
+
+            MEServerConfigHelper config = new MEServerConfigHelper();
+            config.Load(server);
+
+            config.ScenarioType = SubTypeId;
+
+            config.SaveName = string.Empty;
+
+            config.Save(server);
+
+            ServiceHelper.StartService(server);
+
+            return Content(XMLMessage.Success("MAP-MCM-OK", "The map have been created, the server is (re)starting ...").ToString());
         }
 
         // POST: API/Map/UploadMap        

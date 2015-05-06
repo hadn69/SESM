@@ -96,9 +96,14 @@ namespace SESM
                              "GetAccessSettings|" +
                              "SetAccessSettings|" +
 
-                             "GetConfiguration|" +
-                             "GetConfigurationRights|" +
-                             "SetConfiguration|" +
+                             "SEGetConfiguration|" +
+                             "SEGetConfigurationRights|" +
+                             "SESetConfiguration|" +
+
+                             "MEGetConfiguration|" +
+                             "MEGetConfigurationRights|" +
+                             "MESetConfiguration|" +
+
                              "StartServers|" +
                              "StopServers|" +
                              "RestartServers|" +
@@ -118,7 +123,8 @@ namespace SESM
                              "DeleteMaps|" +
                              "DownloadMaps|" +
                              "UploadMap|" +
-                             "CreateMap|"
+                             "SECreateMap|" +
+                             "MECreateMap"
                 }
             );
 
