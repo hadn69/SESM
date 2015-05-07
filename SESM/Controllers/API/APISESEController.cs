@@ -2,7 +2,6 @@
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools.API;
-using SESM.Tools.Helpers;
 
 namespace SESM.Controllers.API
 {

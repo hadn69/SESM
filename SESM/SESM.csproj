@@ -2798,6 +2798,7 @@
     <Compile Include="Tools\SESMConfigStorage.cs" />
     <Compile Include="Tools\Helpers\SteamCMDHelper.cs" />
     <Compile Include="Tools\SESMRunningVarsStorage.cs" />
+    <Compile Include="Tools\VersionCache.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config">
