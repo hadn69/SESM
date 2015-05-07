@@ -23,7 +23,7 @@
         CATACLYSM_UNREAL
     }
 
-    public enum SubTypeId
+    public enum SESubTypeId
     {
         LoneSurvivor,
         EasyStart1,
@@ -34,4 +34,20 @@
         EmptyWorld
     }
 
+    public enum MESubTypeId
+    {
+        Quickstart,
+        PreviewDestructionMap,
+        TestLab1_Neverland,
+        TestLab2_Castle,
+        TestLab3_Integrity,
+        LargeTerrain,
+        NormalTerrain,
+        SmallTerrain,
+        VerySmallTerrain,
+        GenerateTerrain,
+        GenerateFromMaps,
+        TestTrees,
+        BattleBaseMap2
+    }
 }

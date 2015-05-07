@@ -1,6 +1,7 @@
 ﻿using System.Web.Mvc;
 using SESM.Controllers.ActionFilters;
 using SESM.DAL;
+using SESM.DTO;
 
 namespace SESM.Controllers
 {
@@ -31,7 +32,14 @@ namespace SESM.Controllers
         [ManagerAndAbove]
         public ActionResult Maps(int id)
         {
-            return View();
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityServer serv = srvPrv.GetServer(id);
+
+            if(serv.ServerType == EnumServerType.SpaceEngineers)
+                return View("SEMaps");
+            else
+                return View("MEMaps");
         }
 
         // GET: 1/Configuration
@@ -40,7 +48,14 @@ namespace SESM.Controllers
         [ManagerAndAbove]
         public ActionResult Configuration(int id)
         {
-            return View();
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            EntityServer serv = srvPrv.GetServer(id);
+
+            if (serv.ServerType == EnumServerType.SpaceEngineers)
+                return View("SEConfiguration");
+            else
+                return View("MEConfiguration");
         }
 
         // GET: 1/Explorer

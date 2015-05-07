@@ -86,7 +86,7 @@ namespace SESM.Tools
                                 backupList = Directory.GetFiles(PathHelper.GetBackupsPath(item), "AutoBackupLvl" + backupLvl + "_*.zip");
                                 Array.Sort(backupList);
                             }
-                            ServerConfigHelper config = new ServerConfigHelper();
+                            ServerConfigHelperBase config = new SEServerConfigHelper();
                             config.LoadFromServConf(PathHelper.GetConfigurationFilePath(item));
                             if (!string.IsNullOrEmpty(config.SaveName))
                             {

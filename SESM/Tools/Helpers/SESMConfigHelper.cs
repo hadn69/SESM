@@ -165,6 +165,48 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public static string MESavePath
+        {
+            get
+            {
+                ConfigStorage.Read();
+
+                if (!ConfigStorage.MESavePath.EndsWith(@"\"))
+                {
+                    ConfigStorage.MESavePath += @"\";
+                    ConfigStorage.Write();
+                }
+
+                return ConfigStorage.MESavePath;
+            }
+            set
+            {
+                ConfigStorage.MESavePath = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string MEDataPath
+        {
+            get
+            {
+                ConfigStorage.Read();
+
+                if (!ConfigStorage.MEDataPath.EndsWith(@"\"))
+                {
+                    ConfigStorage.MEDataPath += @"\";
+                    ConfigStorage.Write();
+                }
+
+                return ConfigStorage.MEDataPath;
+            }
+            set
+            {
+                ConfigStorage.MEDataPath = value;
+                ConfigStorage.Write();
+            }
+        }
+
         public static ArchType Arch
         {
             get
@@ -236,6 +278,20 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public static bool MEUpdating
+        {
+            get
+            {
+                RunningVars.Read();
+                return RunningVars.MEUpdating;
+            }
+            set
+            {
+                RunningVars.MEUpdating = value;
+                RunningVars.Write();
+            }
+        }
+
         public static bool SESEUpdating
         {
             get
@@ -250,46 +306,90 @@ namespace SESM.Tools.Helpers
             }
         }
 
-        // Auto-Update Settings
+        // SE Auto-Update Settings
 
-        public static bool AutoUpdateEnabled
+        public static bool SEAutoUpdateEnabled
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.AutoUpdateEnabled;
+                return ConfigStorage.SEAutoUpdateEnabled;
             }
             set
             {
-                ConfigStorage.AutoUpdateEnabled = value;
+                ConfigStorage.SEAutoUpdateEnabled = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static string AutoUpdateCron
+        public static string SEAutoUpdateCron
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.AutoUpdateCron;
+                return ConfigStorage.SEAutoUpdateCron;
             }
             set
             {
-                ConfigStorage.AutoUpdateCron = value;
+                ConfigStorage.SEAutoUpdateCron = value;
                 ConfigStorage.Write();
             }
         }
 
-        public static string AutoUpdateBetaPassword
+        public static string SEAutoUpdateBetaPassword
         {
             get
             {
                 ConfigStorage.Read();
-                return ConfigStorage.AutoUpdateBetaPassword;
+                return ConfigStorage.SEAutoUpdateBetaPassword;
             }
             set
             {
-                ConfigStorage.AutoUpdateBetaPassword = value;
+                ConfigStorage.SEAutoUpdateBetaPassword = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        // ME Auto-Update Settings
+
+        public static bool MEAutoUpdateEnabled
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.MEAutoUpdateEnabled;
+            }
+            set
+            {
+                ConfigStorage.MEAutoUpdateEnabled = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string MEAutoUpdateCron
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.MEAutoUpdateCron;
+            }
+            set
+            {
+                ConfigStorage.MEAutoUpdateCron = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string MEAutoUpdateBetaPassword
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.MEAutoUpdateBetaPassword;
+            }
+            set
+            {
+                ConfigStorage.MEAutoUpdateBetaPassword = value;
                 ConfigStorage.Write();
             }
         }

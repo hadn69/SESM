@@ -50,11 +50,6 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#tab_Production" data-toggle="tab">
-                            Production
-                        </a>
-                    </li>
-                    <li>
                         <a href="#tab_Construction" data-toggle="tab">
                             Construction
                         </a>
@@ -163,11 +158,9 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Max Floating Objects</label>
+                                            <label class="control-label col-md-6">Client Can Save Localy</label>
                                             <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpMaxFloatingObjects" type="text" class="form-control">
-                                                </div>
+                                                <input type="checkbox" id="inpClientCanSave">
                                             </div>
                                         </div>
                                     </div>
@@ -193,48 +186,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">World Size Km</label>
-                                            <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpWorldSizeKm" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">View Distance</label>
-                                            <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpViewDistance" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Client Can Save Locally</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpClientCanSave">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Remove Trash</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpRemoveTrash">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </form>
                     </div>
@@ -247,19 +198,19 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Spawn Ship Time Multiplier</label>
+                                            <label class="control-label col-md-6">Max Active Fracture Pieces</label>
                                             <div class="col-md-6">
                                                 <div class="input-inline input-small">
-                                                    <input id="inpSpawnShipTimeMultiplier" type="text" class="form-control">
+                                                    <input id="inpMaxActiveFracturePieces" type="text" class="form-control">
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Auto Delete Respawn Ship</label>
+                                            <label class="control-label col-md-6">Structural Simulation</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpRespawnShipDelete">
+                                                <input type="checkbox" id="inpEnableStructuralSimulation">
                                             </div>
                                         </div>
                                     </div>
@@ -268,41 +219,19 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Thruster Damage</label>
+                                            <label class="control-label col-md-6">Max Bots</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpThrusterDamage">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpMaximumBots" type="text" class="form-control">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Enable Ingame Scripts</label>
+                                            <label class="control-label col-md-6">Barbarians</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpEnableIngameScripts">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Environment Hostility</label>
-                                            <div class="col-md-6">
-                                                <select id="inpEnvironmentHostility" class="bs-select form-control">
-                                                    <option value="SAFE">Safe</option>
-                                                    <option value="NORMAL">Normal</option>
-                                                    <option value="CATACLYSM">Cataclysm</option>
-                                                    <option value="CATACLYSM_UNREAL">Cataclysm Unreal</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Spawn Cargo Ships</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpCargoShipsEnabled">
+                                                <input type="checkbox" id="inpEnableBarbarians">
                                             </div>
                                         </div>
                                     </div>
@@ -311,39 +240,39 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Ice Generation</label>
+                                            <label class="control-label col-md-6">Game Day In Real Minutes</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpVoxelGeneratorVersion">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpGameDayInRealMinutes" type="text" class="form-control">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Oxygen</label>
+                                            <label class="control-label col-md-6">Day Night Ratio</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpEnableOxygen">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpDayNightRatio" type="text" class="form-control">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Enable Tool Shake</label>
+                                            <label class="control-label col-md-6">Animals</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpEnableToolShake">
+                                                <div class="input-inline input-small">
+                                                    <input type="checkbox" id="inpEnableAnimals">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Encounters</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpEnableEncounters">
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -358,70 +287,14 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Auto Healing</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpAutoHealing">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Weapons Enabled</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpWeaponsEnabled">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Inventory Size Multiplier</label>
-                                            <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpInventorySizeMultiplier" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
                                             <label class="control-label col-md-6">Enable Spectator</label>
                                             <div class="col-md-6">
                                                 <input type="checkbox" id="inpEnableSpectator">
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="row">
                                     <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Permanent Death</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpPermanentDeath">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Show Player Names On Hud</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpShowPlayerNamesOnHud">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Force 3rd Person View</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpEnable3rdPersonView">
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -474,63 +347,14 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Reset Ownership</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpResetOwnership">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
                                             <label class="control-label col-md-6">Steam Group ID</label>
                                             <div class="col-md-6">
                                                 <input class="form-control" id="inpGroupID" type="text">
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="tab-pane" id="tab_Production">
-                        <form action="#" class="form-horizontal form">
-                            <div class="form-body">
-                                <h3 class="form-section">Production Settings</h3>
-
-                                <div class="row">
                                     <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Assembler Speed Multiplier</label>
-                                            <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpAssemblerSpeedMultiplier" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Assembler Efficiency Multiplier</label>
-                                            <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpAssemblerEfficiencyMultiplier" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Refinery Speed Multiplier</label>
-                                            <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpRefinerySpeedMultiplier" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -553,53 +377,9 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Welder Speed Multiplier</label>
-                                            <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpWelderSpeedMultiplier" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Grinder Speed Multiplier</label>
-                                            <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpGrinderSpeedMultiplier" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Hack Speed Multiplier</label>
-                                            <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpHackSpeedMultiplier" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
                                             <label class="control-label col-md-6">Enable Copy Paste</label>
                                             <div class="col-md-6">
                                                 <input type="checkbox" id="inpEnableCopyPaste">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Destructible Blocks</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpDestructibleBlocks">
                                             </div>
                                         </div>
                                     </div>
@@ -623,12 +403,6 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">Realistic Sound</label>
-                                            <div class="col-md-6">
-                                                <input type="checkbox" id="inpRealisticSound">
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -684,13 +458,6 @@
             max: 1000000,
             step: 1
         });
-        $('#inpMaxFloatingObjects').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 1,
-            max: 1000000,
-            step: 1
-        });
         $('#inpAutoSaveInMinutes').TouchSpin({
             buttondown_class: 'btn blue',
             buttonup_class: 'btn green',
@@ -698,92 +465,31 @@
             max: 1000000,
             step: 1
         });
-        $('#inpWorldSizeKm').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 0,
-            max: 10000000,
-            step: 1
-        });
-        $('#inpViewDistance').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 1,
-            max: 10000000,
-            step: 1000
-        });
 
         // Gameplay
-        $('#inpSpawnShipTimeMultiplier').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 1,
-            max: 1000000,
-            decimals: 2,
-            step: 1
-        });
-
-        // Players
-        $('#inpInventorySizeMultiplier').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 1,
-            max: 1000000,
-            decimals: 2,
-            step: 1
-        });
-
-        // Production
-        $('#inpAssemblerSpeedMultiplier').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 1,
-            max: 1000000,
-            decimals: 2,
-            step: 1
-        });
-        $('#inpAssemblerEfficiencyMultiplier').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 1,
-            max: 1000000,
-            decimals: 2,
-            step: 1
-        });
-        $('#inpRefinerySpeedMultiplier').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 1,
-            max: 1000000,
-            decimals: 2,
-            step: 1
-        });
-
-        // Construction
-        $('#inpWelderSpeedMultiplier').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 1,
-            max: 1000000,
-            decimals: 2,
-            step: 1
-        });
-        $('#inpGrinderSpeedMultiplier').TouchSpin({
-            buttondown_class: 'btn blue',
-            buttonup_class: 'btn green',
-            min: 1,
-            max: 1000000,
-            decimals: 2,
-            step: 1
-        });
-        $('#inpHackSpeedMultiplier').TouchSpin({
+        $('#inpMaxActiveFracturePieces').TouchSpin({
             buttondown_class: 'btn blue',
             buttonup_class: 'btn green',
             min: 0,
             max: 1000000,
-            decimals: 2,
+            step: 1
+        });
+        $('#inpMaximumBots').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 0,
+            max: 1000000,
+            step: 1
+        });
+        $('#inpDayNightRatio').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 0,
+            max: 100000,
             step: 0.01
         });
+
+
 
         var dataLoaded = false;
         var maskLoaded = false;
@@ -800,7 +506,7 @@
 
             dataLoaded = false;
             maskLoaded = false;
-            $.post("/API/Server/GetConfiguration",
+            $.post("/API/Server/MEGetConfiguration",
             {
                 ServerID: serverID
             },
@@ -826,39 +532,22 @@
 
                 // Server
                 $('#inpMaxPlayers').val(content.children("MaxPlayers").text());
-                $('#inpMaxFloatingObjects').val(content.children("MaxFloatingObjects").text());
                 $('#inpAutoSaveInMinutes').val(content.children("AutoSaveInMinutes").text());
-                $("#inpPauseGameWhenEmpty").bootstrapSwitch('state', content.children("PauseGameWhenEmpty").text() == "true");
-                $('#inpWorldSizeKm').val(content.children("WorldSizeKm").text());
-                $('#inpViewDistance').val(content.children("ViewDistance").text());
                 $("#inpClientCanSave").bootstrapSwitch('state', content.children("ClientCanSave").text() == "true");
-                $("#inpRemoveTrash").bootstrapSwitch('state', content.children("RemoveTrash").text() == "true");
+                $("#inpPauseGameWhenEmpty").bootstrapSwitch('state', content.children("PauseGameWhenEmpty").text() == "true");
 
                 // Gameplay
-                $('#inpSpawnShipTimeMultiplier').val(content.children("SpawnShipTimeMultiplier").text());
-                $('#inpRespawnShipDelete').bootstrapSwitch('state', content.children("RespawnShipDelete").text() == "true");
-                $('#inpThrusterDamage').bootstrapSwitch('state', content.children("ThrusterDamage").text() == "true");
-                $('#inpEnableIngameScripts').bootstrapSwitch('state', content.children("EnableIngameScripts").text() == "true");
-                $('#inpEnvironmentHostility').val(content.children("EnvironmentHostility").text());
-                $('#inpCargoShipsEnabled').bootstrapSwitch('state', content.children("CargoShipsEnabled").text() == "true");
-                $('#inpEnableToolShake').bootstrapSwitch('state', content.children("EnableToolShake").text() == "true");
-                if (content.children("VoxelGeneratorVersion").text() == "0") {
-                    $("#inpVoxelGeneratorVersion").bootstrapSwitch('state', false);
-                } else if (content.children("VoxelGeneratorVersion").text() == "1") {
-                    $("#inpVoxelGeneratorVersion").bootstrapSwitch('state', true);
-                }
-                $('#inpEnableOxygen').bootstrapSwitch('state', content.children("EnableOxygen").text() == "true");
-                $('#inpEnableEncounters').bootstrapSwitch('state', content.children("EnableEncounters").text() == "true");
-
+                $("#inpEnableStructuralSimulation").bootstrapSwitch('state', content.children("EnableStructuralSimulation").text() == "true");
+                $('#inpMaxActiveFracturePieces').val(content.children("MaxActiveFracturePieces").text());
+                $("#inpEnableBarbarians").bootstrapSwitch('state', content.children("EnableBarbarians").text() == "true");
+                $('#inpMaximumBots').val(content.children("MaximumBots").text());
+                $('#inpGameDayInRealMinutes').val(content.children("GameDayInRealMinutes").text());
+                $('#inpDayNightRatio').val(content.children("DayNightRatio").text());
+                $("#inpEnableAnimals").bootstrapSwitch('state', content.children("EnableAnimals").text() == "true");
+                
                 // Players
-                $('#inpAutoHealing').bootstrapSwitch('state', content.children("AutoHealing").text() == "true");
-                $('#inpWeaponsEnabled').bootstrapSwitch('state', content.children("WeaponsEnabled").text() == "true");
-                $('#inpInventorySizeMultiplier').val(content.children("InventorySizeMultiplier").text());
                 $('#inpEnableSpectator').bootstrapSwitch('state', content.children("EnableSpectator").text() == "true");
-                $('#inpPermanentDeath').bootstrapSwitch('state', content.children("PermanentDeath").text() == "true");
-                $('#inpShowPlayerNamesOnHud').bootstrapSwitch('state', content.children("ShowPlayerNamesOnHud").text() == "true");
-                $('#inpEnable3rdPersonView').bootstrapSwitch('state', content.children("Enable3rdPersonView").text() == "true");
-
+                
                 // Mods
                 var mods = [];
                 content.children("Mods").children().each(function (index) {
@@ -880,13 +569,10 @@
                     banned.push(item.text());
                 });
                 $('#inpBanned').val(banned.join("\r\n"));
-                $('#inpResetOwnership').bootstrapSwitch('state', content.children("ResetOwnership").text() == "true");
                 $('#inpGroupID').val(content.children("GroupID").text());
 
                 // Production
-                $('#inpAssemblerSpeedMultiplier').val(content.children("AssemblerSpeedMultiplier").text());
-                $('#inpAssemblerEfficiencyMultiplier').val(content.children("AssemblerEfficiencyMultiplier").text());
-                $('#inpRefinerySpeedMultiplier').val(content.children("RefinerySpeedMultiplier").text());
+                
 
                 // Construction
                 if (content.children("GameMode").text() == "Survival") {
@@ -894,20 +580,15 @@
                 } else if (content.children("GameMode").text() == "Creative") {
                     $("#inpGamemode").bootstrapSwitch('state', true);
                 }
-                $('#inpWelderSpeedMultiplier').val(content.children("WelderSpeedMultiplier").text());
-                $('#inpGrinderSpeedMultiplier').val(content.children("GrinderSpeedMultiplier").text());
-                $('#inpHackSpeedMultiplier').val(content.children("HackSpeedMultiplier").text());
                 $("#inpEnableCopyPaste").bootstrapSwitch('state', content.children("EnableCopyPaste").text() == "true");
-                $("#inpDestructibleBlocks").bootstrapSwitch('state', content.children("DestructibleBlocks").text() == "true");
 
                 // Misc
                 $("#inpIgnoreLastSession").bootstrapSwitch('state', content.children("IgnoreLastSession").text() == "true");
-                $("#inpRealisticSound").bootstrapSwitch('state', content.children("RealisticSound").text() == "true");
 
                 ShowContent();
             });
 
-            $.post("/API/Server/GetConfigurationRights",
+            $.post("/API/Server/MEGetConfigurationRights",
             {
                 ServerID: serverID
             },
@@ -934,61 +615,39 @@
 
                 // Server
                 $('#inpMaxPlayers').prop("readonly", content.children("MaxPlayers").text() != "true");
-                $('#inpMaxFloatingObjects').prop("readonly", content.children("MaxFloatingObjects").text() != "true");
                 $('#inpAutoSaveInMinutes').prop("readonly", content.children("AutoSaveInMinutes").text() != "true");
                 $("#inpPauseGameWhenEmpty").bootstrapSwitch("readonly", content.children("PauseGameWhenEmpty").text() != "true");
-                $('#inpWorldSizeKm').prop("readonly", content.children("WorldSizeKm").text() != "true");
-                $('#inpViewDistance').prop("readonly", content.children("ViewDistance").text() != "true");
                 $("#inpClientCanSave").bootstrapSwitch("readonly", content.children("ClientCanSave").text() != "true");
-                $("#inpRemoveTrash").bootstrapSwitch("readonly", content.children("RemoveTrash").text() != "true");
 
                 // Gameplay
-                $('#inpSpawnShipTimeMultiplier').prop("readonly", content.children("SpawnShipTimeMultiplier").text() != "true");
-                $('#inpRespawnShipDelete').bootstrapSwitch("readonly", content.children("RespawnShipDelete").text() != "true");
-                $('#inpThrusterDamage').bootstrapSwitch("readonly", content.children("ThrusterDamage").text() != "true");
-                $('#inpEnableIngameScripts').bootstrapSwitch("readonly", content.children("EnableIngameScripts").text() != "true");
-                $('#inpEnvironmentHostility').prop("disabled", content.children("EnvironmentHostility").text() != "true");
-                $('#inpCargoShipsEnabled').bootstrapSwitch("readonly", content.children("CargoShipsEnabled").text() != "true");
-                $('#inpEnableToolShake').bootstrapSwitch("readonly", content.children("EnableToolShake").text() != "true");
-                $('#inpVoxelGeneratorVersion').bootstrapSwitch("readonly", content.children("VoxelGeneratorVersion").text() != "true");
-                $('#inpEnableOxygen').bootstrapSwitch("readonly", content.children("EnableOxygen").text() != "true");
-                $('#inpEnableEncounters').bootstrapSwitch("readonly", content.children("EnableEncounters").text() != "true");
+                $("#inpEnableStructuralSimulation").bootstrapSwitch("readonly", content.children("EnableStructuralSimulation").text() != "true");
+                $('#inpMaxActiveFracturePieces').prop("readonly", content.children("MaxActiveFracturePieces").text() != "true");
+                $("#inpEnableBarbarians").bootstrapSwitch("readonly", content.children("EnableBarbarians").text() != "true");
+                $('#inpMaximumBots').prop("readonly", content.children("MaximumBots").text() != "true");
+                $('#inpGameDayInRealMinutes').prop("readonly", content.children("GameDayInRealMinutes").text() != "true");
+                $('#inpDayNightRatio').prop("readonly", content.children("DayNightRatio").text() != "true");
+                $("#inpEnableAnimals").bootstrapSwitch("readonly", content.children("EnableAnimals").text() != "true");
 
                 // Players
-                $('#inpAutoHealing').bootstrapSwitch("readonly", content.children("AutoHealing").text() != "true");
-                $('#inpWeaponsEnabled').bootstrapSwitch("readonly", content.children("WeaponsEnabled").text() != "true");
-                $('#inpInventorySizeMultiplier').prop("readonly", content.children("InventorySizeMultiplier").text() != "true");
                 $('#inpEnableSpectator').bootstrapSwitch("readonly", content.children("EnableSpectator").text() != "true");
-                $('#inpPermanentDeath').bootstrapSwitch("readonly", content.children("PermanentDeath").text() != "true");
-                $('#inpShowPlayerNamesOnHud').bootstrapSwitch("readonly", content.children("ShowPlayerNamesOnHud").text() != "true");
-                $('#inpEnable3rdPersonView').bootstrapSwitch("readonly", content.children("Enable3rdPersonView").text() != "true");
-
+                
                 // Mods
                 $('#inpMods').prop("readonly", content.children("Mods").text() != "true");
 
                 // Access
                 $('#inpAdministrators').prop("readonly", content.children("Administrators").text() != "true");
                 $('#inpBanned').prop("readonly", content.children("Banned").text() != "true");
-                $('#inpResetOwnership').bootstrapSwitch("readonly", content.children("ResetOwnership").text() != "true");
                 $('#inpGroupID').prop("readonly", content.children("GroupID").text() != "true");
 
                 // Production
-                $('#inpAssemblerSpeedMultiplier').prop("readonly", content.children("AssemblerSpeedMultiplier").text() != "true");
-                $('#inpAssemblerEfficiencyMultiplier').prop("readonly", content.children("AssemblerEfficiencyMultiplier").text() != "true");
-                $('#inpRefinerySpeedMultiplier').prop("readonly", content.children("RefinerySpeedMultiplier").text() != "true");
 
                 // Construction
                 $("#inpGameMode").bootstrapSwitch("readonly", content.children("GameMode").text() != "true");
-                $('#inpWelderSpeedMultiplier').prop("readonly", content.children("WelderSpeedMultiplier").text() != "true");
-                $('#inpGrinderSpeedMultiplier').prop("readonly", content.children("GrinderSpeedMultiplier").text() != "true");
-                $('#inpHackSpeedMultiplier').prop("readonly", content.children("HackSpeedMultiplier").text() != "true");
                 $("#inpEnableCopyPaste").bootstrapSwitch("readonly", content.children("EnableCopyPaste").text() != "true");
-                $("#inpDestructibleBlocks").bootstrapSwitch("readonly", content.children("DestructibleBlocks").text() != "true");
-
+                
                 // Misc
                 $("#inpIgnoreLastSession").bootstrapSwitch("readonly", content.children("IgnoreLastSession").text() != "true");
-                $("#inpRealisticSound").bootstrapSwitch("readonly", content.children("RealisticSound").text() != "true");
-
+                
                 ShowContent();
             });
         }
@@ -1022,63 +681,33 @@
                     // Server
                     if (maskData.children("MaxPlayers").text() == "true")
                         config.MaxPlayers = $('#inpMaxPlayers').val();
-                    if (maskData.children("MaxFloatingObjects").text() == "true")
-                        config.MaxFloatingObjects = $('#inpMaxFloatingObjects').val();
                     if (maskData.children("AutoSaveInMinutes").text() == "true")
                         config.AutoSaveInMinutes = $('#inpAutoSaveInMinutes').val();
                     if (maskData.children("PauseGameWhenEmpty").text() == "true")
                         config.PauseGameWhenEmpty = $('#inpPauseGameWhenEmpty').is(":checked");
-                    if (maskData.children("WorldSizeKm").text() == "true")
-                        config.WorldSizeKm = $('#inpWorldSizeKm').val();
-                    if (maskData.children("ViewDistance").text() == "true")
-                        config.ViewDistance = $('#inpViewDistance').val();
                     if (maskData.children("ClientCanSave").text() == "true")
                         config.ClientCanSave = $('#inpClientCanSave').is(":checked");
-                    if (maskData.children("RemoveTrash").text() == "true")
-                        config.RemoveTrash = $('#inpRemoveTrash').is(":checked");
-
+                    
                     // Gameplay
-                    if (maskData.children("SpawnShipTimeMultiplier").text() == "true")
-                        config.SpawnShipTimeMultiplier = $('#inpSpawnShipTimeMultiplier').val();
-                    if (maskData.children("RespawnShipDelete").text() == "true")
-                        config.RespawnShipDelete = $('#inpRespawnShipDelete').is(":checked");
-                    if (maskData.children("ThrusterDamage").text() == "true")
-                        config.ThrusterDamage = $('#inpThrusterDamage').is(":checked");
-                    if (maskData.children("EnableIngameScripts").text() == "true")
-                        config.EnableIngameScripts = $('#inpEnableIngameScripts').is(":checked");
-                    if (maskData.children("EnvironmentHostility").text() == "true")
-                        config.EnvironmentHostility = $('#inpEnvironmentHostility').val();
-                    if (maskData.children("CargoShipsEnabled").text() == "true")
-                        config.CargoShipsEnabled = $('#inpCargoShipsEnabled').is(":checked");
-                    if (maskData.children("EnableToolShake").text() == "true")
-                        config.EnableToolShake = $('#inpEnableToolShake').is(":checked");
-                    if (maskData.children("VoxelGeneratorVersion").text() == "true") {
-                        if ($('#inpVoxelGeneratorVersion').is(":checked"))
-                            config.VoxelGeneratorVersion = "1";
-                        else
-                            config.VoxelGeneratorVersion = "0";
-                    }
-                    if (maskData.children("EnableOxygen").text() == "true")
-                        config.EnableOxygen = $('#inpEnableOxygen').is(":checked");
-                    if (maskData.children("EnableEncounters").text() == "true")
-                        config.EnableEncounters = $('#inpEnableEncounters').is(":checked");
+                    if (maskData.children("EnableStructuralSimulation").text() == "true")
+                        config.EnableStructuralSimulation = $('#inpEnableStructuralSimulation').is(":checked");
+                    if (maskData.children("MaxActiveFracturePieces").text() == "true")
+                        config.MaxActiveFracturePieces = $('#inpMaxActiveFracturePieces').val();
+                    if (maskData.children("EnableBarbarians").text() == "true")
+                        config.EnableBarbarians = $('#inpEnableBarbarians').is(":checked");
+                    if (maskData.children("MaximumBots").text() == "true")
+                        config.MaximumBots = $('#inpMaximumBots').val();
+                    if (maskData.children("GameDayInRealMinutes").text() == "true")
+                        config.GameDayInRealMinutes = $('#inpGameDayInRealMinutes').val();
+                    if (maskData.children("DayNightRatio").text() == "true")
+                        config.DayNightRatio = $('#inpDayNightRatio').val();
+                    if (maskData.children("EnableAnimals").text() == "true")
+                        config.EnableAnimals = $('#inpEnableAnimals').is(":checked");
 
                     // Players
-                    if (maskData.children("AutoHealing").text() == "true")
-                        config.AutoHealing = $('#inpAutoHealing').is(":checked");
-                    if (maskData.children("WeaponsEnabled").text() == "true")
-                        config.WeaponsEnabled = $('#inpWeaponsEnabled').is(":checked");
-                    if (maskData.children("InventorySizeMultiplier").text() == "true")
-                        config.InventorySizeMultiplier = $('#inpInventorySizeMultiplier').val();
                     if (maskData.children("EnableSpectator").text() == "true")
                         config.EnableSpectator = $('#inpEnableSpectator').is(":checked");
-                    if (maskData.children("PermanentDeath").text() == "true")
-                        config.PermanentDeath = $('#inpPermanentDeath').is(":checked");
-                    if (maskData.children("ShowPlayerNamesOnHud").text() == "true")
-                        config.ShowPlayerNamesOnHud = $('#inpShowPlayerNamesOnHud').is(":checked");
-                    if (maskData.children("Enable3rdPersonView").text() == "true")
-                        config.Enable3rdPersonView = $('#inpEnable3rdPersonView').is(":checked");
-
+                    
                     // Mods
                     if (maskData.children("Mods").text() == "true") {
                         var mods = [];
@@ -1106,19 +735,11 @@
                         });
                         config.Banned = banned.join(";");
                     }
-                    if (maskData.children("ResetOwnership").text() == "true")
-                        config.ResetOwnership = $('#inpResetOwnership').is(":checked");
                     if (maskData.children("GroupID").text() == "true")
                         config.GroupID = $('#inpGroupID').val();
 
                     // Production
-                    if (maskData.children("AssemblerSpeedMultiplier").text() == "true")
-                        config.AssemblerSpeedMultiplier = $('#inpAssemblerSpeedMultiplier').val();
-                    if (maskData.children("AssemblerEfficiencyMultiplier").text() == "true")
-                        config.AssemblerEfficiencyMultiplier = $('#inpAssemblerEfficiencyMultiplier').val();
-                    if (maskData.children("RefinerySpeedMultiplier").text() == "true")
-                        config.RefinerySpeedMultiplier = $('#inpRefinerySpeedMultiplier').val();
-
+                    
                     // Construction
                     if (maskData.children("GameMode").text() == "true") {
                         if ($('#inpGameMode').is(":checked"))
@@ -1126,26 +747,17 @@
                         else
                             config.GameMode = "Survival";
                     }
-                    if (maskData.children("WelderSpeedMultiplier").text() == "true")
-                        config.WelderSpeedMultiplier = $('#inpWelderSpeedMultiplier').val();
-                    if (maskData.children("GrinderSpeedMultiplier").text() == "true")
-                        config.GrinderSpeedMultiplier = $('#inpGrinderSpeedMultiplier').val();
-                    if (maskData.children("HackSpeedMultiplier").text() == "true")
-                        config.HackSpeedMultiplier = $('#inpHackSpeedMultiplier').val();
+
                     if (maskData.children("EnableCopyPaste").text() == "true")
                         config.EnableCopyPaste = $('#inpEnableCopyPaste').is(":checked");
-                    if (maskData.children("DestructibleBlocks").text() == "true")
-                        config.DestructibleBlocks = $('#inpDestructibleBlocks').is(":checked");
 
                     // Misc
                     if (maskData.children("IgnoreLastSession").text() == "true")
                         config.IgnoreLastSession = $('#inpIgnoreLastSession').is(":checked");
-                    if (maskData.children("RealisticSound").text() == "true")
-                        config.RealisticSound = $('#inpRealisticSound').is(":checked");
 
                     config.ServerID = serverID;
 
-                    $.post("/API/Server/SetConfiguration",
+                    $.post("/API/Server/MESetConfiguration",
                     config,
                     function (data) {
                         var root = $($.parseXML(data)).find("Response");

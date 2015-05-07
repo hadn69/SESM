@@ -28,6 +28,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -46,12 +47,12 @@
       <HintPath>..\packages\Common.Logging.Core.2.2.0\lib\net40\Common.Logging.Core.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework.SqlServerCompact, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -2655,13 +2656,16 @@
     <Content Include="Views\Settings\SESE.cshtml" />
     <Content Include="Views\Error\404.cshtml" />
     <Content Include="Views\Server\Explorer.cshtml" />
-    <Content Include="Views\Server\Configuration.cshtml" />
-    <Content Include="Views\Server\Maps.cshtml" />
+    <Content Include="Views\Server\SEConfiguration.cshtml" />
+    <Content Include="Views\Server\SEMaps.cshtml" />
     <Content Include="Views\Settings\SE.cshtml" />
     <Content Include="Views\Server\Dashboard.cshtml" />
-    <Content Include="Views\Server\Settings.cshtml" />
     <Content Include="Views\Server\Monitor.cshtml" />
     <Content Include="Views\PerfMon\Index.cshtml" />
+    <Content Include="Views\Settings\ME.cshtml" />
+    <Content Include="Views\Server\Settings.cshtml" />
+    <Content Include="Views\Server\MEMaps.cshtml" />
+    <Content Include="Views\Server\MEConfiguration.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -2718,6 +2722,7 @@
     <Compile Include="DTO\EnumInstancePerm.cs" />
     <Compile Include="DTO\EnumPermAccess.cs" />
     <Compile Include="DTO\EnumProcessPriority.cs" />
+    <Compile Include="DTO\EnumServerType.cs" />
     <Compile Include="DTO\EnumServerWidePerm.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -2754,17 +2759,25 @@
     <Compile Include="Migrations\201412041630025_processPriority.Designer.cs">
       <DependentUpon>201412041630025_processPriority.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201505042002309_ServerType.cs" />
+    <Compile Include="Migrations\201505042002309_ServerType.Designer.cs">
+      <DependentUpon>201505042002309_ServerType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ArchType.cs" />
     <Compile Include="Models\ServerEnums.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\API\XMLMessage.cs" />
+    <Compile Include="Tools\Helpers\ServerConfigHelperBase.cs" />
+    <Compile Include="Tools\Helpers\MEServerConfigHelper.cs" />
     <Compile Include="Tools\Helpers\SESEServiceHelper.cs" />
     <Compile Include="Tools\Jobs\AutoRestartJob.cs" />
     <Compile Include="Tools\Jobs\AutoStartJob.cs" />
     <Compile Include="Tools\Jobs\AutoBackupJob.cs" />
     <Compile Include="Tools\Constants.cs" />
-    <Compile Include="Tools\Default.cs" />
+    <Compile Include="Tools\Jobs\MEAutoUpdateJob.cs" />
+    <Compile Include="Tools\MEDefault.cs" />
+    <Compile Include="Tools\SEDefault.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
     <Compile Include="Tools\GraphHelper.cs" />
     <Compile Include="Tools\Helpers\FSHelper.cs" />
@@ -2777,7 +2790,7 @@
     <Compile Include="Tools\Jobs\SESEAutoUpdateJob.cs" />
     <Compile Include="Tools\Monitor\Collector.cs" />
     <Compile Include="Tools\Helpers\ServiceHelper.cs" />
-    <Compile Include="Tools\Helpers\ServerConfigHelper.cs" />
+    <Compile Include="Tools\Helpers\SEServerConfigHelper.cs" />
     <Compile Include="Tools\Helpers\SESMConfigHelper.cs" />
     <Compile Include="Tools\Monitor\HourlyCrusher.cs" />
     <Compile Include="Tools\Jobs\ResetPriorityJob.cs" />
@@ -2823,6 +2836,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201412041630025_processPriority.resx">
       <DependentUpon>201412041630025_processPriority.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505042002309_ServerType.resx">
+      <DependentUpon>201505042002309_ServerType.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

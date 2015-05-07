@@ -1,4 +1,0 @@
-- SE Update
-- Server config
-- maps
-- mods

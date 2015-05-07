@@ -34,13 +34,20 @@ namespace SESM.Tools.Helpers
         {
             return SESMConfigHelper.SEDataPath + @"SteamCMD\";
         }
-        public static string GetSyncDirPath()
+        public static string GetSESyncDirPath()
         {
             return SESMConfigHelper.SEDataPath + @"SyncData\";
         }
+        public static string GetMESyncDirPath()
+        {
+            return SESMConfigHelper.MEDataPath + @"SyncData\";
+        }
         public static string GetInstancePath(string prefix, EntityServer server)
         {
-            return SESMConfigHelper.SESavePath + prefix + "_" + server.Id + "_" + server.Name + @"\";
+            if(server.ServerType == EnumServerType.SpaceEngineers)
+                return SESMConfigHelper.SESavePath + prefix + "_" + server.Id + "_" + server.Name + @"\";
+            else
+                return SESMConfigHelper.MESavePath + prefix + "_" + server.Id + "_" + server.Name + @"\";
         }
         public static string GetInstancePath(EntityServer server)
         {

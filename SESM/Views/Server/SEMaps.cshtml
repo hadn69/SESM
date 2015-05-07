@@ -467,7 +467,7 @@
                 if (result) {
                     LockPage();
                     $("#createModal").modal('hide');
-                    $.post("/API/Map/CreateMap",
+                    $.post("/API/Map/SECreateMap",
                     {
                         ServerID: serverID,
                         SubTypeId: $("#inpSubTypeId").val(),

@@ -7,11 +7,13 @@ namespace SESM.Tools
     {
         public bool Lockdown;
         public bool SEUpdating;
+        public bool MEUpdating;
         public bool SESEUpdating;
         public SESMRunningVarsStorage()
         {
             Lockdown = false;
             SEUpdating = false;
+            MEUpdating = false;
             SESEUpdating = false;
 
         }

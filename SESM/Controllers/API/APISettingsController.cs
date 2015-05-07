@@ -44,6 +44,8 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("Prefix", SESMConfigHelper.Prefix));
             response.AddToContent(new XElement("SESavePath", SESMConfigHelper.SESavePath));
             response.AddToContent(new XElement("SEDataPath", SESMConfigHelper.SEDataPath));
+            response.AddToContent(new XElement("MESavePath", SESMConfigHelper.MESavePath));
+            response.AddToContent(new XElement("MEDataPath", SESMConfigHelper.MEDataPath));
             response.AddToContent(new XElement("Arch", SESMConfigHelper.Arch));
             return Content(response.ToString());
         }
@@ -70,15 +72,27 @@ namespace SESM.Controllers.API
 
             string SESavePath = Request.Form["SESavePath"];
             if (string.IsNullOrWhiteSpace(SESavePath))
-                return Content(XMLMessage.Error("SRV-SSESMS-MISSP", "The SESavePath field must be provided").ToString());
+                return Content(XMLMessage.Error("SRV-SSESMS-MISSSP", "The SESavePath field must be provided").ToString());
             if (!SESavePath.EndsWith(@"\"))
-                return Content(XMLMessage.Error("SRV-SSESMS-BADSP", "The SESavePath field must end with \\").ToString());
+                return Content(XMLMessage.Error("SRV-SSESMS-BADSSP", "The SESavePath field must end with \\").ToString());
 
             string SEDataPath = Request.Form["SEDataPath"];
             if (string.IsNullOrWhiteSpace(SEDataPath))
-                return Content(XMLMessage.Error("SRV-SSESMS-MISSP", "The SEDataPath field must be provided").ToString());
+                return Content(XMLMessage.Error("SRV-SSESMS-MISSDP", "The SEDataPath field must be provided").ToString());
             if (!SEDataPath.EndsWith(@"\"))
-                return Content(XMLMessage.Error("SRV-SSESMS-BADSP", "The SEDataPath field must end with \\").ToString());
+                return Content(XMLMessage.Error("SRV-SSESMS-BADSDP", "The SEDataPath field must end with \\").ToString());
+
+            string MESavePath = Request.Form["MESavePath"];
+            if (string.IsNullOrWhiteSpace(MESavePath))
+                return Content(XMLMessage.Error("SRV-SSESMS-MISMSP", "The MESavePath field must be provided").ToString());
+            if (!SESavePath.EndsWith(@"\"))
+                return Content(XMLMessage.Error("SRV-SSESMS-BADMSP", "The MESavePath field must end with \\").ToString());
+
+            string MEDataPath = Request.Form["MEDataPath"];
+            if (string.IsNullOrWhiteSpace(MEDataPath))
+                return Content(XMLMessage.Error("SRV-SSESMS-MISMDP", "The MEDataPath field must be provided").ToString());
+            if (!SEDataPath.EndsWith(@"\"))
+                return Content(XMLMessage.Error("SRV-SSESMS-BADMDP", "The MEDataPath field must end with \\").ToString());
 
             ArchType Arch;
             if (string.IsNullOrWhiteSpace(Request.Form["Arch"]))
@@ -136,17 +150,26 @@ namespace SESM.Controllers.API
                     Directory.Move(SESMConfigHelper.SEDataPath, SEDataPath);
                 }
 
+                if (MESavePath != SESMConfigHelper.MESavePath)
+                {
+                    Directory.Move(SESMConfigHelper.MESavePath, MESavePath);
+                }
+
+                if (MEDataPath != SESMConfigHelper.MEDataPath)
+                {
+                    Directory.Move(SESMConfigHelper.MEDataPath, MEDataPath);
+                }
+
                 SESMConfigHelper.Prefix = Prefix;
                 SESMConfigHelper.SESavePath = SESavePath;
                 SESMConfigHelper.SEDataPath = SEDataPath;
+                SESMConfigHelper.MESavePath = MESavePath;
+                SESMConfigHelper.MEDataPath = MEDataPath;
                 SESMConfigHelper.Arch = Arch;
 
                 foreach (EntityServer server in SEServer)
                 {
-                    if (server.UseServerExtender)
-                        ServiceHelper.RegisterServerExtenderService(server);
-                    else
-                        ServiceHelper.RegisterService(server);
+                    ServiceHelper.RegisterService(server);
                 }
 
                 foreach (EntityServer server in SERunningServer)
@@ -356,7 +379,7 @@ namespace SESM.Controllers.API
             XMLMessage response = new XMLMessage("SET-GSES-OK");
 
             response.AddToContent(new XElement("UpdateRunning", SESMConfigHelper.SEUpdating));
-            response.AddToContent(new XElement("NbServer", srvPrv.GetAllServers().Count));
+            response.AddToContent(new XElement("NbServer", srvPrv.GetAllSEServers().Count));
             return Content(response.ToString());
         }
 
@@ -382,15 +405,15 @@ namespace SESM.Controllers.API
                 if (localVersion == null)
                 {
                     logger.Info("Retrieving local version : ");
-                    localVersion = SteamCMDHelper.GetInstalledVersion(logger);
+                    localVersion = SteamCMDHelper.GetSEInstalledVersion(logger);
                 }
 
                 if (remoteVersion == null)
                 {
                     logger.Info("Retrieving remote version : ");
                     remoteVersion =
-                        SteamCMDHelper.GetAvailableVersion(
-                            !string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword), logger);
+                        SteamCMDHelper.GetSEAvailableVersion(
+                            !string.IsNullOrWhiteSpace(SESMConfigHelper.SEAutoUpdateBetaPassword), logger);
                 }
 
                 if (localVersion == null || remoteVersion == null)
@@ -431,9 +454,9 @@ namespace SESM.Controllers.API
             // ** PROCESS **
             XMLMessage response = new XMLMessage("SET-GSES-OK");
 
-            response.AddToContent(new XElement("AutoUpdateEnabled", SESMConfigHelper.AutoUpdateEnabled));
-            response.AddToContent(new XElement("AutoUpdateCron", SESMConfigHelper.AutoUpdateCron));
-            response.AddToContent(new XElement("AutoUpdateBetaPassword", SESMConfigHelper.AutoUpdateBetaPassword));
+            response.AddToContent(new XElement("AutoUpdateEnabled", SESMConfigHelper.SEAutoUpdateEnabled));
+            response.AddToContent(new XElement("AutoUpdateCron", SESMConfigHelper.SEAutoUpdateCron));
+            response.AddToContent(new XElement("AutoUpdateBetaPassword", SESMConfigHelper.SEAutoUpdateBetaPassword));
 
             return Content(response.ToString());
         }
@@ -466,30 +489,30 @@ namespace SESM.Controllers.API
             string autoUpdateBetaPassword = Request.Form["AutoUpdateBetaPassword"];
 
             // ** PROCESS **
-            SESMConfigHelper.AutoUpdateEnabled = autoUpdateEnabled;
-            SESMConfigHelper.AutoUpdateCron = autoUpdateCron;
-            SESMConfigHelper.AutoUpdateBetaPassword = autoUpdateBetaPassword;
+            SESMConfigHelper.SEAutoUpdateEnabled = autoUpdateEnabled;
+            SESMConfigHelper.SEAutoUpdateCron = autoUpdateCron;
+            SESMConfigHelper.SEAutoUpdateBetaPassword = autoUpdateBetaPassword;
 
             // Deleting the Job
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.DeleteJob(SEAutoUpdateJob.GetJobKey());
 
-            if (SESMConfigHelper.AutoUpdateEnabled)
+            if (SESMConfigHelper.SEAutoUpdateEnabled)
             {
                 // Instantiating the job
-                IJobDetail SEAutoUpdateJobDetail = JobBuilder.Create<SESEAutoUpdateJob>()
+                IJobDetail SEAutoUpdateJobDetail = JobBuilder.Create<SEAutoUpdateJob>()
                     .WithIdentity(SEAutoUpdateJob.GetJobKey())
                     .Build();
 
                 ITrigger SEAutoUpdateJobTrigger = TriggerBuilder.Create()
                     .WithIdentity(SEAutoUpdateJob.GetTriggerKey())
-                    .WithCronSchedule(SESMConfigHelper.SESEAutoUpdateCron)
+                    .WithCronSchedule(SESMConfigHelper.SEAutoUpdateCron)
                     .Build();
 
                 scheduler.ScheduleJob(SEAutoUpdateJobDetail, SEAutoUpdateJobTrigger);
             }
 
-            return Content(XMLMessage.Success("SET-SSES-OK", "The SESE Settings has been updated").ToString());
+            return Content(XMLMessage.Success("SET-SSES-OK", "The SE Settings has been updated").ToString());
         }
 
         // POST: API/Settings/UploadSE        
@@ -511,8 +534,6 @@ namespace SESM.Controllers.API
             // ** ACCESS **
             if (user == null || !user.IsAdmin)
                 return Content(XMLMessage.Error("SET-UPSE-NOACCESS", "The current user don't have enough right for this action").ToString());
-
-            SESEHelper.CleanupUpdate();
 
             ZipFile.SaveAs(SESMConfigHelper.SEDataPath + "DedicatedServer.zip");
 
@@ -551,6 +572,221 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Warning("SET-UPDSE-NOK", "An error occured : " + result.ToString()).ToString());
 
             return Content(XMLMessage.Success("SET-UPDSE-OK", "SE Game Files applied").ToString());
+        }
+
+        #endregion
+
+        #region ME
+
+        // GET: API/Settings/GetMEStatus        
+        [HttpGet]
+        public ActionResult GetMEStatus()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+            ServerProvider srvPrv = new ServerProvider(_context);
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-GMES-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PROCESS **
+            XMLMessage response = new XMLMessage("SET-GMES-OK");
+
+            response.AddToContent(new XElement("UpdateRunning", SESMConfigHelper.MEUpdating));
+            response.AddToContent(new XElement("NbServer", srvPrv.GetAllMEServers().Count));
+            return Content(response.ToString());
+        }
+
+        // GET: API/Settings/GetMEVersion        
+        [HttpGet]
+        public ActionResult GetMEVersion()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-GMEV-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PROCESS **
+            Logger logger = LogManager.GetLogger("MEGetVersionLogger");
+            int? localVersion = null;
+
+            int? remoteVersion = null;
+
+            for (int i = 0; i < 5; i++)
+            {
+                if (localVersion == null)
+                {
+                    logger.Info("Retrieving local version : ");
+                    localVersion = SteamCMDHelper.GetMEInstalledVersion(logger);
+                }
+
+                if (remoteVersion == null)
+                {
+                    logger.Info("Retrieving remote version : ");
+                    remoteVersion =
+                        SteamCMDHelper.GetMEAvailableVersion(
+                            !string.IsNullOrWhiteSpace(SESMConfigHelper.MEAutoUpdateBetaPassword), logger);
+                }
+
+                if (localVersion == null || remoteVersion == null)
+                {
+                    logger.Info("Fail retrieving one of the version (try " + (i + 1) + " of 5), waiting and retrying ...");
+                    Thread.Sleep(2000);
+                }
+                else
+                    break;
+
+            }
+
+            if (localVersion == null || remoteVersion == null)
+            {
+                return Content(XMLMessage.Error("SET-GMEV-FAIL", "Fail retieving one of the version. See MEGetVersion log for more info").ToString());
+            }
+
+            XMLMessage response = new XMLMessage("SET-GMEV-OK");
+
+            response.AddToContent(new XElement("Local", localVersion.ToString()));
+            response.AddToContent(new XElement("Remote", remoteVersion.ToString()));
+            response.AddToContent(new XElement("Diff", localVersion - remoteVersion));
+
+            return Content(response.ToString());
+        }
+
+        // GET: API/Settings/GetMESettings        
+        [HttpGet]
+        public ActionResult GetMESettings()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-GMES-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PROCESS **
+            XMLMessage response = new XMLMessage("SET-GMES-OK");
+
+            response.AddToContent(new XElement("AutoUpdateEnabled", SESMConfigHelper.MEAutoUpdateEnabled));
+            response.AddToContent(new XElement("AutoUpdateCron", SESMConfigHelper.MEAutoUpdateCron));
+            response.AddToContent(new XElement("AutoUpdateBetaPassword", SESMConfigHelper.MEAutoUpdateBetaPassword));
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Settings/SetMESettings        
+        [HttpPost]
+        public ActionResult SetMESettings()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-SMES-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PARSING **
+            bool autoUpdateEnabled;
+            if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateEnabled"]))
+                return Content(XMLMessage.Error("SET-SMES-MISAUE", "The AutoUpdateEnabled field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["AutoUpdateEnabled"], out autoUpdateEnabled))
+                return Content(XMLMessage.Error("SET-SMES-BADAUE", "The AutoUpdateEnabled field must be equal to \"True\" or \"False\"").ToString());
+
+
+            string autoUpdateCron = Request.Form["AutoUpdateCron"];
+            if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateCron"]))
+                return Content(XMLMessage.Error("SET-SMES-MISAUC", "The AutoUpdateCron field must be provided").ToString());
+            if (!CronExpression.IsValidExpression(autoUpdateCron))
+                return Content(XMLMessage.Error("SET-SMES-BADAUC", "The AutoUpdateCron field is invalid").ToString());
+
+            string autoUpdateBetaPassword = Request.Form["AutoUpdateBetaPassword"];
+
+            // ** PROCESS **
+            SESMConfigHelper.MEAutoUpdateEnabled = autoUpdateEnabled;
+            SESMConfigHelper.MEAutoUpdateCron = autoUpdateCron;
+            SESMConfigHelper.MEAutoUpdateBetaPassword = autoUpdateBetaPassword;
+
+            // Deleting the Job
+            IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+            scheduler.DeleteJob(MEAutoUpdateJob.GetJobKey());
+
+            if (SESMConfigHelper.MEAutoUpdateEnabled)
+            {
+                // Instantiating the job
+                IJobDetail MEAutoUpdateJobDetail = JobBuilder.Create<MEAutoUpdateJob>()
+                    .WithIdentity(MEAutoUpdateJob.GetJobKey())
+                    .Build();
+
+                ITrigger MEAutoUpdateJobTrigger = TriggerBuilder.Create()
+                    .WithIdentity(MEAutoUpdateJob.GetTriggerKey())
+                    .WithCronSchedule(SESMConfigHelper.MEAutoUpdateCron)
+                    .Build();
+
+                scheduler.ScheduleJob(MEAutoUpdateJobDetail, MEAutoUpdateJobTrigger);
+            }
+
+            return Content(XMLMessage.Success("SET-SMES-OK", "The ME Settings has been updated").ToString());
+        }
+
+        // POST: API/Settings/UploadME        
+        [HttpPost]
+        public ActionResult UploadME(HttpPostedFileBase ZipFile)
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** PARSING **
+            if (ZipFile == null)
+                return Content(XMLMessage.Error("SET-UPME-MISZIP", "The zipFile parameter must be provided").ToString());
+
+            if (!Ionic.Zip.ZipFile.IsZipFile(ZipFile.InputStream, false))
+                return Content(XMLMessage.Error("SET-UPME-BADZIP", "The provided file in not a zip file").ToString());
+
+            ZipFile.InputStream.Seek(0, SeekOrigin.Begin);
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-UPME-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            ZipFile.SaveAs(SESMConfigHelper.MEDataPath + "DedicatedServer.zip");
+
+            Logger logger = LogManager.GetLogger("MEManualUpdateLogger");
+            ReturnEnum result = MEAutoUpdateJob.Run(logger, true, true, false);
+
+            if (result != ReturnEnum.Success)
+                return Content(XMLMessage.Warning("SET-UPME-NOK", "An error occured : " + result.ToString()).ToString());
+
+
+            return Content(XMLMessage.Success("SET-UPME-OK", "ME Game Files applied").ToString());
+        }
+
+        // POST: API/Settings/UpdateME        
+        [HttpPost]
+        public ActionResult UpdateME()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** PARSING **
+            bool force = false;
+            if (!string.IsNullOrWhiteSpace(Request.Form["Force"]))
+                if (!bool.TryParse(Request.Form["Force"], out force))
+                    return Content(XMLMessage.Error("SET-UPDME-BADFRC", "The value provided in the Force field is not valid").ToString());
+
+            // ** ACCESS **
+            if (user == null || !user.IsAdmin)
+                return Content(XMLMessage.Error("SET-UPDME-NOACCESS", "The current user don't have enough right for this action").ToString());
+
+            // ** PROCESS **
+            Logger logger = LogManager.GetLogger("MEManualUpdateLogger");
+            ReturnEnum result = MEAutoUpdateJob.Run(logger, true, false, force);
+
+            if (result != ReturnEnum.Success)
+                return Content(XMLMessage.Warning("SET-UPDME-NOK", "An error occured : " + result.ToString()).ToString());
+
+            return Content(XMLMessage.Success("SET-UPDME-OK", "ME Game Files applied").ToString());
         }
 
         #endregion

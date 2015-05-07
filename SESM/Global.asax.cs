@@ -18,7 +18,7 @@ namespace SESM
     {
         protected void Application_Start()
         {
-            Constants.SetVersion(3,5,0);
+            Constants.SetVersion(3,6,0);
             // Resetting Run Vars
             if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar"))
                 File.Delete(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar");
@@ -35,8 +35,8 @@ namespace SESM
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
             scheduler.Start();
 
-            // Auto-Update
-            if (SESMConfigHelper.AutoUpdateEnabled)
+            // SE Auto-Update
+            if (SESMConfigHelper.SEAutoUpdateEnabled)
             {
                 // Instantiating the job
                 IJobDetail SEAutoUpdateJobDetail = JobBuilder.Create<SEAutoUpdateJob>()
@@ -45,10 +45,26 @@ namespace SESM
 
                 ITrigger SEAutoUpdateJobTrigger = TriggerBuilder.Create()
                     .WithIdentity(SEAutoUpdateJob.GetTriggerKey())
-                    .WithCronSchedule(SESMConfigHelper.AutoUpdateCron)
+                    .WithCronSchedule(SESMConfigHelper.SEAutoUpdateCron)
                     .Build();
 
                 scheduler.ScheduleJob(SEAutoUpdateJobDetail, SEAutoUpdateJobTrigger);
+            }
+
+            // ME Auto-Update
+            if (SESMConfigHelper.MEAutoUpdateEnabled)
+            {
+                // Instantiating the job
+                IJobDetail MEAutoUpdateJobDetail = JobBuilder.Create<MEAutoUpdateJob>()
+                    .WithIdentity(MEAutoUpdateJob.GetJobKey())
+                    .Build();
+
+                ITrigger MEAutoUpdateJobTrigger = TriggerBuilder.Create()
+                    .WithIdentity(MEAutoUpdateJob.GetTriggerKey())
+                    .WithCronSchedule(SESMConfigHelper.MEAutoUpdateCron)
+                    .Build();
+
+                scheduler.ScheduleJob(MEAutoUpdateJobDetail, MEAutoUpdateJobTrigger);
             }
 
             // SESE Auto-update

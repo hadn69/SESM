@@ -22,7 +22,7 @@ namespace SESM.Tools.Jobs
 
         public static ReturnEnum Run(Logger logger, bool manualFire = true, bool useLocalZip = false, bool force = false)
         {
-            if (!manualFire && !SESMConfigHelper.AutoUpdateEnabled)
+            if (!manualFire && !SESMConfigHelper.SEAutoUpdateEnabled)
                 return ReturnEnum.AloneJob;
 
             if (SESMConfigHelper.SEUpdating)
@@ -41,15 +41,15 @@ namespace SESM.Tools.Jobs
                 if (localVersion == null)
                 {
                     logger.Info("Retrieving local version : ");
-                    localVersion = SteamCMDHelper.GetInstalledVersion(logger);
+                    localVersion = SteamCMDHelper.GetSEInstalledVersion(logger);
                 }
 
                 if (remoteVersion == null)
                 {
                     logger.Info("Retrieving remote version : ");
                     remoteVersion =
-                        SteamCMDHelper.GetAvailableVersion(
-                            !string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword), logger);
+                        SteamCMDHelper.GetSEAvailableVersion(
+                            !string.IsNullOrWhiteSpace(SESMConfigHelper.SEAutoUpdateBetaPassword), logger);
                 }
 
                 if (localVersion == null || remoteVersion == null)
@@ -98,7 +98,7 @@ namespace SESM.Tools.Jobs
                 logger.Info("Stopping all SE Server : ");
                 DataContext _context = new DataContext();
                 ServerProvider srvPrv = new ServerProvider(_context);
-                List<EntityServer> SEServer = srvPrv.GetAllServers();
+                List<EntityServer> SEServer = srvPrv.GetAllSEServers();
                 List<EntityServer> SERunningServer = new List<EntityServer>();
 
                 foreach (EntityServer server in SEServer)
@@ -129,8 +129,8 @@ namespace SESM.Tools.Jobs
 
                 logger.Info("Waiting 10 secs for grace periode ...");
                 Thread.Sleep(10000);
-                logger.Info("Killing any remaining SE process");
-                ServiceHelper.KillAllServices();
+                logger.Info("Killing any remaining SE/SESE process");
+                ServiceHelper.KillAllSEServices();
                 logger.Info("Waiting 10 secs for kills to finish ...");
                 Thread.Sleep(10000);
 
@@ -165,17 +165,17 @@ namespace SESM.Tools.Jobs
                 else
                 {
                     logger.Info("Updating SE Game Files ...");
-                    SteamCMDHelper.Update(logger, !string.IsNullOrWhiteSpace(SESMConfigHelper.AutoUpdateBetaPassword));
+                    SteamCMDHelper.UpdateSE(logger, !string.IsNullOrWhiteSpace(SESMConfigHelper.SEAutoUpdateBetaPassword));
 
                     logger.Info("Applying SE Game Files ...");
                     logger.Info("Applying Content ...");
-                    FSHelper.DirectoryCopy(PathHelper.GetSyncDirPath() + @"Content\",
+                    FSHelper.DirectoryCopy(PathHelper.GetSESyncDirPath() + @"Content\",
                         SESMConfigHelper.SEDataPath + @"Content\", true);
                     logger.Info("Applying DedicatedServer ...");
-                    FSHelper.DirectoryCopy(PathHelper.GetSyncDirPath() + @"DedicatedServer\",
+                    FSHelper.DirectoryCopy(PathHelper.GetSESyncDirPath() + @"DedicatedServer\",
                         SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
                     logger.Info("Applying DedicatedServer64 ...");
-                    FSHelper.DirectoryCopy(PathHelper.GetSyncDirPath() + @"DedicatedServer64\",
+                    FSHelper.DirectoryCopy(PathHelper.GetSESyncDirPath() + @"DedicatedServer64\",
                         SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
                 }
 

@@ -11,7 +11,8 @@ namespace SESM.Tools.Helpers
 {
     public class SteamCMDHelper
     {
-        private const int AppId = 298740;
+        private const int SEAppId = 298740;
+        private const int MEAppId = 367970;
         private const int GetInfoDuration = 60;
 
         private static object CheckSteamCMDLock = new object();
@@ -26,8 +27,6 @@ namespace SESM.Tools.Helpers
                     if (!Directory.Exists(PathHelper.GetSteamCMDPath()))
                         Directory.CreateDirectory(PathHelper.GetSteamCMDPath());
 
-                    if (!Directory.Exists(PathHelper.GetSyncDirPath()))
-                        Directory.CreateDirectory(PathHelper.GetSyncDirPath());
                     try
                     {
                         WebRequest objRequest = HttpWebRequest.Create("http://media.steampowered.com/installer/steamcmd.zip");
@@ -134,12 +133,12 @@ namespace SESM.Tools.Helpers
             return null;
         }
 
-        public static int? GetInstalledVersion(Logger logger = null)
+        public static int? GetSEInstalledVersion(Logger logger = null)
         {
             string output = ExecuteSteamCMD(logger, " +@ShutdownOnFailedCommand 1"
-                                                    + " +force_install_dir " + PathHelper.GetSyncDirPath()
+                                                    + " +force_install_dir " + PathHelper.GetSESyncDirPath()
                                                     + " +login Anonymous"
-                                                    + " +app_status " + AppId
+                                                    + " +app_status " + SEAppId
                                                     + " +quit");
 
             if (output.Contains("Login Failure"))
@@ -173,15 +172,15 @@ namespace SESM.Tools.Helpers
             return null;
         }
 
-        public static int? GetAvailableVersion(bool dev, Logger logger = null)
+        public static int? GetSEAvailableVersion(bool dev, Logger logger = null)
         {
             string output = ExecuteSteamCMD(logger, " +@ShutdownOnFailedCommand 1"
-                                                    + " +force_install_dir " + PathHelper.GetSyncDirPath()
+                                                    + " +force_install_dir " + PathHelper.GetSESyncDirPath()
                                                     + " +login Anonymous"
-                                                    + " +app_info_request " + AppId
+                                                    + " +app_info_request " + SEAppId
                                                     + " +app_info_update" // Try to force info update
                                                     + " +app_info_update 1"
-                                                    + " +app_info_print " + AppId
+                                                    + " +app_info_print " + SEAppId
                                                     + " +quit");
             if (output.Contains("Login Failure"))
             {
@@ -212,13 +211,104 @@ namespace SESM.Tools.Helpers
             return null;
         }
 
-        public static void Update(Logger logger, bool dev)
+        public static void UpdateSE(Logger logger, bool dev)
         {
             string output = ExecuteSteamCMD(logger, " +login Anonymous"
-                                                    + " +force_install_dir " + PathHelper.GetSyncDirPath()
-                                                    + " +app_update " + AppId + " -validate "
+                                                    + " +force_install_dir " + PathHelper.GetSESyncDirPath()
+                                                    + " +app_update " + SEAppId + " -validate "
                                                     + (dev ?
-                                                        " -beta development -betapassword " + SESMConfigHelper.AutoUpdateBetaPassword :
+                                                        " -beta development -betapassword " + SESMConfigHelper.SEAutoUpdateBetaPassword :
+                                                        " -beta public")
+                                                    + " +quit", 120);
+            logger.Info("Update output : " + output);
+
+        }
+
+        public static int? GetMEInstalledVersion(Logger logger = null)
+        {
+            string output = ExecuteSteamCMD(logger, " +@ShutdownOnFailedCommand 1"
+                                                    + " +force_install_dir " + PathHelper.GetMESyncDirPath()
+                                                    + " +login Anonymous"
+                                                    + " +app_status " + MEAppId
+                                                    + " +quit");
+
+            if (output.Contains("Login Failure"))
+            {
+                logger?.Error("Login Failure !");
+                return null;
+            }
+
+            if (output.Contains("install state:"))
+            {
+                if (output.Contains("install state: uninstalled"))
+                    return 0;
+                Regex regex = new Regex(@"BuildID (\d+)");
+                Match match = regex.Match(output);
+                if (match.Success)
+                {
+                    try
+                    {
+                        return int.Parse(match.Groups[1].Value);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.Error("Failed parsing int :", ex);
+                        return null;
+                    }
+                }
+                logger?.Error("Missing keyword !");
+                return null;
+            }
+            logger?.Error("Missing keyword !");
+            return null;
+        }
+
+        public static int? GetMEAvailableVersion(bool dev, Logger logger = null)
+        {
+            string output = ExecuteSteamCMD(logger, " +@ShutdownOnFailedCommand 1"
+                                                    + " +force_install_dir " + PathHelper.GetMESyncDirPath()
+                                                    + " +login Anonymous"
+                                                    + " +app_info_request " + MEAppId
+                                                    + " +app_info_update" // Try to force info update
+                                                    + " +app_info_update 1"
+                                                    + " +app_info_print " + MEAppId
+                                                    + " +quit");
+            if (output.Contains("Login Failure"))
+            {
+                logger?.Error("Login Failure !");
+                return null;
+            }
+
+            if (output.Contains("\"branches\""))
+            {
+                Regex regex = dev ?
+                    new Regex("dev\"\\s*{\\s*\"buildid\"\\s*\"(\\d+)") :
+                    new Regex("public\"\\s*{\\s*\"buildid\"\\s*\"(\\d+)");
+                Match match = regex.Match(output);
+                if (match.Success)
+                {
+                    try
+                    {
+                        return int.Parse(match.Groups[1].Value);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.Error("Failed parsing int :", ex);
+                        return 0;
+                    }
+                }
+            }
+            logger?.Error("Missing keyword !");
+            return null;
+        }
+
+        public static void UpdateME(Logger logger, bool dev)
+        {
+            string output = ExecuteSteamCMD(logger, " +login Anonymous"
+                                                    + " +force_install_dir " + PathHelper.GetMESyncDirPath()
+                                                    + " +app_update " + MEAppId + " -validate "
+                                                    + (dev ?
+                                                        " -beta development -betapassword " + SESMConfigHelper.MEAutoUpdateBetaPassword :
                                                         " -beta public")
                                                     + " +quit", 120);
             logger.Info("Update output : " + output);

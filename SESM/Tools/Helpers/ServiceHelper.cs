@@ -32,7 +32,7 @@ namespace SESM.Tools.Helpers
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
-                if(svcController.Status == ServiceControllerStatus.Running)
+                if (svcController.Status == ServiceControllerStatus.Running)
                 {
                     svcController.Stop();
                     IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
@@ -40,7 +40,7 @@ namespace SESM.Tools.Helpers
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return;
             }
@@ -53,13 +53,13 @@ namespace SESM.Tools.Helpers
             {
                 ServiceController svcController = new ServiceController(serviceName);
 
-                if(svcController.Status == ServiceControllerStatus.Running)
+                if (svcController.Status == ServiceControllerStatus.Running)
                 {
                     StopService(server);
                     WaitForStopped(server);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return;
             }
@@ -73,7 +73,7 @@ namespace SESM.Tools.Helpers
                 ServiceController svcController = new ServiceController(serviceName);
                 svcController.WaitForStatus(ServiceControllerStatus.Stopped, new TimeSpan(0, 0, 30));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return;
             }
@@ -85,9 +85,9 @@ namespace SESM.Tools.Helpers
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
-                if(svcController.Status != ServiceControllerStatus.Running)
+                if (svcController.Status != ServiceControllerStatus.Running)
                 {
-                    if(!server.UseServerExtender)
+                    if (!server.UseServerExtender)
                     {
                         svcController.Start();
                     }
@@ -103,7 +103,7 @@ namespace SESM.Tools.Helpers
                         svcController.Start(argsStr);
                     }
 
-                    if(SESMConfigHelper.LowPriorityStart)
+                    if (SESMConfigHelper.LowPriorityStart)
                     {
                         SetLowPriority(serviceName);
                         IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
@@ -126,7 +126,7 @@ namespace SESM.Tools.Helpers
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return;
             }
@@ -138,14 +138,14 @@ namespace SESM.Tools.Helpers
             try
             {
                 ServiceController svcController = new ServiceController(serviceName);
-                if(svcController.Status == ServiceControllerStatus.Running)
+                if (svcController.Status == ServiceControllerStatus.Running)
                 {
                     StopService(server);
                     WaitForStopped(server);
                     StartService(server);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return;
             }
@@ -155,17 +155,17 @@ namespace SESM.Tools.Helpers
         {
             try
             {
-                if(DoesServiceExist(serviceName))
+                if (DoesServiceExist(serviceName))
                 {
                     uint? pid = GetServicePID(serviceName);
-                    if(pid == null)
+                    if (pid == null)
                         return;
 
                     Process process = Process.GetProcessById((int)pid);
                     process.PriorityClass = ProcessPriorityClass.BelowNormal;
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
 
             }
@@ -175,17 +175,17 @@ namespace SESM.Tools.Helpers
         {
             try
             {
-                if(DoesServiceExist(serviceName))
+                if (DoesServiceExist(serviceName))
                 {
                     uint? pid = GetServicePID(serviceName);
-                    if(pid == null)
+                    if (pid == null)
                         return;
 
                     Process process = Process.GetProcessById((int)pid);
                     process.PriorityClass = ProcessPriorityClass.Normal;
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
 
             }
@@ -195,17 +195,17 @@ namespace SESM.Tools.Helpers
         {
             try
             {
-                if(DoesServiceExist(serviceName))
+                if (DoesServiceExist(serviceName))
                 {
                     uint? pid = GetServicePID(serviceName);
-                    if(pid == null)
+                    if (pid == null)
                         return;
 
                     Process process = Process.GetProcessById((int)pid);
                     process.PriorityClass = ProcessPriorityClass.High;
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
 
             }
@@ -217,7 +217,7 @@ namespace SESM.Tools.Helpers
 
             switch (server.ProcessPriority)
             {
-                case EnumProcessPriority.Low :
+                case EnumProcessPriority.Low:
                     SetLowPriority(serviceName);
                     break;
                 case EnumProcessPriority.Normal:
@@ -231,14 +231,30 @@ namespace SESM.Tools.Helpers
 
         public static void RegisterService(EntityServer server)
         {
-            if(DoesServiceExist(server))
+            if (DoesServiceExist(server))
                 return;
 
-            string dataPath = SESMConfigHelper.SEDataPath;
-            if(SESMConfigHelper.Arch == ArchType.x86)
-                dataPath += @"DedicatedServer\SpaceEngineersDedicated.exe";
-            if(SESMConfigHelper.Arch == ArchType.x64)
-                dataPath += @"DedicatedServer64\SpaceEngineersDedicated.exe";
+            string dataPath = string.Empty;
+
+            if (server.ServerType == EnumServerType.SpaceEngineers)
+                dataPath = SESMConfigHelper.SEDataPath;
+            if (server.ServerType == EnumServerType.MedievalEngineers)
+                dataPath = SESMConfigHelper.MEDataPath;
+
+            if (SESMConfigHelper.Arch == ArchType.x86)
+                dataPath += @"DedicatedServer\";
+            if (SESMConfigHelper.Arch == ArchType.x64)
+                dataPath += @"DedicatedServer64\";
+
+            if (server.ServerType == EnumServerType.SpaceEngineers)
+            {
+                if (server.UseServerExtender)
+                    dataPath += "SEServerExtender.exe";
+                else
+                    dataPath += "SpaceEngineersDedicated.exe";
+            }
+            if (server.ServerType == EnumServerType.MedievalEngineers)
+                dataPath += "MedievalEngineersDedicated.exe";
 
             Process si = new Process();
             si.StartInfo.WorkingDirectory = @"c:\";
@@ -254,9 +270,10 @@ namespace SESM.Tools.Helpers
             si.Close();
         }
 
+        /*
         public static void RegisterServerExtenderService(EntityServer server)
         {
-            if(DoesServiceExist(server))
+            if (DoesServiceExist(server))
                 return;
 
             string dataPath = SESMConfigHelper.SEDataPath + @"DedicatedServer64\SEServerExtender.exe";
@@ -275,6 +292,7 @@ namespace SESM.Tools.Helpers
             string output = si.StandardOutput.ReadToEnd();
             si.Close();
         }
+        */
 
         public static void UnRegisterService(EntityServer server)
         {
@@ -311,7 +329,7 @@ namespace SESM.Tools.Helpers
             ManagementObjectSearcher searcher = new ManagementObjectSearcher
               ("Select * From Win32_Process Where ParentProcessID=" + pid);
             ManagementObjectCollection moc = searcher.Get();
-            foreach(ManagementObject mo in moc)
+            foreach (ManagementObject mo in moc)
             {
                 KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
             }
@@ -320,7 +338,7 @@ namespace SESM.Tools.Helpers
                 Process proc = Process.GetProcessById(pid);
                 proc.Kill();
             }
-            catch(ArgumentException)
+            catch (ArgumentException)
             {
                 // Process already exited.
             }
@@ -333,10 +351,10 @@ namespace SESM.Tools.Helpers
 
         public static void KillService(string serviceName)
         {
-            if(DoesServiceExist(serviceName))
+            if (DoesServiceExist(serviceName))
             {
                 uint? pid = GetServicePID(serviceName);
-                if(pid == null)
+                if (pid == null)
                     return;
                 KillProcessAndChildren((int)pid);
             }
@@ -344,7 +362,14 @@ namespace SESM.Tools.Helpers
 
         public static void KillAllServices()
         {
+            KillAllSEServices();
+            KillAllMEServices();
+        }
+
+        public static void KillAllSEServices()
+        {
             KillAllProcesses("SpaceEngineersDedicated");
+            KillAllSESEServices();
         }
 
         public static void KillAllSESEServices()
@@ -352,9 +377,14 @@ namespace SESM.Tools.Helpers
             KillAllProcesses("SEServerExtender");
         }
 
+        public static void KillAllMEServices()
+        {
+            KillAllProcesses("MedievalEngineersDedicated");
+        }
+
         public static void KillAllProcesses(string processName)
         {
-            foreach(Process proc in Process.GetProcessesByName(processName))
+            foreach (Process proc in Process.GetProcessesByName(processName))
             {
                 try
                 {
@@ -366,7 +396,7 @@ namespace SESM.Tools.Helpers
 
         public static uint? GetServicePID(string serviceName)
         {
-            if(!DoesServiceExist(serviceName))
+            if (!DoesServiceExist(serviceName))
                 return null;
 
             Process si = new Process();
@@ -383,13 +413,13 @@ namespace SESM.Tools.Helpers
             si.Close();
             string[] outputSplitted = output.Replace("\r", "").Split('\n');
             string outputLine = string.Empty;
-            foreach(string item in outputSplitted.Where(item => item.Contains("PID")))
+            foreach (string item in outputSplitted.Where(item => item.Contains("PID")))
             {
                 outputLine = item;
             }
             string pid = outputLine.Substring(28).Trim();
             uint processId = uint.Parse(pid);
-            if(processId == 0)
+            if (processId == 0)
                 return null;
             else
                 return processId;
@@ -399,7 +429,7 @@ namespace SESM.Tools.Helpers
         {
             uint? pid = GetServicePID(serviceName);
             Ressources ressources = new Ressources();
-            if(pid == null || pid == 0)
+            if (pid == null || pid == 0)
             {
                 ressources.CPU = 0;
                 ressources.Memory = 0;
@@ -420,7 +450,7 @@ namespace SESM.Tools.Helpers
                 ressources.CPU = int.Parse(managementObject["PercentProcessorTime"].ToString()) / Environment.ProcessorCount;
                 ressources.Memory = (int)Math.Floor(long.Parse(managementObject["WorkingSetPrivate"].ToString()) / (1024.0 * 2)); // /!\ RAM in MB
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger exceptionLogger = LogManager.GetLogger("GenericExceptionLogger");
                 exceptionLogger.Fatal("Caught Exception in GetCurrentRessourceUsage :", ex);

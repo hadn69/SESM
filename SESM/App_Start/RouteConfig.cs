@@ -56,6 +56,13 @@ namespace SESM
                              "UploadSE|" +
                              "UpdateSE|" +
 
+                             "GetMEStatus|" +
+                             "GetMEVersion|" +
+                             "GetMESettings|" +
+                             "SetMESettings|" +
+                             "UploadME|" +
+                             "UpdateME|" +
+
                              "GetSESEStatus|" +
                              "GetSESEVersion|" +
                              "GetSESESettings|" +
@@ -89,9 +96,14 @@ namespace SESM
                              "GetAccessSettings|" +
                              "SetAccessSettings|" +
 
-                             "GetConfiguration|" +
-                             "GetConfigurationRights|" +
-                             "SetConfiguration|" +
+                             "SEGetConfiguration|" +
+                             "SEGetConfigurationRights|" +
+                             "SESetConfiguration|" +
+
+                             "MEGetConfiguration|" +
+                             "MEGetConfigurationRights|" +
+                             "MESetConfiguration|" +
+
                              "StartServers|" +
                              "StopServers|" +
                              "RestartServers|" +
@@ -111,7 +123,8 @@ namespace SESM
                              "DeleteMaps|" +
                              "DownloadMaps|" +
                              "UploadMap|" +
-                             "CreateMap|"
+                             "SECreateMap|" +
+                             "MECreateMap"
                 }
             );
 
@@ -207,6 +220,7 @@ namespace SESM
                 {
                     action = "Index|" +
                              "SE|" +
+                             "ME|" +
                              "SESE"
                 }
             );
