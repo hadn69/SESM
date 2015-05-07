@@ -56,6 +56,7 @@ namespace SESM.Tools.Helpers
                     Match extract = Regex.Match(item.assets[0].name, "^.*v(.*)-.*$");
                     if (extract.Groups.Count != 2)
                         return null;
+                    VersionCache.SESERemoteVersion = extract.Groups[1].Value;
                     return new Version(extract.Groups[1].Value);
                 }
             }
@@ -81,7 +82,11 @@ namespace SESM.Tools.Helpers
         {
             string SESELocPath = SESMConfigHelper.SEDataPath + "DedicatedServer64\\SEServerExtender.exe";
             if (File.Exists(SESELocPath))
-                return AssemblyName.GetAssemblyName(SESELocPath).Version;
+            {
+                Version ver = AssemblyName.GetAssemblyName(SESELocPath).Version;
+                VersionCache.SESELocalVersion = ver.ToString();
+                return ver;
+            }
             return new Version(0, 0, 0, 0);
         }
 

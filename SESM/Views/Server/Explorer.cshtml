@@ -117,6 +117,11 @@
                 </li>
                 <li>
                     <a href="#">
+                        <i class="fa fa-info"></i> Get Version
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
                         <i class="fa fa-trash"></i> Delete
                     </a>
                 </li>
@@ -365,11 +370,20 @@
                     before: function (e, element, target) {
                         e.preventDefault();
                         var tr = $(e.target).parents("tr");
+
                         if (tr.children("td:nth-child(2)").find("span").length != 0)
                             return false;
+
+                        // Edit
                         this.getMenu().find("li:first-child").hide();
                         if (canEdit(tr))
                             this.getMenu().find("li:first-child").show();
+
+                        // Get Version
+                        this.getMenu().find("li:nth-child(4)").hide();
+                        if (tr.children("td:nth-child(3)").text().substring(tr.children("td:nth-child(3)").text().length - 4).toLowerCase() == ".dll")
+                            this.getMenu().find("li:nth-child(4)").show();
+
                         return true;
                     },
                     onItem: function (context, e) {
@@ -383,9 +397,11 @@
                             renameItem($(context));
                         } else if (clicked == "Download") {
                             downloadItem($(context));
+                        } else if (clicked == "Get Version") {
+                            getDllVersion($(context));
                         } else if (clicked == "Delete") {
                             deleteItem($(context));
-                        }
+                        } 
                     }
                 });
             });
@@ -741,6 +757,31 @@
                         }
                     }
                 }
+            });
+        }
+
+        function getDllVersion(trLine) {
+            var name = trLine.children('td:nth-child(3)').text();
+            var path = "";
+            if (isEmptyOrSpaces(currentPath)) {
+                path = name;
+            } else {
+                path = currentPath + "\\" + name;
+            }
+
+            $.post("/API/Explorer/GetDllVersion",
+            {
+                ServerID: serverID,
+                Path: path
+            },
+            function (data) {
+                var root = $($.parseXML(data)).find("Response");
+
+                if (root.children("Type").text() == "Error") {
+                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                    return;
+                }
+                bootbox.alert('DLL Version : ' + root.children("Content").text());
             });
         }
 

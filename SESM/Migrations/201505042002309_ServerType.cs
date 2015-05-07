@@ -1,8 +1,7 @@
+using System.Data.Entity.Migrations;
+
 namespace SESM.Migrations
 {
-    using System;
-    using System.Data.Entity.Migrations;
-    
     public partial class ServerType : DbMigration
     {
         public override void Up()

@@ -25,7 +25,7 @@ namespace SESM
                 }
             );
 
-            // Misc API
+            // Perf Mon API
             routes.MapRoute(
                 name: "APIPerfMon",
                 url: "API/PerfMon/{action}",
@@ -69,7 +69,9 @@ namespace SESM
                              "SetSESESettings|" +
                              "UploadSESE|" +
                              "UpdateSESE|" +
-                             "DeleteSESE"
+                             "DeleteSESE|" +
+
+                             "GetCachedVersions"
                 }
             );
 
@@ -144,7 +146,8 @@ namespace SESM
                              "NewFile|" +
                              "Upload|" +
                              "GetFileContent|" +
-                             "SetFileContent"
+                             "SetFileContent|" +
+                             "GetDllVersion"
                 }
             );
 
@@ -261,6 +264,13 @@ namespace SESM
                 name: "Home",
                 url: "",
                 defaults: new { controller = "Home", action = "Index" }
+            );
+
+            // Version
+            routes.MapRoute(
+                name: "Versions",
+                url: "Versions",
+                defaults: new { controller = "Home", action = "Versions" }
             );
 
             // Server List

@@ -2666,6 +2666,7 @@
     <Content Include="Views\Server\Settings.cshtml" />
     <Content Include="Views\Server\MEMaps.cshtml" />
     <Content Include="Views\Server\MEConfiguration.cshtml" />
+    <Content Include="Views\Home\Versions.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -2798,6 +2799,7 @@
     <Compile Include="Tools\SESMConfigStorage.cs" />
     <Compile Include="Tools\Helpers\SteamCMDHelper.cs" />
     <Compile Include="Tools\SESMRunningVarsStorage.cs" />
+    <Compile Include="Tools\VersionCache.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config">

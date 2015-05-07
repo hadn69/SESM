@@ -9,5 +9,11 @@ namespace SESM.Controllers
         {
             return View();
         }
+
+        // GET: /Home/
+        public ActionResult Versions()
+        {
+            return View();
+        }
     }
 }

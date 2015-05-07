@@ -1038,6 +1038,25 @@ namespace SESM.Controllers.API
 
         #endregion
 
+        // GET: API/Settings/GetCachedVersions        
+        [HttpGet]
+        public ActionResult GetCachedVersions()
+        {
+
+            // ** PROCESS **
+            XMLMessage response = new XMLMessage("SET-GCV-OK");
+
+            response.AddToContent(new XElement("SELocalVersion", VersionCache.SELocalVersion));
+            response.AddToContent(new XElement("SERemoteVersion", VersionCache.SERemoteVersion));
+            response.AddToContent(new XElement("MELocalVersion", VersionCache.MELocalVersion));
+            response.AddToContent(new XElement("MERemoteVersion", VersionCache.MERemoteVersion));
+            response.AddToContent(new XElement("SESELocalVersion", VersionCache.SESELocalVersion));
+            response.AddToContent(new XElement("SESERemoteVersion", VersionCache.SESERemoteVersion));
+            response.AddToContent(new XElement("SESMLocalVersion", Constants.GetVersion()));
+
+            return Content(response.ToString());
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
