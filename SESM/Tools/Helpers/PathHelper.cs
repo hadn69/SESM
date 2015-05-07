@@ -71,8 +71,11 @@ namespace SESM.Tools.Helpers
         }
         public static string GetConfigurationFilePath(EntityServer server)
         {
-            return GetInstancePath(server) + @"SpaceEngineers-Dedicated.cfg";
-            
+            if (server.ServerType == EnumServerType.SpaceEngineers)
+                return GetInstancePath(server) + @"SpaceEngineers-Dedicated.cfg";
+            else
+                return GetInstancePath(server) + @"MedievalEngineers-Dedicated.cfg";
+
         }
         public static string GetBackupsPath(EntityServer server)
         {

@@ -144,7 +144,8 @@ namespace SESM
                              "NewFile|" +
                              "Upload|" +
                              "GetFileContent|" +
-                             "SetFileContent"
+                             "SetFileContent|" +
+                             "GetDllVersion"
                 }
             );
 
