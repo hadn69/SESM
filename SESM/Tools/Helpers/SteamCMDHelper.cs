@@ -157,6 +157,7 @@ namespace SESM.Tools.Helpers
                 {
                     try
                     {
+                        VersionCache.SELocalVersion = match.Groups[1].Value;
                         return int.Parse(match.Groups[1].Value);
                     }
                     catch (Exception ex)
@@ -198,6 +199,7 @@ namespace SESM.Tools.Helpers
                 {
                     try
                     {
+                        VersionCache.SERemoteVersion = match.Groups[1].Value;
                         return int.Parse(match.Groups[1].Value);
                     }
                     catch (Exception ex)
@@ -248,6 +250,7 @@ namespace SESM.Tools.Helpers
                 {
                     try
                     {
+                        VersionCache.MELocalVersion = match.Groups[1].Value;
                         return int.Parse(match.Groups[1].Value);
                     }
                     catch (Exception ex)
@@ -289,6 +292,7 @@ namespace SESM.Tools.Helpers
                 {
                     try
                     {
+                        VersionCache.MERemoteVersion = match.Groups[1].Value;
                         return int.Parse(match.Groups[1].Value);
                     }
                     catch (Exception ex)

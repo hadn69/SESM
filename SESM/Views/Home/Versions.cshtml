@@ -1,0 +1,178 @@
+﻿@{
+    ViewBag.Title = "Versions";
+
+    List<KeyValuePair<string, string>> breadCrumb = new List<KeyValuePair<string, string>>();
+    breadCrumb.Add(new KeyValuePair<string, string>("Versions", "/Versions/"));
+    ViewBag.Breadcrumb = breadCrumb;
+
+    ViewBag.RefreshBtn = true;
+}
+
+<div class="col-md-12">
+    <div class="row">
+        <div class="col-md-12" id="Status-SE">
+            <div class="alert alert-warning text-center">
+                The version provided below are not real time values. They are only updated by the auto-updates or by viewing the setting page of those. Note also that those cached values are resetted to 0 on host/IIS restart.
+            </div>
+        </div>
+    </div>
+    <h3>Space Engineers</h3>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="Local-SE">
+            <div class="dashboard-stat blue-madison">
+                <div class="visual">
+                    <i class="fa fa-database"></i>
+                </div>
+                <div class="details">
+                    <div class="number">
+                        0
+                    </div>
+                    <div class="desc">
+                        Local Version
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="remote-SE">
+            <div class="dashboard-stat blue-madison">
+                <div class="visual">
+                    <i class="fa fa-globe"></i>
+                </div>
+                <div class="details">
+                    <div class="number">
+                        0
+                    </div>
+                    <div class="desc">
+                        Online Version
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3>Space Engineers Server Extender</h3>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="Local-SESE">
+            <div class="dashboard-stat blue-madison">
+                <div class="visual">
+                    <i class="fa fa-database"></i>
+                </div>
+                <div class="details">
+                    <div class="number">
+                        0
+                    </div>
+                    <div class="desc">
+                        Local Version
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="remote-SESE">
+            <div class="dashboard-stat blue-madison">
+                <div class="visual">
+                    <i class="fa fa-globe"></i>
+                </div>
+                <div class="details">
+                    <div class="number">
+                        0
+                    </div>
+                    <div class="desc">
+                        Online Version
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Medieval Engineers</h3>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="Local-ME">
+            <div class="dashboard-stat blue-madison">
+                <div class="visual">
+                    <i class="fa fa-database"></i>
+                </div>
+                <div class="details">
+                    <div class="number">
+                        0
+                    </div>
+                    <div class="desc">
+                        Local Version
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" id="remote-ME">
+            <div class="dashboard-stat blue-madison">
+                <div class="visual">
+                    <i class="fa fa-globe"></i>
+                </div>
+                <div class="details">
+                    <div class="number">
+                        0
+                    </div>
+                    <div class="desc">
+                        Online Version
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Space Engineers Server Manager</h3>
+    <div class="row">
+        <div class="col-md-12" id="Local-SESM">
+            <div class="dashboard-stat blue-madison">
+                <div class="visual">
+                    <i class="fa fa-database"></i>
+                </div>
+                <div class="details">
+                    <div class="number">
+                        0
+                    </div>
+                    <div class="desc">
+                        Local Version
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function initPage() {
+        function refresh() {
+            LockPage();
+            $.get("/API/Settings/GetCachedVersions",
+                function (data) {
+                    UnlockPage();
+                    var root = $($.parseXML(data)).find("Response");
+
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        showView();
+                        return;
+                    }
+                    console.log(data);
+                    var content = root.children("Content");
+
+                    $("#Local-SE").find(".number").text(content.children("SELocalVersion").text());
+                    $("#remote-SE").find(".number").text(content.children("SERemoteVersion").text());
+                    $("#Local-SESE").find(".number").text(content.children("SESELocalVersion").text());
+                    $("#remote-SESE").find(".number").text(content.children("SESERemoteVersion").text());
+                    $("#Local-ME").find(".number").text(content.children("MELocalVersion").text());
+                    $("#remote-ME").find(".number").text(content.children("MERemoteVersion").text());
+
+                    $("#Local-SESM").find(".number").text(content.children("SESMLocalVersion").text());
+                });
+        }
+
+        refresh();
+
+        $("#btnRefresh").click(function () {
+            refresh();
+        });
+    }
+</script>
+
