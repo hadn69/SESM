@@ -86,7 +86,12 @@ namespace SESM.Tools
                                 backupList = Directory.GetFiles(PathHelper.GetBackupsPath(item), "AutoBackupLvl" + backupLvl + "_*.zip");
                                 Array.Sort(backupList);
                             }
-                            ServerConfigHelperBase config = new SEServerConfigHelper();
+                            ServerConfigHelperBase config;
+                            if(item.ServerType == EnumServerType.SpaceEngineers)
+                                config = new SEServerConfigHelper();
+                            else
+                                config = new MEServerConfigHelper();
+
                             config.LoadFromServConf(PathHelper.GetConfigurationFilePath(item));
                             if (!string.IsNullOrEmpty(config.SaveName))
                             {
