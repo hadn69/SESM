@@ -12,10 +12,10 @@ namespace SESM.Tools.Helpers
     public class MEServerConfigHelper : ServerConfigHelperBase
     {
         // Server Grade
-        public new string SaveName = MEDefault.SaveName;
-        public new string IP = MEDefault.IP;
+        //public string SaveName = MEDefault.SaveName;
+        //public string IP = MEDefault.IP;
         public int SteamPort = MEDefault.SteamPort;
-        public new int ServerPort = MEDefault.ServerPort;
+        //public int ServerPort = MEDefault.ServerPort;
         public string ServerName = MEDefault.ServerName;
         public bool IgnoreLastSession = MEDefault.IgnoreLastSession;
         public bool PauseGameWhenEmpty = MEDefault.PauseGameWhenEmpty;
@@ -27,7 +27,7 @@ namespace SESM.Tools.Helpers
         // Map Grade
         // -- Misc
         public bool EnableSpectator = MEDefault.EnableSpectator;
-        public new uint AutoSaveInMinutes = MEDefault.AutoSaveInMinutes;
+        //public uint AutoSaveInMinutes = MEDefault.AutoSaveInMinutes;
 
         // -- Building
         public GameMode GameMode = MEDefault.GameMode;
@@ -310,6 +310,8 @@ namespace SESM.Tools.Helpers
                     bool.TryParse(sessionSettings.Element("EnableCopyPaste").Value, out EnableCopyPaste);
                 if (sessionSettings.Element("EnableStructuralSimulation") != null)
                     bool.TryParse(sessionSettings.Element("EnableStructuralSimulation").Value, out EnableStructuralSimulation);
+                if (sessionSettings.Element("MaxActiveFracturePieces") != null)
+                    uint.TryParse(sessionSettings.Element("MaxActiveFracturePieces").Value, out MaxActiveFracturePieces);
                 if (sessionSettings.Element("EnableSpectator") != null)
                     bool.TryParse(sessionSettings.Element("EnableSpectator").Value, out EnableSpectator);
                 if (sessionSettings.Element("ClientCanSave") != null)
@@ -404,6 +406,8 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(settings.Element("EnableCopyPaste").Value, out EnableCopyPaste);
             if (settings.Element("EnableStructuralSimulation") != null)
                 bool.TryParse(settings.Element("EnableStructuralSimulation").Value, out EnableStructuralSimulation);
+            if (settings.Element("MaxActiveFracturePieces") != null)
+                uint.TryParse(settings.Element("MaxActiveFracturePieces").Value, out MaxActiveFracturePieces);
             if (settings.Element("EnableSpectator") != null)
                 bool.TryParse(settings.Element("EnableSpectator").Value, out EnableSpectator);
             if (settings.Element("ClientCanSave") != null)
