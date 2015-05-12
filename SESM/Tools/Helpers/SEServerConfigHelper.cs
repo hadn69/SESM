@@ -12,10 +12,10 @@ namespace SESM.Tools.Helpers
     public class SEServerConfigHelper : ServerConfigHelperBase
     {
         // Server Grade
-        public new string SaveName = SEDefault.SaveName;
-        public string IP = SEDefault.IP;
+        //public string SaveName = SEDefault.SaveName;
+        //public string IP = SEDefault.IP;
         public int SteamPort = SEDefault.SteamPort;
-        public new int ServerPort = SEDefault.ServerPort;
+        //public int ServerPort = SEDefault.ServerPort;
         public string ServerName = SEDefault.ServerName;
         public bool IgnoreLastSession = SEDefault.IgnoreLastSession;
         public bool PauseGameWhenEmpty = SEDefault.PauseGameWhenEmpty;
@@ -30,7 +30,7 @@ namespace SESM.Tools.Helpers
         // -- Misc
         public bool EnableSpectator = SEDefault.EnableSpectator;
         public bool RealisticSound = SEDefault.RealisticSound;
-        public new uint AutoSaveInMinutes = SEDefault.AutoSaveInMinutes;
+        //public uint AutoSaveInMinutes = SEDefault.AutoSaveInMinutes;
 
         // -- Production
         public float InventorySizeMultiplier = SEDefault.InventorySizeMultiplier;

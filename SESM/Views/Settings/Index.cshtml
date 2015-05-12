@@ -56,6 +56,18 @@
                             <input type="checkbox" id="inpArch" class="make-switch" data-off-text="&nbsp;x64&nbsp;" data-on-text="&nbsp;x86&nbsp;">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Send Log To KSH</label>
+                        <div class="col-md-8">
+                            <input type="checkbox" id="inpSendLogToKeen" class="make-switch">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Add Date To Log </label>
+                        <div class="col-md-8">
+                            <input type="checkbox" id="inpAddDateToLog" class="make-switch">
+                        </div>
+                    </div>
                 </div>
                 <div class="form-actions">
                     <div class="row">
@@ -176,6 +188,16 @@
             </div>
         </div>
     </a>
+    <a class="dashboard-stat dashboard-stat-light yellow-casablanca" href="/Settings/Me/">
+        <div class="visual">
+            <i class="icon-rocket"></i>
+        </div>
+        <div class="details">
+            <div class="number">
+                Medieval Engineers Settings
+            </div>
+        </div>
+    </a>
 </div>
 <script type="text/javascript">
     function initPage() {
@@ -240,6 +262,8 @@
                 $('#inpMEDataPath').val(content.children("MEDataPath").text());
                 $('#inpMESavePath').val(content.children("MESavePath").text());
                 $('#inpArch').bootstrapSwitch('state', content.children("Arch").text() == "x86");
+                $('#inpSendLogToKeen').bootstrapSwitch('state', content.children("SendLogToKeen").text() == "true");
+                $('#inpAddDateToLog').bootstrapSwitch('state', content.children("AddDateToLog").text() == "true");
             });
 
             // Backups Settings
@@ -288,7 +312,9 @@
                         SEDataPath: $("#inpSEDataPath").val(),
                         MESavePath: $("#inpMESavePath").val(),
                         MEDataPath: $("#inpMEDataPath").val(),
-                        Arch: $('#inpArch').is(":checked") ? "x86" : "x64"
+                        Arch: $('#inpArch').is(":checked") ? "x86" : "x64",
+                        SendLogToKeen: $('#inpSendLogToKeen').is(":checked"),
+                        AddDateToLog: $('#inpAddDateToLog').is(":checked")
                     },
                     function (data) {
 

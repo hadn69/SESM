@@ -47,6 +47,8 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("MESavePath", SESMConfigHelper.MESavePath));
             response.AddToContent(new XElement("MEDataPath", SESMConfigHelper.MEDataPath));
             response.AddToContent(new XElement("Arch", SESMConfigHelper.Arch));
+            response.AddToContent(new XElement("SendLogToKeen", SESMConfigHelper.SendLogToKeen));
+            response.AddToContent(new XElement("AddDateToLog", SESMConfigHelper.AddDateToLog));
             return Content(response.ToString());
         }
 
@@ -99,6 +101,18 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SSESMS-MISAR", "The Arch field must be provided").ToString());
             if (!Enum.TryParse(Request.Form["Arch"], out Arch))
                 return Content(XMLMessage.Error("SRV-SSESMS-BADAR", "The Arch field is invalid").ToString());
+
+            bool SendLogToKeen;
+            if (string.IsNullOrWhiteSpace(Request.Form["SendLogToKeen"]))
+                return Content(XMLMessage.Error("SRV-SSESMS-MISSLTK", "The SendLogToKeen field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["SendLogToKeen"], out SendLogToKeen))
+                return Content(XMLMessage.Error("SRV-SSESMS-BADSLTK", "The SendLogToKeen field is invalid").ToString());
+
+            bool AddDateToLog;
+            if (string.IsNullOrWhiteSpace(Request.Form["AddDateToLog"]))
+                return Content(XMLMessage.Error("SRV-SSESMS-MISADTL", "The AddDateToLog field must be provided").ToString());
+            if (!bool.TryParse(Request.Form["AddDateToLog"], out AddDateToLog))
+                return Content(XMLMessage.Error("SRV-SSESMS-BADADTL", "The AddDateToLog field is invalid").ToString());
 
             // ** Process **
             try
@@ -166,6 +180,8 @@ namespace SESM.Controllers.API
                 SESMConfigHelper.MESavePath = MESavePath;
                 SESMConfigHelper.MEDataPath = MEDataPath;
                 SESMConfigHelper.Arch = Arch;
+                SESMConfigHelper.SendLogToKeen = SendLogToKeen;
+                SESMConfigHelper.AddDateToLog = AddDateToLog;
 
                 foreach (EntityServer server in SEServer)
                 {
