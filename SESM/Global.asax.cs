@@ -25,7 +25,7 @@ namespace SESM
 
             // Killing any remaining SteamCMD
             ServiceHelper.KillAllProcesses("steamcmd");
-            ServiceHelper.KillAllProcesses("SteamService.exe");
+            ServiceHelper.KillAllProcesses("SteamService");
             ServiceHelper.KillAllProcesses("steamerrorreporter");
 
             // Registering routes

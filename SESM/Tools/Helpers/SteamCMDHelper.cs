@@ -17,6 +17,8 @@ namespace SESM.Tools.Helpers
 
         private static object CheckSteamCMDLock = new object();
 
+        private static object ExecuteSteamCMDLock = new object();
+
         private static void CheckSteamCMD(Logger logger)
         {
             lock (CheckSteamCMDLock)
@@ -71,60 +73,69 @@ namespace SESM.Tools.Helpers
         {
             try
             {
-                // Check and DL SteamCMD
-                CheckSteamCMD(logger);
-
-                // Getting Info
-                Process si = new Process
+                lock (ExecuteSteamCMDLock)
                 {
-                    StartInfo =
+                    // Check and DL SteamCMD
+                    CheckSteamCMD(logger);
+
+                    // Force deleting 
+                    if(Directory.Exists(PathHelper.GetSteamCMDPath() + @"appcache\"))
+                        Directory.Delete(PathHelper.GetSteamCMDPath() + @"appcache\", true);
+                    if (Directory.Exists(PathHelper.GetSteamCMDPath() + @"depotcache\"))
+                        Directory.Delete(PathHelper.GetSteamCMDPath() + @"depotcache\", true);
+
+                    // Getting Info
+                    Process si = new Process
                     {
-                        WorkingDirectory = PathHelper.GetSteamCMDPath(),
-                        UseShellExecute = false,
-                        FileName = SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe",
-                        Arguments = arguments,
-                        CreateNoWindow = false,
-                        RedirectStandardInput = true,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = false
+                        StartInfo =
+                        {
+                            WorkingDirectory = PathHelper.GetSteamCMDPath(),
+                            UseShellExecute = false,
+                            FileName = SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe",
+                            Arguments = arguments,
+                            CreateNoWindow = false,
+                            RedirectStandardInput = true,
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = false
+                        }
+                    };
+
+                    logger?.Info("Starting SteamCMD (" + GetInfoDuration + " secs Max)");
+                    logger?.Debug("Arguments : " + si.StartInfo.Arguments);
+                    si.Start();
+
+                    DateTime endTime = DateTime.Now.AddSeconds(duration);
+                    string output = string.Empty;
+
+                    logger?.Debug("Start of SteamCMD output :");
+                    while (!si.HasExited && DateTime.Now <= endTime)
+                    {
+                        string val = si.StandardOutput.ReadLine();
+                        if (val == null)
+                            continue;
+                        output += val + "\n";
+                        logger?.Debug("    " + val);
                     }
-                };
+                    logger?.Debug("End of SteamCMD output");
 
-                logger?.Info("Starting SteamCMD (" + GetInfoDuration + " secs Max)");
-                logger?.Debug("Arguments : " + si.StartInfo.Arguments);
-                si.Start();
-
-                DateTime endTime = DateTime.Now.AddSeconds(duration);
-                string output = string.Empty;
-
-                logger?.Debug("Start of SteamCMD output :");
-                while (!si.HasExited && DateTime.Now <= endTime)
-                {
-                    string val = si.StandardOutput.ReadLine();
-                    if (val == null)
-                        continue;
-                    output += val + "\n";
-                    logger?.Debug("    " + val);
+                    if (si.HasExited)
+                        logger?.Info("Process closed itself gracefully");
+                    else
+                    {
+                        logger?.Warn("Process execution timeout");
+                        try
+                        {
+                            ServiceHelper.KillProcessAndChildren(si.Id);
+                            logger?.Info("Killing process sucessful");
+                            Thread.Sleep(2000);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger?.Error("Error while killing process", ex);
+                        }
+                    }
+                    return output;
                 }
-                logger?.Debug("End of SteamCMD output");
-
-                if (si.HasExited)
-                    logger?.Info("Process closed itself gracefully");
-                else
-                {
-                    logger?.Warn("Process execution timeout");
-                    try
-                    {
-                        ServiceHelper.KillProcessAndChildren(si.Id);
-                        logger?.Info("Killing process sucessful");
-                        Thread.Sleep(2000);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger?.Error("Error while killing process", ex);
-                    }
-                }
-                return output;
             }
             catch (Exception ex)
             {

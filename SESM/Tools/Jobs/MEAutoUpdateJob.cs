@@ -16,7 +16,7 @@ namespace SESM.Tools.Jobs
     {
         public void Execute(IJobExecutionContext context)
         {
-            Logger logger = LogManager.GetLogger("SEAutoUpdateLogger");
+            Logger logger = LogManager.GetLogger("MEAutoUpdateLogger");
             Run(logger, false, false, false);
         }
 
