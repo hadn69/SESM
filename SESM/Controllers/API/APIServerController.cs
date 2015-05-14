@@ -470,6 +470,8 @@ namespace SESM.Controllers.API
                         SEServerConfigHelper config = new SEServerConfigHelper();
                         config.Load(server);
                         server.AutoSaveInMinutes = Convert.ToInt32(config.AutoSaveInMinutes);
+                        config.AutoSaveInMinutes = 0;
+                        config.Save(server);
                         srvPrv.UpdateServer(server);
                     }
                     else
@@ -872,7 +874,7 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("PauseGameWhenEmpty", serverConfig.PauseGameWhenEmpty));
             response.AddToContent(new XElement("EnableSpectator", serverConfig.EnableSpectator));
             response.AddToContent(new XElement("RealisticSound", serverConfig.RealisticSound));
-            response.AddToContent(new XElement("AutoSaveInMinutes", serverConfig.AutoSaveInMinutes));
+            response.AddToContent(new XElement("AutoSaveInMinutes", server.AutoSaveInMinutes));
             response.AddToContent(new XElement("InventorySizeMultiplier", serverConfig.InventorySizeMultiplier));
             response.AddToContent(new XElement("AssemblerSpeedMultiplier", serverConfig.AssemblerSpeedMultiplier));
             response.AddToContent(new XElement("AssemblerEfficiencyMultiplier", serverConfig.AssemblerEfficiencyMultiplier));
@@ -1423,7 +1425,7 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("IgnoreLastSession", serverConfig.IgnoreLastSession));
             response.AddToContent(new XElement("PauseGameWhenEmpty", serverConfig.PauseGameWhenEmpty));
             response.AddToContent(new XElement("EnableSpectator", serverConfig.EnableSpectator));
-            response.AddToContent(new XElement("AutoSaveInMinutes", serverConfig.AutoSaveInMinutes));
+            response.AddToContent(new XElement("AutoSaveInMinutes", server.AutoSaveInMinutes));
             response.AddToContent(new XElement("GameMode", serverConfig.GameMode));
             response.AddToContent(new XElement("EnableCopyPaste", serverConfig.EnableCopyPaste));
             response.AddToContent(new XElement("MaxPlayers", serverConfig.MaxPlayers));

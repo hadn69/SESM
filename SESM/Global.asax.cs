@@ -18,14 +18,14 @@ namespace SESM
     {
         protected void Application_Start()
         {
-            Constants.SetVersion(3,7,1);
+            Constants.SetVersion(3,7,2);
             // Resetting Run Vars
             if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar"))
                 File.Delete(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar");
 
             // Killing any remaining SteamCMD
             ServiceHelper.KillAllProcesses("steamcmd");
-            ServiceHelper.KillAllProcesses("SteamService.exe");
+            ServiceHelper.KillAllProcesses("SteamService");
             ServiceHelper.KillAllProcesses("steamerrorreporter");
 
             // Registering routes
