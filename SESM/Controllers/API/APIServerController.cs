@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Mvc;
+using System.Xml;
 using System.Xml.Linq;
 using NLog;
 using Quartz;
 using Quartz.Impl;
+using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools;
@@ -18,9 +20,16 @@ using SESM.Tools.Jobs;
 
 namespace SESM.Controllers.API
 {
-    public class APIServerController : Controller
+    public class APIServerController : Controller, IAPIController
     {
-        private readonly DataContext _context = new DataContext();
+        public DataContext CurrentContext { get; set; }
+
+        public EntityServer RequestServer { get; set; }
+
+        public APIServerController()
+        {
+            CurrentContext = new DataContext();
+        }
 
         #region Informations Provider
 
@@ -29,8 +38,8 @@ namespace SESM.Controllers.API
         public ActionResult GetServers()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-            UserProvider usrPrv = new UserProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
+            UserProvider usrPrv = new UserProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
 
@@ -59,39 +68,24 @@ namespace SESM.Controllers.API
 
         // POST: API/Server/GetServer
         [HttpPost]
+        [APIServerAccess("SRV-GS", "SERVER_INFO")]
         public ActionResult GetServer()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
 
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-GS-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-GS-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-GS-UKNSRV", "The server doesn't exist").ToString());
-
-            if (srvPrv.GetAccessLevel(userID, server.Id) == AccessLevel.None)
-                return Content(XMLMessage.Error("SRV-GS-NOACCESS", "You don't have access to this server").ToString());
-
             // ** PROCESS **
             XMLMessage response = new XMLMessage("SRV-GS-OK");
 
-            response.AddToContent(new XElement("Name", server.Name));
-            response.AddToContent(new XElement("ID", server.Id));
-            response.AddToContent(new XElement("Public", server.IsPublic.ToString()));
-            response.AddToContent(new XElement("State", srvPrv.GetState(server).ToString()));
-            response.AddToContent(new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, server.Id)));
-            response.AddToContent(new XElement("Type", server.ServerType == EnumServerType.SpaceEngineers ? server.UseServerExtender ? "SESE" : "SE" : "ME"));
+            response.AddToContent(new XElement("Name", RequestServer.Name));
+            response.AddToContent(new XElement("ID", RequestServer.Id));
+            response.AddToContent(new XElement("Public", RequestServer.IsPublic.ToString()));
+            response.AddToContent(new XElement("State", srvPrv.GetState(RequestServer).ToString()));
+            response.AddToContent(new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, RequestServer.Id)));
+            response.AddToContent(new XElement("Type", RequestServer.ServerType == EnumServerType.SpaceEngineers ? RequestServer.UseServerExtender ? "SESE" : "SE" : "ME"));
 
             return Content(response.ToString());
         }
@@ -105,7 +99,7 @@ namespace SESM.Controllers.API
         public ActionResult CreateServer()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -130,15 +124,15 @@ namespace SESM.Controllers.API
             if (!(ServerType == "SE" || ServerType == "ME"))
                 return Content(XMLMessage.Error("SRV-CRS-BADTYPE", "The ServerType must be either SE or ME").ToString());
 
-            EnumServerType ServerTypeParsed = EnumServerType.SpaceEngineers;
+            EnumServerType serverTypeParsed = EnumServerType.SpaceEngineers;
 
             switch (ServerType)
             {
                 case "SE":
-                    ServerTypeParsed = EnumServerType.SpaceEngineers;
+                    serverTypeParsed = EnumServerType.SpaceEngineers;
                     break;
                 case "ME":
-                    ServerTypeParsed = EnumServerType.MedievalEngineers;
+                    serverTypeParsed = EnumServerType.MedievalEngineers;
                     break;
             }
 
@@ -149,8 +143,7 @@ namespace SESM.Controllers.API
                 Ip = SEDefault.IP,
                 IsPublic = SEDefault.IsPublic,
                 Port = srvPrv.GetNextAvailablePort(),
-                ServerExtenderPort = srvPrv.GetNextAvailableSESEPort(),
-                ServerType = ServerTypeParsed
+                ServerType = serverTypeParsed
             };
             srvPrv.CreateServer(server);
 
@@ -179,7 +172,7 @@ namespace SESM.Controllers.API
         public ActionResult DeleteServers()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -246,122 +239,137 @@ namespace SESM.Controllers.API
 
         // POST: API/Server/GetSettings
         [HttpPost]
+        [APIServerAccess("SRV-GSET", "SERVER_SETTINGS_GLOBAL_RD")]
         public ActionResult GetSettings()
         {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-GSET-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-GSET-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-GSET-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("SRV-GSET-NOACCESS", "You don't have access to this server").ToString());
-
             // ** PROCESS **
-
             XMLMessage response = new XMLMessage("SRV-GSET-OK");
 
-            response.AddToContent(new XElement("Name", server.Name));
-            response.AddToContent(new XElement("Public", server.IsPublic));
-            response.AddToContent(new XElement("ProcessPriority", server.ProcessPriority.ToString()));
+            XElement values = new XElement("Values");
+            values.Add(new XElement("Name", RequestServer.Name));
+            if(RequestServer.ServerType == EnumServerType.SpaceEngineers)
+                values.Add(new XElement("UseServerExtender", RequestServer.UseServerExtender));
+            values.Add(new XElement("Public", RequestServer.IsPublic));
+            values.Add(new XElement("ProcessPriority", RequestServer.ProcessPriority.ToString()));
+            response.AddToContent(values);
+
+            XElement rights = new XElement("Rights");
+            rights.Add(new XElement("Name", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_NAME_WR")));
+            if (RequestServer.ServerType == EnumServerType.SpaceEngineers)
+                rights.Add(new XElement("UseServerExtender", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_USESESE_WR")));
+            rights.Add(new XElement("Public", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PUBLIC_WR")));
+            rights.Add(new XElement("ProcessPriority", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PROCESSPRIO_WR")));
+            response.AddToContent(rights);
 
             return Content(response.ToString());
         }
 
         // POST: API/Server/SetSettings
         [HttpPost]
+        [APIServerAccess("SRV-SSET", "SERVER_SETTINGS_GLOBAL_NAME_WR",
+                                     "SERVER_SETTINGS_GLOBAL_USESESE_WR", 
+                                     "SERVER_SETTINGS_GLOBAL_PROCESSPRIO_WR",
+                                     "SERVER_SETTINGS_GLOBAL_PUBLIC_WR")]
         public ActionResult SetSettings()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-SSET-MISID", "The ServerID field must be provided").ToString());
+            bool accessName = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_NAME_WR");
+            bool accessSESE = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_USESESE_WR");
+            bool accessPublic = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PUBLIC_WR");
+            bool accessProcessPrio = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PROCESSPRIO_WR");
 
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-SSET-BADID", "The ServerID is invalid").ToString());
+            string Name = string.Empty;
+            if (accessName)
+            {
+                Name = Request.Form["Name"];
+                if (string.IsNullOrWhiteSpace(Name))
+                    return Content(XMLMessage.Error("SRV-SSET-MISNAME", "The Name field must be provided").ToString());
+                if (!Regex.IsMatch(Name, @"^[a-zA-Z0-9_.-]+$"))
+                    return Content(XMLMessage.Error("SRV-SSET-BADNAME","The Name field must be only composed of letters, numbers, dots, dashs and underscores").ToString());
+                if (Name != RequestServer.Name && !srvPrv.IsNameAvaialble(Name))
+                    return Content(XMLMessage.Error("SRV-SSET-NAMEUSE", "The server " + Name + "Already Exist").ToString());
 
-            EntityServer server = srvPrv.GetServer(serverId);
+            }
 
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-SSET-UKNSRV", "The server doesn't exist").ToString());
+            bool UseServerExtender = false;
+            if (RequestServer.ServerType == EnumServerType.SpaceEngineers && accessSESE)
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["UseServerExtender"]))
+                    return Content(XMLMessage.Error("SRV-SSET-MISSESE", "The UseServerExtender field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["SESE"], out UseServerExtender))
+                    return Content(XMLMessage.Error("SRV-SSET-BADSESE", "The UseServerExtender field is invalid").ToString());
+            }
 
-            if (!srvPrv.IsAdminOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("SRV-SSET-NOACCESS", "You don't have access to this server").ToString());
+            bool Public = false;
+            if (accessPublic)
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["Public"]))
+                    return Content(XMLMessage.Error("SRV-SSET-MISPUB", "The Public field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["Public"], out Public))
+                    return Content(XMLMessage.Error("SRV-SSET-BADPUB", "The Public field is invalid").ToString());
+            }
 
-            string serverName = Request.Form["Name"];
-            if (string.IsNullOrWhiteSpace(serverName))
-                return Content(XMLMessage.Error("SRV-SSET-MISNAME", "The Name field must be provided").ToString());
-            if (!Regex.IsMatch(serverName, @"^[a-zA-Z0-9_.-]+$"))
-                return Content(XMLMessage.Error("SRV-SSET-BADNAME", "The Name field must be only composed of letters, numbers, dots, dashs and underscores").ToString());
-            if (serverName != server.Name && !srvPrv.IsNameAvaialble(serverName))
-                return Content(XMLMessage.Error("SRV-SSET-NAMEUSE", "The server " + serverName + "Already Exist").ToString());
-
-            bool serverPublic;
-            if (string.IsNullOrWhiteSpace(Request.Form["Public"]))
-                return Content(XMLMessage.Error("SRV-SSET-MISPUB", "The Public field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["Public"], out serverPublic))
-                return Content(XMLMessage.Error("SRV-SSET-BADPUB", "The Public field is invalid").ToString());
-
-            EnumProcessPriority serverProcessPriority;
-            if (string.IsNullOrWhiteSpace(Request.Form["ProcessPriority"]))
-                return Content(XMLMessage.Error("SRV-SSET-MISPP", "The ProcessPriority field must be provided").ToString());
-            if (!Enum.TryParse(Request.Form["ProcessPriority"], out serverProcessPriority))
-                return Content(XMLMessage.Error("SRV-SSET-BADPP", "The ProcessPriority field is invalid").ToString());
+            EnumProcessPriority ProcessPriority = EnumProcessPriority.Normal;
+            if (accessProcessPrio)
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["ProcessPriority"]))
+                    return Content(XMLMessage.Error("SRV-SSET-MISPP", "The ProcessPriority field must be provided").ToString());
+                if (!Enum.TryParse(Request.Form["ProcessPriority"], out ProcessPriority))
+                    return Content(XMLMessage.Error("SRV-SSET-BADPP", "The ProcessPriority field is invalid").ToString());
+            }
 
             // ** Process **
             try
             {
-                ServiceState serverState = srvPrv.GetState(server);
+                ServiceState serverState = srvPrv.GetState(RequestServer);
                 bool restartRequired = false;
 
-                if (serverName != server.Name)
+                if (!accessName)
+                    Name = RequestServer.Name;
+
+                if (!accessSESE)
+                    UseServerExtender = RequestServer.UseServerExtender;
+
+                if ((accessName || accessSESE ) && (Name != RequestServer.Name || UseServerExtender != RequestServer.UseServerExtender))
                 {
                     if (serverState != ServiceState.Stopped &&
                         serverState != ServiceState.Unknow)
                     {
-                        ServiceHelper.StopServiceAndWait(server);
+                        ServiceHelper.StopServiceAndWait(RequestServer);
                         Thread.Sleep(5000);
-                        ServiceHelper.KillService(server);
+                        ServiceHelper.KillService(RequestServer);
                         Thread.Sleep(1000);
                         restartRequired = true;
                     }
-                    ServiceHelper.UnRegisterService(server);
-                    string oldpath = PathHelper.GetInstancePath(server);
-                    server.Name = serverName;
-                    string newpath = PathHelper.GetInstancePath(server);
+                    ServiceHelper.UnRegisterService(RequestServer);
+                    string oldpath = PathHelper.GetInstancePath(RequestServer);
+                    RequestServer.Name = Name;
+                    RequestServer.UseServerExtender = UseServerExtender;
+                    string newpath = PathHelper.GetInstancePath(RequestServer);
 
                     Directory.Move(oldpath, newpath);
 
-                    ServiceHelper.RegisterService(server);
+                    ServiceHelper.RegisterService(RequestServer);
                 }
-                server.IsPublic = serverPublic;
-                server.ProcessPriority = serverProcessPriority;
+                if(accessPublic)
+                    RequestServer.IsPublic = Public;
 
-                if (serverState != ServiceState.Stopped && serverState != ServiceState.Unknow)
-                    ServiceHelper.SetPriority(server);
+                if (accessProcessPrio)
+                {
+                    RequestServer.ProcessPriority = ProcessPriority;
 
-                srvPrv.UpdateServer(server);
+                    if (serverState != ServiceState.Stopped && serverState != ServiceState.Unknow)
+                        ServiceHelper.SetPriority(RequestServer);
+                }
+
+
+                srvPrv.UpdateServer(RequestServer);
+
                 if (restartRequired)
-                    ServiceHelper.StartService(server);
+                    ServiceHelper.StartService(RequestServer);
 
                 return Content(XMLMessage.Success("SRV-SSET-OK", "The server settings have been updated").ToString());
             }
@@ -371,247 +379,109 @@ namespace SESM.Controllers.API
             }
         }
 
-        // POST: API/Server/GetSESESettings
-        [HttpPost]
-        public ActionResult GetSESESettings()
-        {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-GSESES-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-GSESES-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-GSESES-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("SRV-GSESES-NOACCESS", "You don't have access to this server").ToString());
-
-            // ** PROCESS **
-
-            XMLMessage response = new XMLMessage("SRV-GSESES-OK");
-
-            response.AddToContent(new XElement("UseServerExtender", server.UseServerExtender));
-            response.AddToContent(new XElement("ServerExtenderPort", server.ServerExtenderPort));
-
-            return Content(response.ToString());
-        }
-
-        // POST: API/Server/SetSESESettings
-        [HttpPost]
-        public ActionResult SetSESESettings()
-        {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-SSESES-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-SSESES-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-SSESES-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("SRV-SSESES-NOACCESS", "You don't have access to this server").ToString());
-
-            bool useServerExtender;
-            if (string.IsNullOrWhiteSpace(Request.Form["UseServerExtender"]))
-                return Content(XMLMessage.Error("SRV-SSESES-MISUSE", "The UseServerExtender field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["UseServerExtender"], out useServerExtender))
-                return Content(XMLMessage.Error("SRV-SSESES-BADUSE", "The UseServerExtender field is invalid").ToString());
-
-            int serverExtenderPort;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerExtenderPort"]))
-                return Content(XMLMessage.Error("SRV-SSESES-MISSEP", "The ServerExtenderPort field must be provided").ToString());
-            if (!int.TryParse(Request.Form["ServerExtenderPort"], out serverExtenderPort) || serverExtenderPort < 1 || serverExtenderPort > 65535)
-                return Content(XMLMessage.Error("SRV-SSESES-BADSEP", "The ServerExtenderPort field is invalid").ToString());
-            if (serverExtenderPort != server.ServerExtenderPort && !srvPrv.IsPortAvailable(serverExtenderPort, server))
-                return Content(XMLMessage.Error("SRV-SSESES-EXSEP", "The ServerExtenderPort is already in use by another server").ToString());
-
-            // ** Process **
-            try
-            {
-                ServiceState serverState = srvPrv.GetState(server);
-                bool restartRequired = false;
-
-                if (serverState != ServiceState.Stopped &&
-                    serverState != ServiceState.Unknow)
-                {
-                    ServiceHelper.StopServiceAndWait(server);
-                    Thread.Sleep(5000);
-                    ServiceHelper.KillService(server);
-                    Thread.Sleep(1000);
-                    restartRequired = true;
-                }
-
-                if (useServerExtender != server.UseServerExtender)
-                {
-                    if (useServerExtender)
-                    {
-                        SEServerConfigHelper config = new SEServerConfigHelper();
-                        config.Load(server);
-                        server.AutoSaveInMinutes = Convert.ToInt32(config.AutoSaveInMinutes);
-                        config.AutoSaveInMinutes = 0;
-                        config.Save(server);
-                        srvPrv.UpdateServer(server);
-                    }
-                    else
-                    {
-                        SEServerConfigHelper config = new SEServerConfigHelper();
-                        config.Load(server);
-                        config.AutoSaveInMinutes = Convert.ToUInt32(server.AutoSaveInMinutes);
-                        config.Save(server);
-                    }
-
-                    server.UseServerExtender = useServerExtender;
-                    ServiceHelper.UnRegisterService(server);
-                    ServiceHelper.RegisterService(server);
-                }
-
-                server.ServerExtenderPort = serverExtenderPort;
-
-                srvPrv.UpdateServer(server);
-                if (restartRequired)
-                    ServiceHelper.StartService(server);
-
-                return Content(XMLMessage.Success("SRV-SSESES-OK", "The server SESE settings have been updated").ToString());
-            }
-            catch (Exception ex)
-            {
-                return Content(XMLMessage.Error("SRV-SSESES-EX", "Exception :" + ex).ToString());
-            }
-        }
-
         // POST: API/Server/GetJobsSettings
         [HttpPost]
+        [APIServerAccess("SRV-GJS", "SERVER_SETTINGS_JOBS_RD")]
         public ActionResult GetJobsSettings()
         {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-GJS-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-GJS-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-GJS-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("SRV-GJS-NOACCESS", "You don't have access to this server").ToString());
-
             // ** PROCESS **
-
             XMLMessage response = new XMLMessage("SRV-GJS-OK");
 
-            response.AddToContent(new XElement("AutoRestart", server.IsAutoRestartEnabled));
-            response.AddToContent(new XElement("AutoRestartCron", server.AutoRestartCron));
-            response.AddToContent(new XElement("AutoStart", server.IsAutoStartEnabled));
+            XElement values = new XElement("Values");
+            values.Add(new XElement("AutoRestart", RequestServer.IsAutoRestartEnabled));
+            values.Add(new XElement("AutoRestartCron", RequestServer.AutoRestartCron));
+            values.Add(new XElement("AutoStart", RequestServer.IsAutoStartEnabled));
+            response.AddToContent(values);
+
+            XElement rights = new XElement("Rights");
+            rights.Add(new XElement("AutoRestart", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_JOBS_AUTORESTART_WR")));
+            rights.Add(new XElement("AutoRestartCron", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_JOBS_AUTORESTARTCRON_WR")));
+            rights.Add(new XElement("AutoStart", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_JOBS_AUTOSTART_WR")));
+            response.AddToContent(rights);
 
             return Content(response.ToString());
         }
 
         // POST: API/Server/SetJobsSettings
         [HttpPost]
+        [APIServerAccess("SRV-SJS", "SERVER_SETTINGS_JOBS_AUTORESTART_WR",
+                                     "SERVER_SETTINGS_JOBS_AUTORESTARTCRON_WR",
+                                     "SERVER_SETTINGS_JOBS_AUTOSTART_WR")]
         public ActionResult SetJobsSettings()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-SJS-MISID", "The ServerID field must be provided").ToString());
+            bool accessAutoRestart = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_JOBS_AUTORESTART_WR");
+            bool accessAutoRestartCron = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_JOBS_AUTORESTARTCRON_WR");
+            bool accessAutoStart = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_JOBS_AUTOSTART_WR");
 
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-SJS-BADID", "The ServerID is invalid").ToString());
+            bool AutoRestart = false;
+            if (accessAutoRestart)
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["AutoRestart"]))
+                    return
+                        Content(XMLMessage.Error("SRV-SJS-MISAR", "The AutoRestart field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["AutoRestart"], out AutoRestart))
+                    return Content(XMLMessage.Error("SRV-SJS-BADAR", "The AutoRestart field is invalid").ToString());
+            }
+            else
+                AutoRestart = RequestServer.IsAutoRestartEnabled;
 
-            EntityServer server = srvPrv.GetServer(serverId);
+            string AutoRestartCron;
+            if (accessAutoRestartCron)
+            {
+                AutoRestartCron = Request.Form["AutoRestartCron"];
+                if (string.IsNullOrWhiteSpace(AutoRestartCron))
+                    return Content(XMLMessage.Error("SET-SJS-MISARC", "The AutoRestartCron field must be provided").ToString());
+                if (!CronExpression.IsValidExpression(AutoRestartCron))
+                    return Content(XMLMessage.Error("SET-SJS-BADARC", "The AutoRestartCron field is invalid").ToString());
+            }
+            else
+                AutoRestartCron = RequestServer.AutoRestartCron;
 
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-SJS-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("SRV-SJS-NOACCESS", "You don't have access to this server").ToString());
-
-            bool autoRestart;
-            if (string.IsNullOrWhiteSpace(Request.Form["AutoRestart"]))
-                return Content(XMLMessage.Error("SRV-SJS-MISAR", "The AutoRestart field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["AutoRestart"], out autoRestart))
-                return Content(XMLMessage.Error("SRV-SJS-BADAR", "The AutoRestart field is invalid").ToString());
-
-            string autoRestartCron = Request.Form["AutoRestartCron"];
-            if (string.IsNullOrWhiteSpace(autoRestartCron))
-                return Content(XMLMessage.Error("SET-SJS-MISARC", "The AutoRestartCron field must be provided").ToString());
-            if (!CronExpression.IsValidExpression(autoRestartCron))
-                return Content(XMLMessage.Error("SET-SJS-BADARC", "The AutoRestartCron field is invalid").ToString());
-
-            bool autoStart;
-            if (string.IsNullOrWhiteSpace(Request.Form["AutoStart"]))
-                return Content(XMLMessage.Error("SRV-SJS-MISAS", "The AutoStart field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["AutoStart"], out autoStart))
-                return Content(XMLMessage.Error("SRV-SJS-BADAS", "The AutoStart field is invalid").ToString());
+            bool AutoStart = false;
+            if (accessAutoStart)
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["AutoStart"]))
+                    return Content(XMLMessage.Error("SRV-SJS-MISAS", "The AutoStart field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["AutoStart"], out AutoStart))
+                    return Content(XMLMessage.Error("SRV-SJS-BADAS", "The AutoStart field is invalid").ToString());
+            }
+            else
+                AutoStart = RequestServer.IsAutoStartEnabled;
 
             // ** Process **
             try
             {
-                if (autoRestart != server.IsAutoRestartEnabled || server.AutoRestartCron != autoRestartCron)
+                if (AutoRestart != RequestServer.IsAutoRestartEnabled || AutoRestartCron != RequestServer.AutoRestartCron )
                 {
-                    server.IsAutoRestartEnabled = autoRestart;
-                    server.AutoRestartCron = autoRestartCron;
+                    RequestServer.IsAutoRestartEnabled = AutoRestart;
+                    RequestServer.AutoRestartCron = AutoRestartCron;
 
                     IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
-                    scheduler.DeleteJob(AutoRestartJob.GetJobKey(server));
+                    scheduler.DeleteJob(AutoRestartJob.GetJobKey(RequestServer));
 
-                    if (server.IsAutoRestartEnabled)
+                    if (RequestServer.IsAutoRestartEnabled)
                     {
                         // Instantiating the job
                         IJobDetail AutoRestartJobDetail = JobBuilder.Create<AutoRestartJob>()
-                            .WithIdentity(AutoRestartJob.GetJobKey(server))
+                            .WithIdentity(AutoRestartJob.GetJobKey(RequestServer))
                             .Build();
 
                         ITrigger AutoRestartJobTrigger = TriggerBuilder.Create()
-                            .WithIdentity(AutoRestartJob.GetTriggerKey(server))
-                            .WithCronSchedule(autoRestartCron)
+                            .WithIdentity(AutoRestartJob.GetTriggerKey(RequestServer))
+                            .WithCronSchedule(RequestServer.AutoRestartCron)
                             .Build();
 
                         scheduler.ScheduleJob(AutoRestartJobDetail, AutoRestartJobTrigger);
                     }
                 }
 
-                server.IsAutoStartEnabled = autoStart;
+                RequestServer.IsAutoStartEnabled = AutoStart;
 
-                srvPrv.UpdateServer(server);
+                srvPrv.UpdateServer(RequestServer);
 
                 return Content(XMLMessage.Success("SRV-SJS-OK", "The server Jobs settings have been updated").ToString());
             }
@@ -626,7 +496,7 @@ namespace SESM.Controllers.API
         public ActionResult GetBackupsSettings()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -672,7 +542,7 @@ namespace SESM.Controllers.API
         public ActionResult SetBackupsSettings()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -727,13 +597,13 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SBS-EX", "Exception :" + ex).ToString());
             }
         }
-
+        
         // POST: API/Server/GetAccessSettings
         [HttpPost]
         public ActionResult GetAccessSettings()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -759,18 +629,18 @@ namespace SESM.Controllers.API
             XMLMessage response = new XMLMessage("SRV-GAS-OK");
 
             XElement webAdministrators = new XElement("WebAdministrators");
-            foreach (EntityUser wadmin in server.Administrators)
-                webAdministrators.Add(new XElement("WebAdministrator", wadmin.Login));
+            //foreach (EntityUser wadmin in server.Administrators)
+            //    webAdministrators.Add(new XElement("WebAdministrator", wadmin.Login));
             response.AddToContent(webAdministrators);
 
             XElement webManagers = new XElement("WebManagers");
-            foreach (EntityUser wmanager in server.Managers)
-                webManagers.Add(new XElement("WebManager", wmanager.Login));
+            //foreach (EntityUser wmanager in server.Managers)
+            //    webManagers.Add(new XElement("WebManager", wmanager.Login));
             response.AddToContent(webManagers);
 
             XElement webUsers = new XElement("WebUsers");
-            foreach (EntityUser wuser in server.Users)
-                webUsers.Add(new XElement("WebUser", wuser.Login));
+            //foreach (EntityUser wuser in server.Users)
+            //    webUsers.Add(new XElement("WebUser", wuser.Login));
             response.AddToContent(webUsers);
 
             return Content(response.ToString());
@@ -781,8 +651,8 @@ namespace SESM.Controllers.API
         public ActionResult SetAccessSettings()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-            UserProvider usrPrv = new UserProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
+            UserProvider usrPrv = new UserProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -814,11 +684,12 @@ namespace SESM.Controllers.API
             // ** Process **
             try
             {
+                /*
                 if (accessLevel != AccessLevel.Manager)
                     srvPrv.AddAdministrator(webAdministratorsStr.Split(';'), server);
                 srvPrv.AddManagers(webManagersStr.Split(';'), server);
                 srvPrv.AddUsers(webUsersStr.Split(';'), server);
-
+                */
                 srvPrv.UpdateServer(server);
 
                 return Content(XMLMessage.Success("SRV-SAS-OK", "The server Access settings have been updated").ToString());
@@ -828,7 +699,7 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SAS-EX", "Exception :" + ex).ToString());
             }
         }
-
+        
         #endregion
 
         #region SE Server Configuration
@@ -838,7 +709,7 @@ namespace SESM.Controllers.API
         public ActionResult SEGetConfiguration()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -936,7 +807,7 @@ namespace SESM.Controllers.API
         public ActionResult SEGetConfigurationRights()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -1019,7 +890,7 @@ namespace SESM.Controllers.API
         public ActionResult SESetConfiguration()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -1383,14 +1254,14 @@ namespace SESM.Controllers.API
 
         #endregion
 
-        #region SE Server Configuration
+        #region ME Server Configuration
 
         // POST: API/Server/MEGetConfiguration
         [HttpPost]
         public ActionResult MEGetConfiguration()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -1467,7 +1338,7 @@ namespace SESM.Controllers.API
         public ActionResult MEGetConfigurationRights()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -1517,7 +1388,7 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("EnableBarbarians", true));
             response.AddToContent(new XElement("MaximumBots", isAdmin));
             response.AddToContent(new XElement("GameDayInRealMinutes", true));
-            response.AddToContent(new XElement("DayNightRatio",true));
+            response.AddToContent(new XElement("DayNightRatio", true));
             response.AddToContent(new XElement("EnableAnimals", true));
 
             return Content(response.ToString());
@@ -1528,7 +1399,7 @@ namespace SESM.Controllers.API
         public ActionResult MESetConfiguration()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -1762,7 +1633,7 @@ namespace SESM.Controllers.API
         public ActionResult StartServers()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -1818,7 +1689,7 @@ namespace SESM.Controllers.API
         public ActionResult StopServers()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -1873,7 +1744,7 @@ namespace SESM.Controllers.API
         [HttpPost]
         public ActionResult RestartServers()
         {
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -1949,7 +1820,7 @@ namespace SESM.Controllers.API
         public ActionResult KillServers()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             EntityUser user = Session["User"] as EntityUser;
             int userID = user == null ? 0 : user.Id;
@@ -2006,9 +1877,11 @@ namespace SESM.Controllers.API
         {
             if (disposing)
             {
-                _context.Dispose();
+                CurrentContext.Dispose();
             }
             base.Dispose(disposing);
         }
+
+
     }
 }

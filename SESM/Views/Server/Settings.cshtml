@@ -22,11 +22,6 @@
                             Server
                         </a>
                     </li>
-                    <li style="display: none;">
-                        <a href="#tab_SESE" data-toggle="tab">
-                            SE Server Extender
-                        </a>
-                    </li>
                     <li>
                         <a href="#tab_Jobs" data-toggle="tab">
                             Jobs
@@ -79,45 +74,19 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-md-6">
-                                        <div class="col-md-offset-6 col-md-6">
-                                            <button type="button" class="btn green" id="btnSaveServer">Save</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="tab-pane" id="tab_SESE">
-                        <form action="#" class="form-horizontal form">
-                            <div class="form-body">
-                                <h3 class="form-section">SESE Settings</h3>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
+                                        <div class="form-group" style="display: none;">
                                             <label class="control-label col-md-6">Use SE Server Extender</label>
                                             <div class="col-md-6">
                                                 <input type="checkbox" id="inpUseServerExtender">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">SESE WCF Port</label>
-                                            <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpServerExtenderPort" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="col-md-offset-6 col-md-6">
-                                            <button type="button" class="btn green" id="btnSaveSESE">Save</button>
+                                            <button type="button" class="btn green" id="btnSaveServer">Save</button>
                                         </div>
                                     </div>
                                 </div>
@@ -307,41 +276,24 @@
             step: 1
         });
 
-        var accessLevel = "Manager";
-        $.post("/API/Server/GetServer",
-        {
-            ServerID: serverID
-        },
-        function(data) {
-            var root = $($.parseXML(data)).find("Response");
-
-            if (root.children("Type").text() == "Error") {
-                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                return;
-            }
-
-            accessLevel = root.children("Content").children("AccessLevel").text();
-            if (root.children("Content").children("Type").text() == "SE" || root.children("Content").children("Type").text() == "SESE")
-                $('a[href="#tab_SESE"]').parents("li").show();
-
-        });
-
-
         var serverLoaded = false;
-        var SESELoaded = false;
         var jobsLoaded = false;
         var backupsLoaded = false;
         var accessLoaded = false;
 
+        var serverRights = null;
+        var jobsRights = null;
+        var backupsRights = null;
+        var accessRights = null;
+
         function checkLock() {
-            if (serverLoaded && SESELoaded && jobsLoaded && backupsLoaded && accessLoaded)
+            if (serverLoaded && jobsLoaded && backupsLoaded && accessLoaded)
                 UnlockPage();
         }
 
         function refreshData() {
             LockPage();
             serverLoaded = false;
-            SESELoaded = false;
             jobsLoaded = false;
             backupsLoaded = false;
             accessLoaded = false;
@@ -363,33 +315,26 @@
                 }
 
                 var content = root.children("Content");
+                var values = content.children("Values");
+                serverRights = content.children("Rights");
 
-                $('#inpName').val(content.children("Name").text());
-                $('#inpPublic').bootstrapSwitch('state', content.children("Public").text() == "true");
-                $('#inpProcessPriority').val(content.children("ProcessPriority").text());
+                $('#inpName').val(values.children("Name").text());
+                $('#inpPublic').bootstrapSwitch('state', values.children("Public").text() == "true");
+                $('#inpProcessPriority').val(values.children("ProcessPriority").text());
+                if (values.children("UseServerExtender").length != 0)
+                    $('#inpUseServerExtender').bootstrapSwitch('state', values.children("UseServerExtender").text() == "true");
 
-            });
 
-            // SESE Settings
-            $.post("/API/Server/GetSESESettings",
-            {
-                ServerID: serverID
-            },
-            function (data) {
-                SESELoaded = true;
-                checkLock();
+                $('#inpName').prop("readonly", serverRights.children("Name").text() != "true");
+                $("#inpPublic").bootstrapSwitch("readonly", serverRights.children("Public").text() != "true");
+                $('#inpProcessPriority').prop("disabled", serverRights.children("ProcessPriority").text() != "true");
 
-                var root = $($.parseXML(data)).find("Response");
-
-                if (root.children("Type").text() == "Error") {
-                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                    return;
+                if (serverRights.children("UseServerExtender").length != 0) {
+                    $("#inpUseServerExtender").parents(".form-group").show();
+                    $("#inpUseServerExtender").bootstrapSwitch("readonly", serverRights.children("UseServerExtender").text() != "true");
+                } else {
+                    $("#inpUseServerExtender").parents(".form-group").hide();
                 }
-
-                var content = root.children("Content");
-
-                $('#inpUseServerExtender').bootstrapSwitch('state', content.children("UseServerExtender").text() == "true");
-                $('#inpServerExtenderPort').val(content.children("ServerExtenderPort").text());
 
             });
 
@@ -410,10 +355,16 @@
                 }
 
                 var content = root.children("Content");
+                var values = content.children("Values");
+                jobsRights = content.children("Rights");
 
-                $('#inpAutoRestart').bootstrapSwitch('state', content.children("AutoRestart").text() == "true");
-                $('#inpAutoRestartCron').val(content.children("AutoRestartCron").text());
-                $('#inpAutoStart').bootstrapSwitch('state', content.children("AutoStart").text() == "true");
+                $('#inpAutoRestart').bootstrapSwitch('state', values.children("AutoRestart").text() == "true");
+                $('#inpAutoRestartCron').val(values.children("AutoRestartCron").text());
+                $('#inpAutoStart').bootstrapSwitch('state', values.children("AutoStart").text() == "true");
+
+                $("#inpAutoRestart").bootstrapSwitch("readonly", jobsRights.children("AutoRestart").text() != "true");
+                $('#inpAutoRestartCron').prop("readonly", jobsRights.children("AutoRestartCron").text() != "true");
+                $("#inpAutoStart").bootstrapSwitch("readonly", jobsRights.children("AutoStart").text() != "true");
             });
 
             // Backups Settings

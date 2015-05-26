@@ -3,14 +3,22 @@ using System.Web.Mvc;
 using System.Xml.Linq;
 using SESM.DAL;
 using SESM.DTO;
+using SESM.Tools;
 using SESM.Tools.API;
 using SESM.Tools.Helpers;
 
 namespace SESM.Controllers.API
 {
-    public class APIAccountController : Controller
+    public class APIAccountController : Controller, IAPIController
     {
-        private readonly DataContext _context = new DataContext();
+        public DataContext CurrentContext { get; set; }
+
+        public EntityServer RequestServer { get; set; }
+
+        public APIAccountController()
+        {
+            CurrentContext = new DataContext();
+        }
 
         // GET: API/Account/GetChallenge
         [HttpGet]
@@ -28,15 +36,15 @@ namespace SESM.Controllers.API
         public ActionResult LogOut()
         {
             EntityUser user = Session["User"] as EntityUser;
-            XMLMessage returnMessage = new XMLMessage();
+            XMLMessage response = new XMLMessage();
 
             if (user == null)
-                returnMessage = XMLMessage.Warning("ACT-LGO-NOTLOG", "No user is logged in");
+                response = XMLMessage.Warning("ACT-LGO-NOTLOG", "No user is logged in");
             else
-                returnMessage = XMLMessage.Success("ACT-LGO-OK", "User " + user.Login + " have been logged out");
+                response = XMLMessage.Success("ACT-LGO-OK", "User " + user.Login + " have been logged out");
 
             Session.Abandon();
-            return Content(returnMessage.ToString());
+            return Content(response.ToString());
         }
 
         // POST: API/Account/Authenticate
@@ -64,7 +72,7 @@ namespace SESM.Controllers.API
             if (string.IsNullOrWhiteSpace(password))
                 return Content(XMLMessage.Error("ACT-ATH-MISPWD", "The Password field must be provided").ToString());
 
-            UserProvider usrPrv = new UserProvider(_context);
+            UserProvider usrPrv = new UserProvider(CurrentContext);
             EntityUser usr = usrPrv.GetUser(login);
 
             if (usr == null)
@@ -76,6 +84,8 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("ACT-ATH-FAIL", "The provided login/password are incorrect").ToString());
 
             Session["User"] = usr;
+            Session["PermSummary"] = AuthHelper.GetPermSummaries(usr);
+
             return Content(XMLMessage.Success("ACT-ATH-OK", "Login successful. Hello " + usr.Login).ToString());
         }
 
@@ -108,7 +118,7 @@ namespace SESM.Controllers.API
             if (!Regex.IsMatch(eMail, @"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$", RegexOptions.IgnoreCase))
                 return Content(XMLMessage.Error("ACT-REG-BADEML", "The email " + eMail + " is not valid").ToString());
 
-            UserProvider usrPrv = new UserProvider(_context);
+            UserProvider usrPrv = new UserProvider(CurrentContext);
             EntityUser usr = usrPrv.GetUser(login);
 
             if (usr != null)
@@ -173,7 +183,7 @@ namespace SESM.Controllers.API
             if (string.IsNullOrWhiteSpace(oldPassword) != string.IsNullOrWhiteSpace(newPassword))
                 return Content(XMLMessage.Error("ACT-STD-MISPWD", "One of OldPassword or NewPassword has been provided but not the other").ToString());
 
-            UserProvider usrPrv = new UserProvider(_context);
+            UserProvider usrPrv = new UserProvider(CurrentContext);
 
             if (user.Login != login && usrPrv.UserExist(login))
                 return Content(XMLMessage.Error("ACT-STD-USREXI", "User " + login + " already exist").ToString());
@@ -210,7 +220,7 @@ namespace SESM.Controllers.API
         {
             if (disposing)
             {
-                _context.Dispose();
+                CurrentContext.Dispose();
             }
             base.Dispose(disposing);
         }

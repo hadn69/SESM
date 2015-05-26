@@ -23,7 +23,7 @@
         else
         {
             user = usrPrv.GetUser(userID);
-
+            /*
             managedServers = ((HashSet<EntityServer>)user.AdministratorOf);
             managedServers.UnionWith((HashSet<EntityServer>)user.ManagerOf);
             managedServers = new HashSet<EntityServer>(managedServers.OrderBy(x => x.Name).ToList());
@@ -32,6 +32,8 @@
             publicServers.UnionWith(new HashSet<EntityServer>(srvPrv.GetAllPublicServers()));
             publicServers.ExceptWith(managedServers);
             publicServers = new HashSet<EntityServer>(publicServers.OrderBy(x => x.Name).ToList());
+
+        */
         }
     }
 }

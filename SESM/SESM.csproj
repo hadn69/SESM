@@ -19,6 +19,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -2688,12 +2689,14 @@
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\ActionFilters\AdminAndAboveAttribute.cs" />
-    <Compile Include="Controllers\ActionFilters\CheckAuthAttribute.cs" />
-    <Compile Include="Controllers\ActionFilters\CheckLockout.cs" />
-    <Compile Include="Controllers\ActionFilters\GuestOnlyAttribute.cs" />
-    <Compile Include="Controllers\ActionFilters\ManagerAndAboveAttribute.cs" />
-    <Compile Include="Controllers\ActionFilters\SuperAdminAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\APIHostAccessAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\APIServerAccessAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\old\AdminAndAboveAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\old\CheckAuthAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\old\CheckLockout.cs" />
+    <Compile Include="Controllers\ActionFilters\old\GuestOnlyAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\old\ManagerAndAboveAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\old\SuperAdminAttribute.cs" />
     <Compile Include="Controllers\API\APIAccountController.cs" />
     <Compile Include="Controllers\API\APIExplorerController.cs" />
     <Compile Include="Controllers\API\APIMapController.cs" />
@@ -2703,11 +2706,12 @@
     <Compile Include="Controllers\API\APISettingsController.cs" />
     <Compile Include="Controllers\API\APIMiscController.cs" />
     <Compile Include="Controllers\API\APIUsersController.cs" />
+    <Compile Include="Controllers\API\IAPIController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\PerfMonController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ActionFilters\LoggedOnlyAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\old\LoggedOnlyAttribute.cs" />
     <Compile Include="Controllers\ServerController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="DAL\DataContext.cs" />
@@ -2715,16 +2719,16 @@
     <Compile Include="DAL\PerfProvider.cs" />
     <Compile Include="DAL\ServerProvider.cs" />
     <Compile Include="DAL\UserProvider.cs" />
-    <Compile Include="DTO\EntityInstanceRole.cs" />
+    <Compile Include="DTO\EnumServerPerm.cs" />
+    <Compile Include="DTO\EntityInstanceServerRole.cs" />
     <Compile Include="DTO\EntityPerfEntry.cs" />
     <Compile Include="DTO\EntityServer.cs" />
-    <Compile Include="DTO\EntityServerWideRole.cs" />
+    <Compile Include="DTO\EntityHostRole.cs" />
+    <Compile Include="DTO\EntityServerRole.cs" />
     <Compile Include="DTO\EntityUser.cs" />
-    <Compile Include="DTO\EnumInstancePerm.cs" />
-    <Compile Include="DTO\EnumPermAccess.cs" />
     <Compile Include="DTO\EnumProcessPriority.cs" />
     <Compile Include="DTO\EnumServerType.cs" />
-    <Compile Include="DTO\EnumServerWidePerm.cs" />
+    <Compile Include="DTO\EnumHostPerm.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -2764,11 +2768,20 @@
     <Compile Include="Migrations\201505042002309_ServerType.Designer.cs">
       <DependentUpon>201505042002309_ServerType.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201505222109544_Permission.cs" />
+    <Compile Include="Migrations\201505222109544_Permission.Designer.cs">
+      <DependentUpon>201505222109544_Permission.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201505242247145_SESEWCFPortRemoval.cs" />
+    <Compile Include="Migrations\201505242247145_SESEWCFPortRemoval.Designer.cs">
+      <DependentUpon>201505242247145_SESEWCFPortRemoval.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ArchType.cs" />
     <Compile Include="Models\ServerEnums.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\API\XMLMessage.cs" />
+    <Compile Include="Tools\AuthHelper.cs" />
     <Compile Include="Tools\Helpers\ServerConfigHelperBase.cs" />
     <Compile Include="Tools\Helpers\MEServerConfigHelper.cs" />
     <Compile Include="Tools\Helpers\SESEServiceHelper.cs" />
@@ -2778,6 +2791,7 @@
     <Compile Include="Tools\Constants.cs" />
     <Compile Include="Tools\Jobs\MEAutoUpdateJob.cs" />
     <Compile Include="Tools\MEDefault.cs" />
+    <Compile Include="Tools\PermContainer.cs" />
     <Compile Include="Tools\SEDefault.cs" />
     <Compile Include="Tools\FileExtensions.cs" />
     <Compile Include="Tools\GraphHelper.cs" />
@@ -2841,6 +2855,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201505042002309_ServerType.resx">
       <DependentUpon>201505042002309_ServerType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505222109544_Permission.resx">
+      <DependentUpon>201505222109544_Permission.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201505242247145_SESEWCFPortRemoval.resx">
+      <DependentUpon>201505242247145_SESEWCFPortRemoval.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
