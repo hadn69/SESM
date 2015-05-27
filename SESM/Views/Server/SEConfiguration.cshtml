@@ -786,11 +786,10 @@
         });
 
         var dataLoaded = false;
-        var maskLoaded = false;
         var maskData = "";
 
         function ShowContent() {
-            if (dataLoaded && maskLoaded) {
+            if (dataLoaded) {
                 UnlockPage();
             }
         }
@@ -815,53 +814,56 @@
                 }
 
                 var content = root.children("Content");
+                var values = content.children("Values");
+                maskData = content.children("Rights");
+
                 console.log(data);
                 // Network
-                $('#inpIP').val(content.children("IP").text());
-                $('#inpServerPort').val(content.children("ServerPort").text());
-                $('#inpSteamPort').val(content.children("SteamPort").text());
-                $('#inpOnlineMode').val(content.children("OnlineMode").text());
-                $('#inpServerName').val(content.children("ServerName").text());
-                $('#inpWorldName').val(content.children("WorldName").text());
+                $('#inpIP').val(values.children("IP").text());
+                $('#inpServerPort').val(values.children("ServerPort").text());
+                $('#inpSteamPort').val(values.children("SteamPort").text());
+                $('#inpOnlineMode').val(values.children("OnlineMode").text());
+                $('#inpServerName').val(values.children("ServerName").text());
+                $('#inpWorldName').val(values.children("WorldName").text());
 
                 // Server
-                $('#inpMaxPlayers').val(content.children("MaxPlayers").text());
-                $('#inpMaxFloatingObjects').val(content.children("MaxFloatingObjects").text());
-                $('#inpAutoSaveInMinutes').val(content.children("AutoSaveInMinutes").text());
-                $("#inpPauseGameWhenEmpty").bootstrapSwitch('state', content.children("PauseGameWhenEmpty").text() == "true");
-                $('#inpWorldSizeKm').val(content.children("WorldSizeKm").text());
-                $('#inpViewDistance').val(content.children("ViewDistance").text());
-                $("#inpClientCanSave").bootstrapSwitch('state', content.children("ClientCanSave").text() == "true");
-                $("#inpRemoveTrash").bootstrapSwitch('state', content.children("RemoveTrash").text() == "true");
+                $('#inpMaxPlayers').val(values.children("MaxPlayers").text());
+                $('#inpMaxFloatingObjects').val(values.children("MaxFloatingObjects").text());
+                $('#inpAutoSaveInMinutes').val(values.children("AutoSaveInMinutes").text());
+                $("#inpPauseGameWhenEmpty").bootstrapSwitch('state', values.children("PauseGameWhenEmpty").text() == "true");
+                $('#inpWorldSizeKm').val(values.children("WorldSizeKm").text());
+                $('#inpViewDistance').val(values.children("ViewDistance").text());
+                $("#inpClientCanSave").bootstrapSwitch('state', values.children("ClientCanSave").text() == "true");
+                $("#inpRemoveTrash").bootstrapSwitch('state', values.children("RemoveTrash").text() == "true");
 
                 // Gameplay
-                $('#inpSpawnShipTimeMultiplier').val(content.children("SpawnShipTimeMultiplier").text());
-                $('#inpRespawnShipDelete').bootstrapSwitch('state', content.children("RespawnShipDelete").text() == "true");
-                $('#inpThrusterDamage').bootstrapSwitch('state', content.children("ThrusterDamage").text() == "true");
-                $('#inpEnableIngameScripts').bootstrapSwitch('state', content.children("EnableIngameScripts").text() == "true");
-                $('#inpEnvironmentHostility').val(content.children("EnvironmentHostility").text());
-                $('#inpCargoShipsEnabled').bootstrapSwitch('state', content.children("CargoShipsEnabled").text() == "true");
-                $('#inpEnableToolShake').bootstrapSwitch('state', content.children("EnableToolShake").text() == "true");
-                if (content.children("VoxelGeneratorVersion").text() == "0") {
+                $('#inpSpawnShipTimeMultiplier').val(values.children("SpawnShipTimeMultiplier").text());
+                $('#inpRespawnShipDelete').bootstrapSwitch('state', values.children("RespawnShipDelete").text() == "true");
+                $('#inpThrusterDamage').bootstrapSwitch('state', values.children("ThrusterDamage").text() == "true");
+                $('#inpEnableIngameScripts').bootstrapSwitch('state', values.children("EnableIngameScripts").text() == "true");
+                $('#inpEnvironmentHostility').val(values.children("EnvironmentHostility").text());
+                $('#inpCargoShipsEnabled').bootstrapSwitch('state', values.children("CargoShipsEnabled").text() == "true");
+                $('#inpEnableToolShake').bootstrapSwitch('state', values.children("EnableToolShake").text() == "true");
+                if (values.children("VoxelGeneratorVersion").text() == "0") {
                     $("#inpVoxelGeneratorVersion").bootstrapSwitch('state', false);
-                } else if (content.children("VoxelGeneratorVersion").text() == "1") {
+                } else if (values.children("VoxelGeneratorVersion").text() == "1") {
                     $("#inpVoxelGeneratorVersion").bootstrapSwitch('state', true);
                 }
-                $('#inpEnableOxygen').bootstrapSwitch('state', content.children("EnableOxygen").text() == "true");
-                $('#inpEnableEncounters').bootstrapSwitch('state', content.children("EnableEncounters").text() == "true");
+                $('#inpEnableOxygen').bootstrapSwitch('state', values.children("EnableOxygen").text() == "true");
+                $('#inpEnableEncounters').bootstrapSwitch('state', values.children("EnableEncounters").text() == "true");
 
                 // Players
-                $('#inpAutoHealing').bootstrapSwitch('state', content.children("AutoHealing").text() == "true");
-                $('#inpWeaponsEnabled').bootstrapSwitch('state', content.children("WeaponsEnabled").text() == "true");
-                $('#inpInventorySizeMultiplier').val(content.children("InventorySizeMultiplier").text());
-                $('#inpEnableSpectator').bootstrapSwitch('state', content.children("EnableSpectator").text() == "true");
-                $('#inpPermanentDeath').bootstrapSwitch('state', content.children("PermanentDeath").text() == "true");
-                $('#inpShowPlayerNamesOnHud').bootstrapSwitch('state', content.children("ShowPlayerNamesOnHud").text() == "true");
-                $('#inpEnable3rdPersonView').bootstrapSwitch('state', content.children("Enable3rdPersonView").text() == "true");
+                $('#inpAutoHealing').bootstrapSwitch('state', values.children("AutoHealing").text() == "true");
+                $('#inpWeaponsEnabled').bootstrapSwitch('state', values.children("WeaponsEnabled").text() == "true");
+                $('#inpInventorySizeMultiplier').val(values.children("InventorySizeMultiplier").text());
+                $('#inpEnableSpectator').bootstrapSwitch('state', values.children("EnableSpectator").text() == "true");
+                $('#inpPermanentDeath').bootstrapSwitch('state', values.children("PermanentDeath").text() == "true");
+                $('#inpShowPlayerNamesOnHud').bootstrapSwitch('state', values.children("ShowPlayerNamesOnHud").text() == "true");
+                $('#inpEnable3rdPersonView').bootstrapSwitch('state', values.children("Enable3rdPersonView").text() == "true");
 
                 // Mods
                 var mods = [];
-                content.children("Mods").children().each(function (index) {
+                values.children("Mods").children().each(function (index) {
                     var item = $(this);
                     mods.push(item.text());
                 });
@@ -869,125 +871,108 @@
 
                 // Access
                 var administrators = [];
-                content.children("Administrators").children().each(function (index) {
+                values.children("Administrators").children().each(function (index) {
                     var item = $(this);
                     administrators.push(item.text());
                 });
                 $('#inpAdministrators').val(administrators.join("\r\n"));
                 var banned = [];
-                content.children("Banned").children().each(function (index) {
+                values.children("Banned").children().each(function (index) {
                     var item = $(this);
                     banned.push(item.text());
                 });
                 $('#inpBanned').val(banned.join("\r\n"));
-                $('#inpResetOwnership').bootstrapSwitch('state', content.children("ResetOwnership").text() == "true");
-                $('#inpGroupID').val(content.children("GroupID").text());
+                $('#inpResetOwnership').bootstrapSwitch('state', values.children("ResetOwnership").text() == "true");
+                $('#inpGroupID').val(values.children("GroupID").text());
 
                 // Production
-                $('#inpAssemblerSpeedMultiplier').val(content.children("AssemblerSpeedMultiplier").text());
-                $('#inpAssemblerEfficiencyMultiplier').val(content.children("AssemblerEfficiencyMultiplier").text());
-                $('#inpRefinerySpeedMultiplier').val(content.children("RefinerySpeedMultiplier").text());
+                $('#inpAssemblerSpeedMultiplier').val(values.children("AssemblerSpeedMultiplier").text());
+                $('#inpAssemblerEfficiencyMultiplier').val(values.children("AssemblerEfficiencyMultiplier").text());
+                $('#inpRefinerySpeedMultiplier').val(values.children("RefinerySpeedMultiplier").text());
 
                 // Construction
-                if (content.children("GameMode").text() == "Survival") {
+                if (values.children("GameMode").text() == "Survival") {
                     $("#inpGamemode").bootstrapSwitch('state', false);
-                } else if (content.children("GameMode").text() == "Creative") {
+                } else if (values.children("GameMode").text() == "Creative") {
                     $("#inpGamemode").bootstrapSwitch('state', true);
                 }
-                $('#inpWelderSpeedMultiplier').val(content.children("WelderSpeedMultiplier").text());
-                $('#inpGrinderSpeedMultiplier').val(content.children("GrinderSpeedMultiplier").text());
-                $('#inpHackSpeedMultiplier').val(content.children("HackSpeedMultiplier").text());
-                $("#inpEnableCopyPaste").bootstrapSwitch('state', content.children("EnableCopyPaste").text() == "true");
-                $("#inpDestructibleBlocks").bootstrapSwitch('state', content.children("DestructibleBlocks").text() == "true");
+                $('#inpWelderSpeedMultiplier').val(values.children("WelderSpeedMultiplier").text());
+                $('#inpGrinderSpeedMultiplier').val(values.children("GrinderSpeedMultiplier").text());
+                $('#inpHackSpeedMultiplier').val(values.children("HackSpeedMultiplier").text());
+                $("#inpEnableCopyPaste").bootstrapSwitch('state', values.children("EnableCopyPaste").text() == "true");
+                $("#inpDestructibleBlocks").bootstrapSwitch('state', values.children("DestructibleBlocks").text() == "true");
 
                 // Misc
-                $("#inpIgnoreLastSession").bootstrapSwitch('state', content.children("IgnoreLastSession").text() == "true");
-                $("#inpRealisticSound").bootstrapSwitch('state', content.children("RealisticSound").text() == "true");
+                $("#inpIgnoreLastSession").bootstrapSwitch('state', values.children("IgnoreLastSession").text() == "true");
+                $("#inpRealisticSound").bootstrapSwitch('state', values.children("RealisticSound").text() == "true");
 
-                ShowContent();
-            });
 
-            $.post("/API/Server/SEGetConfigurationRights",
-            {
-                ServerID: serverID
-            },
-            function (data) {
-                maskLoaded = true;
-                var root = $($.parseXML(data)).find("Response");
-
-                if (root.children("Type").text() == "Error") {
-                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                    ShowContent();
-                    return;
-                }
-
-                var content = root.children("Content");
-                maskData = content;
+                // -- Rights --
 
                 // Network
-                $('#inpIP').prop("readonly", content.children("IP").text() != "true");
-                $('#inpServerPort').prop("readonly", content.children("ServerPort").text() != "true");
-                $('#inpSteamPort').prop("readonly", content.children("SteamPort").text() != "true");
-                $('#inpOnlineMode').prop("disabled", content.children("OnlineMode").text() != "true");
-                $('#inpServerName').prop("readonly", content.children("ServerName").text() != "true");
-                $('#inpWorldName').prop("readonly", content.children("WorldName").text() != "true");
+                $('#inpIP').prop("readonly", maskData.children("IP").text() != "true");
+                $('#inpServerPort').prop("readonly", maskData.children("ServerPort").text() != "true");
+                $('#inpSteamPort').prop("readonly", maskData.children("SteamPort").text() != "true");
+                $('#inpOnlineMode').prop("disabled", maskData.children("OnlineMode").text() != "true");
+                $('#inpServerName').prop("readonly", maskData.children("ServerName").text() != "true");
+                $('#inpWorldName').prop("readonly", maskData.children("WorldName").text() != "true");
 
                 // Server
-                $('#inpMaxPlayers').prop("readonly", content.children("MaxPlayers").text() != "true");
-                $('#inpMaxFloatingObjects').prop("readonly", content.children("MaxFloatingObjects").text() != "true");
-                $('#inpAutoSaveInMinutes').prop("readonly", content.children("AutoSaveInMinutes").text() != "true");
-                $("#inpPauseGameWhenEmpty").bootstrapSwitch("readonly", content.children("PauseGameWhenEmpty").text() != "true");
-                $('#inpWorldSizeKm').prop("readonly", content.children("WorldSizeKm").text() != "true");
-                $('#inpViewDistance').prop("readonly", content.children("ViewDistance").text() != "true");
-                $("#inpClientCanSave").bootstrapSwitch("readonly", content.children("ClientCanSave").text() != "true");
-                $("#inpRemoveTrash").bootstrapSwitch("readonly", content.children("RemoveTrash").text() != "true");
+                $('#inpMaxPlayers').prop("readonly", maskData.children("MaxPlayers").text() != "true");
+                $('#inpMaxFloatingObjects').prop("readonly", maskData.children("MaxFloatingObjects").text() != "true");
+                $('#inpAutoSaveInMinutes').prop("readonly", maskData.children("AutoSaveInMinutes").text() != "true");
+                $("#inpPauseGameWhenEmpty").bootstrapSwitch("readonly", maskData.children("PauseGameWhenEmpty").text() != "true");
+                $('#inpWorldSizeKm').prop("readonly", maskData.children("WorldSizeKm").text() != "true");
+                $('#inpViewDistance').prop("readonly", maskData.children("ViewDistance").text() != "true");
+                $("#inpClientCanSave").bootstrapSwitch("readonly", maskData.children("ClientCanSave").text() != "true");
+                $("#inpRemoveTrash").bootstrapSwitch("readonly", maskData.children("RemoveTrash").text() != "true");
 
                 // Gameplay
-                $('#inpSpawnShipTimeMultiplier').prop("readonly", content.children("SpawnShipTimeMultiplier").text() != "true");
-                $('#inpRespawnShipDelete').bootstrapSwitch("readonly", content.children("RespawnShipDelete").text() != "true");
-                $('#inpThrusterDamage').bootstrapSwitch("readonly", content.children("ThrusterDamage").text() != "true");
-                $('#inpEnableIngameScripts').bootstrapSwitch("readonly", content.children("EnableIngameScripts").text() != "true");
-                $('#inpEnvironmentHostility').prop("disabled", content.children("EnvironmentHostility").text() != "true");
-                $('#inpCargoShipsEnabled').bootstrapSwitch("readonly", content.children("CargoShipsEnabled").text() != "true");
-                $('#inpEnableToolShake').bootstrapSwitch("readonly", content.children("EnableToolShake").text() != "true");
-                $('#inpVoxelGeneratorVersion').bootstrapSwitch("readonly", content.children("VoxelGeneratorVersion").text() != "true");
-                $('#inpEnableOxygen').bootstrapSwitch("readonly", content.children("EnableOxygen").text() != "true");
-                $('#inpEnableEncounters').bootstrapSwitch("readonly", content.children("EnableEncounters").text() != "true");
+                $('#inpSpawnShipTimeMultiplier').prop("readonly", maskData.children("SpawnShipTimeMultiplier").text() != "true");
+                $('#inpRespawnShipDelete').bootstrapSwitch("readonly", maskData.children("RespawnShipDelete").text() != "true");
+                $('#inpThrusterDamage').bootstrapSwitch("readonly", maskData.children("ThrusterDamage").text() != "true");
+                $('#inpEnableIngameScripts').bootstrapSwitch("readonly", maskData.children("EnableIngameScripts").text() != "true");
+                $('#inpEnvironmentHostility').prop("disabled", maskData.children("EnvironmentHostility").text() != "true");
+                $('#inpCargoShipsEnabled').bootstrapSwitch("readonly", maskData.children("CargoShipsEnabled").text() != "true");
+                $('#inpEnableToolShake').bootstrapSwitch("readonly", maskData.children("EnableToolShake").text() != "true");
+                $('#inpVoxelGeneratorVersion').bootstrapSwitch("readonly", maskData.children("VoxelGeneratorVersion").text() != "true");
+                $('#inpEnableOxygen').bootstrapSwitch("readonly", maskData.children("EnableOxygen").text() != "true");
+                $('#inpEnableEncounters').bootstrapSwitch("readonly", maskData.children("EnableEncounters").text() != "true");
 
                 // Players
-                $('#inpAutoHealing').bootstrapSwitch("readonly", content.children("AutoHealing").text() != "true");
-                $('#inpWeaponsEnabled').bootstrapSwitch("readonly", content.children("WeaponsEnabled").text() != "true");
-                $('#inpInventorySizeMultiplier').prop("readonly", content.children("InventorySizeMultiplier").text() != "true");
-                $('#inpEnableSpectator').bootstrapSwitch("readonly", content.children("EnableSpectator").text() != "true");
-                $('#inpPermanentDeath').bootstrapSwitch("readonly", content.children("PermanentDeath").text() != "true");
-                $('#inpShowPlayerNamesOnHud').bootstrapSwitch("readonly", content.children("ShowPlayerNamesOnHud").text() != "true");
-                $('#inpEnable3rdPersonView').bootstrapSwitch("readonly", content.children("Enable3rdPersonView").text() != "true");
+                $('#inpAutoHealing').bootstrapSwitch("readonly", maskData.children("AutoHealing").text() != "true");
+                $('#inpWeaponsEnabled').bootstrapSwitch("readonly", maskData.children("WeaponsEnabled").text() != "true");
+                $('#inpInventorySizeMultiplier').prop("readonly", maskData.children("InventorySizeMultiplier").text() != "true");
+                $('#inpEnableSpectator').bootstrapSwitch("readonly", maskData.children("EnableSpectator").text() != "true");
+                $('#inpPermanentDeath').bootstrapSwitch("readonly", maskData.children("PermanentDeath").text() != "true");
+                $('#inpShowPlayerNamesOnHud').bootstrapSwitch("readonly", maskData.children("ShowPlayerNamesOnHud").text() != "true");
+                $('#inpEnable3rdPersonView').bootstrapSwitch("readonly", maskData.children("Enable3rdPersonView").text() != "true");
 
                 // Mods
-                $('#inpMods').prop("readonly", content.children("Mods").text() != "true");
+                $('#inpMods').prop("readonly", maskData.children("Mods").text() != "true");
 
                 // Access
-                $('#inpAdministrators').prop("readonly", content.children("Administrators").text() != "true");
-                $('#inpBanned').prop("readonly", content.children("Banned").text() != "true");
-                $('#inpResetOwnership').bootstrapSwitch("readonly", content.children("ResetOwnership").text() != "true");
-                $('#inpGroupID').prop("readonly", content.children("GroupID").text() != "true");
+                $('#inpAdministrators').prop("readonly", maskData.children("Administrators").text() != "true");
+                $('#inpBanned').prop("readonly", maskData.children("Banned").text() != "true");
+                $('#inpResetOwnership').bootstrapSwitch("readonly", maskData.children("ResetOwnership").text() != "true");
+                $('#inpGroupID').prop("readonly", maskData.children("GroupID").text() != "true");
 
                 // Production
-                $('#inpAssemblerSpeedMultiplier').prop("readonly", content.children("AssemblerSpeedMultiplier").text() != "true");
-                $('#inpAssemblerEfficiencyMultiplier').prop("readonly", content.children("AssemblerEfficiencyMultiplier").text() != "true");
-                $('#inpRefinerySpeedMultiplier').prop("readonly", content.children("RefinerySpeedMultiplier").text() != "true");
+                $('#inpAssemblerSpeedMultiplier').prop("readonly", maskData.children("AssemblerSpeedMultiplier").text() != "true");
+                $('#inpAssemblerEfficiencyMultiplier').prop("readonly", maskData.children("AssemblerEfficiencyMultiplier").text() != "true");
+                $('#inpRefinerySpeedMultiplier').prop("readonly", maskData.children("RefinerySpeedMultiplier").text() != "true");
 
                 // Construction
-                $("#inpGameMode").bootstrapSwitch("readonly", content.children("GameMode").text() != "true");
-                $('#inpWelderSpeedMultiplier').prop("readonly", content.children("WelderSpeedMultiplier").text() != "true");
-                $('#inpGrinderSpeedMultiplier').prop("readonly", content.children("GrinderSpeedMultiplier").text() != "true");
-                $('#inpHackSpeedMultiplier').prop("readonly", content.children("HackSpeedMultiplier").text() != "true");
-                $("#inpEnableCopyPaste").bootstrapSwitch("readonly", content.children("EnableCopyPaste").text() != "true");
-                $("#inpDestructibleBlocks").bootstrapSwitch("readonly", content.children("DestructibleBlocks").text() != "true");
+                $("#inpGameMode").bootstrapSwitch("readonly", maskData.children("GameMode").text() != "true");
+                $('#inpWelderSpeedMultiplier').prop("readonly", maskData.children("WelderSpeedMultiplier").text() != "true");
+                $('#inpGrinderSpeedMultiplier').prop("readonly", maskData.children("GrinderSpeedMultiplier").text() != "true");
+                $('#inpHackSpeedMultiplier').prop("readonly", maskData.children("HackSpeedMultiplier").text() != "true");
+                $("#inpEnableCopyPaste").bootstrapSwitch("readonly", maskData.children("EnableCopyPaste").text() != "true");
+                $("#inpDestructibleBlocks").bootstrapSwitch("readonly", maskData.children("DestructibleBlocks").text() != "true");
 
                 // Misc
-                $("#inpIgnoreLastSession").bootstrapSwitch("readonly", content.children("IgnoreLastSession").text() != "true");
-                $("#inpRealisticSound").bootstrapSwitch("readonly", content.children("RealisticSound").text() != "true");
+                $("#inpIgnoreLastSession").bootstrapSwitch("readonly", maskData.children("IgnoreLastSession").text() != "true");
+                $("#inpRealisticSound").bootstrapSwitch("readonly", maskData.children("RealisticSound").text() != "true");
 
                 ShowContent();
             });

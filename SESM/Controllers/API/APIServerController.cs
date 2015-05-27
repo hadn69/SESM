@@ -96,6 +96,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Server/CreateServer
         [HttpPost]
+        [APIHostAccess("SRV-CRS", "SERVER_CREATE")]
         public ActionResult CreateServer()
         {
             // ** INIT **
@@ -201,7 +202,7 @@ namespace SESM.Controllers.API
                 if (server == null)
                     return Content(XMLMessage.Error("SRV-DEL-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
 
-                if (!user.IsAdmin)
+                if (!AuthHelper.HasAccess(server, "SERVER_DELETE"))
                     return Content(XMLMessage.Error("SRV-DEL-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
 
                 servers.Add(server);
@@ -247,7 +248,7 @@ namespace SESM.Controllers.API
 
             XElement values = new XElement("Values");
             values.Add(new XElement("Name", RequestServer.Name));
-            if(RequestServer.ServerType == EnumServerType.SpaceEngineers)
+            if (RequestServer.ServerType == EnumServerType.SpaceEngineers)
                 values.Add(new XElement("UseServerExtender", RequestServer.UseServerExtender));
             values.Add(new XElement("Public", RequestServer.IsPublic));
             values.Add(new XElement("ProcessPriority", RequestServer.ProcessPriority.ToString()));
@@ -267,7 +268,7 @@ namespace SESM.Controllers.API
         // POST: API/Server/SetSettings
         [HttpPost]
         [APIServerAccess("SRV-SSET", "SERVER_SETTINGS_GLOBAL_NAME_WR",
-                                     "SERVER_SETTINGS_GLOBAL_USESESE_WR", 
+                                     "SERVER_SETTINGS_GLOBAL_USESESE_WR",
                                      "SERVER_SETTINGS_GLOBAL_PROCESSPRIO_WR",
                                      "SERVER_SETTINGS_GLOBAL_PUBLIC_WR")]
         public ActionResult SetSettings()
@@ -281,20 +282,24 @@ namespace SESM.Controllers.API
             bool accessPublic = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PUBLIC_WR");
             bool accessProcessPrio = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PROCESSPRIO_WR");
 
-            string Name = string.Empty;
+            string Name;
             if (accessName)
             {
                 Name = Request.Form["Name"];
                 if (string.IsNullOrWhiteSpace(Name))
                     return Content(XMLMessage.Error("SRV-SSET-MISNAME", "The Name field must be provided").ToString());
                 if (!Regex.IsMatch(Name, @"^[a-zA-Z0-9_.-]+$"))
-                    return Content(XMLMessage.Error("SRV-SSET-BADNAME","The Name field must be only composed of letters, numbers, dots, dashs and underscores").ToString());
+                    return Content(
+                            XMLMessage.Error("SRV-SSET-BADNAME",
+                                "The Name field must be only composed of letters, numbers, dots, dashs and underscores")
+                                .ToString());
                 if (Name != RequestServer.Name && !srvPrv.IsNameAvaialble(Name))
                     return Content(XMLMessage.Error("SRV-SSET-NAMEUSE", "The server " + Name + "Already Exist").ToString());
-
             }
+            else
+                Name = RequestServer.Name;
 
-            bool UseServerExtender = false;
+            bool UseServerExtender;
             if (RequestServer.ServerType == EnumServerType.SpaceEngineers && accessSESE)
             {
                 if (string.IsNullOrWhiteSpace(Request.Form["UseServerExtender"]))
@@ -302,8 +307,10 @@ namespace SESM.Controllers.API
                 if (!bool.TryParse(Request.Form["SESE"], out UseServerExtender))
                     return Content(XMLMessage.Error("SRV-SSET-BADSESE", "The UseServerExtender field is invalid").ToString());
             }
+            else
+                UseServerExtender = RequestServer.UseServerExtender;
 
-            bool Public = false;
+            bool Public;
             if (accessPublic)
             {
                 if (string.IsNullOrWhiteSpace(Request.Form["Public"]))
@@ -311,8 +318,10 @@ namespace SESM.Controllers.API
                 if (!bool.TryParse(Request.Form["Public"], out Public))
                     return Content(XMLMessage.Error("SRV-SSET-BADPUB", "The Public field is invalid").ToString());
             }
+            else
+                Public = RequestServer.IsPublic;
 
-            EnumProcessPriority ProcessPriority = EnumProcessPriority.Normal;
+            EnumProcessPriority ProcessPriority;
             if (accessProcessPrio)
             {
                 if (string.IsNullOrWhiteSpace(Request.Form["ProcessPriority"]))
@@ -320,6 +329,8 @@ namespace SESM.Controllers.API
                 if (!Enum.TryParse(Request.Form["ProcessPriority"], out ProcessPriority))
                     return Content(XMLMessage.Error("SRV-SSET-BADPP", "The ProcessPriority field is invalid").ToString());
             }
+            else
+                ProcessPriority = RequestServer.ProcessPriority;
 
             // ** Process **
             try
@@ -327,13 +338,7 @@ namespace SESM.Controllers.API
                 ServiceState serverState = srvPrv.GetState(RequestServer);
                 bool restartRequired = false;
 
-                if (!accessName)
-                    Name = RequestServer.Name;
-
-                if (!accessSESE)
-                    UseServerExtender = RequestServer.UseServerExtender;
-
-                if ((accessName || accessSESE ) && (Name != RequestServer.Name || UseServerExtender != RequestServer.UseServerExtender))
+                if ((accessName || accessSESE) && (Name != RequestServer.Name || UseServerExtender != RequestServer.UseServerExtender))
                 {
                     if (serverState != ServiceState.Stopped &&
                         serverState != ServiceState.Unknow)
@@ -354,7 +359,7 @@ namespace SESM.Controllers.API
 
                     ServiceHelper.RegisterService(RequestServer);
                 }
-                if(accessPublic)
+                if (accessPublic)
                     RequestServer.IsPublic = Public;
 
                 if (accessProcessPrio)
@@ -405,8 +410,8 @@ namespace SESM.Controllers.API
         // POST: API/Server/SetJobsSettings
         [HttpPost]
         [APIServerAccess("SRV-SJS", "SERVER_SETTINGS_JOBS_AUTORESTART_WR",
-                                     "SERVER_SETTINGS_JOBS_AUTORESTARTCRON_WR",
-                                     "SERVER_SETTINGS_JOBS_AUTOSTART_WR")]
+                                    "SERVER_SETTINGS_JOBS_AUTORESTARTCRON_WR",
+                                    "SERVER_SETTINGS_JOBS_AUTOSTART_WR")]
         public ActionResult SetJobsSettings()
         {
             // ** INIT **
@@ -421,8 +426,7 @@ namespace SESM.Controllers.API
             if (accessAutoRestart)
             {
                 if (string.IsNullOrWhiteSpace(Request.Form["AutoRestart"]))
-                    return
-                        Content(XMLMessage.Error("SRV-SJS-MISAR", "The AutoRestart field must be provided").ToString());
+                    return Content(XMLMessage.Error("SRV-SJS-MISAR", "The AutoRestart field must be provided").ToString());
                 if (!bool.TryParse(Request.Form["AutoRestart"], out AutoRestart))
                     return Content(XMLMessage.Error("SRV-SJS-BADAR", "The AutoRestart field is invalid").ToString());
             }
@@ -455,7 +459,7 @@ namespace SESM.Controllers.API
             // ** Process **
             try
             {
-                if (AutoRestart != RequestServer.IsAutoRestartEnabled || AutoRestartCron != RequestServer.AutoRestartCron )
+                if ((accessAutoRestart || accessAutoRestartCron) && (AutoRestart != RequestServer.IsAutoRestartEnabled || AutoRestartCron != RequestServer.AutoRestartCron))
                 {
                     RequestServer.IsAutoRestartEnabled = AutoRestart;
                     RequestServer.AutoRestartCron = AutoRestartCron;
@@ -479,7 +483,8 @@ namespace SESM.Controllers.API
                     }
                 }
 
-                RequestServer.IsAutoStartEnabled = AutoStart;
+                if (accessAutoStart)
+                    RequestServer.IsAutoStartEnabled = AutoStart;
 
                 srvPrv.UpdateServer(RequestServer);
 
@@ -493,102 +498,93 @@ namespace SESM.Controllers.API
 
         // POST: API/Server/GetBackupsSettings
         [HttpPost]
+        [APIServerAccess("SRV-GBS", "SERVER_SETTINGS_BACKUPS_RD")]
         public ActionResult GetBackupsSettings()
         {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(CurrentContext);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-GBS-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-GBS-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-GBS-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("SRV-GBS-NOACCESS", "You don't have access to this server").ToString());
-
             // ** PROCESS **
 
             XMLMessage response = new XMLMessage("SRV-GBS-OK");
 
-            response.AddToContent(new XElement("Lvl1BackupEnabled", server.IsLvl1BackupEnabled));
-            response.AddToContent(new XElement("Lvl1BackupInfos", "Cron : " + SESMConfigHelper.AutoBackupLvl1Cron +
-                                                                " ; " + (SESMConfigHelper.AutoBackupLvl1Enabled ? "Enabled" : "Disabled") +
-                                                                " ; Nb Rotating Backup : " + SESMConfigHelper.AutoBackupLvl1NbToKeep));
-            response.AddToContent(new XElement("Lvl2BackupEnabled", server.IsLvl2BackupEnabled));
-            response.AddToContent(new XElement("Lvl2BackupInfos", "Cron : " + SESMConfigHelper.AutoBackupLvl2Cron +
-                                                                " ; " + (SESMConfigHelper.AutoBackupLvl2Enabled ? "Enabled" : "Disabled") +
-                                                                " ; Nb Rotating Backup : " + SESMConfigHelper.AutoBackupLvl2NbToKeep));
-            response.AddToContent(new XElement("Lvl3BackupEnabled", server.IsLvl3BackupEnabled));
-            response.AddToContent(new XElement("Lvl3BackupInfos", "Cron : " + SESMConfigHelper.AutoBackupLvl3Cron +
-                                                                " ; " + (SESMConfigHelper.AutoBackupLvl3Enabled ? "Enabled" : "Disabled") +
-                                                                " ; Nb Rotating Backup : " + SESMConfigHelper.AutoBackupLvl3NbToKeep));
+            XElement values = new XElement("Values");
+            values.Add(new XElement("Lvl1BackupEnabled", RequestServer.IsLvl1BackupEnabled));
+            values.Add(new XElement("Lvl1BackupInfos", "Cron : " + SESMConfigHelper.AutoBackupLvl1Cron +
+                                                        " ; " + (SESMConfigHelper.AutoBackupLvl1Enabled ? "Enabled" : "Disabled") +
+                                                        " ; Nb Rotating Backup : " + SESMConfigHelper.AutoBackupLvl1NbToKeep));
+            values.Add(new XElement("Lvl2BackupEnabled", RequestServer.IsLvl2BackupEnabled));
+            values.Add(new XElement("Lvl2BackupInfos", "Cron : " + SESMConfigHelper.AutoBackupLvl2Cron +
+                                                        " ; " + (SESMConfigHelper.AutoBackupLvl2Enabled ? "Enabled" : "Disabled") +
+                                                        " ; Nb Rotating Backup : " + SESMConfigHelper.AutoBackupLvl2NbToKeep));
+            values.Add(new XElement("Lvl3BackupEnabled", RequestServer.IsLvl3BackupEnabled));
+            values.Add(new XElement("Lvl3BackupInfos", "Cron : " + SESMConfigHelper.AutoBackupLvl3Cron +
+                                                        " ; " + (SESMConfigHelper.AutoBackupLvl3Enabled ? "Enabled" : "Disabled") +
+                                                        " ; Nb Rotating Backup : " + SESMConfigHelper.AutoBackupLvl3NbToKeep));
+            response.AddToContent(values);
+
+            XElement rights = new XElement("Rights");
+            rights.Add(new XElement("Lvl1BackupEnabled", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_BACKUPS_LVL1_WR")));
+            rights.Add(new XElement("Lvl2BackupEnabled", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_BACKUPS_LVL2_WR")));
+            rights.Add(new XElement("Lvl3BackupEnabled", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_BACKUPS_LVL3_WR")));
+            response.AddToContent(rights);
 
             return Content(response.ToString());
         }
 
         // POST: API/Server/SetBackupsSettings
         [HttpPost]
+        [APIServerAccess("SRV-SBS", "SERVER_SETTINGS_BACKUPS_LVL1_WR",
+                                    "SERVER_SETTINGS_BACKUPS_LVL2_WR",
+                                    "SERVER_SETTINGS_BACKUPS_LVL3_WR")]
         public ActionResult SetBackupsSettings()
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
             // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-SBS-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-SBS-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-SBS-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("SRV-SBS-NOACCESS", "You don't have access to this server").ToString());
+            bool accesslvl1 = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_BACKUPS_LVL1_WR");
+            bool accesslvl2 = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_BACKUPS_LVL2_WR");
+            bool accesslvl3 = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_BACKUPS_LVL3_WR");
 
             bool lvl1BackupEnabled;
-            if (string.IsNullOrWhiteSpace(Request.Form["Lvl1BackupEnabled"]))
-                return Content(XMLMessage.Error("SRV-SBS-LVL1", "The Lvl1BackupEnabled field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["Lvl1BackupEnabled"], out lvl1BackupEnabled))
-                return Content(XMLMessage.Error("SRV-SBS-LVL1", "The Lvl1BackupEnabled field is invalid").ToString());
+            if (accesslvl1)
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["Lvl1BackupEnabled"]))
+                    return Content(XMLMessage.Error("SRV-SBS-MISLVL1", "The Lvl1BackupEnabled field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["Lvl1BackupEnabled"], out lvl1BackupEnabled))
+                    return Content(XMLMessage.Error("SRV-SBS-BADLVL1", "The Lvl1BackupEnabled field is invalid").ToString());
+            }
+            else
+                lvl1BackupEnabled = RequestServer.IsLvl1BackupEnabled;
 
             bool lvl2BackupEnabled;
-            if (string.IsNullOrWhiteSpace(Request.Form["Lvl2BackupEnabled"]))
-                return Content(XMLMessage.Error("SRV-SBS-LVL2", "The Lvl2BackupEnabled field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["Lvl2BackupEnabled"], out lvl2BackupEnabled))
-                return Content(XMLMessage.Error("SRV-SBS-LVL2", "The Lvl2BackupEnabled field is invalid").ToString());
+            if (accesslvl2)
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["Lvl2BackupEnabled"]))
+                    return Content(XMLMessage.Error("SRV-SBS-MISLVL2", "The Lvl2BackupEnabled field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["Lvl2BackupEnabled"], out lvl2BackupEnabled))
+                    return Content(XMLMessage.Error("SRV-SBS-BADLVL2", "The Lvl2BackupEnabled field is invalid").ToString());
+            }
+            else
+                lvl2BackupEnabled = RequestServer.IsLvl2BackupEnabled;
 
             bool lvl3BackupEnabled;
-            if (string.IsNullOrWhiteSpace(Request.Form["Lvl3BackupEnabled"]))
-                return Content(XMLMessage.Error("SRV-SBS-LVL3", "The Lvl3BackupEnabled field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["Lvl3BackupEnabled"], out lvl3BackupEnabled))
-                return Content(XMLMessage.Error("SRV-SBS-LVL3", "The Lvl3BackupEnabled field is invalid").ToString());
+            if (accesslvl3)
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["Lvl3BackupEnabled"]))
+                    return Content(XMLMessage.Error("SRV-SBS-MISLVL3", "The Lvl3BackupEnabled field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["Lvl3BackupEnabled"], out lvl3BackupEnabled))
+                    return Content(XMLMessage.Error("SRV-SBS-BADLVL3", "The Lvl3BackupEnabled field is invalid").ToString());
+            }
+            else
+                lvl3BackupEnabled = RequestServer.IsLvl3BackupEnabled;
 
             // ** Process **
             try
             {
-                server.IsLvl1BackupEnabled = lvl1BackupEnabled;
-                server.IsLvl2BackupEnabled = lvl2BackupEnabled;
-                server.IsLvl3BackupEnabled = lvl3BackupEnabled;
+                RequestServer.IsLvl1BackupEnabled = lvl1BackupEnabled;
+                RequestServer.IsLvl2BackupEnabled = lvl2BackupEnabled;
+                RequestServer.IsLvl3BackupEnabled = lvl3BackupEnabled;
 
-                srvPrv.UpdateServer(server);
+                srvPrv.UpdateServer(RequestServer);
 
                 return Content(XMLMessage.Success("SRV-SBS-OK", "The server backups settings have been updated").ToString());
             }
@@ -597,659 +593,649 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SRV-SBS-EX", "Exception :" + ex).ToString());
             }
         }
-        
-        // POST: API/Server/GetAccessSettings
-        [HttpPost]
-        public ActionResult GetAccessSettings()
-        {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-GAS-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-GAS-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-GAS-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("SRV-GAS-NOACCESS", "You don't have access to this server").ToString());
-
-            // ** PROCESS **
-
-            XMLMessage response = new XMLMessage("SRV-GAS-OK");
-
-            XElement webAdministrators = new XElement("WebAdministrators");
-            //foreach (EntityUser wadmin in server.Administrators)
-            //    webAdministrators.Add(new XElement("WebAdministrator", wadmin.Login));
-            response.AddToContent(webAdministrators);
-
-            XElement webManagers = new XElement("WebManagers");
-            //foreach (EntityUser wmanager in server.Managers)
-            //    webManagers.Add(new XElement("WebManager", wmanager.Login));
-            response.AddToContent(webManagers);
-
-            XElement webUsers = new XElement("WebUsers");
-            //foreach (EntityUser wuser in server.Users)
-            //    webUsers.Add(new XElement("WebUser", wuser.Login));
-            response.AddToContent(webUsers);
-
-            return Content(response.ToString());
-        }
-
-        // POST: API/Server/SetAccessSettings
-        [HttpPost]
-        public ActionResult SetAccessSettings()
-        {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(CurrentContext);
-            UserProvider usrPrv = new UserProvider(CurrentContext);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-SAS-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-SAS-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-SAS-UKNSRV", "The server doesn't exist").ToString());
-
-            AccessLevel accessLevel = srvPrv.GetAccessLevel(userID, server.Id);
-            if (!srvPrv.IsManagerOrAbore(accessLevel))
-                return Content(XMLMessage.Error("SRV-SAS-NOACCESS", "You don't have access to this server").ToString());
-
-            string webAdministratorsStr = Request.Form["WebAdministrators"];
-            if (accessLevel == AccessLevel.Manager && !string.IsNullOrWhiteSpace(webAdministratorsStr))
-                return Content(XMLMessage.Error("SRV-SAS-NOADMACC", "You don't sufficient priviledges to edit the administrators list").ToString());
-
-            string webManagersStr = Request.Form["WebManagers"];
-            string webUsersStr = Request.Form["WebUsers"];
-
-            // ** Process **
-            try
-            {
-                /*
-                if (accessLevel != AccessLevel.Manager)
-                    srvPrv.AddAdministrator(webAdministratorsStr.Split(';'), server);
-                srvPrv.AddManagers(webManagersStr.Split(';'), server);
-                srvPrv.AddUsers(webUsersStr.Split(';'), server);
-                */
-                srvPrv.UpdateServer(server);
-
-                return Content(XMLMessage.Success("SRV-SAS-OK", "The server Access settings have been updated").ToString());
-            }
-            catch (Exception ex)
-            {
-                return Content(XMLMessage.Error("SRV-SAS-EX", "Exception :" + ex).ToString());
-            }
-        }
-        
         #endregion
 
         #region SE Server Configuration
 
         // POST: API/Server/SEGetConfiguration
         [HttpPost]
+        [APIServerAccess("SRV-GC", "SERVER_CONFIG_SE_RD")]
         public ActionResult SEGetConfiguration()
         {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(CurrentContext);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-GC-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-GC-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-GC-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("SRV-GC-NOACCESS", "You don't have access to this server").ToString());
-
             // ** PROCESS **
             // Loading the server config
             SEServerConfigHelper serverConfig = new SEServerConfigHelper();
-            serverConfig.Load(server);
+            serverConfig.Load(RequestServer);
 
             XMLMessage response = new XMLMessage("SRV-GC-OK");
 
-            response.AddToContent(new XElement("IP", serverConfig.IP));
-            response.AddToContent(new XElement("SteamPort", serverConfig.SteamPort));
-            response.AddToContent(new XElement("ServerPort", serverConfig.ServerPort));
-            response.AddToContent(new XElement("ServerName", serverConfig.ServerName));
-            response.AddToContent(new XElement("IgnoreLastSession", serverConfig.IgnoreLastSession));
-            response.AddToContent(new XElement("PauseGameWhenEmpty", serverConfig.PauseGameWhenEmpty));
-            response.AddToContent(new XElement("EnableSpectator", serverConfig.EnableSpectator));
-            response.AddToContent(new XElement("RealisticSound", serverConfig.RealisticSound));
-            response.AddToContent(new XElement("AutoSaveInMinutes", server.AutoSaveInMinutes));
-            response.AddToContent(new XElement("InventorySizeMultiplier", serverConfig.InventorySizeMultiplier));
-            response.AddToContent(new XElement("AssemblerSpeedMultiplier", serverConfig.AssemblerSpeedMultiplier));
-            response.AddToContent(new XElement("AssemblerEfficiencyMultiplier", serverConfig.AssemblerEfficiencyMultiplier));
-            response.AddToContent(new XElement("RefinerySpeedMultiplier", serverConfig.RefinerySpeedMultiplier));
-            response.AddToContent(new XElement("GameMode", serverConfig.GameMode));
-            response.AddToContent(new XElement("EnableCopyPaste", serverConfig.EnableCopyPaste));
-            response.AddToContent(new XElement("WelderSpeedMultiplier", serverConfig.WelderSpeedMultiplier));
-            response.AddToContent(new XElement("GrinderSpeedMultiplier", serverConfig.GrinderSpeedMultiplier));
-            response.AddToContent(new XElement("HackSpeedMultiplier", serverConfig.HackSpeedMultiplier));
-            response.AddToContent(new XElement("DestructibleBlocks", serverConfig.DestructibleBlocks));
-            response.AddToContent(new XElement("MaxPlayers", serverConfig.MaxPlayers));
-            response.AddToContent(new XElement("MaxFloatingObjects", serverConfig.MaxFloatingObjects));
-            response.AddToContent(new XElement("WorldName", serverConfig.WorldName));
-            response.AddToContent(new XElement("EnvironmentHostility", serverConfig.EnvironmentHostility));
-            response.AddToContent(new XElement("WorldSizeKm", serverConfig.WorldSizeKm));
-            response.AddToContent(new XElement("PermanentDeath", serverConfig.PermanentDeath));
-            response.AddToContent(new XElement("CargoShipsEnabled", serverConfig.CargoShipsEnabled));
-            response.AddToContent(new XElement("RemoveTrash", serverConfig.RemoveTrash));
-            response.AddToContent(new XElement("ClientCanSave", serverConfig.ClientCanSave));
+            XElement values = new XElement("Values");
+            values.Add(new XElement("IP", serverConfig.IP));
+            values.Add(new XElement("SteamPort", serverConfig.SteamPort));
+            values.Add(new XElement("ServerPort", serverConfig.ServerPort));
+            values.Add(new XElement("ServerName", serverConfig.ServerName));
+            values.Add(new XElement("IgnoreLastSession", serverConfig.IgnoreLastSession));
+            values.Add(new XElement("PauseGameWhenEmpty", serverConfig.PauseGameWhenEmpty));
+            values.Add(new XElement("EnableSpectator", serverConfig.EnableSpectator));
+            values.Add(new XElement("RealisticSound", serverConfig.RealisticSound));
+            values.Add(new XElement("AutoSaveInMinutes", RequestServer.AutoSaveInMinutes));
+            values.Add(new XElement("InventorySizeMultiplier", serverConfig.InventorySizeMultiplier));
+            values.Add(new XElement("AssemblerSpeedMultiplier", serverConfig.AssemblerSpeedMultiplier));
+            values.Add(new XElement("AssemblerEfficiencyMultiplier", serverConfig.AssemblerEfficiencyMultiplier));
+            values.Add(new XElement("RefinerySpeedMultiplier", serverConfig.RefinerySpeedMultiplier));
+            values.Add(new XElement("GameMode", serverConfig.GameMode));
+            values.Add(new XElement("EnableCopyPaste", serverConfig.EnableCopyPaste));
+            values.Add(new XElement("WelderSpeedMultiplier", serverConfig.WelderSpeedMultiplier));
+            values.Add(new XElement("GrinderSpeedMultiplier", serverConfig.GrinderSpeedMultiplier));
+            values.Add(new XElement("HackSpeedMultiplier", serverConfig.HackSpeedMultiplier));
+            values.Add(new XElement("DestructibleBlocks", serverConfig.DestructibleBlocks));
+            values.Add(new XElement("MaxPlayers", serverConfig.MaxPlayers));
+            values.Add(new XElement("MaxFloatingObjects", serverConfig.MaxFloatingObjects));
+            values.Add(new XElement("WorldName", serverConfig.WorldName));
+            values.Add(new XElement("EnvironmentHostility", serverConfig.EnvironmentHostility));
+            values.Add(new XElement("WorldSizeKm", serverConfig.WorldSizeKm));
+            values.Add(new XElement("PermanentDeath", serverConfig.PermanentDeath));
+            values.Add(new XElement("CargoShipsEnabled", serverConfig.CargoShipsEnabled));
+            values.Add(new XElement("RemoveTrash", serverConfig.RemoveTrash));
+            values.Add(new XElement("ClientCanSave", serverConfig.ClientCanSave));
 
             XElement mods = new XElement("Mods");
             foreach (ulong mod in serverConfig.Mods)
                 mods.Add(new XElement("Mod", mod));
-            response.AddToContent(mods);
+            values.Add(mods);
 
-            response.AddToContent(new XElement("ViewDistance", serverConfig.ViewDistance));
-            response.AddToContent(new XElement("OnlineMode", serverConfig.OnlineMode));
-            response.AddToContent(new XElement("ResetOwnership", serverConfig.ResetOwnership));
-            response.AddToContent(new XElement("GroupID", serverConfig.GroupID));
+            values.Add(new XElement("ViewDistance", serverConfig.ViewDistance));
+            values.Add(new XElement("OnlineMode", serverConfig.OnlineMode));
+            values.Add(new XElement("ResetOwnership", serverConfig.ResetOwnership));
+            values.Add(new XElement("GroupID", serverConfig.GroupID));
 
             XElement administrators = new XElement("Administrators");
             foreach (ulong adminitrator in serverConfig.Administrators)
                 administrators.Add(new XElement("Adminitrator", adminitrator));
-            response.AddToContent(administrators);
+            values.Add(administrators);
 
             XElement banned = new XElement("Banned");
             foreach (ulong ban in serverConfig.Banned)
                 banned.Add(new XElement("Ban", ban));
-            response.AddToContent(banned);
+            values.Add(banned);
 
-            response.AddToContent(new XElement("AutoHealing", serverConfig.AutoHealing));
-            response.AddToContent(new XElement("WeaponsEnabled", serverConfig.WeaponsEnabled));
-            response.AddToContent(new XElement("ShowPlayerNamesOnHud", serverConfig.ShowPlayerNamesOnHud));
-            response.AddToContent(new XElement("ThrusterDamage", serverConfig.ThrusterDamage));
-            response.AddToContent(new XElement("SpawnShipTimeMultiplier", serverConfig.SpawnShipTimeMultiplier));
-            response.AddToContent(new XElement("RespawnShipDelete", serverConfig.RespawnShipDelete));
-            response.AddToContent(new XElement("EnableToolShake", serverConfig.EnableToolShake));
-            response.AddToContent(new XElement("EnableIngameScripts", serverConfig.EnableIngameScripts));
-            response.AddToContent(new XElement("VoxelGeneratorVersion", serverConfig.VoxelGeneratorVersion));
-            response.AddToContent(new XElement("EnableOxygen", serverConfig.EnableOxygen));
-            response.AddToContent(new XElement("Enable3rdPersonView", serverConfig.Enable3rdPersonView));
-            response.AddToContent(new XElement("EnableEncounters", serverConfig.EnableEncounters));
+            values.Add(new XElement("AutoHealing", serverConfig.AutoHealing));
+            values.Add(new XElement("WeaponsEnabled", serverConfig.WeaponsEnabled));
+            values.Add(new XElement("ShowPlayerNamesOnHud", serverConfig.ShowPlayerNamesOnHud));
+            values.Add(new XElement("ThrusterDamage", serverConfig.ThrusterDamage));
+            values.Add(new XElement("SpawnShipTimeMultiplier", serverConfig.SpawnShipTimeMultiplier));
+            values.Add(new XElement("RespawnShipDelete", serverConfig.RespawnShipDelete));
+            values.Add(new XElement("EnableToolShake", serverConfig.EnableToolShake));
+            values.Add(new XElement("EnableIngameScripts", serverConfig.EnableIngameScripts));
+            values.Add(new XElement("VoxelGeneratorVersion", serverConfig.VoxelGeneratorVersion));
+            values.Add(new XElement("EnableOxygen", serverConfig.EnableOxygen));
+            values.Add(new XElement("Enable3rdPersonView", serverConfig.Enable3rdPersonView));
+            values.Add(new XElement("EnableEncounters", serverConfig.EnableEncounters));
+            response.AddToContent(values);
 
-            return Content(response.ToString());
-        }
-
-        // POST: API/Server/SEGetConfigurationRights
-        [HttpPost]
-        public ActionResult SEGetConfigurationRights()
-        {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(CurrentContext);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-GCR-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-GCR-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-GCR-UKNSRV", "The server doesn't exist").ToString());
-
-            AccessLevel accessLevel = srvPrv.GetAccessLevel(userID, server.Id);
-            if (!srvPrv.IsManagerOrAbore(accessLevel))
-                return Content(XMLMessage.Error("SRV-GCR-NOACCESS", "You don't have access to this server").ToString());
-
-            // ** PROCESS **
-            bool isAdmin = accessLevel != AccessLevel.Manager;
-
-            XMLMessage response = new XMLMessage("SRV-GCR-OK");
-
-            response.AddToContent(new XElement("IP", isAdmin));
-            response.AddToContent(new XElement("SteamPort", isAdmin));
-            response.AddToContent(new XElement("ServerPort", isAdmin));
-            response.AddToContent(new XElement("ServerName", true));
-            response.AddToContent(new XElement("IgnoreLastSession", true));
-            response.AddToContent(new XElement("PauseGameWhenEmpty", true));
-            response.AddToContent(new XElement("EnableSpectator", true));
-            response.AddToContent(new XElement("RealisticSound", true));
-            response.AddToContent(new XElement("AutoSaveInMinutes", true));
-            response.AddToContent(new XElement("InventorySizeMultiplier", true));
-            response.AddToContent(new XElement("AssemblerSpeedMultiplier", true));
-            response.AddToContent(new XElement("AssemblerEfficiencyMultiplier", true));
-            response.AddToContent(new XElement("RefinerySpeedMultiplier", true));
-            response.AddToContent(new XElement("GameMode", true));
-            response.AddToContent(new XElement("EnableCopyPaste", true));
-            response.AddToContent(new XElement("WelderSpeedMultiplier", true));
-            response.AddToContent(new XElement("GrinderSpeedMultiplier", true));
-            response.AddToContent(new XElement("HackSpeedMultiplier", true));
-            response.AddToContent(new XElement("DestructibleBlocks", true));
-            response.AddToContent(new XElement("MaxPlayers", isAdmin));
-            response.AddToContent(new XElement("MaxFloatingObjects", isAdmin));
-            response.AddToContent(new XElement("WorldName", true));
-            response.AddToContent(new XElement("EnvironmentHostility", true));
-            response.AddToContent(new XElement("WorldSizeKm", true));
-            response.AddToContent(new XElement("PermanentDeath", true));
-            response.AddToContent(new XElement("CargoShipsEnabled", true));
-            response.AddToContent(new XElement("RemoveTrash", true));
-            response.AddToContent(new XElement("ClientCanSave", true));
-            response.AddToContent(new XElement("Mods", true));
-            response.AddToContent(new XElement("ViewDistance", true));
-            response.AddToContent(new XElement("OnlineMode", true));
-            response.AddToContent(new XElement("ResetOwnership", true));
-            response.AddToContent(new XElement("GroupID", true));
-            response.AddToContent(new XElement("Administrators", true));
-            response.AddToContent(new XElement("Banned", true));
-            response.AddToContent(new XElement("AutoHealing", true));
-            response.AddToContent(new XElement("WeaponsEnabled", true));
-            response.AddToContent(new XElement("ShowPlayerNamesOnHud", true));
-            response.AddToContent(new XElement("ThrusterDamage", true));
-            response.AddToContent(new XElement("SpawnShipTimeMultiplier", true));
-            response.AddToContent(new XElement("RespawnShipDelete", true));
-            response.AddToContent(new XElement("EnableToolShake", true));
-            response.AddToContent(new XElement("EnableIngameScripts", true));
-            response.AddToContent(new XElement("VoxelGeneratorVersion", true));
-            response.AddToContent(new XElement("EnableOxygen", true));
-            response.AddToContent(new XElement("Enable3rdPersonView", true));
-            response.AddToContent(new XElement("EnableEncounters", true));
+            XElement rights = new XElement("Rights");
+            rights.Add(new XElement("IP", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_IP_WR")));
+            rights.Add(new XElement("SteamPort", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_STEAMPORT_WR")));
+            rights.Add(new XElement("ServerPort", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SERVERPORT_WR")));
+            rights.Add(new XElement("ServerName", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SERVERNAME_WR")));
+            rights.Add(new XElement("IgnoreLastSession", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_IGNORELASTSESSION_WR")));
+            rights.Add(new XElement("PauseGameWhenEmpty", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_PAUSEGAMEWHENEMPTY_WR")));
+            rights.Add(new XElement("EnableSpectator", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLESPECTATOR_WR")));
+            rights.Add(new XElement("RealisticSound", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_REALISTICSOUND_WR")));
+            rights.Add(new XElement("AutoSaveInMinutes", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_AUTOSAVEINMINUTES_WR")));
+            rights.Add(new XElement("InventorySizeMultiplier", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_INVENTORYSIZEMULTIPLIER_WR")));
+            rights.Add(new XElement("AssemblerSpeedMultiplier", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ASSEMBLERSPEEDMULTIPLIER_WR")));
+            rights.Add(new XElement("AssemblerEfficiencyMultiplier", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ASSEMBLEREFFICIENCYMULTIPLIER_WR")));
+            rights.Add(new XElement("RefinerySpeedMultiplier", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_REFINERYSPEEDMULTIPLIER_WR")));
+            rights.Add(new XElement("GameMode", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_GAMEMODE_WR")));
+            rights.Add(new XElement("EnableCopyPaste", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLECOPYPASTE_WR")));
+            rights.Add(new XElement("WelderSpeedMultiplier", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_WELDERSPEEDMULTIPLIER_WR")));
+            rights.Add(new XElement("GrinderSpeedMultiplier", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_GRINDERSPEEDMULTIPLIER_WR")));
+            rights.Add(new XElement("HackSpeedMultiplier", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_HACKSPEEDMULTIPLIER_WR")));
+            rights.Add(new XElement("DestructibleBlocks", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_DESTRUCTIBLEBLOCKS_WR")));
+            rights.Add(new XElement("MaxPlayers", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_MAXPLAYERS_WR")));
+            rights.Add(new XElement("MaxFloatingObjects", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_MAXFLOATINGOBJECTS_WR")));
+            rights.Add(new XElement("WorldName", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_WORLDNAME_WR")));
+            rights.Add(new XElement("EnvironmentHostility", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENVIRONMENTHOSTILITY_WR")));
+            rights.Add(new XElement("WorldSizeKm", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_WORLDSIZEKM_WR")));
+            rights.Add(new XElement("PermanentDeath", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_PERMANENTDEATH_WR")));
+            rights.Add(new XElement("CargoShipsEnabled", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_CARGOSHIPSENABLED_WR")));
+            rights.Add(new XElement("RemoveTrash", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_REMOVETRASH_WR")));
+            rights.Add(new XElement("ClientCanSave", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_CLIENTCANSAVE_WR")));
+            rights.Add(new XElement("Mods", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_MODS_WR")));
+            rights.Add(new XElement("ViewDistance", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_VIEWDISTANCE_WR")));
+            rights.Add(new XElement("OnlineMode", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ONLINEMODE_WR")));
+            rights.Add(new XElement("ResetOwnership", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_RESETOWNERSHIP_WR")));
+            rights.Add(new XElement("GroupID", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_GROUPID_WR")));
+            rights.Add(new XElement("Administrators", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ADMINISTRATORS_WR")));
+            rights.Add(new XElement("Banned", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_BANNED_WR")));
+            rights.Add(new XElement("AutoHealing", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_AUTOHEALING_WR")));
+            rights.Add(new XElement("WeaponsEnabled", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_WEAPONSENABLED_WR")));
+            rights.Add(new XElement("ShowPlayerNamesOnHud", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SHOWPLAYERNAMESONHUD_WR")));
+            rights.Add(new XElement("ThrusterDamage", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_THRUSTERDAMAGE_WR")));
+            rights.Add(new XElement("SpawnShipTimeMultiplier", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SPAWNSHIPTIMEMULTIPLIER_WR")));
+            rights.Add(new XElement("RespawnShipDelete", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_RESPAWNSHIPDELETE_WR")));
+            rights.Add(new XElement("EnableToolShake", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLETOOLSHAKE_WR")));
+            rights.Add(new XElement("EnableIngameScripts", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEINGAMESCRIPTS_WR")));
+            rights.Add(new XElement("VoxelGeneratorVersion", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_VOXELGENERATORVERSION_WR")));
+            rights.Add(new XElement("EnableOxygen", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEOXYGEN_WR")));
+            rights.Add(new XElement("Enable3rdPersonView", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLE3RDPERSONVIEW_WR")));
+            rights.Add(new XElement("EnableEncounters", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEENCOUNTERS_WR")));
+            response.AddToContent(rights);
 
             return Content(response.ToString());
         }
 
         // POST: API/Server/SESetConfiguration
         [HttpPost]
+        [APIServerAccess("SRV-SESC", "SERVER_CONFIG_SE_IP_WR", "SERVER_CONFIG_SE_STEAMPORT_WR",
+                                     "SERVER_CONFIG_SE_SERVERPORT_WR", "SERVER_CONFIG_SE_SERVERNAME_WR",
+                                     "SERVER_CONFIG_SE_IGNORELASTSESSION_WR", "SERVER_CONFIG_SE_PAUSEGAMEWHENEMPTY_WR",
+                                     "SERVER_CONFIG_SE_ENABLESPECTATOR_WR", "SERVER_CONFIG_SE_REALISTICSOUND_WR",
+                                     "SERVER_CONFIG_SE_AUTOSAVEINMINUTES_WR", "SERVER_CONFIG_SE_INVENTORYSIZEMULTIPLIER_WR",
+                                     "SERVER_CONFIG_SE_ASSEMBLERSPEEDMULTIPLIER_WR", "SERVER_CONFIG_SE_ASSEMBLEREFFICIENCYMULTIPLIER_WR",
+                                     "SERVER_CONFIG_SE_REFINERYSPEEDMULTIPLIER_WR", "SERVER_CONFIG_SE_GAMEMODE_WR",
+                                     "SERVER_CONFIG_SE_ENABLECOPYPASTE_WR", "SERVER_CONFIG_SE_WELDERSPEEDMULTIPLIER_WR",
+                                     "SERVER_CONFIG_SE_GRINDERSPEEDMULTIPLIER_WR", "SERVER_CONFIG_SE_HACKSPEEDMULTIPLIER_WR",
+                                     "SERVER_CONFIG_SE_DESTRUCTIBLEBLOCKS_WR", "SERVER_CONFIG_SE_MAXPLAYERS_WR",
+                                     "SERVER_CONFIG_SE_MAXFLOATINGOBJECTS_WR", "SERVER_CONFIG_SE_WORLDNAME_WR",
+                                     "SERVER_CONFIG_SE_ENVIRONMENTHOSTILITY_WR", "SERVER_CONFIG_SE_WORLDSIZEKM_WR",
+                                     "SERVER_CONFIG_SE_PERMANENTDEATH_WR", "SERVER_CONFIG_SE_CARGOSHIPSENABLED_WR",
+                                     "SERVER_CONFIG_SE_REMOVETRASH_WR", "SERVER_CONFIG_SE_CLIENTCANSAVE_WR",
+                                     "SERVER_CONFIG_SE_MODS_WR", "SERVER_CONFIG_SE_VIEWDISTANCE_WR",
+                                     "SERVER_CONFIG_SE_ONLINEMODE_WR", "SERVER_CONFIG_SE_RESETOWNERSHIP_WR",
+                                     "SERVER_CONFIG_SE_GROUPID_WR", "SERVER_CONFIG_SE_ADMINISTRATORS_WR",
+                                     "SERVER_CONFIG_SE_BANNED_WR", "SERVER_CONFIG_SE_AUTOHEALING_WR",
+                                     "SERVER_CONFIG_SE_WEAPONSENABLED_WR", "SERVER_CONFIG_SE_SHOWPLAYERNAMESONHUD_WR",
+                                     "SERVER_CONFIG_SE_THRUSTERDAMAGE_WR", "SERVER_CONFIG_SE_SPAWNSHIPTIMEMULTIPLIER_WR",
+                                     "SERVER_CONFIG_SE_RESPAWNSHIPDELETE_WR", "SERVER_CONFIG_SE_ENABLETOOLSHAKE_WR",
+                                     "SERVER_CONFIG_SE_ENABLEINGAMESCRIPTS_WR", "SERVER_CONFIG_SE_VOXELGENERATORVERSION_WR",
+                                     "SERVER_CONFIG_SE_ENABLEOXYGEN_WR", "SERVER_CONFIG_SE_ENABLE3RDPERSONVIEW_WR",
+                                     "SERVER_CONFIG_SE_ENABLEENCOUNTERS_WR")]
         public ActionResult SESetConfiguration()
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
             // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("SRV-SC-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("SRV-SC-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("SRV-SC-UKNSRV", "The server doesn't exist").ToString());
-
-            AccessLevel accessLevel = srvPrv.GetAccessLevel(userID, server.Id);
-            if (!srvPrv.IsManagerOrAbore(accessLevel))
-                return Content(XMLMessage.Error("SRV-SC-NOACCESS", "You don't have access to this server").ToString());
-
-            bool isAdmin = accessLevel != AccessLevel.Manager;
 
             // Loading the server config
             SEServerConfigHelper serverConfig = new SEServerConfigHelper();
-            serverConfig.Load(server);
+            serverConfig.Load(RequestServer);
 
-            if (isAdmin)
+            // ==== IP ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_IP_WR"))
             {
-                // ==== IP ====
                 if (string.IsNullOrWhiteSpace(Request.Form["IP"]))
-                    return Content(XMLMessage.Error("SRV-SC-MISIP", "The IP field must be provided").ToString());
+                    return Content(XMLMessage.Error("SRV-SESC-MISIP", "The IP field must be provided").ToString());
                 if (!Regex.IsMatch(Request.Form["IP"], @"^((\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])$"))
-                    return Content(XMLMessage.Error("SRV-SC-BADIP", "The IP field is invalid").ToString());
+                    return Content(XMLMessage.Error("SRV-SESC-BADIP", "The IP field is invalid").ToString());
                 serverConfig.IP = Request.Form["IP"];
+            }
 
-                // ==== SteamPort ====
+            // ==== SteamPort ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_STEAMPORT_WR"))
+            {
                 if (string.IsNullOrWhiteSpace(Request.Form["SteamPort"]))
-                    return Content(XMLMessage.Error("SRV-SC-MISSTMPRT", "The SteamPort field must be provided").ToString());
+                    return Content(XMLMessage.Error("SRV-SESC-MISSTMPRT", "The SteamPort field must be provided").ToString());
                 if (!int.TryParse(Request.Form["SteamPort"], out serverConfig.SteamPort) || serverConfig.SteamPort < 1 || serverConfig.SteamPort > 65535)
-                    return Content(XMLMessage.Error("SRV-SC-BADSTMPRT", "The SteamPort field is invalid").ToString());
+                    return Content(XMLMessage.Error("SRV-SESC-BADSTMPRT", "The SteamPort field is invalid").ToString());
+            }
 
-                // ==== ServerPort ====
+            // ==== ServerPort ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SERVERPORT_WR"))
+            {
                 if (string.IsNullOrWhiteSpace(Request.Form["ServerPort"]))
-                    return Content(XMLMessage.Error("SRV-SC-MISSRVPRT", "The ServerPort field must be provided").ToString());
+                    return Content(XMLMessage.Error("SRV-SESC-MISSRVPRT", "The ServerPort field must be provided").ToString());
                 if (!int.TryParse(Request.Form["ServerPort"], out serverConfig.ServerPort) || serverConfig.ServerPort < 1 || serverConfig.ServerPort > 65535)
-                    return Content(XMLMessage.Error("SRV-SC-BADSRVPRT", "The ServerPort field is invalid").ToString());
-                if (!srvPrv.IsPortAvailable(serverConfig.ServerPort, server))
-                    return Content(XMLMessage.Error("SRV-SC-EXSRVPRT", "The ServerPort is already in use").ToString());
+                    return Content(XMLMessage.Error("SRV-SESC-BADSRVPRT", "The ServerPort field is invalid").ToString());
+                if (!srvPrv.IsPortAvailable(serverConfig.ServerPort, RequestServer))
+                    return Content(XMLMessage.Error("SRV-SESC-EXSRVPRT", "The ServerPort is already in use").ToString());
 
-                // ==== MaxPlayers ====
-                if (string.IsNullOrWhiteSpace(Request.Form["MaxPlayers"]))
-                    return Content(XMLMessage.Error("SRV-SC-MISMAXPL", "The MaxPlayers field must be provided").ToString());
-                if (!int.TryParse(Request.Form["MaxPlayers"], out serverConfig.MaxPlayers) || serverConfig.MaxPlayers < 1)
-                    return Content(XMLMessage.Error("SRV-SC-BADMAXPL", "The MaxPlayers field is invalid").ToString());
-
-                // ==== MaxFloatingObjects ====
-                if (string.IsNullOrWhiteSpace(Request.Form["MaxFloatingObjects"]))
-                    return Content(XMLMessage.Error("SRV-SC-MISMAXFO", "The MaxFloatingObjects field must be provided").ToString());
-                if (!int.TryParse(Request.Form["MaxFloatingObjects"], out serverConfig.MaxFloatingObjects) || serverConfig.MaxFloatingObjects < 1)
-                    return Content(XMLMessage.Error("SRV-SC-BADMAXFO", "The MaxFloatingObjects field is invalid").ToString());
             }
 
             // ==== ServerName ====
-            if (!string.IsNullOrWhiteSpace(Request.Form["ServerName"]))
-                serverConfig.ServerName = Request.Form["ServerName"];
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SERVERNAME_WR"))
+            {
+                if (!string.IsNullOrWhiteSpace(Request.Form["ServerName"]))
+                    serverConfig.ServerName = Request.Form["ServerName"];
+            }
 
             // ==== IgnoreLastSession ====
-            if (string.IsNullOrWhiteSpace(Request.Form["IgnoreLastSession"]))
-                return Content(XMLMessage.Error("SRV-SC-MISILS", "The IgnoreLastSession field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["IgnoreLastSession"], out serverConfig.IgnoreLastSession))
-                return Content(XMLMessage.Error("SRV-SC-BADILS", "The IgnoreLastSession field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_IGNORELASTSESSION_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["IgnoreLastSession"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISILS", "The IgnoreLastSession field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["IgnoreLastSession"], out serverConfig.IgnoreLastSession))
+                    return Content(XMLMessage.Error("SRV-SESC-BADILS", "The IgnoreLastSession field is invalid").ToString());
+            }
 
             // ==== PauseGameWhenEmpty ====
-            if (string.IsNullOrWhiteSpace(Request.Form["PauseGameWhenEmpty"]))
-                return Content(XMLMessage.Error("SRV-SC-MISPGWE", "The PauseGameWhenEmpty field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["PauseGameWhenEmpty"], out serverConfig.PauseGameWhenEmpty))
-                return Content(XMLMessage.Error("SRV-SC-BADPGWE", "The PauseGameWhenEmpty field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_PAUSEGAMEWHENEMPTY_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["PauseGameWhenEmpty"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISPGWE", "The PauseGameWhenEmpty field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["PauseGameWhenEmpty"], out serverConfig.PauseGameWhenEmpty))
+                    return Content(XMLMessage.Error("SRV-SESC-BADPGWE", "The PauseGameWhenEmpty field is invalid").ToString());
+            }
 
             // ==== EnableSpectator ====
-            if (string.IsNullOrWhiteSpace(Request.Form["EnableSpectator"]))
-                return Content(XMLMessage.Error("SRV-SC-MISES", "The EnableSpectator field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["EnableSpectator"], out serverConfig.EnableSpectator))
-                return Content(XMLMessage.Error("SRV-SC-BADES", "The EnableSpectator field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLESPECTATOR_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableSpectator"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISES", "The EnableSpectator field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableSpectator"], out serverConfig.EnableSpectator))
+                    return Content(XMLMessage.Error("SRV-SESC-BADES", "The EnableSpectator field is invalid").ToString());
+            }
 
             // ==== RealisticSound ====
-            if (string.IsNullOrWhiteSpace(Request.Form["RealisticSound"]))
-                return Content(XMLMessage.Error("SRV-SC-MISRS", "The RealisticSound field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["RealisticSound"], out serverConfig.RealisticSound))
-                return Content(XMLMessage.Error("SRV-SC-BADRS", "The RealisticSound field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_REALISTICSOUND_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["RealisticSound"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISRS", "The RealisticSound field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["RealisticSound"], out serverConfig.RealisticSound))
+                    return Content(XMLMessage.Error("SRV-SESC-BADRS", "The RealisticSound field is invalid").ToString());
+            }
 
             // ==== AutoSaveInMinutes ====
-            if (string.IsNullOrWhiteSpace(Request.Form["AutoSaveInMinutes"]))
-                return Content(XMLMessage.Error("SRV-SC-MISASIM", "The AutoSaveInMinutes field must be provided").ToString());
-            if (!uint.TryParse(Request.Form["AutoSaveInMinutes"], out serverConfig.AutoSaveInMinutes))
-                return Content(XMLMessage.Error("SRV-SC-BADASIM", "The AutoSaveInMinutes field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_AUTOSAVEINMINUTES_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["AutoSaveInMinutes"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISASIM", "The AutoSaveInMinutes field must be provided").ToString());
+                if (!uint.TryParse(Request.Form["AutoSaveInMinutes"], out serverConfig.AutoSaveInMinutes))
+                    return Content(XMLMessage.Error("SRV-SESC-BADASIM", "The AutoSaveInMinutes field is invalid").ToString());
+            }
 
             // ==== InventorySizeMultiplier ====
-            if (string.IsNullOrWhiteSpace(Request.Form["InventorySizeMultiplier"]))
-                return Content(XMLMessage.Error("SRV-SC-MISISM", "The InventorySizeMultiplier field must be provided").ToString());
-            if (!float.TryParse(Request.Form["InventorySizeMultiplier"], out serverConfig.InventorySizeMultiplier) || serverConfig.InventorySizeMultiplier < 1)
-                return Content(XMLMessage.Error("SRV-SC-BADISM", "The InventorySizeMultiplier field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_INVENTORYSIZEMULTIPLIER_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["InventorySizeMultiplier"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISISM", "The InventorySizeMultiplier field must be provided").ToString());
+                if (!float.TryParse(Request.Form["InventorySizeMultiplier"], out serverConfig.InventorySizeMultiplier) || serverConfig.InventorySizeMultiplier < 1)
+                    return Content(XMLMessage.Error("SRV-SESC-BADISM", "The InventorySizeMultiplier field is invalid").ToString());
+            }
 
             // ==== AssemblerSpeedMultiplier ====
-            if (string.IsNullOrWhiteSpace(Request.Form["AssemblerSpeedMultiplier"]))
-                return Content(XMLMessage.Error("SRV-SC-MISASM", "The AssemblerSpeedMultiplier field must be provided").ToString());
-            if (!float.TryParse(Request.Form["AssemblerSpeedMultiplier"], out serverConfig.AssemblerSpeedMultiplier) || serverConfig.AssemblerSpeedMultiplier < 1)
-                return Content(XMLMessage.Error("SRV-SC-BADASM", "The AssemblerSpeedMultiplier field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ASSEMBLERSPEEDMULTIPLIER_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["AssemblerSpeedMultiplier"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISASM", "The AssemblerSpeedMultiplier field must be provided").ToString());
+                if (!float.TryParse(Request.Form["AssemblerSpeedMultiplier"], out serverConfig.AssemblerSpeedMultiplier) || serverConfig.AssemblerSpeedMultiplier < 1)
+                    return Content(XMLMessage.Error("SRV-SESC-BADASM", "The AssemblerSpeedMultiplier field is invalid").ToString());
+            }
 
             // ==== AssemblerEfficiencyMultiplier ====
-            if (string.IsNullOrWhiteSpace(Request.Form["AssemblerEfficiencyMultiplier"]))
-                return Content(XMLMessage.Error("SRV-SC-MISAEM", "The AssemblerEfficiencyMultiplier field must be provided").ToString());
-            if (!float.TryParse(Request.Form["AssemblerEfficiencyMultiplier"], out serverConfig.AssemblerEfficiencyMultiplier) || serverConfig.AssemblerEfficiencyMultiplier < 1)
-                return Content(XMLMessage.Error("SRV-SC-BADAEM", "The AssemblerEfficiencyMultiplier field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ASSEMBLEREFFICIENCYMULTIPLIER_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["AssemblerEfficiencyMultiplier"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISAEM", "The AssemblerEfficiencyMultiplier field must be provided").ToString());
+                if (!float.TryParse(Request.Form["AssemblerEfficiencyMultiplier"], out serverConfig.AssemblerEfficiencyMultiplier) || serverConfig.AssemblerEfficiencyMultiplier < 1)
+                    return Content(XMLMessage.Error("SRV-SESC-BADAEM", "The AssemblerEfficiencyMultiplier field is invalid").ToString());
+            }
 
             // ==== RefinerySpeedMultiplier ====
-            if (string.IsNullOrWhiteSpace(Request.Form["RefinerySpeedMultiplier"]))
-                return Content(XMLMessage.Error("SRV-SC-MISRSM", "The RefinerySpeedMultiplier field must be provided").ToString());
-            if (!float.TryParse(Request.Form["RefinerySpeedMultiplier"], out serverConfig.RefinerySpeedMultiplier) || serverConfig.RefinerySpeedMultiplier < 1)
-                return Content(XMLMessage.Error("SRV-SC-BADRSM", "The RefinerySpeedMultiplier field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_REFINERYSPEEDMULTIPLIER_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["RefinerySpeedMultiplier"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISRSM", "The RefinerySpeedMultiplier field must be provided").ToString());
+                if (!float.TryParse(Request.Form["RefinerySpeedMultiplier"], out serverConfig.RefinerySpeedMultiplier) || serverConfig.RefinerySpeedMultiplier < 1)
+                    return Content(XMLMessage.Error("SRV-SESC-BADRSM", "The RefinerySpeedMultiplier field is invalid").ToString());
+            }
 
             // ==== GameMode ====
-            if (string.IsNullOrWhiteSpace(Request.Form["GameMode"]))
-                return Content(XMLMessage.Error("SRV-SC-MISGM", "The GameMode field must be provided").ToString());
-            if (!Enum.TryParse(Request.Form["GameMode"], out serverConfig.GameMode))
-                return Content(XMLMessage.Error("SRV-SC-BADGM", "The GameMode field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_GAMEMODE_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["GameMode"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISGM", "The GameMode field must be provided").ToString());
+                if (!Enum.TryParse(Request.Form["GameMode"], out serverConfig.GameMode))
+                    return Content(XMLMessage.Error("SRV-SESC-BADGM", "The GameMode field is invalid").ToString());
+            }
 
             // ==== EnableCopyPaste ====
-            if (string.IsNullOrWhiteSpace(Request.Form["EnableCopyPaste"]))
-                return Content(XMLMessage.Error("SRV-SC-MISECP", "The EnableCopyPaste field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["EnableCopyPaste"], out serverConfig.EnableCopyPaste))
-                return Content(XMLMessage.Error("SRV-SC-BADECP", "The EnableCopyPaste field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLECOPYPASTE_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableCopyPaste"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISECP", "The EnableCopyPaste field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableCopyPaste"], out serverConfig.EnableCopyPaste))
+                    return Content(XMLMessage.Error("SRV-SESC-BADECP", "The EnableCopyPaste field is invalid").ToString());
+            }
 
             // ==== WelderSpeedMultiplier ====
-            if (string.IsNullOrWhiteSpace(Request.Form["WelderSpeedMultiplier"]))
-                return Content(XMLMessage.Error("SRV-SC-MISWSM", "The WelderSpeedMultiplier field must be provided").ToString());
-            if (!float.TryParse(Request.Form["WelderSpeedMultiplier"], out serverConfig.WelderSpeedMultiplier) || serverConfig.WelderSpeedMultiplier < 0)
-                return Content(XMLMessage.Error("SRV-SC-BADWSM", "The WelderSpeedMultiplier field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_WELDERSPEEDMULTIPLIER_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["WelderSpeedMultiplier"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISWSM", "The WelderSpeedMultiplier field must be provided").ToString());
+                if (!float.TryParse(Request.Form["WelderSpeedMultiplier"], out serverConfig.WelderSpeedMultiplier) || serverConfig.WelderSpeedMultiplier < 0)
+                    return Content(XMLMessage.Error("SRV-SESC-BADWSM", "The WelderSpeedMultiplier field is invalid").ToString());
+            }
 
             // ==== GrinderSpeedMultiplier ====
-            if (string.IsNullOrWhiteSpace(Request.Form["GrinderSpeedMultiplier"]))
-                return Content(XMLMessage.Error("SRV-SC-MISGSM", "The GrinderSpeedMultiplier field must be provided").ToString());
-            if (!float.TryParse(Request.Form["GrinderSpeedMultiplier"], out serverConfig.GrinderSpeedMultiplier) || serverConfig.GrinderSpeedMultiplier < 0)
-                return Content(XMLMessage.Error("SRV-SC-BADGSM", "The GrinderSpeedMultiplier field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_GRINDERSPEEDMULTIPLIER_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["GrinderSpeedMultiplier"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISGSM", "The GrinderSpeedMultiplier field must be provided").ToString());
+                if (!float.TryParse(Request.Form["GrinderSpeedMultiplier"], out serverConfig.GrinderSpeedMultiplier) || serverConfig.GrinderSpeedMultiplier < 0)
+                    return Content(XMLMessage.Error("SRV-SESC-BADGSM", "The GrinderSpeedMultiplier field is invalid").ToString());
+            }
 
             // ==== HackSpeedMultiplier ====
-            if (string.IsNullOrWhiteSpace(Request.Form["HackSpeedMultiplier"]))
-                return Content(XMLMessage.Error("SRV-SC-MISHSM", "The HackSpeedMultiplier field must be provided").ToString());
-            if (!float.TryParse(Request.Form["HackSpeedMultiplier"], out serverConfig.HackSpeedMultiplier) || serverConfig.HackSpeedMultiplier < 0)
-                return Content(XMLMessage.Error("SRV-SC-BADHSM", "The HackSpeedMultiplier field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_HACKSPEEDMULTIPLIER_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["HackSpeedMultiplier"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISHSM", "The HackSpeedMultiplier field must be provided").ToString());
+                if (!float.TryParse(Request.Form["HackSpeedMultiplier"], out serverConfig.HackSpeedMultiplier) || serverConfig.HackSpeedMultiplier < 0)
+                    return Content(XMLMessage.Error("SRV-SESC-BADHSM", "The HackSpeedMultiplier field is invalid").ToString());
+            }
 
             // ==== DestructibleBlocks ====
-            if (string.IsNullOrWhiteSpace(Request.Form["DestructibleBlocks"]))
-                return Content(XMLMessage.Error("SRV-SC-MISDB", "The DestructibleBlocks field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["DestructibleBlocks"], out serverConfig.DestructibleBlocks))
-                return Content(XMLMessage.Error("SRV-SC-BADDB", "The DestructibleBlocks field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_DESTRUCTIBLEBLOCKS_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["DestructibleBlocks"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISDB", "The DestructibleBlocks field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["DestructibleBlocks"], out serverConfig.DestructibleBlocks))
+                    return Content(XMLMessage.Error("SRV-SESC-BADDB", "The DestructibleBlocks field is invalid").ToString());
+            }
+
+            // ==== MaxPlayers ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_MAXPLAYERS_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["MaxPlayers"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISMAXPL", "The MaxPlayers field must be provided").ToString());
+                if (!int.TryParse(Request.Form["MaxPlayers"], out serverConfig.MaxPlayers) || serverConfig.MaxPlayers < 1)
+                    return Content(XMLMessage.Error("SRV-SESC-BADMAXPL", "The MaxPlayers field is invalid").ToString());
+            }
+
+            // ==== MaxFloatingObjects ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_MAXFLOATINGOBJECTS_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["MaxFloatingObjects"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISMAXFO", "The MaxFloatingObjects field must be provided").ToString());
+                if (!int.TryParse(Request.Form["MaxFloatingObjects"], out serverConfig.MaxFloatingObjects) || serverConfig.MaxFloatingObjects < 1)
+                    return Content(XMLMessage.Error("SRV-SESC-BADMAXFO", "The MaxFloatingObjects field is invalid").ToString());
+            }
 
             // ==== WorldName ====
-            if (!string.IsNullOrWhiteSpace(Request.Form["WorldName"]))
-                serverConfig.WorldName = Request.Form["WorldName"];
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_WORLDNAME_WR"))
+            {
+                if (!string.IsNullOrWhiteSpace(Request.Form["WorldName"]))
+                    serverConfig.WorldName = Request.Form["WorldName"];
+            }
 
             // ==== EnvironmentHostility ====
-            if (string.IsNullOrWhiteSpace(Request.Form["EnvironmentHostility"]))
-                return Content(XMLMessage.Error("SRV-SC-MISEH", "The EnvironmentHostility field must be provided").ToString());
-            if (!Enum.TryParse(Request.Form["EnvironmentHostility"], out serverConfig.EnvironmentHostility))
-                return Content(XMLMessage.Error("SRV-SC-BADEH", "The EnvironmentHostility field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENVIRONMENTHOSTILITY_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnvironmentHostility"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISEH", "The EnvironmentHostility field must be provided").ToString());
+                if (!Enum.TryParse(Request.Form["EnvironmentHostility"], out serverConfig.EnvironmentHostility))
+                    return Content(XMLMessage.Error("SRV-SESC-BADEH", "The EnvironmentHostility field is invalid").ToString());
+            }
 
             // ==== WorldSizeKm ====
-            if (string.IsNullOrWhiteSpace(Request.Form["WorldSizeKm"]))
-                return Content(XMLMessage.Error("SRV-SC-MISWSK", "The WorldSizeKm field must be provided").ToString());
-            if (!int.TryParse(Request.Form["WorldSizeKm"], out serverConfig.WorldSizeKm) || serverConfig.WorldSizeKm < 0)
-                return Content(XMLMessage.Error("SRV-SC-BADWSK", "The WorldSizeKm field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_WORLDSIZEKM_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["WorldSizeKm"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISWSK", "The WorldSizeKm field must be provided").ToString());
+                if (!int.TryParse(Request.Form["WorldSizeKm"], out serverConfig.WorldSizeKm) || serverConfig.WorldSizeKm < 0)
+                    return Content(XMLMessage.Error("SRV-SESC-BADWSK", "The WorldSizeKm field is invalid").ToString());
+            }
 
             // ==== PermanentDeath ====
-            if (string.IsNullOrWhiteSpace(Request.Form["PermanentDeath"]))
-                return Content(XMLMessage.Error("SRV-SC-MISPD", "The PermanentDeath field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["PermanentDeath"], out serverConfig.PermanentDeath))
-                return Content(XMLMessage.Error("SRV-SC-BADPD", "The PermanentDeath field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_PERMANENTDEATH_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["PermanentDeath"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISPD", "The PermanentDeath field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["PermanentDeath"], out serverConfig.PermanentDeath))
+                    return Content(XMLMessage.Error("SRV-SESC-BADPD", "The PermanentDeath field is invalid").ToString());
+            }
 
             // ==== CargoShipsEnabled ====
-            if (string.IsNullOrWhiteSpace(Request.Form["CargoShipsEnabled"]))
-                return Content(XMLMessage.Error("SRV-SC-MISCSE", "The CargoShipsEnabled field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["CargoShipsEnabled"], out serverConfig.CargoShipsEnabled))
-                return Content(XMLMessage.Error("SRV-SC-BADCSE", "The CargoShipsEnabled field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_CARGOSHIPSENABLED_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["CargoShipsEnabled"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISCSE", "The CargoShipsEnabled field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["CargoShipsEnabled"], out serverConfig.CargoShipsEnabled))
+                    return Content(XMLMessage.Error("SRV-SESC-BADCSE", "The CargoShipsEnabled field is invalid").ToString());
+            }
 
             // ==== RemoveTrash ====
-            if (string.IsNullOrWhiteSpace(Request.Form["RemoveTrash"]))
-                return Content(XMLMessage.Error("SRV-SC-MISRT", "The RemoveTrash field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["RemoveTrash"], out serverConfig.RemoveTrash))
-                return Content(XMLMessage.Error("SRV-SC-BADRT", "The RemoveTrash field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_REMOVETRASH_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["RemoveTrash"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISRT", "The RemoveTrash field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["RemoveTrash"], out serverConfig.RemoveTrash))
+                    return Content(XMLMessage.Error("SRV-SESC-BADRT", "The RemoveTrash field is invalid").ToString());
+            }
 
             // ==== ClientCanSave ====
-            if (string.IsNullOrWhiteSpace(Request.Form["ClientCanSave"]))
-                return Content(XMLMessage.Error("SRV-SC-MISCCS", "The ClientCanSave field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["ClientCanSave"], out serverConfig.ClientCanSave))
-                return Content(XMLMessage.Error("SRV-SC-BADCCS", "The ClientCanSave field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_CLIENTCANSAVE_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["ClientCanSave"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISCCS", "The ClientCanSave field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["ClientCanSave"], out serverConfig.ClientCanSave))
+                    return Content(XMLMessage.Error("SRV-SESC-BADCCS", "The ClientCanSave field is invalid").ToString());
+            }
 
             // ==== Mods ====
-            serverConfig.Mods.Clear();
-            foreach (string mod in Request.Form["Mods"].Split(';'))
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_MODS_WR"))
             {
-                if (!string.IsNullOrWhiteSpace(mod))
+                serverConfig.Mods.Clear();
+                foreach (string mod in Request.Form["Mods"].Split(';'))
                 {
-                    ulong modParsed;
-                    if (!ulong.TryParse(mod, out modParsed))
-                        return Content(XMLMessage.Error("SRV-SC-BADMOD", "The Mods field is invalid").ToString());
-                    serverConfig.Mods.Add(modParsed);
+                    if (!string.IsNullOrWhiteSpace(mod))
+                    {
+                        ulong modParsed;
+                        if (!ulong.TryParse(mod, out modParsed))
+                            return Content(XMLMessage.Error("SRV-SESC-BADMOD", "The Mods field is invalid").ToString());
+                        serverConfig.Mods.Add(modParsed);
+                    }
                 }
             }
 
             // ==== ViewDistance ====
-            if (string.IsNullOrWhiteSpace(Request.Form["ViewDistance"]))
-                return Content(XMLMessage.Error("SRV-SC-MISVD", "The ViewDistance field must be provided").ToString());
-            if (!int.TryParse(Request.Form["ViewDistance"], out serverConfig.ViewDistance) || serverConfig.ViewDistance < 1)
-                return Content(XMLMessage.Error("SRV-SC-BADVD", "The ViewDistance field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_VIEWDISTANCE_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["ViewDistance"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISVD", "The ViewDistance field must be provided").ToString());
+                if (!int.TryParse(Request.Form["ViewDistance"], out serverConfig.ViewDistance) ||
+                    serverConfig.ViewDistance < 1)
+                    return Content(XMLMessage.Error("SRV-SESC-BADVD", "The ViewDistance field is invalid").ToString());
+            }
 
             // ==== OnlineMode ====
-            if (string.IsNullOrWhiteSpace(Request.Form["OnlineMode"]))
-                return Content(XMLMessage.Error("SRV-SC-MISOM", "The OnlineMode field must be provided").ToString());
-            if (!Enum.TryParse(Request.Form["OnlineMode"], out serverConfig.OnlineMode))
-                return Content(XMLMessage.Error("SRV-SC-BADOM", "The OnlineMode field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ONLINEMODE_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["OnlineMode"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISOM", "The OnlineMode field must be provided").ToString());
+                if (!Enum.TryParse(Request.Form["OnlineMode"], out serverConfig.OnlineMode))
+                    return Content(XMLMessage.Error("SRV-SESC-BADOM", "The OnlineMode field is invalid").ToString());
+            }
 
             // ==== ResetOwnership ====
-            if (string.IsNullOrWhiteSpace(Request.Form["ResetOwnership"]))
-                return Content(XMLMessage.Error("SRV-SC-MISRO", "The ResetOwnership field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["ResetOwnership"], out serverConfig.ResetOwnership))
-                return Content(XMLMessage.Error("SRV-SC-BADRO", "The ResetOwnership field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_RESETOWNERSHIP_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["ResetOwnership"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISRO", "The ResetOwnership field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["ResetOwnership"], out serverConfig.ResetOwnership))
+                    return Content(XMLMessage.Error("SRV-SESC-BADRO", "The ResetOwnership field is invalid").ToString());
+            }
 
             // ==== GroupID ====
-            if (string.IsNullOrWhiteSpace(Request.Form["GroupID"]))
-                return Content(XMLMessage.Error("SRV-SC-MISGRID", "The GroupID field must be provided").ToString());
-            if (!ulong.TryParse(Request.Form["GroupID"], out serverConfig.GroupID))
-                return Content(XMLMessage.Error("SRV-SC-BADGRID", "The GroupID field is invalid").ToString());
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_GROUPID_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["GroupID"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISGRID", "The GroupID field must be provided").ToString());
+                if (!ulong.TryParse(Request.Form["GroupID"], out serverConfig.GroupID))
+                    return Content(XMLMessage.Error("SRV-SESC-BADGRID", "The GroupID field is invalid").ToString());
+            }
 
             // ==== Administrators ====
-            serverConfig.Administrators.Clear();
-            foreach (string adm in Request.Form["Administrators"].Split(';'))
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ADMINISTRATORS_WR"))
             {
-                if (!string.IsNullOrWhiteSpace(adm))
+                serverConfig.Administrators.Clear();
+                foreach (string adm in Request.Form["Administrators"].Split(';'))
                 {
-                    ulong admParsed;
-                    if (!ulong.TryParse(adm, out admParsed))
-                        return
-                            Content(XMLMessage.Error("SRV-SC-BADADM", "The Administrators field is invalid").ToString());
-                    serverConfig.Administrators.Add(admParsed);
+                    if (!string.IsNullOrWhiteSpace(adm))
+                    {
+                        ulong admParsed;
+                        if (!ulong.TryParse(adm, out admParsed))
+                            return Content(XMLMessage.Error("SRV-SESC-BADADM", "The Administrators field is invalid").ToString());
+                        serverConfig.Administrators.Add(admParsed);
+                    }
                 }
             }
 
             // ==== Banned ====
-            serverConfig.Banned.Clear();
-            foreach (string ban in Request.Form["Banned"].Split(';'))
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_BANNED_WR"))
             {
-                if (!string.IsNullOrWhiteSpace(ban))
+                serverConfig.Banned.Clear();
+                foreach (string ban in Request.Form["Banned"].Split(';'))
                 {
-                    ulong banParsed;
-                    if (!ulong.TryParse(ban, out banParsed))
-                        return Content(XMLMessage.Error("SRV-SC-BADBAN", "The Banned field is invalid").ToString());
-                    serverConfig.Banned.Add(banParsed);
+                    if (!string.IsNullOrWhiteSpace(ban))
+                    {
+                        ulong banParsed;
+                        if (!ulong.TryParse(ban, out banParsed))
+                            return Content(XMLMessage.Error("SRV-SESC-BADBAN", "The Banned field is invalid").ToString());
+                        serverConfig.Banned.Add(banParsed);
+                    }
                 }
             }
 
             // ==== AutoHealing ====
-            if (string.IsNullOrWhiteSpace(Request.Form["AutoHealing"]))
-                return Content(XMLMessage.Error("SRV-SC-MISAH", "The AutoHealing field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["AutoHealing"], out serverConfig.AutoHealing))
-                return Content(XMLMessage.Error("SRV-SC-BADAH", "The AutoHealing field is invalid").ToString());
-
-            // ==== WeaponsEnabled ====
-            if (string.IsNullOrWhiteSpace(Request.Form["WeaponsEnabled"]))
-                return Content(XMLMessage.Error("SRV-SC-MISWE", "The WeaponsEnabled field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["WeaponsEnabled"], out serverConfig.WeaponsEnabled))
-                return Content(XMLMessage.Error("SRV-SC-BADWE", "The WeaponsEnabled field is invalid").ToString());
-
-            // ==== ShowPlayerNamesOnHud ====
-            if (string.IsNullOrWhiteSpace(Request.Form["ShowPlayerNamesOnHud"]))
-                return Content(XMLMessage.Error("SRV-SC-MISSPNOH", "The ShowPlayerNamesOnHud field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["ShowPlayerNamesOnHud"], out serverConfig.ShowPlayerNamesOnHud))
-                return Content(XMLMessage.Error("SRV-SC-BADSPNOH", "The ShowPlayerNamesOnHud field is invalid").ToString());
-
-            // ==== ThrusterDamage ====
-            if (string.IsNullOrWhiteSpace(Request.Form["ThrusterDamage"]))
-                return Content(XMLMessage.Error("SRV-SC-MISTD", "The ThrusterDamage field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["ThrusterDamage"], out serverConfig.ThrusterDamage))
-                return Content(XMLMessage.Error("SRV-SC-BADTD", "The ThrusterDamage field is invalid").ToString());
-
-            // ==== SpawnShipTimeMultiplier ====
-            if (string.IsNullOrWhiteSpace(Request.Form["SpawnShipTimeMultiplier"]))
-                return Content(XMLMessage.Error("SRV-SC-MISSSTM", "The SpawnShipTimeMultiplier field must be provided").ToString());
-            if (!float.TryParse(Request.Form["SpawnShipTimeMultiplier"], out serverConfig.SpawnShipTimeMultiplier) || serverConfig.SpawnShipTimeMultiplier < 0)
-                return Content(XMLMessage.Error("SRV-SC-BADSSTM", "The SpawnShipTimeMultiplier field is invalid").ToString());
-
-            // ==== RespawnShipDelete ====
-            if (string.IsNullOrWhiteSpace(Request.Form["RespawnShipDelete"]))
-                return Content(XMLMessage.Error("SRV-SC-MISRSD", "The RespawnShipDelete field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["RespawnShipDelete"], out serverConfig.RespawnShipDelete))
-                return Content(XMLMessage.Error("SRV-SC-BADRSD", "The RespawnShipDelete field is invalid").ToString());
-
-            // ==== EnableToolShake ====
-            if (string.IsNullOrWhiteSpace(Request.Form["EnableToolShake"]))
-                return Content(XMLMessage.Error("SRV-SC-MISETS", "The EnableToolShake field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["EnableToolShake"], out serverConfig.EnableToolShake))
-                return Content(XMLMessage.Error("SRV-SC-BADETS", "The EnableToolShake field is invalid").ToString());
-
-            // ==== EnableIngameScripts ====
-            if (string.IsNullOrWhiteSpace(Request.Form["EnableIngameScripts"]))
-                return Content(XMLMessage.Error("SRV-SC-MISETS", "The EnableIngameScripts field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["EnableIngameScripts"], out serverConfig.EnableIngameScripts))
-                return Content(XMLMessage.Error("SRV-SC-BADETS", "The EnableIngameScripts field is invalid").ToString());
-
-            // ==== VoxelGeneratorVersion ====
-            if (string.IsNullOrWhiteSpace(Request.Form["VoxelGeneratorVersion"]))
-                return Content(XMLMessage.Error("SRV-SC-MISVGV", "The VoxelGeneratorVersion field must be provided").ToString());
-            if (!int.TryParse(Request.Form["VoxelGeneratorVersion"], out serverConfig.VoxelGeneratorVersion) || serverConfig.VoxelGeneratorVersion < 0 || serverConfig.VoxelGeneratorVersion > 1)
-                return Content(XMLMessage.Error("SRV-SC-BADVGV", "The VoxelGeneratorVersion field is invalid").ToString());
-
-            // ==== EnableOxygen ====
-            if (string.IsNullOrWhiteSpace(Request.Form["EnableOxygen"]))
-                return Content(XMLMessage.Error("SRV-SC-MISEO", "The EnableOxygen field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["EnableOxygen"], out serverConfig.EnableOxygen))
-                return Content(XMLMessage.Error("SRV-SC-BADEO", "The EnableOxygen field is invalid").ToString());
-
-            // ==== Enable3rdPersonView ====
-            if (string.IsNullOrWhiteSpace(Request.Form["Enable3rdPersonView"]))
-                return Content(XMLMessage.Error("SRV-SC-MISE3PV", "The Enable3rdPersonView field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["Enable3rdPersonView"], out serverConfig.Enable3rdPersonView))
-                return Content(XMLMessage.Error("SRV-SC-BADE3PV", "The Enable3rdPersonView field is invalid").ToString());
-
-            // ==== EnableEncounters ====
-            if (string.IsNullOrWhiteSpace(Request.Form["EnableEncounters"]))
-                return Content(XMLMessage.Error("SRV-SC-MISEE", "The EnableEncounters field must be provided").ToString());
-            if (!bool.TryParse(Request.Form["EnableEncounters"], out serverConfig.EnableEncounters))
-                return Content(XMLMessage.Error("SRV-SC-BADEE", "The EnableEncounters field is invalid").ToString());
-
-            // ** PROCESS **
-            server.Ip = serverConfig.IP;
-            server.Port = serverConfig.ServerPort;
-            server.AutoSaveInMinutes = Convert.ToInt32(serverConfig.AutoSaveInMinutes);
-
-            srvPrv.UpdateServer(server);
-
-            bool restartRequired = false;
-            if (srvPrv.GetState(server) != ServiceState.Stopped)
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_AUTOHEALING_WR"))
             {
-                restartRequired = true;
-                ServiceHelper.StopServiceAndWait(server);
+                if (string.IsNullOrWhiteSpace(Request.Form["AutoHealing"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISAH", "The AutoHealing field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["AutoHealing"], out serverConfig.AutoHealing))
+                    return Content(XMLMessage.Error("SRV-SESC-BADAH", "The AutoHealing field is invalid").ToString());
             }
 
-            if (server.UseServerExtender)
+            // ==== WeaponsEnabled ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_WEAPONSENABLED_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["WeaponsEnabled"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISWE", "The WeaponsEnabled field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["WeaponsEnabled"], out serverConfig.WeaponsEnabled))
+                    return Content(XMLMessage.Error("SRV-SESC-BADWE", "The WeaponsEnabled field is invalid").ToString());
+            }
+
+            // ==== ShowPlayerNamesOnHud ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SHOWPLAYERNAMESONHUD_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["ShowPlayerNamesOnHud"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISSPNOH", "The ShowPlayerNamesOnHud field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["ShowPlayerNamesOnHud"], out serverConfig.ShowPlayerNamesOnHud))
+                    return Content(XMLMessage.Error("SRV-SESC-BADSPNOH", "The ShowPlayerNamesOnHud field is invalid").ToString());
+            }
+
+            // ==== ThrusterDamage ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_THRUSTERDAMAGE_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["ThrusterDamage"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISTD", "The ThrusterDamage field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["ThrusterDamage"], out serverConfig.ThrusterDamage))
+                    return Content(XMLMessage.Error("SRV-SESC-BADTD", "The ThrusterDamage field is invalid").ToString());
+            }
+
+            // ==== SpawnShipTimeMultiplier ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SPAWNSHIPTIMEMULTIPLIER_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["SpawnShipTimeMultiplier"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISSSTM", "The SpawnShipTimeMultiplier field must be provided").ToString());
+                if (!float.TryParse(Request.Form["SpawnShipTimeMultiplier"], out serverConfig.SpawnShipTimeMultiplier) || serverConfig.SpawnShipTimeMultiplier < 0)
+                    return Content(XMLMessage.Error("SRV-SESC-BADSSTM", "The SpawnShipTimeMultiplier field is invalid").ToString());
+            }
+
+            // ==== RespawnShipDelete ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_RESPAWNSHIPDELETE_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["RespawnShipDelete"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISRSD", "The RespawnShipDelete field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["RespawnShipDelete"], out serverConfig.RespawnShipDelete))
+                    return Content(XMLMessage.Error("SRV-SESC-BADRSD", "The RespawnShipDelete field is invalid").ToString());
+            }
+
+            // ==== EnableToolShake ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLETOOLSHAKE_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableToolShake"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISETS", "The EnableToolShake field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableToolShake"], out serverConfig.EnableToolShake))
+                    return Content(XMLMessage.Error("SRV-SESC-BADETS", "The EnableToolShake field is invalid").ToString());
+            }
+
+            // ==== EnableIngameScripts ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEINGAMESCRIPTS_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableIngameScripts"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISETS", "The EnableIngameScripts field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableIngameScripts"], out serverConfig.EnableIngameScripts))
+                    return Content(XMLMessage.Error("SRV-SESC-BADETS", "The EnableIngameScripts field is invalid").ToString());
+            }
+
+            // ==== VoxelGeneratorVersion ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_VOXELGENERATORVERSION_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["VoxelGeneratorVersion"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISVGV", "The VoxelGeneratorVersion field must be provided").ToString());
+                if (!int.TryParse(Request.Form["VoxelGeneratorVersion"], out serverConfig.VoxelGeneratorVersion) ||
+                    serverConfig.VoxelGeneratorVersion < 0 || serverConfig.VoxelGeneratorVersion > 1)
+                    return Content(XMLMessage.Error("SRV-SESC-BADVGV", "The VoxelGeneratorVersion field is invalid").ToString());
+            }
+
+            // ==== EnableOxygen ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEOXYGEN_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableOxygen"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISEO", "The EnableOxygen field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableOxygen"], out serverConfig.EnableOxygen))
+                    return Content(XMLMessage.Error("SRV-SESC-BADEO", "The EnableOxygen field is invalid").ToString());
+            }
+
+            // ==== Enable3rdPersonView ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLE3RDPERSONVIEW_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["Enable3rdPersonView"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISE3PV", "The Enable3rdPersonView field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["Enable3rdPersonView"], out serverConfig.Enable3rdPersonView))
+                    return Content(XMLMessage.Error("SRV-SESC-BADE3PV", "The Enable3rdPersonView field is invalid").ToString());
+            }
+
+            // ==== EnableEncounters ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEENCOUNTERS_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableEncounters"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISEE", "The EnableEncounters field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableEncounters"], out serverConfig.EnableEncounters))
+                    return Content(XMLMessage.Error("SRV-SESC-BADEE", "The EnableEncounters field is invalid").ToString());
+            }
+
+            // ** PROCESS **
+            RequestServer.Ip = serverConfig.IP;
+            RequestServer.Port = serverConfig.ServerPort;
+            RequestServer.AutoSaveInMinutes = Convert.ToInt32(serverConfig.AutoSaveInMinutes);
+
+            srvPrv.UpdateServer(RequestServer);
+
+            bool restartRequired = false;
+            if (srvPrv.GetState(RequestServer) != ServiceState.Stopped)
+            {
+                restartRequired = true;
+                ServiceHelper.StopServiceAndWait(RequestServer);
+            }
+
+            if (RequestServer.UseServerExtender)
                 serverConfig.AutoSaveInMinutes = 0;
 
-            serverConfig.Save(server);
+            serverConfig.Save(RequestServer);
 
             if (restartRequired)
             {
-                ServiceHelper.StartService(server);
-                return Content(XMLMessage.Success("SRV-SC-OK", "The server configuration has been updated, the server is restarting ...").ToString());
+                ServiceHelper.StartService(RequestServer);
+                return Content(XMLMessage.Success("SRV-SESC-OK", "The server configuration has been updated, the server is restarting ...").ToString());
             }
 
-            return Content(XMLMessage.Success("SRV-SC-OK", "The server configuration has been updated").ToString());
+            return Content(XMLMessage.Success("SRV-SESC-OK", "The server configuration has been updated").ToString());
         }
 
         #endregion
@@ -1577,8 +1563,7 @@ namespace SESM.Controllers.API
                 {
                     ulong admParsed;
                     if (!ulong.TryParse(adm, out admParsed))
-                        return
-                            Content(XMLMessage.Error("SRV-SC-BADADM", "The Administrators field is invalid").ToString());
+                        return Content(XMLMessage.Error("SRV-SC-BADADM", "The Administrators field is invalid").ToString());
                     serverConfig.Administrators.Add(admParsed);
                 }
             }
