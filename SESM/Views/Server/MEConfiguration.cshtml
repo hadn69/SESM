@@ -490,22 +490,11 @@
         });
 
 
-
-        var dataLoaded = false;
-        var maskLoaded = false;
         var maskData = "";
-
-        function ShowContent() {
-            if (dataLoaded && maskLoaded) {
-                UnlockPage();
-            }
-        }
 
         function LoadParam() {
             LockPage();
 
-            dataLoaded = false;
-            maskLoaded = false;
             $.post("/API/Server/MEGetConfiguration",
             {
                 ServerID: serverID
@@ -521,36 +510,38 @@
                 }
 
                 var content = root.children("Content");
-                console.log(data);
+                var values = content.children("Values");
+                maskData = content.children("Rights");
+
                 // Network
-                $('#inpIP').val(content.children("IP").text());
-                $('#inpServerPort').val(content.children("ServerPort").text());
-                $('#inpSteamPort').val(content.children("SteamPort").text());
-                $('#inpOnlineMode').val(content.children("OnlineMode").text());
-                $('#inpServerName').val(content.children("ServerName").text());
-                $('#inpWorldName').val(content.children("WorldName").text());
+                $('#inpIP').val(values.children("IP").text());
+                $('#inpServerPort').val(values.children("ServerPort").text());
+                $('#inpSteamPort').val(values.children("SteamPort").text());
+                $('#inpOnlineMode').val(values.children("OnlineMode").text());
+                $('#inpServerName').val(values.children("ServerName").text());
+                $('#inpWorldName').val(values.children("WorldName").text());
 
                 // Server
-                $('#inpMaxPlayers').val(content.children("MaxPlayers").text());
-                $('#inpAutoSaveInMinutes').val(content.children("AutoSaveInMinutes").text());
-                $("#inpClientCanSave").bootstrapSwitch('state', content.children("ClientCanSave").text() == "true");
-                $("#inpPauseGameWhenEmpty").bootstrapSwitch('state', content.children("PauseGameWhenEmpty").text() == "true");
+                $('#inpMaxPlayers').val(values.children("MaxPlayers").text());
+                $('#inpAutoSaveInMinutes').val(values.children("AutoSaveInMinutes").text());
+                $("#inpClientCanSave").bootstrapSwitch('state', values.children("ClientCanSave").text() == "true");
+                $("#inpPauseGameWhenEmpty").bootstrapSwitch('state', values.children("PauseGameWhenEmpty").text() == "true");
 
                 // Gameplay
-                $("#inpEnableStructuralSimulation").bootstrapSwitch('state', content.children("EnableStructuralSimulation").text() == "true");
-                $('#inpMaxActiveFracturePieces').val(content.children("MaxActiveFracturePieces").text());
-                $("#inpEnableBarbarians").bootstrapSwitch('state', content.children("EnableBarbarians").text() == "true");
-                $('#inpMaximumBots').val(content.children("MaximumBots").text());
-                $('#inpGameDayInRealMinutes').val(content.children("GameDayInRealMinutes").text());
-                $('#inpDayNightRatio').val(content.children("DayNightRatio").text());
-                $("#inpEnableAnimals").bootstrapSwitch('state', content.children("EnableAnimals").text() == "true");
+                $("#inpEnableStructuralSimulation").bootstrapSwitch('state', values.children("EnableStructuralSimulation").text() == "true");
+                $('#inpMaxActiveFracturePieces').val(values.children("MaxActiveFracturePieces").text());
+                $("#inpEnableBarbarians").bootstrapSwitch('state', values.children("EnableBarbarians").text() == "true");
+                $('#inpMaximumBots').val(values.children("MaximumBots").text());
+                $('#inpGameDayInRealMinutes').val(values.children("GameDayInRealMinutes").text());
+                $('#inpDayNightRatio').val(values.children("DayNightRatio").text());
+                $("#inpEnableAnimals").bootstrapSwitch('state', values.children("EnableAnimals").text() == "true");
                 
                 // Players
-                $('#inpEnableSpectator').bootstrapSwitch('state', content.children("EnableSpectator").text() == "true");
+                $('#inpEnableSpectator').bootstrapSwitch('state', values.children("EnableSpectator").text() == "true");
                 
                 // Mods
                 var mods = [];
-                content.children("Mods").children().each(function (index) {
+                values.children("Mods").children().each(function (index) {
                     var item = $(this);
                     mods.push(item.text());
                 });
@@ -558,97 +549,74 @@
 
                 // Access
                 var administrators = [];
-                content.children("Administrators").children().each(function (index) {
+                values.children("Administrators").children().each(function (index) {
                     var item = $(this);
                     administrators.push(item.text());
                 });
                 $('#inpAdministrators').val(administrators.join("\r\n"));
                 var banned = [];
-                content.children("Banned").children().each(function (index) {
+                values.children("Banned").children().each(function (index) {
                     var item = $(this);
                     banned.push(item.text());
                 });
                 $('#inpBanned').val(banned.join("\r\n"));
                 $('#inpGroupID').val(content.children("GroupID").text());
 
-                // Production
-                
-
                 // Construction
-                if (content.children("GameMode").text() == "Survival") {
+                if (values.children("GameMode").text() == "Survival") {
                     $("#inpGamemode").bootstrapSwitch('state', false);
-                } else if (content.children("GameMode").text() == "Creative") {
+                } else if (values.children("GameMode").text() == "Creative") {
                     $("#inpGamemode").bootstrapSwitch('state', true);
                 }
-                $("#inpEnableCopyPaste").bootstrapSwitch('state', content.children("EnableCopyPaste").text() == "true");
+                $("#inpEnableCopyPaste").bootstrapSwitch('state', values.children("EnableCopyPaste").text() == "true");
 
                 // Misc
-                $("#inpIgnoreLastSession").bootstrapSwitch('state', content.children("IgnoreLastSession").text() == "true");
+                $("#inpIgnoreLastSession").bootstrapSwitch('state', values.children("IgnoreLastSession").text() == "true");
 
-                ShowContent();
-            });
-
-            $.post("/API/Server/MEGetConfigurationRights",
-            {
-                ServerID: serverID
-            },
-            function (data) {
-                maskLoaded = true;
-                var root = $($.parseXML(data)).find("Response");
-
-                if (root.children("Type").text() == "Error") {
-                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                    ShowContent();
-                    return;
-                }
-
-                var content = root.children("Content");
-                maskData = content;
+                // -- Rights --
 
                 // Network
-                $('#inpIP').prop("readonly", content.children("IP").text() != "true");
-                $('#inpServerPort').prop("readonly", content.children("ServerPort").text() != "true");
-                $('#inpSteamPort').prop("readonly", content.children("SteamPort").text() != "true");
-                $('#inpOnlineMode').prop("disabled", content.children("OnlineMode").text() != "true");
-                $('#inpServerName').prop("readonly", content.children("ServerName").text() != "true");
-                $('#inpWorldName').prop("readonly", content.children("WorldName").text() != "true");
+                $('#inpIP').prop("readonly", maskData.children("IP").text() != "true");
+                $('#inpServerPort').prop("readonly", maskData.children("ServerPort").text() != "true");
+                $('#inpSteamPort').prop("readonly", maskData.children("SteamPort").text() != "true");
+                $('#inpOnlineMode').prop("disabled", maskData.children("OnlineMode").text() != "true");
+                $('#inpServerName').prop("readonly", maskData.children("ServerName").text() != "true");
+                $('#inpWorldName').prop("readonly", maskData.children("WorldName").text() != "true");
 
                 // Server
-                $('#inpMaxPlayers').prop("readonly", content.children("MaxPlayers").text() != "true");
-                $('#inpAutoSaveInMinutes').prop("readonly", content.children("AutoSaveInMinutes").text() != "true");
-                $("#inpPauseGameWhenEmpty").bootstrapSwitch("readonly", content.children("PauseGameWhenEmpty").text() != "true");
-                $("#inpClientCanSave").bootstrapSwitch("readonly", content.children("ClientCanSave").text() != "true");
+                $('#inpMaxPlayers').prop("readonly", maskData.children("MaxPlayers").text() != "true");
+                $('#inpAutoSaveInMinutes').prop("readonly", maskData.children("AutoSaveInMinutes").text() != "true");
+                $("#inpPauseGameWhenEmpty").bootstrapSwitch("readonly", maskData.children("PauseGameWhenEmpty").text() != "true");
+                $("#inpClientCanSave").bootstrapSwitch("readonly", maskData.children("ClientCanSave").text() != "true");
 
                 // Gameplay
-                $("#inpEnableStructuralSimulation").bootstrapSwitch("readonly", content.children("EnableStructuralSimulation").text() != "true");
-                $('#inpMaxActiveFracturePieces').prop("readonly", content.children("MaxActiveFracturePieces").text() != "true");
-                $("#inpEnableBarbarians").bootstrapSwitch("readonly", content.children("EnableBarbarians").text() != "true");
-                $('#inpMaximumBots').prop("readonly", content.children("MaximumBots").text() != "true");
-                $('#inpGameDayInRealMinutes').prop("readonly", content.children("GameDayInRealMinutes").text() != "true");
-                $('#inpDayNightRatio').prop("readonly", content.children("DayNightRatio").text() != "true");
-                $("#inpEnableAnimals").bootstrapSwitch("readonly", content.children("EnableAnimals").text() != "true");
+                $("#inpEnableStructuralSimulation").bootstrapSwitch("readonly", maskData.children("EnableStructuralSimulation").text() != "true");
+                $('#inpMaxActiveFracturePieces').prop("readonly", maskData.children("MaxActiveFracturePieces").text() != "true");
+                $("#inpEnableBarbarians").bootstrapSwitch("readonly", maskData.children("EnableBarbarians").text() != "true");
+                $('#inpMaximumBots').prop("readonly", maskData.children("MaximumBots").text() != "true");
+                $('#inpGameDayInRealMinutes').prop("readonly", maskData.children("GameDayInRealMinutes").text() != "true");
+                $('#inpDayNightRatio').prop("readonly", maskData.children("DayNightRatio").text() != "true");
+                $("#inpEnableAnimals").bootstrapSwitch("readonly", maskData.children("EnableAnimals").text() != "true");
 
                 // Players
-                $('#inpEnableSpectator').bootstrapSwitch("readonly", content.children("EnableSpectator").text() != "true");
-                
+                $('#inpEnableSpectator').bootstrapSwitch("readonly", maskData.children("EnableSpectator").text() != "true");
+
                 // Mods
-                $('#inpMods').prop("readonly", content.children("Mods").text() != "true");
+                $('#inpMods').prop("readonly", maskData.children("Mods").text() != "true");
 
                 // Access
-                $('#inpAdministrators').prop("readonly", content.children("Administrators").text() != "true");
-                $('#inpBanned').prop("readonly", content.children("Banned").text() != "true");
-                $('#inpGroupID').prop("readonly", content.children("GroupID").text() != "true");
-
-                // Production
+                $('#inpAdministrators').prop("readonly", maskData.children("Administrators").text() != "true");
+                $('#inpBanned').prop("readonly", maskData.children("Banned").text() != "true");
+                $('#inpGroupID').prop("readonly", maskData.children("GroupID").text() != "true");
 
                 // Construction
-                $("#inpGameMode").bootstrapSwitch("readonly", content.children("GameMode").text() != "true");
-                $("#inpEnableCopyPaste").bootstrapSwitch("readonly", content.children("EnableCopyPaste").text() != "true");
-                
+                $("#inpGameMode").bootstrapSwitch("readonly", maskData.children("GameMode").text() != "true");
+                $("#inpEnableCopyPaste").bootstrapSwitch("readonly", maskData.children("EnableCopyPaste").text() != "true");
+
                 // Misc
-                $("#inpIgnoreLastSession").bootstrapSwitch("readonly", content.children("IgnoreLastSession").text() != "true");
-                
-                ShowContent();
+                $("#inpIgnoreLastSession").bootstrapSwitch("readonly", maskData.children("IgnoreLastSession").text() != "true");
+
+                UnlockPage();
             });
         }
 
@@ -737,8 +705,6 @@
                     }
                     if (maskData.children("GroupID").text() == "true")
                         config.GroupID = $('#inpGroupID').val();
-
-                    // Production
                     
                     // Construction
                     if (maskData.children("GameMode").text() == "true") {
