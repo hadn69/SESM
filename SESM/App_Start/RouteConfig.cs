@@ -130,6 +130,31 @@ namespace SESM
                 }
             );
 
+            // Access API
+            routes.MapRoute(
+                name: "APIAccess",
+                url: "API/Access/{action}",
+                defaults: new { controller = "APIAccess" },
+                constraints: new
+                {
+                    action = "GetHostRoles|" +
+                             "GetHostRoleAccess|" +
+                             "GetHostPermissions|" +
+                             "GetHostRoleDetails|" +
+                             "SetHostRoleDetails|" +
+                             "CreateHostRole|" +
+                             "DeleteHostRole|" +
+
+                             "GetServerRoles|" +
+                             "GetServerRoleAccess|" +
+                             "GetServerPermissions|" +
+                             "GetServerRoleDetails|" +
+                             "SetServerRoleDetails|" +
+                             "CreateServerRole|" +
+                             "DeleteServerRole"
+                }
+            );
+
             // Explorer API
             routes.MapRoute(
                 name: "APIExplorer",
@@ -163,6 +188,7 @@ namespace SESM
                              "Authenticate|" +
                              "Register|" +
                              "GetDetails|" +
+                             "GetHostPerms|" +
                              "SetDetails"
                 }
             );
@@ -233,6 +259,13 @@ namespace SESM
                 name: "Users",
                 url: "Users",
                 defaults: new { controller = "Users", action = "Index" }
+            );
+
+            // Access
+            routes.MapRoute(
+                name: "Access",
+                url: "Access",
+                defaults: new { controller = "Access", action = "Index" }
             );
 
             // Stats

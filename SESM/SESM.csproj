@@ -2624,6 +2624,7 @@
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Properties\PublishProfiles\devmachine.pubxml" />
     <None Include="Properties\PublishProfiles\Package2.pubxml" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <None Include="Scripts\jquery-2.1.1-vsdoc.js" />
@@ -2668,6 +2669,7 @@
     <Content Include="Views\Server\MEMaps.cshtml" />
     <Content Include="Views\Server\MEConfiguration.cshtml" />
     <Content Include="Views\Home\Versions.cshtml" />
+    <Content Include="Views\Access\Index.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -2688,6 +2690,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AccessController.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ActionFilters\APIHostAccessAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\APIServerAccessAttribute.cs" />
@@ -2697,6 +2700,7 @@
     <Compile Include="Controllers\ActionFilters\old\GuestOnlyAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\old\ManagerAndAboveAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\old\SuperAdminAttribute.cs" />
+    <Compile Include="Controllers\API\APIAccessController.cs" />
     <Compile Include="Controllers\API\APIAccountController.cs" />
     <Compile Include="Controllers\API\APIExplorerController.cs" />
     <Compile Include="Controllers\API\APIMapController.cs" />
@@ -2716,8 +2720,10 @@
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="DAL\DataContext.cs" />
     <Compile Include="DAL\DataContextInitializer.cs" />
+    <Compile Include="DAL\ServerRoleProvider.cs" />
     <Compile Include="DAL\PerfProvider.cs" />
     <Compile Include="DAL\ServerProvider.cs" />
+    <Compile Include="DAL\HostRoleProvider.cs" />
     <Compile Include="DAL\UserProvider.cs" />
     <Compile Include="DTO\EnumServerPerm.cs" />
     <Compile Include="DTO\EntityInstanceServerRole.cs" />
@@ -2868,6 +2874,7 @@
     <Folder Include="assets\global\plugins\angularjs\plugins\angular-file-upload\uploads\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\node\public\files\thumbnail\" />
     <Folder Include="assets\global\plugins\jquery-file-upload\server\php\files\thumbnail\" />
+    <Folder Include="Views\APIAccess\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

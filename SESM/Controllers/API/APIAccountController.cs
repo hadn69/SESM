@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Xml.Linq;
 using SESM.DAL;
@@ -22,6 +23,7 @@ namespace SESM.Controllers.API
 
         // GET: API/Account/GetChallenge
         [HttpGet]
+        [OutputCacheAttribute(VaryByParam = "*", Duration = 0, NoStore = true)]
         public ActionResult GetChallenge()
         {
             // ** PROCESS **
@@ -155,6 +157,28 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("Email", user.Email));
             response.AddToContent(new XElement("IsSuperAdmin", user.IsAdmin));
 
+            return Content(response.ToString());
+        }
+
+        // GET: API/Account/GetHostPerms
+        [HttpGet]
+        public ActionResult GetHostPerms()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** ACCESS **
+            if (user == null)
+                return Content(XMLMessage.Error("ACT-GHP-NOTLOG", "No user is logged in").ToString());
+
+            // ** PROCESS **
+            XMLMessage response = new XMLMessage("ACT-GHP-OK");
+
+            foreach (string item in Enum.GetNames(typeof(EnumHostPerm)))
+            {
+                response.AddToContent(new XElement(item, AuthHelper.HasAccess(item)));
+            }
+            
             return Content(response.ToString());
         }
 

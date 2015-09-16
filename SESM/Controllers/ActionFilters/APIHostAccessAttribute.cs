@@ -1,8 +1,4 @@
-﻿using System.Web;
-using System.Web.Mvc;
-using SESM.Controllers.API;
-using SESM.DAL;
-using SESM.DTO;
+﻿using System.Web.Mvc;
 using SESM.Tools;
 using SESM.Tools.API;
 
@@ -21,7 +17,7 @@ namespace SESM.Controllers.ActionFilters
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (AuthHelper.HasAccess(filterContext.HttpContext.Session["PermSummary"] as PermSummaryContainer, null, _permList))
+            if (!AuthHelper.HasAccess(filterContext.HttpContext.Session["PermSummary"] as PermSummaryContainer, null, _permList))
             {
                 filterContext.Result = new ContentResult
                 {

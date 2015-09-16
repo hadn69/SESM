@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Mvc;
-using System.Xml;
 using System.Xml.Linq;
 using NLog;
 using Quartz;
@@ -60,7 +59,12 @@ namespace SESM.Controllers.API
                                                              new XElement("Public", server.IsPublic.ToString()),
                                                              new XElement("State", serversState[server].ToString()),
                                                              new XElement("AccessLevel", srvPrv.GetAccessLevel(usr, server)),
-                                                             new XElement("Type", server.ServerType == EnumServerType.SpaceEngineers ? server.UseServerExtender ? "SESE" : "SE" : "ME")
+                                                             new XElement("Type", server.ServerType == EnumServerType.SpaceEngineers ? server.UseServerExtender ? "SESE" : "SE" : "ME"),
+                                                             new XElement("CanStart", AuthHelper.HasAccess(RequestServer, "SERVER_START")),
+                                                             new XElement("CanStop", AuthHelper.HasAccess(RequestServer, "SERVER_STOP")),
+                                                             new XElement("CanRestart", AuthHelper.HasAccess(RequestServer, "SERVER_RESTART")),
+                                                             new XElement("CanKill", AuthHelper.HasAccess(RequestServer, "SERVER_KILL")),
+                                                             new XElement("CanDelete", AuthHelper.HasAccess(RequestServer, "SERVER_DELETE"))
                                                              ));
             }
             return Content(response.ToString());
@@ -84,8 +88,13 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("ID", RequestServer.Id));
             response.AddToContent(new XElement("Public", RequestServer.IsPublic.ToString()));
             response.AddToContent(new XElement("State", srvPrv.GetState(RequestServer).ToString()));
-            response.AddToContent(new XElement("AccessLevel", srvPrv.GetAccessLevel(userID, RequestServer.Id)));
+            response.AddToContent(new XElement("HasAnyAccess", AuthHelper.HasAnyServerAccess(RequestServer)));
             response.AddToContent(new XElement("Type", RequestServer.ServerType == EnumServerType.SpaceEngineers ? RequestServer.UseServerExtender ? "SESE" : "SE" : "ME"));
+            response.AddToContent(new XElement("CanStart", AuthHelper.HasAccess(RequestServer, "SERVER_START")));
+            response.AddToContent(new XElement("CanStop", AuthHelper.HasAccess(RequestServer, "SERVER_STOP")));
+            response.AddToContent(new XElement("CanRestart", AuthHelper.HasAccess(RequestServer, "SERVER_RESTART")));
+            response.AddToContent(new XElement("CanKill", AuthHelper.HasAccess(RequestServer, "SERVER_KILL")));
+            response.AddToContent(new XElement("CanDelete", AuthHelper.HasAccess(RequestServer, "SERVER_DELETE")));
 
             return Content(response.ToString());
         }

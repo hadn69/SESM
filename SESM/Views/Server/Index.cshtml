@@ -108,17 +108,17 @@
                         </button>
                     </div>
                     <div class="col-md-6">
-                        <div class="btn-group pull-right" id="actionBtn" style="display: none;">
-                            <button id="btnStartServers" class="btn green">
+                        <div class="btn-group pull-right">
+                            <button id="btnStartServers" class="btn green" style="display: none;">
                                 <i class="fa fa-play"></i> Start
                             </button>
-                            <button id="btnStopServers" class="btn purple">
+                            <button id="btnStopServers" class="btn purple" style="display: none;">
                                 <i class="fa fa-stop"></i> Stop
                             </button>
-                            <button id="btnRestartServers" class="btn yellow">
+                            <button id="btnRestartServers" class="btn yellow" style="display: none;">
                                 <i class="fa fa-repeat"></i> Restart
                             </button>
-                            <button id="btnKillServers" class="btn red">
+                            <button id="btnKillServers" class="btn red" style="display: none;">
                                 <i class="fa fa-times"></i> Kill
                             </button>
                         </div>
@@ -128,21 +128,15 @@
             <table class="table table-striped table-bordered table-hover" id="serverTable">
                 <thead>
                     <tr>
-                        <th class="table-checkbox">
-                            <input type="checkbox" id="chkCheckAll" />
-                        </th>
-                        <th>
-                            Name
-                        </th>
-                        <th>
-                            Status
-                        </th>
-                        <th style="display: none;">
-                            Access Level
-                        </th>
-                        <th style="display: none;">
-                            Server Type
-                        </th>
+                        <th class="table-checkbox"><input type="checkbox" id="chkCheckAll" /></th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Server Type</th>
+                        <th>CanStart</th>
+                        <th>CanStop</th>
+                        <th>CanRestart</th>
+                        <th>CanKill</th>
+                        <th>CanDelete</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -165,42 +159,36 @@
         var table = $('#serverTable');
 
         table.dataTable({
-            "language": {
-                "emptyTable": "No server available",
-                "search": "Search :",
-                "zeroRecords": "No matching server found"
-
+            language: {
+                emptyTable: "No server available",
+                search: "Search :",
+                zeroRecords: "No matching server found"
             },
-            "paging": false,
-            "info": false,
+            paging: false,
+            info: false,
 
-            "columns": [{
-                "orderable": false
+            columns: [{
+                orderable: false,
+                searchable: false
             }, {
-                "orderable": true
+                orderable: true
             }, {
-                "orderable": true
+                orderable: true
             }, {
-                "orderable": false
+                visible: false
             }, {
-                "orderable": false
+                visible: false
+            }, {
+                visible: false
+            }, {
+                visible: false
+            }, {
+                visible: false
+            }, {
+                visible: false
             }],
-            // set the initial value
-            "columnDefs": [{
-                "searchable": false,
-                "targets": [0]
-            }, {
-                "targets": [3],
-                "visible": false
-            }, {
-                "targets": [4],
-                "visible": false
-            }],
-            "order": [[1, "asc"]] // set second column as a default sort by asc
+            order: [[1, "asc"]] // set second column as a default sort by asc
         });
-
-        var isSuperAdmin = false;
-
 
         function updateCheckboxes() {
             $(".checkboxes").each(function () {
@@ -214,16 +202,85 @@
 
             if ($('.checkboxes:checked').length == 0) {
                 $('#chkCheckAll').prop("checked", false);
-                $("#actionBtn").stop(true).fadeOut("slow");
-                if (isSuperAdmin) {
-                    $("#btnDeleteServers").stop(true).fadeOut("slow");
-                }
-            } else {
+
+                $("#btnDeleteServers").stop(true).fadeOut("slow");
+                $("#btnStartServers").stop(true).fadeOut("slow");
+                $("#btnStopServers").stop(true).fadeOut("slow");
+                $("#btnRestartServers").stop(true).fadeOut("slow");
+                $("#btnKillServers").stop(true).fadeOut("slow");
+            }
+            else {
                 $('#chkCheckAll').prop("checked", true);
-                $("#actionBtn").stop(true).fadeIn("slow");
-                if (isSuperAdmin) {
+
+                var canDeleteAll = true;
+                var canStartAll = true;
+                var canStopAll = true;
+                var canRestartAll = true;
+                var canKillAll = true;
+
+                var dt = $("#serverTable").dataTable();
+
+                $.each($('.checkboxes:checked'), function () {
+                    var item = $(this);
+
+                    var tr = item.parents("tr");
+                    var tbody = tr.parents("tbody");
+                    var idx = tbody.children().index(tr);
+                    var data = dt.api().row(idx).data();
+
+                    var canStart = data[4];
+                    var canStop = data[5];
+                    var canRestart = data[6];
+                    var canKill = data[7];
+                    var canDelete = data[8];
+
+                    if (!canStart)
+                        canStartAll = false;
+
+                    if (!canStop)
+                        canStopAll = false;
+
+                    if (!canRestart)
+                        canRestartAll = false;
+
+                    if (!canKill)
+                        canKillAll = false;
+
+                    if (!canDelete)
+                        canDeleteAll = false;
+                });
+
+                if(canDeleteAll)
                     $("#btnDeleteServers").stop(true).fadeIn("slow");
-                }
+                else
+                    $("#btnDeleteServers").stop(true).fadeOut("slow");
+
+                if (canStartAll)
+                    $("#btnStartServers").stop(true).fadeIn("slow");
+                else
+                    $("#btnStartServers").stop(true).fadeOut("slow");
+
+                if (canStopAll)
+                    $("#btnStopServers").stop(true).fadeIn("slow");
+                else
+                    $("#btnStopServers").stop(true).fadeOut("slow");
+
+                if (canRestartAll)
+                    $("#btnRestartServers").stop(true).fadeIn("slow");
+                else
+                    $("#btnRestartServers").stop(true).fadeOut("slow");
+
+                if (canKillAll)
+                    $("#btnKillServers").stop(true).fadeIn("slow");
+                else
+                    $("#btnKillServers").stop(true).fadeOut("slow");
+
+            }
+
+            if ($('.checkboxes:checked').length == 0) {
+
+            } else {
+
             }
             $.uniform.update();
         }
@@ -244,6 +301,8 @@
 
         $(".dataTables_filter").addClass("pull-right");
 
+
+
         function refereshList(checkedIDs) {
             $("#btnRefreshList").children("i").addClass("fa-spin");
             $.get("/API/Server/GetServers",
@@ -263,19 +322,25 @@
                     var ID = item.children("ID").text();
                     var Public = item.children("Public").text();
                     var State = item.children("State").text();
-                    var AccessLevel = item.children("AccessLevel").text();
                     var Type = item.children("Type").text();
 
-                    var chkbField;
+                    var CanStart = item.children("CanStart").text() == "true";
+                    var CanStop = item.children("CanStop").text() == "true";
+                    var CanRestart = item.children("CanRestart").text() == "true";
+                    var CanKill = item.children("CanKill").text() == "true";
+                    var CanDelete = item.children("CanKill").text() == "true";
+
+                    var chkbField = '<input type="checkbox" class="checkboxes"';
+
+                    if (CanStart || CanStop || CanRestart || CanKill)
+                        chkbField += ' value = "' + ID + '"';
+
+                    chkbField += ' />';
+
                     var statusField;
 
-                    if (AccessLevel != "None" && AccessLevel != "Guest" && AccessLevel != "User") {
-                        chkbField = '<input type="checkbox" class="checkboxes" value="' + ID + '" />';
-                    } else {
-                        chkbField = '<input type="checkbox" style="display: none;" class="checkboxes" value="' + ID + '" />';
-                    }
-
                     switch (State) {
+                        default:
                         case "Unknow":
                             statusField = '<span class="label label-sm label-default">Unknow</span>';
                             break;
@@ -293,7 +358,7 @@
                             break;
                     }
 
-                    table.DataTable().row.add([chkbField, Name, statusField, AccessLevel, Type]);
+                    table.DataTable().row.add([chkbField, Name, statusField, Type, CanStart, CanStop, CanRestart, CanKill, CanDelete]);
                 });
                 table.DataTable().draw();
                 $("#btnRefreshList").children("i").removeClass("fa-spin");
@@ -314,20 +379,31 @@
                     before: function (e, element, target) {
                         this.getMenu().find("li").hide();
                         e.preventDefault();
-                        if ($(e.target).parents("tr").find("input:checkbox").css('display') == "none")
+
+                        var tr = $(e.target).parents("tr");
+                        var tbody = tr.parents("tbody");
+                        var idx = tbody.children().index(tr);
+                        var data = $("#serverTable").dataTable().api().row(idx).data();
+
+                        var status = $(data[2]).text().trim();
+                        var canStart = data[4];
+                        var canStop = data[5];
+                        var canRestart = data[6];
+                        var canKill = data[7];
+                        var canDelete = data[8];
+
+                        if (!(canStart || canStop || canRestart || canKill))
                             return false;
 
-                        var status = $(e.target).parents("tr").children("td:nth-child(3)").text().trim();
-
-                        if (status == "Unknow" || status == "Stopped")
+                        if (canStart && (status === "Unknow" || status === "Stopped"))
                             this.getMenu().find("li:nth-child(1)").show();
-                        if (status == "Unknow" || status == "Running")
+                        if (canStop && (status === "Unknow" || status === "Running"))
                             this.getMenu().find("li:nth-child(2)").show();
-                        if (status == "Unknow" || status == "Running")
+                        if (canRestart && (status === "Unknow" || status === "Running"))
                             this.getMenu().find("li:nth-child(3)").show();
-                        if (status == "Unknow" || status == "Starting" || status == "Running" || status == "Stopping")
+                        if (canKill && (status === "Unknow" || status === "Starting" || status == "Running" || status == "Stopping"))
                             this.getMenu().find("li:nth-child(4)").show();
-                        if (isSuperAdmin)
+                        if (canDelete)
                             this.getMenu().find("li:nth-child(5)").show();
                         return true;
                     },
@@ -459,7 +535,7 @@
                 });
 
             });
-            $.get("/API/Account/GetDetails",
+            $.get("/API/Account/GetHostPerms",
             function (data) {
                 var root = $($.parseXML(data)).find("Response");
 
@@ -473,12 +549,10 @@
                     return;
                 }
 
-                if (root.children("Content").children("IsSuperAdmin").text() == "true") {
+                if (root.children("Content").children("SERVER_CREATE").text() == "true") {
                     $("#btnCreateServer").stop(true).fadeIn("slow");
-                    isSuperAdmin = true;
                 } else {
                     $("#btnCreateServer").stop(true).fadeOut("slow");
-                    isSuperAdmin = false;
                 }
             });
         }

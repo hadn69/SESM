@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using SESM.DTO;
 
@@ -36,6 +37,16 @@ namespace SESM.Tools
             return permContainer;
         }
 
+        public static bool HasAnyServerAccess(EntityServer server)
+        {
+            string[] permList = Enum.GetNames(typeof (EnumServerPerm)).Where(item => item != "SERVER_INFO").ToArray();
+            return HasAccess(server, permList);
+        }
+
+        public static bool HasAccess(params string[] permStrings)
+        {
+            return HasAccess(HttpContext.Current.Session["PermSummary"] as PermSummaryContainer, null, permStrings);
+        }
 
         public static bool HasAccess(EntityServer server, params string[] permStrings)
         {
