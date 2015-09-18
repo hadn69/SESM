@@ -15,7 +15,14 @@ namespace SESM.Controllers.API
 
         // GET: API/Users/GetUsers
         [HttpGet]
-        [APIHostAccess("USR-GU", "USER_READ", "ACCESS_HOST_CREATE", "ACCESS_HOST_EDIT_NAME", "ACCESS_HOST_EDIT_PERMISSION", "ACCESS_HOST_EDIT_USERS")]
+        [APIHostAccess("USR-GU", "USER_READ", 
+                                 "ACCESS_HOST_CREATE", 
+                                 "ACCESS_HOST_EDIT_NAME", 
+                                 "ACCESS_HOST_EDIT_PERMISSION",
+                                 "ACCESS_HOST_EDIT_USERS", 
+                                 "ACCESS_SERVER_CREATE",
+                                 "ACCESS_SERVER_EDIT_NAME", 
+                                 "ACCESS_SERVER_EDIT_PERMISSION")]
         public ActionResult GetUsers()
         {
             // ** INIT **

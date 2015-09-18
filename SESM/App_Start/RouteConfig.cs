@@ -95,8 +95,12 @@ namespace SESM
                              "SetJobsSettings|" +
                              "GetBackupsSettings|" +
                              "SetBackupsSettings|" +
-                             "GetAccessSettings|" +
-                             "SetAccessSettings|" +
+                             "GetServerRoles|" +
+                             "GetServerRoleAccess|" +
+                             "GetServerPermissions|" +
+                             "GetServerRoleDetails|" +
+                             "SetServerRoleDetails|" +
+                             "GetUsers|" +
 
                              "SEGetConfiguration|" +
                              "SEGetConfigurationRights|" +
@@ -151,7 +155,8 @@ namespace SESM
                              "GetServerRoleDetails|" +
                              "SetServerRoleDetails|" +
                              "CreateServerRole|" +
-                             "DeleteServerRole"
+                             "DeleteServerRole|" +
+                             "GetUsers"
                 }
             );
 
@@ -287,6 +292,7 @@ namespace SESM
                              "Settings|" +
                              "Maps|" +
                              "Monitor|" +
+                             "Access|" +
                              "Explorer",
                     id = @"\d+"
                 }

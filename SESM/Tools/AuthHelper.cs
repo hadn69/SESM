@@ -55,6 +55,9 @@ namespace SESM.Tools
 
         public static bool HasAccess(PermSummaryContainer permSummary, EntityServer server, params string[] permStrings)
         {
+            if (permStrings == null || permStrings.Length == 0)
+                return true;
+
             if (permSummary == null)
                 return false;
 

@@ -29,7 +29,6 @@ namespace SESM.Controllers.API
             CurrentContext = new DataContext();
         }
 
-
         // POST: API/Explorer/GetDirectoryContent
         [HttpPost]
         [APIServerAccess("EXP-GDC", "SERVER_EXPLORER_LIST")]
@@ -523,7 +522,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Explorer/GetDllVersion
         [HttpPost]
-        [APIServerAccess("EXP-GDV", "SERVER_EXPLORER_WRITEFILE")]
+        [APIServerAccess("EXP-GDV", "SERVER_EXPLORER_READFILE")]
         public ActionResult GetDllVersion()
         {
             // ** PARSING / ACCESS **

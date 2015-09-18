@@ -20,7 +20,6 @@ namespace SESM.Controllers
         // GET: 1/Dashboard
         [HttpGet]
         [CheckAuth]
-        [ManagerAndAbove]
         public ActionResult Dashboard(int id)
         {
             return View();
@@ -29,7 +28,6 @@ namespace SESM.Controllers
         // GET: 1/Maps
         [HttpGet]
         [CheckAuth]
-        [ManagerAndAbove]
         public ActionResult Maps(int id)
         {
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -45,7 +43,6 @@ namespace SESM.Controllers
         // GET: 1/Configuration
         [HttpGet]
         [CheckAuth]
-        [ManagerAndAbove]
         public ActionResult Configuration(int id)
         {
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -61,7 +58,6 @@ namespace SESM.Controllers
         // GET: 1/Explorer
         [HttpGet]
         [CheckAuth]
-        [ManagerAndAbove]
         public ActionResult Explorer(int id)
         { 
             return View();
@@ -70,7 +66,6 @@ namespace SESM.Controllers
         // GET: 1/Settings
         [HttpGet]
         [CheckAuth]
-        [ManagerAndAbove]
         public ActionResult Settings(int id)
         {
             return View();
@@ -79,8 +74,15 @@ namespace SESM.Controllers
         // GET: 1/Monitor
         [HttpGet]
         [CheckAuth]
-        [ManagerAndAbove]
         public ActionResult Monitor(int id)
+        {
+            return View();
+        }
+
+        // GET: 1/Access
+        [HttpGet]
+        [CheckAuth]
+        public ActionResult Access(int id)
         {
             return View();
         }

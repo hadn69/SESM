@@ -359,7 +359,7 @@ namespace SESM.Controllers.API
 
         // GET: API/Access/GetServerPermissions
         [HttpGet]
-        [APIHostAccess("ACC-GSP", "ACCESS_SERVER_CREATE", "ACCESS_SERVER_EDIT_NAME", "ACCESS_SERVER_EDIT_PERMISSION", "ACCESS_SERVER_EDIT_USERS")]
+        [APIHostAccess("ACC-GSP", "ACCESS_SERVER_CREATE", "ACCESS_SERVER_EDIT_NAME", "ACCESS_SERVER_EDIT_PERMISSION")]
         public ActionResult GetServerPermissions()
         {
             XMLMessage response = new XMLMessage("ACC-GSP-OK");
@@ -377,7 +377,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Access/GetServerRoleDetails
         [HttpPost]
-        [APIHostAccess("ACC-GSRD", "ACCESS_SERVER_EDIT_NAME", "ACCESS_SERVER_EDIT_PERMISSION", "ACCESS_SERVER_EDIT_USERS")]
+        [APIHostAccess("ACC-GSRD", "ACCESS_SERVER_EDIT_NAME", "ACCESS_SERVER_EDIT_PERMISSION")]
         public ActionResult GetServerRoleDetails()
         {
             ServerRoleProvider sroPrv = new ServerRoleProvider(CurrentContext);
@@ -411,7 +411,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Access/SetServerRoleDetails
         [HttpPost]
-        [APIHostAccess("ACC-SSRD", "ACCESS_SERVER_EDIT_NAME", "ACCESS_SERVER_EDIT_PERMISSION", "ACCESS_SERVER_EDIT_USERS")]
+        [APIHostAccess("ACC-SSRD", "ACCESS_SERVER_EDIT_NAME", "ACCESS_SERVER_EDIT_PERMISSION")]
         public ActionResult SetServerRoleDetails()
         {
             ServerRoleProvider sroPrv = new ServerRoleProvider(CurrentContext);
@@ -431,7 +431,7 @@ namespace SESM.Controllers.API
             string Name = Request.Form["Name"];
             string Permissions = Request.Form["Permissions"];
 
-            if (AuthHelper.HasAccess("ACCESS_HOST_EDIT_NAME"))
+            if (AuthHelper.HasAccess("ACCESS_SERVER_EDIT_NAME"))
             {
 
                 if (string.IsNullOrWhiteSpace(Name))
@@ -442,7 +442,7 @@ namespace SESM.Controllers.API
             }
 
             List<EnumServerPerm> perms = new List<EnumServerPerm>();
-            if (AuthHelper.HasAccess("ACCESS_HOST_EDIT_PERMISSION"))
+            if (AuthHelper.HasAccess("ACCESS_SERVER_EDIT_PERMISSION"))
             {
                 foreach (string item in Permissions.Split(';'))
                 {
@@ -461,10 +461,10 @@ namespace SESM.Controllers.API
             }
             
 
-            if (AuthHelper.HasAccess("ACCESS_HOST_EDIT_NAME"))
+            if (AuthHelper.HasAccess("ACCESS_SERVER_EDIT_NAME"))
                 serverRole.Name = Name;
 
-            if (AuthHelper.HasAccess("ACCESS_HOST_EDIT_PERMISSION"))
+            if (AuthHelper.HasAccess("ACCESS_SERVER_EDIT_PERMISSION"))
             {
                 serverRole.Permissions.Clear();
                 foreach (EnumServerPerm item in perms)
@@ -550,6 +550,33 @@ namespace SESM.Controllers.API
             sroPrv.RemoveServerRole(serverRole);
 
             return Content(XMLMessage.Success("ACC-DSR-OK", "The role has been deleted").ToString());
+        }
+
+        // GET: API/Access/GetUsers
+        [HttpGet]
+        [APIHostAccess("ACC-GU", "ACCESS_HOST_CREATE",
+                                 "ACCESS_HOST_EDIT_NAME",
+                                 "ACCESS_HOST_EDIT_PERMISSION",
+                                 "ACCESS_HOST_EDIT_USERS",
+                                 "ACCESS_SERVER_CREATE",
+                                 "ACCESS_SERVER_EDIT_NAME",
+                                 "ACCESS_SERVER_EDIT_PERMISSION")]
+        public ActionResult GetUsers()
+        {
+            // ** INIT **
+            UserProvider usrPrv = new UserProvider(CurrentContext);
+
+            List<EntityUser> users = usrPrv.GetUsers();
+
+            // ** PROCESS **
+            XMLMessage response = new XMLMessage("ACC-GU-OK");
+
+            foreach (EntityUser item in users)
+            {
+                response.AddToContent(new XElement("User", new XElement("Login", item.Login),
+                                                           new XElement("ID", item.Id)));
+            }
+            return Content(response.ToString());
         }
 
     }

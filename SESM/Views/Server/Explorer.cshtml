@@ -384,6 +384,21 @@
                         if (tr.children("td:nth-child(3)").text().substring(tr.children("td:nth-child(3)").text().length - 4).toLowerCase() == ".dll")
                             this.getMenu().find("li:nth-child(4)").show();
 
+                        if (!Access.SERVER_EXPLORER_READFILE)
+                            this.getMenu().find("li:first-child").hide();
+
+                        if (!Access.SERVER_EXPLORER_RENAME)
+                            this.getMenu().find("li:nth-child(2)").hide();
+
+                        if (!Access.SERVER_EXPLORER_DOWNLOAD)
+                            this.getMenu().find("li:nth-child(3)").hide();
+
+                        if (!Access.SERVER_EXPLORER_READFILE)
+                            this.getMenu().find("li:nth-child(4)").hide();
+
+                        if (!Access.SERVER_EXPLORER_DELETE)
+                            this.getMenu().find("li:nth-child(5)").hide();
+
                         return true;
                     },
                     onItem: function (context, e) {
@@ -401,7 +416,7 @@
                             getDllVersion($(context));
                         } else if (clicked == "Delete") {
                             deleteItem($(context));
-                        } 
+                        }
                     }
                 });
             });
@@ -829,63 +844,66 @@
         }
 
         // -- Tree --
+        function loadTree() {
+            if (Access.SERVER_EXPLORER_LIST) {
+                $("#treeDiv").jstree({
+                    "plugins": ["types", "sort", "wholerow"],
+                    "core": {
+                        "themes": {
+                            "responsive": false
+                        },
+                        "multiple": false,
+                        "check_callback": true,
+                        'data': function (obj, cb) {
+                            // Root case
+                            if (obj.id == "#") {
+                                cb.call(this, [{ text: "\\", id: "rootNode", children: true }]);
+                                return;
+                            }
+                            // Getting the path
+                            var path = "";
+                            if (obj.id != "#") {
+                                path = $('#treeDiv').jstree(true).get_path(obj, "\\").substring(2);
+                            }
 
-        $("#treeDiv").jstree({
-            "plugins": ["types", "sort", "wholerow"],
-            "core": {
-                "themes": {
-                    "responsive": false
-                },
-                "multiple": false,
-                "check_callback": true,
-                'data': function (obj, cb) {
-                    // Root case
-                    if (obj.id == "#") {
-                        cb.call(this, [{ text: "\\", id: "rootNode", children: true }]);
-                        return;
-                    }
-                    // Getting the path
-                    var path = "";
-                    if (obj.id != "#") {
-                        path = $('#treeDiv').jstree(true).get_path(obj, "\\").substring(2);
-                    }
+                            // Calling for data
+                            $.post("/API/Explorer/GetDirectoryDirectories/",
+                            {
+                                ServerID: serverID,
+                                Path: path
+                            },
+                            function (data) {
+                                var root = $($.parseXML(data)).find("Response");
 
-                    // Calling for data
-                    $.post("/API/Explorer/GetDirectoryDirectories/",
-                    {
-                        ServerID: serverID,
-                        Path: path
-                    },
-                    function (data) {
-                        var root = $($.parseXML(data)).find("Response");
-
-                        if (root.children("Type").text() == "Error") {
-                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                            cb.call(this, new Array());
-                            return;
+                                if (root.children("Type").text() == "Error") {
+                                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                    cb.call(this, new Array());
+                                    return;
+                                }
+                                var dirArray = new Array();
+                                root.children("Content").first().children("Item").each(function (index) {
+                                    var dirName = $(this).children("Name").first().text();
+                                    var nodeId = "";
+                                    if (currentPath == "") {
+                                        nodeId = dirName;
+                                    }
+                                    else {
+                                        nodeId = currentPath + "\\" + dirName;
+                                    }
+                                    dirArray.push({ text: dirName, id: nodeId, children: true });
+                                });
+                                cb.call(this, dirArray);
+                            });
                         }
-                        var dirArray = new Array();
-                        root.children("Content").first().children("Item").each(function (index) {
-                            var dirName = $(this).children("Name").first().text();
-                            var nodeId = "";
-                            if (currentPath == "") {
-                                nodeId = dirName;
-                            }
-                            else {
-                                nodeId = currentPath + "\\" + dirName;
-                            }
-                            dirArray.push({ text: dirName, id: nodeId, children: true });
-                        });
-                        cb.call(this, dirArray);
-                    });
-                }
-            },
-            "types": {
-                "default": {
-                    "icon": "fa fa-folder icon-state-warning icon-lg"
-                }
+                    },
+                    "types": {
+                        "default": {
+                            "icon": "fa fa-folder icon-state-warning icon-lg"
+                        }
+                    }
+                });
             }
-        });
+        }
 
         $('#treeDiv').on('loaded.jstree', function () {
             $('#treeDiv').jstree(true).select_node("rootNode");
@@ -905,6 +923,48 @@
         $("#btnRefresh").click(function () {
             $('#treeDiv').jstree(true).refresh_node(currentNode.id);
             loadList();
+        });
+
+        var Access = {};
+
+        $.post("/API/Server/GetServerPermissions",
+        {
+            ServerID: serverID
+        },
+        function (data) {
+            var root = $($.parseXML(data)).find("Response");
+
+            if (root.children("Type").text() == "Error") {
+                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                return;
+            }
+
+            var content = root.children("Content");
+
+            Access = {};
+
+            content.children().each(function () {
+                var item = $(this);
+
+                Access[item.prop("tagName")] = item.text() == "true";
+            });
+
+            if (!Access.SERVER_EXPLORER_CREATE_FILE)
+                $("#btnNewFile").parent().addClass("disabled");
+
+            if (!Access.SERVER_EXPLORER_CREATE_FOLDER)
+                $("#btnNewFolder").parent().addClass("disabled");
+
+            if (!Access.SERVER_EXPLORER_UPLOAD)
+                $("#btnNewFolder").addClass("disabled");
+
+            if (!Access.SERVER_EXPLORER_DOWNLOAD)
+                $("#btnDownloadAll").addClass("disabled");
+
+            if (!Access.SERVER_EXPLORER_DELETE)
+                $("#btnDeleteAll").addClass("disabled");
+
+            loadTree();
         });
     }
 </script>

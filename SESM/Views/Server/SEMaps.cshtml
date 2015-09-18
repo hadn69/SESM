@@ -340,118 +340,130 @@
         });
 
         function refreshList() {
-            LockPage();
-            $.post("/API/Map/GetMaps",
-            {
-                ServerID: serverID
-            },
-            function (data) {
-                UnlockPage();
-                var root = $($.parseXML(data)).find("Response");
+            if (Access.SERVER_MAP_SE_LIST) {
+                LockPage();
+                $.post("/API/Map/GetMaps",
+                {
+                    ServerID: serverID
+                },
+                function (data) {
+                    UnlockPage();
+                    var root = $($.parseXML(data)).find("Response");
 
-                if (root.children("Type").text() == "Error") {
-                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                    $("#btnRefreshList").children("i").removeClass("fa-spin");
-                    return;
-                }
-
-                mapTable.DataTable().clear();
-                root.children("Content").children("Map").each(function (index) {
-                    var item = $(this);
-                    var Loaded = item.children("Selected").text() == "true";
-                    var DirName = item.children("DirName").text();
-                    var MapName = item.children("MapName").text();
-                    var Date = item.children("Date").text();
-                    var Size = item.children("Size").text();
-
-                    var chkbField = '<input type="checkbox" class="checkboxes" value="' + DirName + '" />';
-
-                    var selectedField = '';
-
-                    if (Loaded) {
-                        selectedField = '<i class="fa fa-check-circle"></i>';
+                    if (root.children("Type").text() == "Error") {
+                        toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                        $("#btnRefreshList").children("i").removeClass("fa-spin");
+                        return;
                     }
 
-                    mapTable.DataTable().row.add([chkbField, selectedField, DirName, MapName, fileSizeIEC(Size), Date]);
-                });
+                    mapTable.DataTable().clear();
+                    root.children("Content").children("Map").each(function (index) {
+                        var item = $(this);
+                        var Loaded = item.children("Selected").text() == "true";
+                        var DirName = item.children("DirName").text();
+                        var MapName = item.children("MapName").text();
+                        var Date = item.children("Date").text();
+                        var Size = item.children("Size").text();
 
-                mapTable.DataTable().draw();
-                mapTable.find('input:checkbox').uniform();
-                updateCheckboxes();
+                        var chkbField = '<input type="checkbox" class="checkboxes" value="' + DirName + '" />';
 
-                if (is_touch_device()) {
-                    $('td').attr('unselectable', 'on').addClass('blockSelect');
-                }
+                        var selectedField = '';
 
-                $('tr.odd, tr.even').contextmenu({
-                    target: '#context-menu',
-                    onItem: function (context, e) {
-                        var dirName = $(context).children("td:nth-child(3)").text();
-
-                        var clicked = $(e.target).text().trim();
-
-                        if (clicked == "Load") {
-                            bootbox.confirm("Are you sure you want to select this map ?<br/>" +
-                            "Note : if the server is running, it WILL be restarted",
-                            function (result) {
-                                if (result) {
-                                    LockPage();
-                                    $.post("/API/Map/SelectMap",
-                                    {
-                                        ServerID: serverID,
-                                        MapDir: dirName
-                                    },
-                                    function (data) {
-
-                                        var root = $($.parseXML(data)).find("Response");
-
-                                        if (root.children("Type").text() == "Error") {
-                                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                            return;
-                                        }
-
-                                        toastr.success("The Map have been selected", "Map Selected");
-                                        refreshList();
-                                    });
-                                }
-                            });
+                        if (Loaded) {
+                            selectedField = '<i class="fa fa-check-circle"></i>';
                         }
-                        else if (clicked == "Download") {
-                            $("#downloadFormMapDirs").val(dirName);
-                            $("#downloadForm").submit();
-                        }
-                        else if (clicked == "Delete") {
-                            bootbox.confirm("Are you sure you want to delete this map ?<br/>" +
-                            "Note : if the server is running, it WILL be stopped",
-                            function (result) {
-                                if (result) {
-                                    LockPage();
-                                    $.post("/API/Map/DeleteMaps",
-                                    {
-                                        ServerID: serverID,
-                                        MapDirs: dirName
-                                    },
-                                    function (data) {
 
-                                        var root = $($.parseXML(data)).find("Response");
+                        mapTable.DataTable().row.add([chkbField, selectedField, DirName, MapName, fileSizeIEC(Size), Date]);
+                    });
 
-                                        if (root.children("Type").text() == "Error") {
-                                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                                            return;
-                                        }
+                    mapTable.DataTable().draw();
+                    mapTable.find('input:checkbox').uniform();
+                    updateCheckboxes();
 
-                                        toastr.success("The Map have been deleted", "Map Deleted");
-                                        refreshList();
-                                    });
-                                }
-                            });
-                        }
+                    if (is_touch_device()) {
+                        $('td').attr('unselectable', 'on').addClass('blockSelect');
                     }
+
+                    $('tr.odd, tr.even').contextmenu({
+                        target: '#context-menu',
+                        before: function(e, element, target) {
+                            if (!Access.SERVER_MAP_SE_SELECT)
+                                this.getMenu().find("li:first-child").hide();
+
+                            if (!Access.SERVER_MAP_SE_DOWNLOAD)
+                                this.getMenu().find("li:nth-child(2)").hide();
+
+                            if (!Access.SERVER_MAP_SE_DELETE)
+                                this.getMenu().find("li:nth-child(3)").hide();
+                        },
+                        onItem: function (context, e) {
+                            var dirName = $(context).children("td:nth-child(3)").text();
+
+                            var clicked = $(e.target).text().trim();
+
+                            if (clicked == "Load") {
+                                bootbox.confirm("Are you sure you want to select this map ?<br/>" +
+                                "Note : if the server is running, it WILL be restarted",
+                                function (result) {
+                                    if (result) {
+                                        LockPage();
+                                        $.post("/API/Map/SelectMap",
+                                        {
+                                            ServerID: serverID,
+                                            MapDir: dirName
+                                        },
+                                        function (data) {
+
+                                            var root = $($.parseXML(data)).find("Response");
+
+                                            if (root.children("Type").text() == "Error") {
+                                                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                                return;
+                                            }
+
+                                            toastr.success("The Map have been selected", "Map Selected");
+                                            refreshList();
+                                        });
+                                    }
+                                });
+                            }
+                            else if (clicked == "Download") {
+                                $("#downloadFormMapDirs").val(dirName);
+                                $("#downloadForm").submit();
+                            }
+                            else if (clicked == "Delete") {
+                                bootbox.confirm("Are you sure you want to delete this map ?<br/>" +
+                                "Note : if the server is running, it WILL be stopped",
+                                function (result) {
+                                    if (result) {
+                                        LockPage();
+                                        $.post("/API/Map/DeleteMaps",
+                                        {
+                                            ServerID: serverID,
+                                            MapDirs: dirName
+                                        },
+                                        function (data) {
+
+                                            var root = $($.parseXML(data)).find("Response");
+
+                                            if (root.children("Type").text() == "Error") {
+                                                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                                                return;
+                                            }
+
+                                            toastr.success("The Map have been deleted", "Map Deleted");
+                                            refreshList();
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    });
                 });
-            });
+            }
         }
 
-        refreshList();
+
 
         $("#btnCreate").click(function () {
             $("#createModal").modal('show');
@@ -538,5 +550,45 @@
         $("#btnRefresh").click(function () {
             refreshList();
         });
+
+        var Access = {};
+
+        $.post("/API/Server/GetServerPermissions",
+        {
+            ServerID: serverID
+        },
+        function (data) {
+            var root = $($.parseXML(data)).find("Response");
+
+            if (root.children("Type").text() == "Error") {
+                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                return;
+            }
+
+            var content = root.children("Content");
+
+            Access = {};
+
+            content.children().each(function () {
+                var item = $(this);
+
+                Access[item.prop("tagName")] = item.text() == "true";
+            });
+
+            if (!Access.SERVER_MAP_SE_CREATE)
+                $("#btnCreate").addClass("disabled");
+
+            if (!Access.SERVER_MAP_SE_UPLOAD)
+                $("#btnUpload").addClass("disabled");
+
+            if (!Access.SERVER_MAP_SE_DOWNLOAD)
+                $("#btnDownloadMaps").addClass("disabled");
+
+            if (!Access.SERVER_MAP_SE_DELETE)
+                $("#btnDeleteMaps").addClass("disabled");
+
+            refreshList();
+        });
+
     }
 </script>

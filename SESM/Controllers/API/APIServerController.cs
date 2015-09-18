@@ -605,6 +605,198 @@ namespace SESM.Controllers.API
 
         #endregion
 
+        // POST: API/Server/GetServerRoles
+        [HttpPost]
+        [APIServerAccess("SRV-GSR", "ACCESS_SERVER_READ")]
+        public ActionResult GetServerRoles()
+        {
+            ServerRoleProvider sroPrv = new ServerRoleProvider(CurrentContext);
+
+            XMLMessage response = new XMLMessage("SRV-GSR-OK");
+
+            foreach (EntityServerRole item in sroPrv.GetServerRoles())
+            {
+                response.AddToContent(new XElement("ServerRole", new XElement("Id", item.Id),
+                                                                 new XElement("Name", item.Name)));
+            }
+
+            return Content(response.ToString());
+        }
+
+        // GET: API/Server/GetServerRoleAccess
+        [HttpGet]
+        public ActionResult GetServerRoleAccess()
+        {
+            XMLMessage response = new XMLMessage("ACC-GHRA-OK");
+
+            response.AddToContent(new XElement("ACCESS_SERVER_READ", AuthHelper.HasAccess(RequestServer, "ACCESS_SERVER_READ")));
+            response.AddToContent(new XElement("ACCESS_SERVER_EDIT_USERS", AuthHelper.HasAccess(RequestServer, "ACCESS_SERVER_EDIT_USERS")));
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Server/GetServerPermissions
+        [HttpPost]
+        [APIServerAccess("SRV-GSP")]
+        public ActionResult GetServerPermissions()
+        {
+            // ** INIT **
+            EntityUser user = Session["User"] as EntityUser;
+
+            // ** ACCESS **
+            if (user == null)
+                return Content(XMLMessage.Error("SRV-GSP-NOTLOG", "No user is logged in").ToString());
+
+            // ** PROCESS **
+            XMLMessage response = new XMLMessage("SRV-GSP-OK");
+
+            foreach (string item in Enum.GetNames(typeof(EnumServerPerm)))
+            {
+                response.AddToContent(new XElement(item, AuthHelper.HasAccess(item)));
+            }
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Server/GetServerRoleDetails
+        [HttpPost]
+        [APIServerAccess("SRV-GSRD", "ACCESS_SERVER_EDIT_USERS")]
+        public ActionResult GetServerRoleDetails()
+        {
+            ServerRoleProvider sroPrv = new ServerRoleProvider(CurrentContext);
+            InstanceServerRoleProvider isrPrv = new InstanceServerRoleProvider(CurrentContext);
+
+            int ServerRoleId;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerRoleId"]))
+                return Content(XMLMessage.Error("SRV-GSRD-MISID", "The ServerRoleId field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerRoleId"], out ServerRoleId))
+                return Content(XMLMessage.Error("SRV-GSRD-BADID", "The ServerRoleId is invalid").ToString());
+
+            EntityServerRole serverRole = sroPrv.GetServerRole(ServerRoleId);
+
+            if (serverRole == null)
+                return Content(XMLMessage.Error("SRV-GSRD-UKNSR", "The ServerRole doesn't exist").ToString());
+
+            EntityInstanceServerRole instanceServerRole = new EntityInstanceServerRole();
+
+            if (isrPrv.GetInstanceServerRoles().Any(item => item.ServerRole == serverRole && item.Server == RequestServer))
+            {
+                instanceServerRole = isrPrv.GetInstanceServerRoles().First(item => item.ServerRole == serverRole && item.Server == RequestServer);
+            }
+
+            XMLMessage response = new XMLMessage("SRV-GSRD-OK");
+
+            response.AddToContent(new XElement("Name", serverRole.Name));
+
+            XElement perms = new XElement("Permissions");
+            response.AddToContent(perms);
+
+            foreach (EnumServerPerm item in serverRole.Permissions)
+            {
+                perms.Add(new XElement("Permission", (int)item));
+            }
+
+            XElement users = new XElement("Users");
+            response.AddToContent(users);
+
+            foreach (EntityUser item in instanceServerRole.Members)
+            {
+                users.Add(new XElement("User", item.Id));
+            }
+
+            return Content(response.ToString());
+        }
+
+        // POST: API/Server/SetServerRoleDetails
+        [HttpPost]
+        [APIServerAccess("SRV-SSRD", "ACCESS_SERVER_EDIT_USERS")]
+        public ActionResult SetServerRoleDetails()
+        {
+            ServerRoleProvider sroPrv = new ServerRoleProvider(CurrentContext);
+            InstanceServerRoleProvider isrPrv = new InstanceServerRoleProvider(CurrentContext);
+            UserProvider usrPrv = new UserProvider(CurrentContext);
+
+            int ServerRoleId;
+            if (string.IsNullOrWhiteSpace(Request.Form["ServerRoleId"]))
+                return Content(XMLMessage.Error("SRV-SSRD-MISID", "The ServerRoleId field must be provided").ToString());
+
+            if (!int.TryParse(Request.Form["ServerRoleId"], out ServerRoleId))
+                return Content(XMLMessage.Error("SRV-SSRD-BADID", "The ServerRoleId is invalid").ToString());
+
+            EntityServerRole serverRole = sroPrv.GetServerRole(ServerRoleId);
+
+            if (serverRole == null)
+                return Content(XMLMessage.Error("SRV-SSRD-UKNHR", "The ServerRole doesn't exist").ToString());
+
+            EntityInstanceServerRole instanceServerRole = new EntityInstanceServerRole()
+            {
+                Server = RequestServer,
+                ServerRole = serverRole
+            };
+
+            if (isrPrv.GetInstanceServerRoles().Any(item => item.ServerRole == serverRole && item.Server == RequestServer))
+            {
+                instanceServerRole = isrPrv.GetInstanceServerRoles().First(item => item.ServerRole == serverRole && item.Server == RequestServer);
+            }
+            else
+            {
+                isrPrv.AddInstanceServerRole(instanceServerRole);
+            }
+
+            List<EntityUser> users = new List<EntityUser>();
+
+            string Users = Request.Form["Users"];
+
+            foreach (string item in Users.Split(';'))
+            {
+                if (string.IsNullOrWhiteSpace(item))
+                    continue;
+
+                int id;
+                if (!int.TryParse(item, out id))
+                    return
+                        Content(XMLMessage.Error("SRV-SSRD-BADUSRID", "One of the user id isn't valid").ToString());
+
+                if (!usrPrv.UserExist(id))
+                    return Content(XMLMessage.Error("SRV-SSRD-BADUSR", "One of the user don't exist").ToString());
+
+                users.Add(usrPrv.GetUser(id));
+            }
+
+            instanceServerRole.Members.Clear();
+
+            foreach (EntityUser item in users)
+            {
+                instanceServerRole.Members.Add(item);
+            }
+
+            isrPrv.UpdateInstanceServerRole(instanceServerRole);
+
+            return Content(XMLMessage.Success("SRV-SSRD-OK", "The role was updated").ToString());
+        }
+
+        // POST: API/Server/GetUsers
+        [HttpPost]
+        [APIServerAccess("SRV-GU", "ACCESS_SERVER_EDIT_USERS")]
+        public ActionResult GetUsers()
+        {
+            // ** INIT **
+            UserProvider usrPrv = new UserProvider(CurrentContext);
+
+            List<EntityUser> users = usrPrv.GetUsers();
+
+            // ** PROCESS **
+            XMLMessage response = new XMLMessage("SRV-GU-OK");
+
+            foreach (EntityUser item in users)
+            {
+                response.AddToContent(new XElement("User", new XElement("Login", item.Login),
+                                                           new XElement("ID", item.Id)));
+            }
+            return Content(response.ToString());
+        }
+
         #region SE Server Configuration
 
         // POST: API/Server/SEGetConfiguration
@@ -681,6 +873,24 @@ namespace SESM.Controllers.API
             values.Add(new XElement("EnableOxygen", serverConfig.EnableOxygen));
             values.Add(new XElement("Enable3rdPersonView", serverConfig.Enable3rdPersonView));
             values.Add(new XElement("EnableEncounters", serverConfig.EnableEncounters));
+
+            values.Add(new XElement("EnableFlora", serverConfig.EnableFlora));
+            values.Add(new XElement("EnableStationVoxelSupport", serverConfig.EnableStationVoxelSupport));
+            values.Add(new XElement("EnableSunRotation", serverConfig.EnableSunRotation));
+            values.Add(new XElement("DisableRespawnShips", serverConfig.DisableRespawnShips));
+            values.Add(new XElement("ScenarioEditMode", serverConfig.ScenarioEditMode));
+            values.Add(new XElement("Battle", serverConfig.Battle));
+            values.Add(new XElement("Scenario", serverConfig.Scenario));
+            values.Add(new XElement("CanJoinRunning", serverConfig.CanJoinRunning));
+            values.Add(new XElement("PhysicsIterations", serverConfig.PhysicsIterations));
+            values.Add(new XElement("SunRotationIntervalMinutes", serverConfig.SunRotationIntervalMinutes));
+            values.Add(new XElement("EnableJetpack", serverConfig.EnableJetpack));
+            values.Add(new XElement("SpawnWithTools", serverConfig.SpawnWithTools));
+            values.Add(new XElement("StartInRespawnScreen", serverConfig.StartInRespawnScreen));
+            values.Add(new XElement("EnableVoxelDestruction", serverConfig.EnableVoxelDestruction));
+            values.Add(new XElement("MaxDrones", serverConfig.MaxDrones));
+            values.Add(new XElement("EnableDrones", serverConfig.EnableDrones));
+
             response.AddToContent(values);
 
             XElement rights = new XElement("Rights");
@@ -731,6 +941,23 @@ namespace SESM.Controllers.API
             rights.Add(new XElement("EnableOxygen", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEOXYGEN_WR")));
             rights.Add(new XElement("Enable3rdPersonView", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLE3RDPERSONVIEW_WR")));
             rights.Add(new XElement("EnableEncounters", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEENCOUNTERS_WR")));
+
+            rights.Add(new XElement("EnableFlora", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEFLORA_WR")));
+            rights.Add(new XElement("EnableStationVoxelSupport", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLESTATIONVOXELSUPPORT_WR")));
+            rights.Add(new XElement("EnableSunRotation", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLESUNROTATION_WR")));
+            rights.Add(new XElement("DisableRespawnShips", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_DISABLERESPAWNSHIPS_WR")));
+            rights.Add(new XElement("ScenarioEditMode", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SCENARIOEDITMODE_WR")));
+            rights.Add(new XElement("Battle", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_BATTLE_WR")));
+            rights.Add(new XElement("Scenario", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SCENARIO_WR")));
+            rights.Add(new XElement("CanJoinRunning", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_CANJOINRUNNING_WR")));
+            rights.Add(new XElement("PhysicsIterations", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_PHYSICSITERATIONS_WR")));
+            rights.Add(new XElement("SunRotationIntervalMinutes", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SUNROTATIONINTERVALMINUTES_WR")));
+            rights.Add(new XElement("EnableJetpack", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEJETPACK_WR")));
+            rights.Add(new XElement("SpawnWithTools", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SPAWNWITHTOOLS_WR")));
+            rights.Add(new XElement("StartInRespawnScreen", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_STARTINRESPAWNSCREEN_WR")));
+            rights.Add(new XElement("EnableVoxelDestruction", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEVOXELDESTRUCTION_WR")));
+            rights.Add(new XElement("MaxDrones", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_MAXDRONES_WR")));
+            rights.Add(new XElement("EnableDrones", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEDRONES_WR")));
             response.AddToContent(rights);
 
             return Content(response.ToString());
@@ -753,7 +980,12 @@ namespace SESM.Controllers.API
                                      "SERVER_CONFIG_SE_WEAPONSENABLED_WR", "SERVER_CONFIG_SE_SHOWPLAYERNAMESONHUD_WR", "SERVER_CONFIG_SE_THRUSTERDAMAGE_WR",
                                      "SERVER_CONFIG_SE_SPAWNSHIPTIMEMULTIPLIER_WR", "SERVER_CONFIG_SE_RESPAWNSHIPDELETE_WR", "SERVER_CONFIG_SE_ENABLETOOLSHAKE_WR",
                                      "SERVER_CONFIG_SE_ENABLEINGAMESCRIPTS_WR", "SERVER_CONFIG_SE_VOXELGENERATORVERSION_WR", "SERVER_CONFIG_SE_ENABLEOXYGEN_WR",
-                                     "SERVER_CONFIG_SE_ENABLE3RDPERSONVIEW_WR", "SERVER_CONFIG_SE_ENABLEENCOUNTERS_WR")]
+                                     "SERVER_CONFIG_SE_ENABLE3RDPERSONVIEW_WR", "SERVER_CONFIG_SE_ENABLEENCOUNTERS_WR", "SERVER_CONFIG_SE_ENABLEFLORA_WR",
+                                     "SERVER_CONFIG_SE_ENABLESTATIONVOXELSUPPORT_WR", "SERVER_CONFIG_SE_ENABLESUNROTATION_WR", "SERVER_CONFIG_SE_DISABLERESPAWNSHIPS_WR",
+                                     "SERVER_CONFIG_SE_SCENARIOEDITMODE_WR", "SERVER_CONFIG_SE_BATTLE_WR", "SERVER_CONFIG_SE_SCENARIO_WR",
+                                     "SERVER_CONFIG_SE_CANJOINRUNNING_WR", "SERVER_CONFIG_SE_PHYSICSITERATIONS_WR", "SERVER_CONFIG_SE_SUNROTATIONINTERVALMINUTES_WR",
+                                     "SERVER_CONFIG_SE_ENABLEJETPACK_WR", "SERVER_CONFIG_SE_SPAWNWITHTOOLS_WR", "SERVER_CONFIG_SE_STARTINRESPAWNSCREEN_WR",
+                                     "SERVER_CONFIG_SE_ENABLEVOXELDESTRUCTION_WR", "SERVER_CONFIG_SE_MAXDRONES_WR", "SERVER_CONFIG_SE_ENABLEDRONES_WR")]
         public ActionResult SESetConfiguration()
         {
             // ** INIT **
@@ -1209,6 +1441,150 @@ namespace SESM.Controllers.API
                     return Content(XMLMessage.Error("SRV-SESC-MISEE", "The EnableEncounters field must be provided").ToString());
                 if (!bool.TryParse(Request.Form["EnableEncounters"], out serverConfig.EnableEncounters))
                     return Content(XMLMessage.Error("SRV-SESC-BADEE", "The EnableEncounters field is invalid").ToString());
+            }
+
+            // ==== EnableFlora ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEFLORA_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableFlora"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISEF", "The EnableFlora field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableFlora"], out serverConfig.EnableFlora))
+                    return Content(XMLMessage.Error("SRV-SESC-BADEF", "The EnableFlora field is invalid").ToString());
+            }
+
+            // ==== EnableStationVoxelSupport ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLESTATIONVOXELSUPPORT_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableStationVoxelSupport"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISESVS", "The EnableStationVoxelSupport field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableStationVoxelSupport"], out serverConfig.EnableStationVoxelSupport))
+                    return Content(XMLMessage.Error("SRV-SESC-BADESVS", "The EnableStationVoxelSupport field is invalid").ToString());
+            }
+
+            // ==== EnableSunRotation ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLESUNROTATION_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableSunRotation"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISESR", "The EnableSunRotation field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableSunRotation"], out serverConfig.EnableSunRotation))
+                    return Content(XMLMessage.Error("SRV-SESC-BADESR", "The EnableSunRotation field is invalid").ToString());
+            }
+
+            // ==== DisableRespawnShips ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_DISABLERESPAWNSHIPS_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["DisableRespawnShips"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISDRS", "The DisableRespawnShips field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["DisableRespawnShips"], out serverConfig.DisableRespawnShips))
+                    return Content(XMLMessage.Error("SRV-SESC-BADDRS", "The DisableRespawnShips field is invalid").ToString());
+            }
+
+            // ==== ScenarioEditMode ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SCENARIOEDITMODE_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["ScenarioEditMode"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISSEM", "The ScenarioEditMode field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["ScenarioEditMode"], out serverConfig.ScenarioEditMode))
+                    return Content(XMLMessage.Error("SRV-SESC-BADSEM", "The ScenarioEditMode field is invalid").ToString());
+            }
+
+            // ==== Battle ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_BATTLE_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["Battle"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISB", "The Battle field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["Battle"], out serverConfig.Battle))
+                    return Content(XMLMessage.Error("SRV-SESC-BADB", "The Battle field is invalid").ToString());
+            }
+
+            // ==== Scenario ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SCENARIO_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["Scenario"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISS", "The Scenario field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["Scenario"], out serverConfig.Scenario))
+                    return Content(XMLMessage.Error("SRV-SESC-BADS", "The Scenario field is invalid").ToString());
+            }
+
+            // ==== CanJoinRunning ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_CANJOINRUNNING_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["CanJoinRunning"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISCJR", "The CanJoinRunning field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["CanJoinRunning"], out serverConfig.CanJoinRunning))
+                    return Content(XMLMessage.Error("SRV-SESC-BADCJR", "The CanJoinRunning field is invalid").ToString());
+            }
+
+            // ==== PhysicsIterations ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_PHYSICSITERATIONS_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["PhysicsIterations"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISPI", "The PhysicsIterations field must be provided").ToString());
+                if (!int.TryParse(Request.Form["PhysicsIterations"], out serverConfig.PhysicsIterations) || serverConfig.PhysicsIterations < 1)
+                    return Content(XMLMessage.Error("SRV-SESC-BADPI", "The PhysicsIterations field is invalid").ToString());
+            }
+
+            // ==== SunRotationIntervalMinutes ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SUNROTATIONINTERVALMINUTES_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["SunRotationIntervalMinutes"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISSRIM", "The SunRotationIntervalMinutes field must be provided").ToString());
+                if (!float.TryParse(Request.Form["SunRotationIntervalMinutes"], out serverConfig.SunRotationIntervalMinutes) || serverConfig.SunRotationIntervalMinutes < 0)
+                    return Content(XMLMessage.Error("SRV-SESC-BADSRIM", "The SunRotationIntervalMinutes field is invalid").ToString());
+            }
+
+            // ==== EnableJetpack ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEJETPACK_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableJetpack"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISEJ", "The EnableJetpack field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableJetpack"], out serverConfig.EnableJetpack))
+                    return Content(XMLMessage.Error("SRV-SESC-BADEJ", "The EnableJetpack field is invalid").ToString());
+            }
+
+            // ==== SpawnWithTools ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_SPAWNWITHTOOLS_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["SpawnWithTools"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISSWT", "The SpawnWithTools field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["SpawnWithTools"], out serverConfig.SpawnWithTools))
+                    return Content(XMLMessage.Error("SRV-SESC-BADSWT", "The SpawnWithTools field is invalid").ToString());
+            }
+
+            // ==== StartInRespawnScreen ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_STARTINRESPAWNSCREEN_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["StartInRespawnScreen"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISSIRS", "The StartInRespawnScreen field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["StartInRespawnScreen"], out serverConfig.StartInRespawnScreen))
+                    return Content(XMLMessage.Error("SRV-SESC-BADSIRS", "The StartInRespawnScreen field is invalid").ToString());
+            }
+
+            // ==== EnableVoxelDestruction ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEVOXELDESTRUCTION_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableVoxelDestruction"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISEVD", "The EnableVoxelDestruction field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableVoxelDestruction"], out serverConfig.EnableVoxelDestruction))
+                    return Content(XMLMessage.Error("SRV-SESC-BADEVD", "The EnableVoxelDestruction field is invalid").ToString());
+            }
+
+            // ==== MaxDrones ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_MAXDRONES_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["MaxDrones"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISMD", "The MaxDrones field must be provided").ToString());
+                if (!int.TryParse(Request.Form["MaxDrones"], out serverConfig.MaxDrones) || serverConfig.MaxDrones < 0)
+                    return Content(XMLMessage.Error("SRV-SESC-BADMD", "The MaxDrones field is invalid").ToString());
+            }
+
+            // ==== EnableDrones ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEDRONES_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableDrones"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISED", "The EnableDrones field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableDrones"], out serverConfig.EnableDrones))
+                    return Content(XMLMessage.Error("SRV-SESC-BADED", "The EnableDrones field is invalid").ToString());
             }
 
             // ** PROCESS **

@@ -2670,6 +2670,7 @@
     <Content Include="Views\Server\MEConfiguration.cshtml" />
     <Content Include="Views\Home\Versions.cshtml" />
     <Content Include="Views\Access\Index.cshtml" />
+    <Content Include="Views\Server\Access.cshtml" />
     <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
     <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
@@ -2720,6 +2721,7 @@
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="DAL\DataContext.cs" />
     <Compile Include="DAL\DataContextInitializer.cs" />
+    <Compile Include="DAL\InstanceServerRoleProvider.cs" />
     <Compile Include="DAL\ServerRoleProvider.cs" />
     <Compile Include="DAL\PerfProvider.cs" />
     <Compile Include="DAL\ServerProvider.cs" />
@@ -2781,6 +2783,10 @@
     <Compile Include="Migrations\201505242247145_SESEWCFPortRemoval.cs" />
     <Compile Include="Migrations\201505242247145_SESEWCFPortRemoval.Designer.cs">
       <DependentUpon>201505242247145_SESEWCFPortRemoval.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201509171642008_ServerRoleInstanceNameRemoval.cs" />
+    <Compile Include="Migrations\201509171642008_ServerRoleInstanceNameRemoval.Designer.cs">
+      <DependentUpon>201509171642008_ServerRoleInstanceNameRemoval.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ArchType.cs" />
@@ -2867,6 +2873,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201505242247145_SESEWCFPortRemoval.resx">
       <DependentUpon>201505242247145_SESEWCFPortRemoval.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201509171642008_ServerRoleInstanceNameRemoval.resx">
+      <DependentUpon>201509171642008_ServerRoleInstanceNameRemoval.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

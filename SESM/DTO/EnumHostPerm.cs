@@ -16,12 +16,15 @@
         ACCESS_HOST_EDIT_PERMISSION = 204,
         ACCESS_HOST_EDIT_USERS = 205,
 
-        // 300+ - 1002 : Host Access
+        // 300+ : Server Access
         ACCESS_SERVER_READ = 300,
         ACCESS_SERVER_CREATE = 301,
         ACCESS_SERVER_DELETE = 302,
         ACCESS_SERVER_EDIT_NAME = 303,
         ACCESS_SERVER_EDIT_PERMISSION = 304,
-        ACCESS_SERVER_EDIT_USERS = 1002
+        ACCESS_SERVER_EDIT_USERS = 305,
+
+        // 400+ : Perf Monitor
+        PERF_CLEANUP = 400
     }
 }

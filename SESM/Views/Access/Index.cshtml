@@ -535,13 +535,15 @@
                                     $("#inpEditHostRoleName").prop("disabled", !HostAccess.ACCESS_HOST_EDIT_NAME);
 
                                     $("#inpEditHostRolePermissions").find("input").bootstrapSwitch('state', false);
-                                    $("#inpEditHostRolePermissions").find("input").prop("disabled", !HostAccess.ACCESS_HOST_EDIT_PERMISSION);
+                                    $("#inpEditHostRolePermissions").find("input").bootstrapSwitch("readonly", false);
 
                                     content.children("Permissions").children().each(function() {
                                         var item = $(this).text();
 
                                         $("#inpEditHostRolePermissions").find('input[value="' + item + '"]').bootstrapSwitch('state', true);
                                     });
+
+                                    $("#inpEditHostRolePermissions").find("input").bootstrapSwitch("readonly", !HostAccess.ACCESS_HOST_EDIT_PERMISSION);
 
                                     $("#inpEditHostRoleUsers").DataTable().rows().nodes().to$().find("input").prop('checked', false);
                                     $("#inpEditHostRoleUsers").DataTable().rows().nodes().to$().find("input").prop("disabled", !HostAccess.ACCESS_HOST_EDIT_USERS);
@@ -616,7 +618,7 @@
                     $("#inpEditHostRolePermissions input[type='checkbox']").bootstrapSwitch();
                 });
 
-                $.get("/API/Users/GetUsers",
+                $.get("/API/Access/GetUsers",
                 function (data) {
                     var root = $($.parseXML(data)).find("Response");
 
@@ -719,13 +721,15 @@
                                     $("#inpEditServerRoleName").prop("disabled", !ServerAccess.ACCESS_SERVER_EDIT_NAME);
 
                                     $("#inpEditServerRolePermissions").find("input").bootstrapSwitch('state', false);
-                                    $("#inpEditServerRolePermissions").find("input").prop("disabled", !ServerAccess.ACCESS_SERVER_EDIT_PERMISSION);
+                                    $("#inpEditServerRolePermissions").find("input").bootstrapSwitch("readonly", false);
 
                                     content.children("Permissions").children().each(function () {
                                         var item = $(this).text();
 
                                         $("#inpEditServerRolePermissions").find('input[value="' + item + '"]').bootstrapSwitch('state', true);
                                     });
+
+                                    $("#inpEditServerRolePermissions").find("input").bootstrapSwitch("readonly", !ServerAccess.ACCESS_SERVER_EDIT_PERMISSION);
                                 });
                             } else if (clicked == "Delete") {
                                 bootbox.confirm("Are you sure you want to delete this role ?",
