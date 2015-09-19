@@ -22,11 +22,6 @@
                             Server
                         </a>
                     </li>
-                    <li style="display: none;">
-                        <a href="#tab_SESE" data-toggle="tab">
-                            SE Server Extender
-                        </a>
-                    </li>
                     <li>
                         <a href="#tab_Jobs" data-toggle="tab">
                             Jobs
@@ -35,11 +30,6 @@
                     <li>
                         <a href="#tab_Backups" data-toggle="tab">
                             Backups
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#tab_Access" data-toggle="tab">
-                            SESM Access
                         </a>
                     </li>
                 </ul>
@@ -79,45 +69,19 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-md-6">
-                                        <div class="col-md-offset-6 col-md-6">
-                                            <button type="button" class="btn green" id="btnSaveServer">Save</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="tab-pane" id="tab_SESE">
-                        <form action="#" class="form-horizontal form">
-                            <div class="form-body">
-                                <h3 class="form-section">SESE Settings</h3>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
+                                        <div class="form-group" style="display: none;">
                                             <label class="control-label col-md-6">Use SE Server Extender</label>
                                             <div class="col-md-6">
                                                 <input type="checkbox" id="inpUseServerExtender">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-6">SESE WCF Port</label>
-                                            <div class="col-md-6">
-                                                <div class="input-inline input-small">
-                                                    <input id="inpServerExtenderPort" type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="col-md-offset-6 col-md-6">
-                                            <button type="button" class="btn green" id="btnSaveSESE">Save</button>
+                                            <button type="button" class="btn green" id="btnSaveServer">Save</button>
                                         </div>
                                     </div>
                                 </div>
@@ -237,47 +201,6 @@
                             </div>
                         </form>
                     </div>
-                    <div class="tab-pane" id="tab_Access">
-                        <form action="#" class="form-horizontal form">
-                            <div class="form-body">
-                                <h3 class="form-section">Access Settings</h3>
-
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-4">Web Administrators</label>
-                                            <div class="col-md-8">
-                                                <textarea rows="10" id="inpWebAdministrators" style="width: 100%; resize: none;"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-4">Web Managers</label>
-                                            <div class="col-md-8">
-                                                <textarea rows="10" id="inpWebManagers" style="width: 100%; resize: none;"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label class="control-label col-md-4">Web Users</label>
-                                            <div class="col-md-8">
-                                                <textarea rows="10" id="inpWebUsers" style="width: 100%; resize: none;"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="col-md-offset-6 col-md-6">
-                                            <button type="button" class="btn green" id="btnSaveAccess">Save</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
                 </div>
             </div>
         </div>
@@ -307,44 +230,24 @@
             step: 1
         });
 
-        var accessLevel = "Manager";
-        $.post("/API/Server/GetServer",
-        {
-            ServerID: serverID
-        },
-        function(data) {
-            var root = $($.parseXML(data)).find("Response");
-
-            if (root.children("Type").text() == "Error") {
-                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                return;
-            }
-
-            accessLevel = root.children("Content").children("AccessLevel").text();
-            if (root.children("Content").children("Type").text() == "SE" || root.children("Content").children("Type").text() == "SESE")
-                $('a[href="#tab_SESE"]').parents("li").show();
-
-        });
-
-
         var serverLoaded = false;
-        var SESELoaded = false;
         var jobsLoaded = false;
         var backupsLoaded = false;
-        var accessLoaded = false;
+
+        var serverRights = null;
+        var jobsRights = null;
+        var backupsRights = null;
 
         function checkLock() {
-            if (serverLoaded && SESELoaded && jobsLoaded && backupsLoaded && accessLoaded)
+            if (serverLoaded && jobsLoaded && backupsLoaded)
                 UnlockPage();
         }
 
         function refreshData() {
             LockPage();
             serverLoaded = false;
-            SESELoaded = false;
             jobsLoaded = false;
             backupsLoaded = false;
-            accessLoaded = false;
 
             // Server Settings
             $.post("/API/Server/GetSettings",
@@ -363,33 +266,26 @@
                 }
 
                 var content = root.children("Content");
+                var values = content.children("Values");
+                serverRights = content.children("Rights");
 
-                $('#inpName').val(content.children("Name").text());
-                $('#inpPublic').bootstrapSwitch('state', content.children("Public").text() == "true");
-                $('#inpProcessPriority').val(content.children("ProcessPriority").text());
+                $('#inpName').val(values.children("Name").text());
+                $('#inpPublic').bootstrapSwitch('state', values.children("Public").text() == "true");
+                $('#inpProcessPriority').val(values.children("ProcessPriority").text());
+                if (values.children("UseServerExtender").length != 0)
+                    $('#inpUseServerExtender').bootstrapSwitch('state', values.children("UseServerExtender").text() == "true");
 
-            });
 
-            // SESE Settings
-            $.post("/API/Server/GetSESESettings",
-            {
-                ServerID: serverID
-            },
-            function (data) {
-                SESELoaded = true;
-                checkLock();
+                $('#inpName').prop("readonly", serverRights.children("Name").text() != "true");
+                $("#inpPublic").bootstrapSwitch("readonly", serverRights.children("Public").text() != "true");
+                $('#inpProcessPriority').prop("disabled", serverRights.children("ProcessPriority").text() != "true");
 
-                var root = $($.parseXML(data)).find("Response");
-
-                if (root.children("Type").text() == "Error") {
-                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                    return;
+                if (serverRights.children("UseServerExtender").length != 0) {
+                    $("#inpUseServerExtender").parents(".form-group").show();
+                    $("#inpUseServerExtender").bootstrapSwitch("readonly", serverRights.children("UseServerExtender").text() != "true");
+                } else {
+                    $("#inpUseServerExtender").parents(".form-group").hide();
                 }
-
-                var content = root.children("Content");
-
-                $('#inpUseServerExtender').bootstrapSwitch('state', content.children("UseServerExtender").text() == "true");
-                $('#inpServerExtenderPort').val(content.children("ServerExtenderPort").text());
 
             });
 
@@ -410,10 +306,16 @@
                 }
 
                 var content = root.children("Content");
+                var values = content.children("Values");
+                jobsRights = content.children("Rights");
 
-                $('#inpAutoRestart').bootstrapSwitch('state', content.children("AutoRestart").text() == "true");
-                $('#inpAutoRestartCron').val(content.children("AutoRestartCron").text());
-                $('#inpAutoStart').bootstrapSwitch('state', content.children("AutoStart").text() == "true");
+                $('#inpAutoRestart').bootstrapSwitch('state', values.children("AutoRestart").text() == "true");
+                $('#inpAutoRestartCron').val(values.children("AutoRestartCron").text());
+                $('#inpAutoStart').bootstrapSwitch('state', values.children("AutoStart").text() == "true");
+
+                $("#inpAutoRestart").bootstrapSwitch("readonly", jobsRights.children("AutoRestart").text() != "true");
+                $('#inpAutoRestartCron').prop("readonly", jobsRights.children("AutoRestartCron").text() != "true");
+                $("#inpAutoStart").bootstrapSwitch("readonly", jobsRights.children("AutoStart").text() != "true");
             });
 
             // Backups Settings
@@ -433,54 +335,20 @@
                 }
 
                 var content = root.children("Content");
+                var values = content.children("Values");
+                backupsRights = content.children("Rights");
 
-                $('#inpLvl1BackupEnabled').bootstrapSwitch('state', content.children("Lvl1BackupEnabled").text() == "true");
-                $('#inpLvl2BackupEnabled').bootstrapSwitch('state', content.children("Lvl2BackupEnabled").text() == "true");
-                $('#inpLvl3BackupEnabled').bootstrapSwitch('state', content.children("Lvl3BackupEnabled").text() == "true");
+                $('#inpLvl1BackupEnabled').bootstrapSwitch('state', values.children("Lvl1BackupEnabled").text() == "true");
+                $('#inpLvl2BackupEnabled').bootstrapSwitch('state', values.children("Lvl2BackupEnabled").text() == "true");
+                $('#inpLvl3BackupEnabled').bootstrapSwitch('state', values.children("Lvl3BackupEnabled").text() == "true");
 
-                $('#inpLvl1BackupInfos').text(content.children("Lvl1BackupInfos").text());
-                $('#inpLvl2BackupInfos').text(content.children("Lvl2BackupInfos").text());
-                $('#inpLvl3BackupInfos').text(content.children("Lvl3BackupInfos").text());
-            });
+                $('#inpLvl1BackupInfos').text(values.children("Lvl1BackupInfos").text());
+                $('#inpLvl2BackupInfos').text(values.children("Lvl2BackupInfos").text());
+                $('#inpLvl3BackupInfos').text(values.children("Lvl3BackupInfos").text());
 
-            // Access Settings
-            $.post("/API/Server/GetAccessSettings",
-            {
-                ServerID: serverID
-            },
-            function (data) {
-                accessLoaded = true;
-                checkLock();
-
-                var root = $($.parseXML(data)).find("Response");
-
-                if (root.children("Type").text() == "Error") {
-                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                    return;
-                }
-
-                var content = root.children("Content");
-
-                var webAdministrators = [];
-                content.children("WebAdministrators").children().each(function (index) {
-                    var item = $(this);
-                    webAdministrators.push(item.text());
-                });
-                $('#inpWebAdministrators').val(webAdministrators.join("\r\n"));
-
-                var webManagers = [];
-                content.children("WebManagers").children().each(function (index) {
-                    var item = $(this);
-                    webManagers.push(item.text());
-                });
-                $('#inpWebManagers').val(webManagers.join("\r\n"));
-
-                var webUsers = [];
-                content.children("WebUsers").children().each(function (index) {
-                    var item = $(this);
-                    webUsers.push(item.text());
-                });
-                $('#inpWebUsers').val(webUsers.join("\r\n"));
+                $("#inpLvl1BackupEnabled").bootstrapSwitch("readonly", backupsRights.children("Lvl1BackupEnabled").text() != "true");
+                $("#inpLvl2BackupEnabled").bootstrapSwitch("readonly", backupsRights.children("Lvl2BackupEnabled").text() != "true");
+                $("#inpLvl3BackupEnabled").bootstrapSwitch("readonly", backupsRights.children("Lvl3BackupEnabled").text() != "true");
             });
         }
 
@@ -508,35 +376,6 @@
                         }
 
                         toastr.success("The server settings have been updated", "Server Settings Updated");
-
-                        refreshData();
-                    });
-
-                }
-            });
-        });
-
-        $('#btnSaveSESE').click(function () {
-            bootbox.confirm("If the server is running, it WILL be restarted !<br/>Are you sure you want to save ?",
-            function (result) {
-                if (result) {
-                    LockPage();
-                    $.post("/API/Server/SetSESESettings",
-                    {
-                        ServerID: serverID,
-                        UseServerExtender: $('#inpUseServerExtender').is(":checked"),
-                        ServerExtenderPort: $("#inpServerExtenderPort").val()
-                    },
-                    function (data) {
-                        UnlockPage();
-                        var root = $($.parseXML(data)).find("Response");
-
-                        if (root.children("Type").text() == "Error") {
-                            toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                            return;
-                        }
-
-                        toastr.success("The server extender settings have been updated", "Server Extender Settings Updated");
 
                         refreshData();
                     });
@@ -588,53 +427,6 @@
                 }
 
                 toastr.success("The backups settings have been updated", "Server Backups Settings Updated");
-
-                refreshData();
-            });
-        });
-
-        $('#btnSaveAccess').click(function () {
-            LockPage();
-            var access = {};
-            access.ServerID = serverID;
-            if (accessLevel != "Manager") {
-                var webAdministrators = [];
-                $("#inpWebAdministrators").val().split("\n").forEach(function (value) {
-                    if (!isEmptyOrSpaces(value))
-                        webAdministrators.push(value);
-                });
-
-                access.WebAdministrators = webAdministrators.join(";");
-            }
-
-            var webManagers = [];
-            $("#inpWebManagers").val().split("\n").forEach(function (value) {
-                if (!isEmptyOrSpaces(value))
-                    webManagers.push(value);
-            });
-
-            access.WebManagers = webManagers.join(";");
-
-            var webUsers = [];
-            $("#inpWebUsers").val().split("\n").forEach(function (value) {
-                if (!isEmptyOrSpaces(value))
-                    webUsers.push(value);
-            });
-
-            access.WebUsers = webUsers.join(";");
-
-            $.post("/API/Server/SetAccessSettings",
-            access,
-            function (data) {
-                UnlockPage();
-                var root = $($.parseXML(data)).find("Response");
-
-                if (root.children("Type").text() == "Error") {
-                    toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
-                    return;
-                }
-
-                toastr.success("The Access settings have been updated", "Server Access Settings Updated");
 
                 refreshData();
             });

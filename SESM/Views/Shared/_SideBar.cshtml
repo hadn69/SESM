@@ -1,5 +1,6 @@
 ﻿@using SESM.DAL
 @using SESM.DTO
+@using SESM.Tools
 @{
 
     DataContext context = new DataContext();
@@ -10,8 +11,7 @@
     int userID = user == null ? 0 : user.Id;
 
     bool isAdmin = false;
-    HashSet<EntityServer> managedServers = new HashSet<EntityServer>();
-    HashSet<EntityServer> publicServers = new HashSet<EntityServer>();
+    IEnumerable<EntityServer> managedServers = new HashSet<EntityServer>();
 
     if (user != null)
     {
@@ -24,14 +24,7 @@
         {
             user = usrPrv.GetUser(userID);
 
-            managedServers = ((HashSet<EntityServer>)user.AdministratorOf);
-            managedServers.UnionWith((HashSet<EntityServer>)user.ManagerOf);
-            managedServers = new HashSet<EntityServer>(managedServers.OrderBy(x => x.Name).ToList());
-
-            publicServers = ((HashSet<EntityServer>)user.UserOf);
-            publicServers.UnionWith(new HashSet<EntityServer>(srvPrv.GetAllPublicServers()));
-            publicServers.ExceptWith(managedServers);
-            publicServers = new HashSet<EntityServer>(publicServers.OrderBy(x => x.Name).ToList());
+            managedServers = user.InstanceServerRoles.Select(item => item.Server);
         }
     }
 }
@@ -48,7 +41,7 @@
             <span class="title">Servers</span>
             <span class="arrow "></span>
         </a>
-        @if (managedServers.Count != 0 || publicServers.Count != 0)
+        @if (managedServers.Count() != 0)
         {
             <ul class="sub-menu">
                 @foreach (EntityServer item in managedServers.OrderBy(x => x.Name))
@@ -58,36 +51,55 @@
                             @item.Name <span class="arrow"></span>
                         </a>
                         <ul class="sub-menu">
-                            <li>
-                                <a href="/@item.Id/Dashboard/"><i class="icon-speedometer"></i> Dashboard</a>
-                            </li>
-                            <li>
-                                <a href="/@item.Id/Settings/"><i class="icon-settings"></i> Server Settings</a>
-                            </li>
-                            <li>
-                                <a href="/@item.Id/Configuration/"><i class="icon-puzzle"></i> Game Configuration</a>
-                            </li>
-                            <li>
-                                <a href="/@item.Id/Explorer/"><i class="icon-folder-alt"></i> File Explorer</a>
-                            </li>
-                            <li>
-                                <a href="/@item.Id/Maps/"><i class="icon-compass"></i> Maps Manager</a>
-                            </li>
-                            <li>
-                                <a href="/@item.Id/Monitor/"><i class="icon-graph"></i> Perf Monitor</a>
-                            </li>
-                            <li>
-                                <a href="/@item.Id/Status/"><i class="icon-screen-desktop"></i> Status Page</a>
-                            </li>
+                            @if (AuthHelper.HasAccess(item, "SERVER_INFO"))
+                            {
+                                <li>
+                                    <a href="/@item.Id/Dashboard/"><i class="icon-speedometer"></i> Dashboard</a>
+                                </li>
+                            }
+                            @if (AuthHelper.HasAccess(item, "SERVER_SETTINGS_GLOBAL_RD", "SERVER_SETTINGS_JOBS_RD", "SERVER_SETTINGS_BACKUPS_RD"))
+                            {
+                                <li>
+                                    <a href="/@item.Id/Settings/"><i class="icon-settings"></i> Server Settings</a>
+                                </li>
+                            }
+                            @if (AuthHelper.HasAccess(item, "SERVER_CONFIG_SE_RD", "SERVER_CONFIG_ME_RD"))
+                            {
+                                <li>
+                                    <a href="/@item.Id/Configuration/"><i class="icon-puzzle"></i> Game Configuration</a>
+                                </li>
+                            }
+                            @if (AuthHelper.HasAccess(item, "SERVER_EXPLORER_LIST"))
+                            {
+                                <li>
+                                    <a href="/@item.Id/Explorer/"><i class="icon-folder-alt"></i> File Explorer</a>
+                                </li>
+                            }
+                            @if (AuthHelper.HasAccess(item, "SERVER_MAP_SE_LIST", "SERVER_MAP_ME_LIST"))
+                            {
+                                <li>
+                                    <a href="/@item.Id/Maps/"><i class="icon-compass"></i> Maps Manager</a>
+                                </li>
+                            }
+                            @if (AuthHelper.HasAccess(item, "SERVER_PERF_READ"))
+                            {
+                                <li>
+                                    <a href="/@item.Id/Monitor/"><i class="icon-graph"></i> Perf Monitor</a>
+                                </li>
+                            }
+                            @if (AuthHelper.HasAccess(item, "ACCESS_SERVER_READ"))
+                            {
+                                <li>
+                                    <a href="/@item.Id/Access/"><i class="icon-list"></i> Access</a>
+                                </li>
+                            }
+                            @if (AuthHelper.HasAccess(item, "SERVER_INFO"))
+                            {
+                                <li>
+                                    <a href="/@item.Id/Status/"><i class="icon-screen-desktop"></i> Status Page</a>
+                                </li>
+                            }
                         </ul>
-                    </li>
-                }
-                @foreach (EntityServer item in publicServers.OrderBy(x => x.Name))
-                {
-                    <li>
-                        <a href="/@item.Id/Status/">
-                            @item.Name
-                        </a>
                     </li>
                 }
             </ul>
@@ -99,7 +111,7 @@
             <span class="title">Versions</span>
         </a>
     </li>
-    @if (isAdmin)
+    @if (AuthHelper.HasAccess("USER_MANAGE"))
     {
         <li>
             <a href="/Users/">
@@ -107,39 +119,68 @@
                 <span class="title">Users Manager</span>
             </a>
         </li>
+    }
+    @if (AuthHelper.HasAccess("ACCESS_HOST_READ", "ACCESS_SERVER_READ"))
+    {
+        <li>
+            <a href="/Access/">
+                <i class="icon-list"></i>
+                <span class="title">Access Manager</span>
+            </a>
+        </li>
+    }
+    @if (AuthHelper.HasAccess("SERVER_PERF_READ", "PERF_CLEANUP"))
+    {
         <li>
             <a href="/Monitor/">
                 <i class="icon-graph"></i>
                 <span class="title">Perf Monitor</span>
             </a>
         </li>
+    }
+    @if (AuthHelper.HasAccess("SETTINGS_SESM", "SETTINGS_SE", "SETTINGS_SESE", "SETTINGS_ME"))
+    {
         <li>
+
             <a href="/Settings/">
                 <i class="icon-settings"></i>
                 <span class="title">Global Settings</span>
                 <span class="arrow "></span>
             </a>
+
             <ul class="sub-menu">
-                <li>
-                    <a href="/Settings/">
-                        <i class="icon-equalizer"></i> SESM
-                    </a>
-                </li>
-                <li>
-                    <a href="/Settings/SE/">
-                        <i class="icon-wrench"></i> Space Engineers
-                    </a>
-                </li>
-                <li>
-                    <a href="/Settings/SESE/">
-                        <i class="icon-rocket"></i> SE Server Extender
-                    </a>
-                </li>
-                <li>
-                    <a href="/Settings/ME/">
-                        <i class="icon-picture"></i> Medieval Engineers
-                    </a>
-                </li>
+                @if (AuthHelper.HasAccess("SETTINGS_SESM"))
+                {
+                    <li>
+                        <a href="/Settings/">
+                            <i class="icon-equalizer"></i> SESM
+                        </a>
+                    </li>
+                }
+                @if (AuthHelper.HasAccess("SETTINGS_SE"))
+                {
+                    <li>
+                        <a href="/Settings/SE/">
+                            <i class="icon-wrench"></i> Space Engineers
+                        </a>
+                    </li>
+                }
+                @if (AuthHelper.HasAccess("SETTINGS_SESE"))
+                {
+                    <li>
+                        <a href="/Settings/SESE/">
+                            <i class="icon-rocket"></i> SE Server Extender
+                        </a>
+                    </li>
+                }
+                @if (AuthHelper.HasAccess("SETTINGS_ME"))
+                {
+                    <li>
+                        <a href="/Settings/ME/">
+                            <i class="icon-picture"></i> Medieval Engineers
+                        </a>
+                    </li>
+                }
             </ul>
         </li>
     }

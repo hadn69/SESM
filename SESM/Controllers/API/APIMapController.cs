@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Xml.Linq;
 using Ionic.Zip;
+using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Models;
@@ -16,49 +17,35 @@ using SESM.Tools.Helpers;
 
 namespace SESM.Controllers.API
 {
-    public class APIMapController : Controller
+    public class APIMapController : Controller, IAPIController
     {
-        private readonly DataContext _context = new DataContext();
+        public DataContext CurrentContext { get; set; }
+
+        public EntityServer RequestServer { get; set; }
+
+        public APIMapController()
+        {
+            CurrentContext = new DataContext();
+        }
 
         // GET: API/Map/GetMaps
         [HttpPost]
+        [APIServerAccess("MAP-GM", "SERVER_MAP_SE_LIST", "SERVER_MAP_ME_LIST")]
         public ActionResult GetMaps()
         {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("MAP-GM-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("MAP-GM-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("MAP-GM-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("MAP-GM-NOACCESS", "You don't have access to this server").ToString());
-
             // ** PROCESS **
             XMLMessage response = new XMLMessage("MAP-GM-OK");
 
             ServerConfigHelperBase config;
 
-            if (server.ServerType == EnumServerType.SpaceEngineers)
+            if (RequestServer.ServerType == EnumServerType.SpaceEngineers)
                 config = new SEServerConfigHelper();
             else
                 config = new MEServerConfigHelper();
 
-            config.Load(server);
+            config.Load(RequestServer);
 
-            foreach (string item in Directory.GetDirectories(PathHelper.GetSavesPath(server), "*", SearchOption.TopDirectoryOnly))
+            foreach (string item in Directory.GetDirectories(PathHelper.GetSavesPath(RequestServer), "*", SearchOption.TopDirectoryOnly))
             {
                 DirectoryInfo dirInfo = new DirectoryInfo(item);
 
@@ -88,108 +75,73 @@ namespace SESM.Controllers.API
 
         // POST: API/Map/SelectMap
         [HttpPost]
+        [APIServerAccess("MAP-SM", "SERVER_MAP_SE_SELECT", "SERVER_MAP_ME_SELECT")]
         public ActionResult SelectMap()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("MAP-SM-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("MAP-SM-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("MAP-SM-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("MAP-SM-NOACCESS", "You don't have access to this server").ToString());
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             string MapDir = Request.Form["MapDir"];
             if (string.IsNullOrWhiteSpace(MapDir))
                 return Content(XMLMessage.Error("SRV-SM-MISMD", "The MapDir field must be provided").ToString());
-            if (!Directory.Exists(PathHelper.GetSavePath(server, MapDir)) || MapDir.Contains(@"\") || MapDir.Contains("/"))
+            if (!Directory.Exists(PathHelper.GetSavePath(RequestServer, MapDir)) || MapDir.Contains(@"\") || MapDir.Contains("/"))
                 return Content(XMLMessage.Error("SRV-SM-BADMD", "The map " + MapDir + " don't exist").ToString());
 
             // ** PROCESS **
-            ServiceState serviceState = srvPrv.GetState(server);
+            ServiceState serviceState = srvPrv.GetState(RequestServer);
 
             bool restartRequired = false;
             if (serviceState != ServiceState.Stopped && serviceState != ServiceState.Unknow)
             {
                 restartRequired = true;
-                ServiceHelper.StopServiceAndWait(server);
+                ServiceHelper.StopServiceAndWait(RequestServer);
                 Thread.Sleep(5000);
-                ServiceHelper.KillService(server);
+                ServiceHelper.KillService(RequestServer);
             }
 
             ServerConfigHelperBase config;
 
-            if (server.ServerType == EnumServerType.SpaceEngineers)
+            if (RequestServer.ServerType == EnumServerType.SpaceEngineers)
                 config = new SEServerConfigHelper();
             else
                 config = new MEServerConfigHelper();
 
-            config.Load(server);
+            config.Load(RequestServer);
 
-            if (server.UseServerExtender)
+            if (RequestServer.UseServerExtender)
             {
-                config.AutoSaveInMinutes = Convert.ToUInt32(server.AutoSaveInMinutes);
-                config.Save(server);
+                config.AutoSaveInMinutes = Convert.ToUInt32(RequestServer.AutoSaveInMinutes);
+                config.Save(RequestServer);
             }
 
             config.SaveName = MapDir;
 
-            config.LoadFromSaveManager(PathHelper.GetSavePath(server, MapDir));
+            config.LoadFromSaveManager(PathHelper.GetSavePath(RequestServer, MapDir));
 
-            if (server.UseServerExtender)
+            if (RequestServer.UseServerExtender)
             {
-                server.AutoSaveInMinutes = Convert.ToInt32(config.AutoSaveInMinutes);
-                srvPrv.UpdateServer(server);
+                RequestServer.AutoSaveInMinutes = Convert.ToInt32(config.AutoSaveInMinutes);
+                srvPrv.UpdateServer(RequestServer);
                 config.AutoSaveInMinutes = 0;
             }
 
-            config.Save(server);
+            config.Save(RequestServer);
 
             if (restartRequired)
-                ServiceHelper.StartService(server);
+                ServiceHelper.StartService(RequestServer);
 
             return Content(XMLMessage.Success("MAP-SM-OK", "The map have been selected").ToString());
         }
 
         // POST: API/Map/DeleteMaps
         [HttpPost]
+        [APIServerAccess("MAP-DM", "SERVER_MAP_SE_DELETE", "SERVER_MAP_ME_DELETE")]
         public ActionResult DeleteMaps()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("MAP-DM-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("MAP-DM-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("MAP-DM-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("MAP-DM-NOACCESS", "You don't have access to this server").ToString());
-
             string MapDirsString = Request.Form["MapDirs"];
             if (string.IsNullOrWhiteSpace(MapDirsString))
                 return Content(XMLMessage.Error("MAP-DM-MISMD", "The MapDir field must be provided").ToString());
@@ -198,7 +150,7 @@ namespace SESM.Controllers.API
 
             foreach (string item in MapDirsString.Split(':'))
             {
-                if (!Directory.Exists(PathHelper.GetSavePath(server, item)) || item.Contains(@"\") || item.Contains("/"))
+                if (!Directory.Exists(PathHelper.GetSavePath(RequestServer, item)) || item.Contains(@"\") || item.Contains("/"))
                 {
                     return Content(XMLMessage.Error("MAP-DM-INVALIDPATH", "One of the map dir provided is invalid").ToString());
                 }
@@ -210,72 +162,52 @@ namespace SESM.Controllers.API
 
             ServerConfigHelperBase config;
 
-            if (server.ServerType == EnumServerType.SpaceEngineers)
+            if (RequestServer.ServerType == EnumServerType.SpaceEngineers)
                 config = new SEServerConfigHelper();
             else
                 config = new MEServerConfigHelper();
 
-            config.Load(server);
+            config.Load(RequestServer);
 
             foreach (string item in MapDirs)
             {
                 if (config.SaveName == item)
                 {
-                    ServiceState serviceState = srvPrv.GetState(server);
+                    ServiceState serviceState = srvPrv.GetState(RequestServer);
 
                     if (serviceState != ServiceState.Stopped && serviceState != ServiceState.Unknow)
                     {
-                        ServiceHelper.StopServiceAndWait(server);
+                        ServiceHelper.StopServiceAndWait(RequestServer);
                         Thread.Sleep(5000);
-                        ServiceHelper.KillService(server);
+                        ServiceHelper.KillService(RequestServer);
                     }
 
                     config.SaveName = string.Empty;
-                    config.Save(server);
+                    config.Save(RequestServer);
                 }
 
-                Directory.Delete(PathHelper.GetSavePath(server, item), true);
+                Directory.Delete(PathHelper.GetSavePath(RequestServer, item), true);
             }
             return Content(XMLMessage.Success("MAP-DM-OK", "The map(s) have been deleted").ToString());
         }
 
         // POST: API/Map/DownloadMaps
         [HttpPost]
+        [APIServerAccess("MAP-DWM", "SERVER_MAP_SE_DOWNLOAD", "SERVER_MAP_ME_DOWNLOAD")]
         public ActionResult DownloadMaps()
         {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
             // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("MAP-DWM-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("MAP-DWM-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("MAP-DWM-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("MAP-DWM-NOACCESS", "You don't have access to this server").ToString());
-
             string MapDirsString = Request.Form["MapDirs"];
             if (string.IsNullOrWhiteSpace(MapDirsString))
-                return Content(XMLMessage.Error("MAP-DM-MISMD", "The MapDir field must be provided").ToString());
+                return Content(XMLMessage.Error("MAP-DWM-MISMD", "The MapDir field must be provided").ToString());
 
             List<string> MapDirs = new List<string>();
 
             foreach (string item in MapDirsString.Split(':'))
             {
-                if (!Directory.Exists(PathHelper.GetSavePath(server, item)) || item.Contains(@"\") || item.Contains("/"))
+                if (!Directory.Exists(PathHelper.GetSavePath(RequestServer, item)) || item.Contains(@"\") || item.Contains("/"))
                 {
-                    return Content(XMLMessage.Error("MAP-DM-INVALIDPATH", "One of the map dir provided is invalid").ToString());
+                    return Content(XMLMessage.Error("MAP-DWM-INVALIDPATH", "One of the map dir provided is invalid").ToString());
                 }
 
                 MapDirs.Add(item);
@@ -285,32 +217,32 @@ namespace SESM.Controllers.API
 
             ServerConfigHelperBase config;
 
-            if (server.ServerType == EnumServerType.SpaceEngineers)
+            if (RequestServer.ServerType == EnumServerType.SpaceEngineers)
                 config = new SEServerConfigHelper();
             else
                 config = new MEServerConfigHelper();
 
-            config.Load(server);
+            config.Load(RequestServer);
 
             Response.Clear();
             Response.ContentType = "application/zip";
-            Response.AddHeader("Content-Disposition", String.Format("attachment; filename={0}", ((MapDirs.Count == 1) ? MapDirs[0] : (server.Name + "-Maps")) + ".zip"));
+            Response.AddHeader("Content-Disposition", String.Format("attachment; filename={0}", ((MapDirs.Count == 1) ? MapDirs[0] : (RequestServer.Name + "-Maps")) + ".zip"));
             using (ZipFile zip = new ZipFile())
             {
                 foreach (string item in MapDirs)
                 {
-                    string sourceFolderPath = PathHelper.GetSavePath(server, item) + @"\";
+                    string sourceFolderPath = PathHelper.GetSavePath(RequestServer, item) + @"\";
 
                     zip.AddSelectedFiles("*", sourceFolderPath, (MapDirs.Count == 1) ? String.Empty : item, true);
-                    if (server.UseServerExtender && config.SaveName == item)
+                    if (RequestServer.UseServerExtender && config.SaveName == item)
                     {
                         using (MemoryStream ms = new MemoryStream())
                         {
                             zip.RemoveEntry(((MapDirs.Count == 1) ? String.Empty : item + "\\") + "Sandbox.sbc");
 
-                            string text = System.IO.File.ReadAllText(PathHelper.GetSavePath(server, item) + @"\Sandbox.sbc", new UTF8Encoding(false));
+                            string text = System.IO.File.ReadAllText(PathHelper.GetSavePath(RequestServer, item) + @"\Sandbox.sbc", new UTF8Encoding(false));
                             text = text.Replace("<AutoSaveInMinutes>0</AutoSaveInMinutes>",
-                                "<AutoSaveInMinutes>" + server.AutoSaveInMinutes + "</AutoSaveInMinutes>");
+                                "<AutoSaveInMinutes>" + RequestServer.AutoSaveInMinutes + "</AutoSaveInMinutes>");
 
                             zip.AddEntry(((MapDirs.Count == 1) ? String.Empty : item + "\\") + "Sandbox.sbc", text, new UTF8Encoding(false));
                         }
@@ -324,30 +256,13 @@ namespace SESM.Controllers.API
 
         // POST: API/Map/SECreateMap
         [HttpPost]
+        [APIServerAccess("MAP-SCM", "SERVER_MAP_SE_CREATE")]
         public ActionResult SECreateMap()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("MAP-SCM-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("MAP-SCM-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("MAP-SCM-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("MAP-SCM-NOACCESS", "You don't have access to this server").ToString());
-
             SESubTypeId SubTypeId;
             if (string.IsNullOrWhiteSpace(Request.Form["SubTypeId"]))
                 return Content(XMLMessage.Error("MAP-SCM-MISSTI", "The SubTypeId field must be provided").ToString());
@@ -373,17 +288,17 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("MAP-SCM-MISPS", "The ProceduralSeed is invalid").ToString());
 
             // ** PROCESS **
-            ServiceState serviceState = srvPrv.GetState(server);
+            ServiceState serviceState = srvPrv.GetState(RequestServer);
 
             if (serviceState != ServiceState.Stopped && serviceState != ServiceState.Unknow)
             {
-                ServiceHelper.StopServiceAndWait(server);
+                ServiceHelper.StopServiceAndWait(RequestServer);
                 Thread.Sleep(5000);
-                ServiceHelper.KillService(server);
+                ServiceHelper.KillService(RequestServer);
             }
 
             SEServerConfigHelper config = new SEServerConfigHelper();
-            config.Load(server);
+            config.Load(RequestServer);
 
             config.ScenarioType = SubTypeId;
             config.AsteroidAmount = AsteroidAmount;
@@ -391,39 +306,22 @@ namespace SESM.Controllers.API
             config.ProceduralSeed = ProceduralSeed;
             config.SaveName = string.Empty;
 
-            config.Save(server);
+            config.Save(RequestServer);
 
-            ServiceHelper.StartService(server);
+            ServiceHelper.StartService(RequestServer);
 
             return Content(XMLMessage.Success("MAP-SCM-OK", "The map have been created, the server is (re)starting ...").ToString());
         }
 
         // POST: API/Map/MECreateMap
         [HttpPost]
+        [APIServerAccess("MAP-MCM", "SERVER_MAP_ME_CREATE")]
         public ActionResult MECreateMap()
         {
             // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
+            ServerProvider srvPrv = new ServerProvider(CurrentContext);
 
             // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("MAP-MCM-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("MAP-MCM-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("MAP-MCM-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("MAP-MCM-NOACCESS", "You don't have access to this server").ToString());
-
             MESubTypeId SubTypeId;
             if (string.IsNullOrWhiteSpace(Request.Form["SubTypeId"]))
                 return Content(XMLMessage.Error("MAP-MCM-MISSTI", "The SubTypeId field must be provided").ToString());
@@ -431,55 +329,35 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("MAP-MCM-MISSTI", "The SubTypeId is invalid").ToString());
 
             // ** PROCESS **
-            ServiceState serviceState = srvPrv.GetState(server);
+            ServiceState serviceState = srvPrv.GetState(RequestServer);
 
             if (serviceState != ServiceState.Stopped && serviceState != ServiceState.Unknow)
             {
-                ServiceHelper.StopServiceAndWait(server);
+                ServiceHelper.StopServiceAndWait(RequestServer);
                 Thread.Sleep(5000);
-                ServiceHelper.KillService(server);
+                ServiceHelper.KillService(RequestServer);
             }
 
             MEServerConfigHelper config = new MEServerConfigHelper();
-            config.Load(server);
+            config.Load(RequestServer);
 
             config.ScenarioType = SubTypeId;
 
             config.SaveName = string.Empty;
 
-            config.Save(server);
+            config.Save(RequestServer);
 
-            ServiceHelper.StartService(server);
+            ServiceHelper.StartService(RequestServer);
 
             return Content(XMLMessage.Success("MAP-MCM-OK", "The map have been created, the server is (re)starting ...").ToString());
         }
 
         // POST: API/Map/UploadMap        
         [HttpPost]
+        [APIServerAccess("MAP-UPM", "SERVER_MAP_SE_UPLOAD", "SERVER_MAP_ME_UPLOAD")]
         public ActionResult UploadMap(HttpPostedFileBase ZipFile)
         {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
             // ** PARSING **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("MAP-DWM-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("MAP-DWM-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("MAP-DWM-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("MAP-DWM-NOACCESS", "You don't have access to this server").ToString());
-
             if (ZipFile == null)
                 return Content(XMLMessage.Error("MAP-UPM-MISZIP", "The zipFile parameter must be provided").ToString());
 
@@ -526,7 +404,7 @@ namespace SESM.Controllers.API
                     dirName = PathHelper.SanitizeFSName(Regex.Match(sbc, @"<SessionName>(.*)<\/SessionName>").Groups[1].Value);
                 }
 
-                if (Directory.Exists(PathHelper.GetSavePath(server, dirName)) && System.IO.File.Exists(PathHelper.GetSavePath(server, dirName) + @"\Sandbox.sbc"))
+                if (Directory.Exists(PathHelper.GetSavePath(RequestServer, dirName)) && System.IO.File.Exists(PathHelper.GetSavePath(RequestServer, dirName) + @"\Sandbox.sbc"))
                 {
                     int i = 2;
                     string testDir;
@@ -534,16 +412,16 @@ namespace SESM.Controllers.API
                     {
                         testDir = dirName + " (" + i + ")";
                         i++;
-                    } while (Directory.Exists(PathHelper.GetSavePath(server, testDir)) && System.IO.File.Exists(PathHelper.GetSavePath(server, testDir) + @"\Sandbox.sbc"));
+                    } while (Directory.Exists(PathHelper.GetSavePath(RequestServer, testDir)) && System.IO.File.Exists(PathHelper.GetSavePath(RequestServer, testDir) + @"\Sandbox.sbc"));
                     dirName = testDir;
                 }
 
-                if (!Directory.Exists(PathHelper.GetSavePath(server, dirName)))
-                    Directory.CreateDirectory(PathHelper.GetSavePath(server, dirName));
+                if (!Directory.Exists(PathHelper.GetSavePath(RequestServer, dirName)))
+                    Directory.CreateDirectory(PathHelper.GetSavePath(RequestServer, dirName));
 
                 if (rootZip)
                 {
-                    zip.ExtractAll(PathHelper.GetSavePath(server, dirName), ExtractExistingFileAction.OverwriteSilently);
+                    zip.ExtractAll(PathHelper.GetSavePath(RequestServer, dirName), ExtractExistingFileAction.OverwriteSilently);
                 }
                 else
                 {
@@ -552,7 +430,7 @@ namespace SESM.Controllers.API
                         if (item.FileName.StartsWith(rootPath))
                         {
                             item.FileName = item.FileName.Substring(rootPath.Length);
-                            item.Extract(PathHelper.GetSavePath(server, dirName), ExtractExistingFileAction.OverwriteSilently);
+                            item.Extract(PathHelper.GetSavePath(RequestServer, dirName), ExtractExistingFileAction.OverwriteSilently);
                         }
                     }
                 }
@@ -561,13 +439,5 @@ namespace SESM.Controllers.API
             return Content(XMLMessage.Success("MAP-UPM-OK", "The map have been uploaded").ToString());
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _context.Dispose();
-            }
-            base.Dispose(disposing);
-        }
     }
 }

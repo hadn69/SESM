@@ -10,6 +10,9 @@ namespace SESM.DAL
         public DbSet<EntityUser> Users { get; set; }
         public DbSet<EntityServer> Servers { get; set; }
         public DbSet<EntityPerfEntry> PerfEntries { get; set; }
+        public DbSet<EntityHostRole> HostRoles { get; set; }
+        public DbSet<EntityServerRole> ServerRoles { get; set; }
+        public DbSet<EntityInstanceServerRole> InstanceServerRoles { get; set; }
 
         public DataContext() : base(SESMConfigHelper.DBConnString)
         {
@@ -20,14 +23,21 @@ namespace SESM.DAL
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<EntityUser>()
-                .HasMany<EntityServer>(x => x.AdministratorOf)
-                .WithMany(x => x.Administrators);
+                .HasMany<EntityHostRole>(x => x.HostRoles)
+                .WithMany(x => x.Members);
+
             modelBuilder.Entity<EntityUser>()
-                .HasMany<EntityServer>(x => x.ManagerOf)
-                .WithMany(x => x.Managers);
-            modelBuilder.Entity<EntityUser>()
-                .HasMany<EntityServer>(x => x.UserOf)
-                .WithMany(x => x.Users);
+                .HasMany<EntityInstanceServerRole>(x => x.InstanceServerRoles)
+                .WithMany(x => x.Members);
+
+            modelBuilder.Entity<EntityServer>()
+                .HasMany<EntityInstanceServerRole>(x => x.InstanceServerRoles)
+                .WithRequired(x => x.Server);
+
+            modelBuilder.Entity<EntityServerRole>()
+                .HasMany<EntityInstanceServerRole>(x => x.InstanceServerRoles)
+                .WithRequired(x => x.ServerRole);
+
             modelBuilder.Entity<EntityServer>()
                 .HasMany<EntityPerfEntry>(x => x.PerfEntries);
         }

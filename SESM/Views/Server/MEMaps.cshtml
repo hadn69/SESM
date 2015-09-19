@@ -339,6 +339,16 @@
 
                 $('tr.odd, tr.even').contextmenu({
                     target: '#context-menu',
+                    before: function (e, element, target) {
+                        if (!Access.SERVER_MAP_ME_SELECT)
+                            this.getMenu().find("li:first-child").hide();
+
+                        if (!Access.SERVER_MAP_ME_DOWNLOAD)
+                            this.getMenu().find("li:nth-child(2)").hide();
+
+                        if (!Access.SERVER_MAP_ME_DELETE)
+                            this.getMenu().find("li:nth-child(3)").hide();
+                    },
                     onItem: function (context, e) {
                         var dirName = $(context).children("td:nth-child(3)").text();
 
@@ -404,8 +414,6 @@
                 });
             });
         }
-
-        refreshList();
 
         $("#btnCreate").click(function () {
             $("#createModal").modal('show');
@@ -487,6 +495,45 @@
         });
 
         $("#btnRefresh").click(function () {
+            refreshList();
+        });
+
+        var Access = {};
+
+        $.post("/API/Server/GetServerPermissions",
+        {
+            ServerID: serverID
+        },
+        function (data) {
+            var root = $($.parseXML(data)).find("Response");
+
+            if (root.children("Type").text() == "Error") {
+                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                return;
+            }
+
+            var content = root.children("Content");
+
+            Access = {};
+
+            content.children().each(function () {
+                var item = $(this);
+
+                Access[item.prop("tagName")] = item.text() == "true";
+            });
+
+            if (!Access.SERVER_MAP_ME_CREATE)
+                $("#btnCreate").addClass("disabled");
+
+            if (!Access.SERVER_MAP_ME_UPLOAD)
+                $("#btnUpload").addClass("disabled");
+
+            if (!Access.SERVER_MAP_ME_DOWNLOAD)
+                $("#btnDownloadMaps").addClass("disabled");
+
+            if (!Access.SERVER_MAP_ME_DELETE)
+                $("#btnDeleteMaps").addClass("disabled");
+
             refreshList();
         });
     }

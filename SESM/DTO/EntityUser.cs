@@ -13,45 +13,29 @@ namespace SESM.DTO
         [DefaultValue(false)]
         public bool IsAdmin { get; set; }
 
-        private ICollection<EntityServer> _administratorOf;
-
-        public virtual ICollection<EntityServer> AdministratorOf
+        private ICollection<EntityHostRole> _hostRoles;
+        public virtual ICollection<EntityHostRole> HostRoles
         {
             get
             {
-                return _administratorOf ?? (_administratorOf = new HashSet<EntityServer>());
+                return _hostRoles ?? (_hostRoles = new HashSet<EntityHostRole>());
             }
             set
             {
-                _administratorOf = value;
+                _hostRoles = value;
             }
         }
 
-        private ICollection<EntityServer> _managerOf;
-
-        public virtual ICollection<EntityServer> ManagerOf
+        private ICollection<EntityInstanceServerRole> _instanceServerRoles;
+        public virtual ICollection<EntityInstanceServerRole> InstanceServerRoles
         {
             get
             {
-                return _managerOf ?? (_managerOf = new HashSet<EntityServer>());
+                return _instanceServerRoles ?? (_instanceServerRoles = new HashSet<EntityInstanceServerRole>());
             }
             set
             {
-                _managerOf = value;
-            }
-        }
-
-        private ICollection<EntityServer> _userOf;
-
-        public virtual ICollection<EntityServer> UserOf
-        {
-            get
-            {
-                return _userOf ?? (_userOf = new HashSet<EntityServer>());
-            }
-            set
-            {
-                _userOf = value;
+                _instanceServerRoles = value;
             }
         }
     }

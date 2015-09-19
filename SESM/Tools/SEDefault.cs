@@ -81,5 +81,24 @@ namespace SESM.Tools
         public static readonly int VoxelGeneratorVersion = 1;
         public static readonly bool EnableOxygen = true;
         public static readonly bool Enable3rdPersonView = true;
+
+        // -- New 18/09
+        public static readonly bool EnableFlora = false;
+        public static readonly bool EnableStationVoxelSupport = false;
+        public static readonly bool EnableSunRotation = true;
+        public static readonly bool DisableRespawnShips = false;
+        public static readonly bool ScenarioEditMode = false;
+        public static readonly bool Battle = false;
+        public static readonly bool Scenario = false;
+        public static readonly bool CanJoinRunning = false;
+        public static readonly int PhysicsIterations = 4;
+        public static readonly float SunRotationIntervalMinutes = 240;
+        public static readonly bool EnableJetpack = true;
+        public static readonly bool SpawnWithTools = true;
+        public static readonly bool StartInRespawnScreen = false;
+        public static readonly bool EnableVoxelDestruction = true;
+        public static readonly int MaxDrones = 5;
+        public static readonly bool EnableDrones = true;
+
     }
 }

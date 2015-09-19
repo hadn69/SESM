@@ -15,31 +15,16 @@ namespace SESM.DTO
         public bool IsAutoRestartEnabled { get; set; }
         public string AutoRestartCron { get; set; }
         public bool UseServerExtender { get; set; }
-        public int ServerExtenderPort { get; set; }
         public bool IsAutoStartEnabled { get; set; }
         public int? AutoSaveInMinutes { get; set; }
         public EnumProcessPriority ProcessPriority { get; set; }
         public EnumServerType ServerType { get; set; }
 
-        private ICollection<EntityUser> _administrators;
-        public virtual ICollection<EntityUser> Administrators
+        private ICollection<EntityInstanceServerRole> _instanceServerRoles;
+        public virtual ICollection<EntityInstanceServerRole> InstanceServerRoles
         {
-            get { return _administrators ?? (_administrators = new HashSet<EntityUser>()); }
-            set { _administrators = value; }
-        }
-
-        private ICollection<EntityUser> _managers;
-        public virtual ICollection<EntityUser> Managers
-        {
-            get { return _managers ?? (_managers = new HashSet<EntityUser>()); }
-            set { _managers = value; }
-        }
-
-        private ICollection<EntityUser> _users;
-        public virtual ICollection<EntityUser> Users
-        {
-            get { return _users ?? (_users = new HashSet<EntityUser>()); }
-            set { _users = value; }
+            get { return _instanceServerRoles ?? (_instanceServerRoles = new HashSet<EntityInstanceServerRole>()); }
+            set { _instanceServerRoles = value; }
         }
         
         private ICollection<EntityPerfEntry> _perfEntries;
@@ -58,7 +43,6 @@ namespace SESM.DTO
             IsAutoRestartEnabled = false;
             AutoRestartCron = "0 0 0 * * ?";
             UseServerExtender = false;
-            ServerExtenderPort = 26016;
             IsAutoStartEnabled = false;
             ProcessPriority = EnumProcessPriority.Normal;
         }

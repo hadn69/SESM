@@ -95,8 +95,12 @@ namespace SESM
                              "SetJobsSettings|" +
                              "GetBackupsSettings|" +
                              "SetBackupsSettings|" +
-                             "GetAccessSettings|" +
-                             "SetAccessSettings|" +
+                             "GetServerRoles|" +
+                             "GetServerRoleAccess|" +
+                             "GetServerPermissions|" +
+                             "GetServerRoleDetails|" +
+                             "SetServerRoleDetails|" +
+                             "GetUsers|" +
 
                              "SEGetConfiguration|" +
                              "SEGetConfigurationRights|" +
@@ -127,6 +131,32 @@ namespace SESM
                              "UploadMap|" +
                              "SECreateMap|" +
                              "MECreateMap"
+                }
+            );
+
+            // Access API
+            routes.MapRoute(
+                name: "APIAccess",
+                url: "API/Access/{action}",
+                defaults: new { controller = "APIAccess" },
+                constraints: new
+                {
+                    action = "GetHostRoles|" +
+                             "GetHostRoleAccess|" +
+                             "GetHostPermissions|" +
+                             "GetHostRoleDetails|" +
+                             "SetHostRoleDetails|" +
+                             "CreateHostRole|" +
+                             "DeleteHostRole|" +
+
+                             "GetServerRoles|" +
+                             "GetServerRoleAccess|" +
+                             "GetServerPermissions|" +
+                             "GetServerRoleDetails|" +
+                             "SetServerRoleDetails|" +
+                             "CreateServerRole|" +
+                             "DeleteServerRole|" +
+                             "GetUsers"
                 }
             );
 
@@ -163,6 +193,7 @@ namespace SESM
                              "Authenticate|" +
                              "Register|" +
                              "GetDetails|" +
+                             "GetHostPerms|" +
                              "SetDetails"
                 }
             );
@@ -235,6 +266,13 @@ namespace SESM
                 defaults: new { controller = "Users", action = "Index" }
             );
 
+            // Access
+            routes.MapRoute(
+                name: "Access",
+                url: "Access",
+                defaults: new { controller = "Access", action = "Index" }
+            );
+
             // Stats
             routes.MapRoute(
                 name: "Monitor",
@@ -254,6 +292,7 @@ namespace SESM
                              "Settings|" +
                              "Maps|" +
                              "Monitor|" +
+                             "Access|" +
                              "Explorer",
                     id = @"\d+"
                 }

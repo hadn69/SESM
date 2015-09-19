@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Xml.Linq;
+using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools.API;
@@ -14,16 +15,11 @@ namespace SESM.Controllers.API
 
         // GET: API/Users/GetUsers
         [HttpGet]
+        [APIHostAccess("USR-GU", "USER_MANAGE")]
         public ActionResult GetUsers()
         {
             // ** INIT **
             UserProvider usrPrv = new UserProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("USR-GU-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             List<EntityUser> users = usrPrv.GetUsers();
 
@@ -43,6 +39,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Users/SetUser
         [HttpPost]
+        [APIHostAccess("USR-SU", "USER_MANAGE")]
         public ActionResult SetUser()
         {
             // ** INIT **
@@ -97,6 +94,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Users/DeleteUsers
         [HttpPost]
+        [APIHostAccess("USR-DU", "USER_MANAGE")]
         public ActionResult DeleteUsers()
         {
             // ** INIT **
@@ -146,6 +144,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Users/CreateUser
         [HttpPost]
+        [APIHostAccess("USR-CU", "USER_MANAGE")]
         public ActionResult CreateUser()
         {
             // ** INIT **
