@@ -286,7 +286,7 @@
         }
 
         $('#chkCheckAll').change(function () {
-            $(".checkboxes").prop("checked", $(this).is(':checked'));
+            $(".checkboxes:not(:disabled)").prop("checked", $(this).is(':checked'));
             updateCheckboxes();
         });
 
@@ -331,9 +331,10 @@
                     var CanDelete = item.children("CanKill").text() == "true";
 
                     var chkbField = '<input type="checkbox" class="checkboxes"';
-
-                    if (CanStart || CanStop || CanRestart || CanKill)
-                        chkbField += ' value = "' + ID + '"';
+                    chkbField += ' value = "' + ID + '" ';
+                    if (!(CanStart || CanStop || CanRestart || CanKill))
+                        chkbField += "disabled";
+                    
 
                     chkbField += ' />';
 

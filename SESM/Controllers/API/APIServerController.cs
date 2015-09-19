@@ -60,10 +60,10 @@ namespace SESM.Controllers.API
                                                              new XElement("State", serversState[server].ToString()),
                                                              new XElement("AccessLevel", srvPrv.GetAccessLevel(usr, server)),
                                                              new XElement("Type", server.ServerType == EnumServerType.SpaceEngineers ? server.UseServerExtender ? "SESE" : "SE" : "ME"),
-                                                             new XElement("CanStart", AuthHelper.HasAccess(RequestServer, "SERVER_START")),
-                                                             new XElement("CanStop", AuthHelper.HasAccess(RequestServer, "SERVER_STOP")),
-                                                             new XElement("CanRestart", AuthHelper.HasAccess(RequestServer, "SERVER_RESTART")),
-                                                             new XElement("CanKill", AuthHelper.HasAccess(RequestServer, "SERVER_KILL")),
+                                                             new XElement("CanStart", AuthHelper.HasAccess(RequestServer, "SERVER_POWER_START")),
+                                                             new XElement("CanStop", AuthHelper.HasAccess(RequestServer, "SERVER_POWER_STOP")),
+                                                             new XElement("CanRestart", AuthHelper.HasAccess(RequestServer, "SERVER_POWER_RESTART")),
+                                                             new XElement("CanKill", AuthHelper.HasAccess(RequestServer, "SERVER_POWER_KILL")),
                                                              new XElement("CanDelete", AuthHelper.HasAccess(RequestServer, "SERVER_DELETE"))
                                                              ));
             }
@@ -90,10 +90,10 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("State", srvPrv.GetState(RequestServer).ToString()));
             response.AddToContent(new XElement("HasAnyAccess", AuthHelper.HasAnyServerAccess(RequestServer)));
             response.AddToContent(new XElement("Type", RequestServer.ServerType == EnumServerType.SpaceEngineers ? RequestServer.UseServerExtender ? "SESE" : "SE" : "ME"));
-            response.AddToContent(new XElement("CanStart", AuthHelper.HasAccess(RequestServer, "SERVER_START")));
-            response.AddToContent(new XElement("CanStop", AuthHelper.HasAccess(RequestServer, "SERVER_STOP")));
-            response.AddToContent(new XElement("CanRestart", AuthHelper.HasAccess(RequestServer, "SERVER_RESTART")));
-            response.AddToContent(new XElement("CanKill", AuthHelper.HasAccess(RequestServer, "SERVER_KILL")));
+            response.AddToContent(new XElement("CanStart", AuthHelper.HasAccess(RequestServer, "SERVER_POWER_START")));
+            response.AddToContent(new XElement("CanStop", AuthHelper.HasAccess(RequestServer, "SERVER_POWER_STOP")));
+            response.AddToContent(new XElement("CanRestart", AuthHelper.HasAccess(RequestServer, "SERVER_POWER_RESTART")));
+            response.AddToContent(new XElement("CanKill", AuthHelper.HasAccess(RequestServer, "SERVER_POWER_KILL")));
             response.AddToContent(new XElement("CanDelete", AuthHelper.HasAccess(RequestServer, "SERVER_DELETE")));
 
             return Content(response.ToString());
@@ -652,7 +652,7 @@ namespace SESM.Controllers.API
 
             foreach (string item in Enum.GetNames(typeof(EnumServerPerm)))
             {
-                response.AddToContent(new XElement(item, AuthHelper.HasAccess(item)));
+                response.AddToContent(new XElement(item, AuthHelper.HasAccess(RequestServer, item)));
             }
 
             return Content(response.ToString());
@@ -2039,7 +2039,7 @@ namespace SESM.Controllers.API
                 if (server == null)
                     return Content(XMLMessage.Error("SRV-STRS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
 
-                if (!AuthHelper.HasAccess(server, "SERVER_START"))
+                if (!AuthHelper.HasAccess(server, "SERVER_POWER_START"))
                     return Content(XMLMessage.Error("SRV-STRS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
 
                 servers.Add(server);
@@ -2090,7 +2090,7 @@ namespace SESM.Controllers.API
                 if (server == null)
                     return Content(XMLMessage.Error("SRV-STPS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
 
-                if (!AuthHelper.HasAccess(server, "SERVER_STOP"))
+                if (!AuthHelper.HasAccess(server, "SERVER_POWER_STOP"))
                     return Content(XMLMessage.Error("SRV-STPS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
 
                 servers.Add(server);
@@ -2141,7 +2141,7 @@ namespace SESM.Controllers.API
                 if (server == null)
                     return Content(XMLMessage.Error("SRV-RSTRS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
 
-                if (!AuthHelper.HasAccess(server, "SERVER_RESTART"))
+                if (!AuthHelper.HasAccess(server, "SERVER_POWER_RESTART"))
                     return Content(XMLMessage.Error("SRV-RSTRS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
 
                 servers.Add(server);
@@ -2211,7 +2211,7 @@ namespace SESM.Controllers.API
                 if (server == null)
                     return Content(XMLMessage.Error("SRV-KILS-UKNSRV", "The following server ID doesn't exist : " + item).ToString());
 
-                if (!AuthHelper.HasAccess(server, "SERVER_KILL"))
+                if (!AuthHelper.HasAccess(server, "SERVER_POWER_KILL"))
                     return Content(XMLMessage.Error("SRV-KILS-NOACCESS", "You don't have the required access level on the folowing server : " + server.Name + " (" + server.Id + ")").ToString());
 
                 servers.Add(server);

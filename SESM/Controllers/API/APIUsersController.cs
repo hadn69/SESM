@@ -15,14 +15,7 @@ namespace SESM.Controllers.API
 
         // GET: API/Users/GetUsers
         [HttpGet]
-        [APIHostAccess("USR-GU", "USER_READ", 
-                                 "ACCESS_HOST_CREATE", 
-                                 "ACCESS_HOST_EDIT_NAME", 
-                                 "ACCESS_HOST_EDIT_PERMISSION",
-                                 "ACCESS_HOST_EDIT_USERS", 
-                                 "ACCESS_SERVER_CREATE",
-                                 "ACCESS_SERVER_EDIT_NAME", 
-                                 "ACCESS_SERVER_EDIT_PERMISSION")]
+        [APIHostAccess("USR-GU", "USER_MANAGE")]
         public ActionResult GetUsers()
         {
             // ** INIT **
@@ -46,6 +39,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Users/SetUser
         [HttpPost]
+        [APIHostAccess("USR-SU", "USER_MANAGE")]
         public ActionResult SetUser()
         {
             // ** INIT **
@@ -100,6 +94,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Users/DeleteUsers
         [HttpPost]
+        [APIHostAccess("USR-DU", "USER_MANAGE")]
         public ActionResult DeleteUsers()
         {
             // ** INIT **
@@ -149,6 +144,7 @@ namespace SESM.Controllers.API
 
         // POST: API/Users/CreateUser
         [HttpPost]
+        [APIHostAccess("USR-CU", "USER_MANAGE")]
         public ActionResult CreateUser()
         {
             // ** INIT **

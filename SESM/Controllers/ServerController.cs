@@ -12,6 +12,7 @@ namespace SESM.Controllers
 
         // GET: Servers
         [HttpGet]
+        
         public ActionResult Index()
         {
             return View();
@@ -19,7 +20,7 @@ namespace SESM.Controllers
 
         // GET: 1/Dashboard
         [HttpGet]
-        [CheckAuth]
+        [ServerAccess("SERVER_INFO")]
         public ActionResult Dashboard(int id)
         {
             return View();
@@ -27,7 +28,7 @@ namespace SESM.Controllers
 
         // GET: 1/Maps
         [HttpGet]
-        [CheckAuth]
+        [ServerAccess("SERVER_MAP_SE_LIST", "SERVER_MAP_ME_LIST")]
         public ActionResult Maps(int id)
         {
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -42,7 +43,7 @@ namespace SESM.Controllers
 
         // GET: 1/Configuration
         [HttpGet]
-        [CheckAuth]
+        [ServerAccess("SERVER_CONFIG_SE_RD", "SERVER_CONFIG_ME_RD")]
         public ActionResult Configuration(int id)
         {
             ServerProvider srvPrv = new ServerProvider(_context);
@@ -57,7 +58,7 @@ namespace SESM.Controllers
 
         // GET: 1/Explorer
         [HttpGet]
-        [CheckAuth]
+        [ServerAccess("SERVER_EXPLORER_LIST")]
         public ActionResult Explorer(int id)
         { 
             return View();
@@ -65,7 +66,7 @@ namespace SESM.Controllers
 
         // GET: 1/Settings
         [HttpGet]
-        [CheckAuth]
+        [ServerAccess("SERVER_SETTINGS_GLOBAL_RD", "SERVER_SETTINGS_JOBS_RD", "SERVER_SETTINGS_BACKUPS_RD")]
         public ActionResult Settings(int id)
         {
             return View();
@@ -73,7 +74,7 @@ namespace SESM.Controllers
 
         // GET: 1/Monitor
         [HttpGet]
-        [CheckAuth]
+        [ServerAccess("SERVER_PERF_READ")]
         public ActionResult Monitor(int id)
         {
             return View();
@@ -81,7 +82,7 @@ namespace SESM.Controllers
 
         // GET: 1/Access
         [HttpGet]
-        [CheckAuth]
+        [ServerAccess("ACCESS_SERVER_READ")]
         public ActionResult Access(int id)
         {
             return View();

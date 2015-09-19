@@ -2695,12 +2695,9 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ActionFilters\APIHostAccessAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\APIServerAccessAttribute.cs" />
-    <Compile Include="Controllers\ActionFilters\old\AdminAndAboveAttribute.cs" />
-    <Compile Include="Controllers\ActionFilters\old\CheckAuthAttribute.cs" />
-    <Compile Include="Controllers\ActionFilters\old\CheckLockout.cs" />
-    <Compile Include="Controllers\ActionFilters\old\GuestOnlyAttribute.cs" />
-    <Compile Include="Controllers\ActionFilters\old\ManagerAndAboveAttribute.cs" />
-    <Compile Include="Controllers\ActionFilters\old\SuperAdminAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\HostAccessAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\ServerAccessAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\CheckLockout.cs" />
     <Compile Include="Controllers\API\APIAccessController.cs" />
     <Compile Include="Controllers\API\APIAccountController.cs" />
     <Compile Include="Controllers\API\APIExplorerController.cs" />
@@ -2716,7 +2713,6 @@
     <Compile Include="Controllers\PerfMonController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ActionFilters\old\LoggedOnlyAttribute.cs" />
     <Compile Include="Controllers\ServerController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="DAL\DataContext.cs" />

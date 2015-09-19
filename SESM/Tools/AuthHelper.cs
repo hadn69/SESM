@@ -22,13 +22,13 @@ namespace SESM.Tools
             // Server-Wide Perms
             foreach (EntityInstanceServerRole instanceServerRole in user.InstanceServerRoles)
             {
-                if (!permContainer.ServerPerms.ContainsKey(instanceServerRole.Server))
-                    permContainer.ServerPerms.Add(instanceServerRole.Server, new HashSet<EnumServerPerm>());
+                if (!permContainer.ServerPerms.ContainsKey(instanceServerRole.Server.Id))
+                    permContainer.ServerPerms.Add(instanceServerRole.Server.Id, new HashSet<EnumServerPerm>());
 
                 foreach (EnumServerPerm perm in instanceServerRole.ServerRole.Permissions)
                 {
-                    if (!permContainer.ServerPerms[instanceServerRole.Server].Contains(perm))
-                        permContainer.ServerPerms[instanceServerRole.Server].Add(perm);
+                    if (!permContainer.ServerPerms[instanceServerRole.Server.Id].Contains(perm))
+                        permContainer.ServerPerms[instanceServerRole.Server.Id].Add(perm);
                 }
             }
 
@@ -77,14 +77,14 @@ namespace SESM.Tools
             }
 
             // Try 2 : Server-wide
-            if (server != null && permSummary.ServerPerms.ContainsKey(server))
+            if (server != null && permSummary.ServerPerms.ContainsKey(server.Id))
             {
                 foreach (string permString in permStrings)
                 {
                     EnumServerPerm enumServerPerm;
                     if (Enum.TryParse(permString, out enumServerPerm))
                     {
-                        if (permSummary.ServerPerms[server].Contains(enumServerPerm))
+                        if (permSummary.ServerPerms[server.Id].Contains(enumServerPerm))
                             return true;
                     }
                 }

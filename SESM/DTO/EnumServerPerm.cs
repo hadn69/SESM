@@ -10,13 +10,12 @@ namespace SESM.DTO
         // 1000+ : Global Server
         SERVER_INFO = 1000,
         SERVER_DELETE = 1001,
-        
 
         // 1010+ : Server Power
-        SERVER_START = 1011,
-        SERVER_STOP = 1012,
-        SERVER_RESTART = 1013,
-        SERVER_KILL = 1014,
+        SERVER_POWER_START = 1011,
+        SERVER_POWER_STOP = 1012,
+        SERVER_POWER_RESTART = 1013,
+        SERVER_POWER_KILL = 1014,
 
         // 1100+ : Server Settings
         // 1110+ : Server global Settings
@@ -162,6 +161,6 @@ namespace SESM.DTO
         SERVER_MAP_ME_UPLOAD = 1605,
 
         // 1700+ : Perf Monitor
-        SERVER_PERF_READ = 1605,
+        SERVER_PERF_READ = 1700
     }
 }

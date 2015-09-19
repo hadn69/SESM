@@ -5,7 +5,7 @@ namespace SESM.Tools
 {
     public class PermSummaryContainer
     {
-        public Dictionary<EntityServer, HashSet<EnumServerPerm>> ServerPerms = new Dictionary<EntityServer, HashSet<EnumServerPerm>>();
+        public Dictionary<int, HashSet<EnumServerPerm>> ServerPerms = new Dictionary<int, HashSet<EnumServerPerm>>();
 
         public HashSet<EnumHostPerm> HostPerm = new HashSet<EnumHostPerm>();
 
