@@ -9,7 +9,7 @@
     ViewBag.RefreshBtn = true;
 }
 
-<div class="col-md-4 col-sm-12">
+<div class="col-md-6 col-sm-12" id="divSettings">
     <a class="dashboard-stat dashboard-stat-light blue-madison" href="/@ViewBag.ServerID/Settings">
         <div class="visual">
             <i class="icon-settings"></i>
@@ -21,7 +21,7 @@
         </div>
     </a>
 </div>
-<div class="col-md-4 col-sm-12">
+<div class="col-md-6 col-sm-12" id="divConfig">
     <a class="dashboard-stat dashboard-stat-light blue-madison" href="/@ViewBag.ServerID/Configuration">
         <div class="visual">
             <i class="icon-puzzle"></i>
@@ -33,7 +33,7 @@
         </div>
     </a>
 </div>
-<div class="col-md-4 col-sm-12">
+<div class="col-md-6 col-sm-12" id="divExplorer">
     <a class="dashboard-stat dashboard-stat-light blue-madison" href="/@ViewBag.ServerID/Explorer">
         <div class="visual">
             <i class="icon-folder-alt"></i>
@@ -45,7 +45,7 @@
         </div>
     </a>
 </div>
-<div class="col-md-6 col-sm-12">
+<div class="col-md-6 col-sm-12" id="divMaps">
     <a class="dashboard-stat dashboard-stat-light blue-madison" href="/@ViewBag.ServerID/Maps">
         <div class="visual">
             <i class="icon-compass"></i>
@@ -57,7 +57,7 @@
         </div>
     </a>
 </div>
-<div class="col-md-6 col-sm-12">
+<div class="col-md-6 col-sm-12" id="divPerf">
     <a class="dashboard-stat dashboard-stat-light blue-madison" href="/@ViewBag.ServerID/Monitor">
         <div class="visual">
             <i class="icon-graph"></i>
@@ -69,3 +69,62 @@
         </div>
     </a>
 </div>
+<div class="col-md-6 col-sm-12"  id="divAccess">
+    <a class="dashboard-stat dashboard-stat-light blue-madison" href="/@ViewBag.ServerID/Access">
+        <div class="visual">
+            <i class="icon-list"></i>
+        </div>
+        <div class="details">
+            <div class="number">
+                Access Manager
+            </div>
+        </div>
+    </a>
+</div>
+
+<script>
+    function initPage() {
+        var Access = {};
+
+        $.post("/API/Server/GetServerPermissions",
+        {
+            ServerID: serverID
+        },
+        function(data) {
+            var root = $($.parseXML(data)).find("Response");
+
+            if (root.children("Type").text() == "Error") {
+                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                return;
+            }
+
+            var content = root.children("Content");
+
+            Access = {};
+
+            content.children().each(function() {
+                var item = $(this);
+
+                Access[item.prop("tagName")] = item.text() == "true";
+            });
+
+            if (!(Access.SERVER_SETTINGS_GLOBAL_RD || Access.SERVER_SETTINGS_JOBS_RD || Access.SERVER_SETTINGS_BACKUPS_RD))
+                $("#divSettings").remove();
+
+            if (!(Access.SERVER_CONFIG_SE_RD || Access.SERVER_CONFIG_ME_RD))
+                $("#divConfig").remove();
+
+            if (!Access.SERVER_EXPLORER_LIST)
+                $("#divExplorer").remove();
+
+            if (!(Access.SERVER_MAP_SE_LIST || Access.SERVER_MAP_ME_LIST))
+                $("#divMaps").remove();
+
+            if (!Access.SERVER_PERF_READ)
+                $("#divPerf").remove();
+
+            if (!Access.ACCESS_SERVER_READ)
+                $("#divAccess").remove();
+        });
+    }
+</script>

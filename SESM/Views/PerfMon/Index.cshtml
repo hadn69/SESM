@@ -273,8 +273,6 @@
             });
         }
 
-        refreshGraphs();
-
         $("#btnCleanup").click(function () {
             bootbox.confirm("Are you sure you want to delete all performance data ?",
             function (result) {
@@ -296,6 +294,33 @@
         });
 
         $("#btnRefresh").click(function () {
+            refreshGraphs();
+        });
+
+        var Access = {};
+
+        $.get("/API/Account/GetHostPerms",
+        function(data) {
+            var root = $($.parseXML(data)).find("Response");
+
+            if (root.children("Type").text() == "Error") {
+                toastr.error(root.children("Content").text(), "Error " + root.children("ReturnCode").text());
+                return;
+            }
+
+            var content = root.children("Content");
+
+            Access = {};
+
+            content.children().each(function() {
+                var item = $(this);
+
+                Access[item.prop("tagName")] = item.text() == "true";
+            });
+
+            if (!Access.PERF_CLEANUP)
+                $("#btnCleanup").addClass("disabled");
+
             refreshGraphs();
         });
     }

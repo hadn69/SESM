@@ -82,6 +82,24 @@ namespace SESM.Tools.Helpers
         public bool EnableOxygen = SEDefault.EnableOxygen;
         public bool Enable3rdPersonView = SEDefault.Enable3rdPersonView;
 
+        // -- New 18/09
+        public bool EnableFlora = SEDefault.EnableFlora;
+        public bool EnableStationVoxelSupport = SEDefault.EnableStationVoxelSupport;
+        public bool EnableSunRotation = SEDefault.EnableSunRotation;
+        public bool DisableRespawnShips = SEDefault.DisableRespawnShips;
+        public bool ScenarioEditMode = SEDefault.ScenarioEditMode;
+        public bool Battle = SEDefault.Battle;
+        public bool Scenario = SEDefault.Scenario;
+        public bool CanJoinRunning = SEDefault.CanJoinRunning;
+        public int PhysicsIterations = SEDefault.PhysicsIterations;
+        public float SunRotationIntervalMinutes = SEDefault.SunRotationIntervalMinutes;
+        public bool EnableJetpack = SEDefault.EnableJetpack;
+        public bool SpawnWithTools = SEDefault.SpawnWithTools;
+        public bool StartInRespawnScreen = SEDefault.StartInRespawnScreen;
+        public bool EnableVoxelDestruction = SEDefault.EnableVoxelDestruction;
+        public int MaxDrones = SEDefault.MaxDrones;
+        public bool EnableDrones = SEDefault.EnableDrones;
+
         public override void Save(EntityServer serv)
         {
             StringBuilder sb = new StringBuilder();
@@ -125,13 +143,27 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <EnableIngameScripts>" + EnableIngameScripts.ToString().ToLower() + "</EnableIngameScripts>");
             sb.AppendLine("    <ViewDistance>" + ViewDistance + "</ViewDistance>");
             sb.AppendLine("    <EnableToolShake>" + EnableToolShake.ToString().ToLower() + "</EnableToolShake>");
-            if (VoxelGeneratorVersion != 0)
-                sb.AppendLine("    <VoxelGeneratorVersion>" + VoxelGeneratorVersion + "</VoxelGeneratorVersion>");
+            sb.AppendLine("    <VoxelGeneratorVersion>" + VoxelGeneratorVersion + "</VoxelGeneratorVersion>");
             sb.AppendLine("    <EnableOxygen>" + EnableOxygen.ToString().ToLower() + "</EnableOxygen>");
-            if (!Enable3rdPersonView)
-                sb.AppendLine("    <Enable3rdPersonView>" + Enable3rdPersonView.ToString().ToLower() + "</Enable3rdPersonView>");
-            if (!EnableEncounters)
-                sb.AppendLine("    <EnableEncounters>" + EnableEncounters.ToString().ToLower() + "</EnableEncounters>");
+            sb.AppendLine("    <Enable3rdPersonView>" + Enable3rdPersonView.ToString().ToLower() + "</Enable3rdPersonView>");
+            sb.AppendLine("    <EnableEncounters>" + EnableEncounters.ToString().ToLower() + "</EnableEncounters>");
+            sb.AppendLine("    <EnableFlora>" + EnableFlora.ToString().ToLower() + "</EnableFlora>");
+            sb.AppendLine("    <EnableStationVoxelSupport>" + EnableStationVoxelSupport.ToString().ToLower() + "</EnableStationVoxelSupport>");
+            sb.AppendLine("    <EnableSunRotation>" + EnableSunRotation.ToString().ToLower() + "</EnableSunRotation>");
+            sb.AppendLine("    <DisableRespawnShips>" + DisableRespawnShips.ToString().ToLower() + "</DisableRespawnShips>");
+            sb.AppendLine("    <ScenarioEditMode>" + ScenarioEditMode.ToString().ToLower() + "</ScenarioEditMode>");
+            sb.AppendLine("    <Battle>" + Battle.ToString().ToLower() + "</Battle>");
+            sb.AppendLine("    <Scenario>" + Scenario.ToString().ToLower() + "</Scenario>");
+            sb.AppendLine("    <CanJoinRunning>" + CanJoinRunning.ToString().ToLower() + "</CanJoinRunning>");
+            sb.AppendLine("    <PhysicsIterations>" + PhysicsIterations + "</PhysicsIterations>");
+            sb.AppendLine("    <SunRotationIntervalMinutes>" + SunRotationIntervalMinutes + "</SunRotationIntervalMinutes>");
+            sb.AppendLine("    <EnableJetpack>" + EnableJetpack.ToString().ToLower() + "</EnableJetpack>");
+            sb.AppendLine("    <SpawnWithTools>" + SpawnWithTools.ToString().ToLower() + "</SpawnWithTools>");
+            sb.AppendLine("    <StartInRespawnScreen>" + StartInRespawnScreen.ToString().ToLower() + "</StartInRespawnScreen>");
+            sb.AppendLine("    <EnableVoxelDestruction>" + EnableVoxelDestruction.ToString().ToLower() + "</EnableVoxelDestruction>");
+            sb.AppendLine("    <MaxDrones>" + MaxDrones + "</MaxDrones>");
+            sb.AppendLine("    <EnableDrones>" + EnableDrones.ToString().ToLower() + "</EnableDrones>");
+
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
             sb.AppendLine("    <TypeId>MyObjectBuilder_ScenarioDefinition</TypeId>");
@@ -419,21 +451,13 @@ namespace SESM.Tools.Helpers
                 settingsNode.SelectSingleNode("descendant::EnableToolShake").InnerText =
                     EnableToolShake.ToString().ToLower();
 
-                if (VoxelGeneratorVersion != 0)
-                {
-                    valueNode = settingsNode.SelectSingleNode("descendant::VoxelGeneratorVersion");
-                    if (valueNode == null)
-                        settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "VoxelGeneratorVersion", null));
-                    settingsNode.SelectSingleNode("descendant::VoxelGeneratorVersion").InnerText =
-                        VoxelGeneratorVersion.ToString();
-                }
-                else
-                {
-                    valueNode = settingsNode.SelectSingleNode("descendant::VoxelGeneratorVersion");
-                    if (valueNode != null)
-                        settingsNode.RemoveChild(valueNode);
-                }
 
+                valueNode = settingsNode.SelectSingleNode("descendant::VoxelGeneratorVersion");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "VoxelGeneratorVersion", null));
+                settingsNode.SelectSingleNode("descendant::VoxelGeneratorVersion").InnerText =
+                    VoxelGeneratorVersion.ToString();
+  
 
                 valueNode = settingsNode.SelectSingleNode("descendant::EnableOxygen");
                 if (valueNode == null)
@@ -442,36 +466,132 @@ namespace SESM.Tools.Helpers
                     EnableOxygen.ToString().ToLower();
 
 
-                if(Enable3rdPersonView)
-                {
-                    valueNode = settingsNode.SelectSingleNode("descendant::Enable3rdPersonView");
-                    if (valueNode == null)
-                        settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "Enable3rdPersonView", null));
-                    settingsNode.SelectSingleNode("descendant::Enable3rdPersonView").InnerText =
-                        Enable3rdPersonView.ToString().ToLower();
-                }
-                else
-                {
-                    valueNode = settingsNode.SelectSingleNode("descendant::Enable3rdPersonView");
-                    if (valueNode != null)
-                        settingsNode.RemoveChild(valueNode);
-                }
+                valueNode = settingsNode.SelectSingleNode("descendant::Enable3rdPersonView");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "Enable3rdPersonView", null));
+                settingsNode.SelectSingleNode("descendant::Enable3rdPersonView").InnerText =
+                    Enable3rdPersonView.ToString().ToLower();
+                
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableEncounters");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableEncounters", null));
+                settingsNode.SelectSingleNode("descendant::EnableEncounters").InnerText =
+                    EnableEncounters.ToString().ToLower();
 
 
-                if (EnableEncounters)
-                {
-                    valueNode = settingsNode.SelectSingleNode("descendant::EnableEncounters");
-                    if (valueNode == null)
-                        settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableEncounters", null));
-                    settingsNode.SelectSingleNode("descendant::EnableEncounters").InnerText =
-                        EnableEncounters.ToString().ToLower();
-                }
-                else
-                {
-                    valueNode = settingsNode.SelectSingleNode("descendant::EnableEncounters");
-                    if (valueNode != null)
-                        settingsNode.RemoveChild(valueNode);
-                }
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableFlora");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableFlora", null));
+                settingsNode.SelectSingleNode("descendant::EnableFlora").InnerText =
+                    EnableFlora.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableStationVoxelSupport");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableStationVoxelSupport", null));
+                settingsNode.SelectSingleNode("descendant::EnableStationVoxelSupport").InnerText =
+                    EnableStationVoxelSupport.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableSunRotation");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableSunRotation", null));
+                settingsNode.SelectSingleNode("descendant::EnableSunRotation").InnerText =
+                    EnableSunRotation.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::DisableRespawnShips");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "DisableRespawnShips", null));
+                settingsNode.SelectSingleNode("descendant::DisableRespawnShips").InnerText =
+                    DisableRespawnShips.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::ScenarioEditMode");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "ScenarioEditMode", null));
+                settingsNode.SelectSingleNode("descendant::ScenarioEditMode").InnerText =
+                    ScenarioEditMode.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::Battle");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "Battle", null));
+                settingsNode.SelectSingleNode("descendant::Battle").InnerText =
+                    Battle.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::Scenario");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "Scenario", null));
+                settingsNode.SelectSingleNode("descendant::Scenario").InnerText =
+                    Scenario.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::CanJoinRunning");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "CanJoinRunning", null));
+                settingsNode.SelectSingleNode("descendant::CanJoinRunning").InnerText =
+                    CanJoinRunning.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::PhysicsIterations");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "PhysicsIterations", null));
+                settingsNode.SelectSingleNode("descendant::PhysicsIterations").InnerText =
+                    PhysicsIterations.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::SunRotationIntervalMinutes");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "SunRotationIntervalMinutes", null));
+                settingsNode.SelectSingleNode("descendant::SunRotationIntervalMinutes").InnerText =
+                    SunRotationIntervalMinutes.ToString().Replace(',', '.');
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableJetpack");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableJetpack", null));
+                settingsNode.SelectSingleNode("descendant::EnableJetpack").InnerText =
+                    EnableJetpack.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::SpawnWithTools");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "SpawnWithTools", null));
+                settingsNode.SelectSingleNode("descendant::SpawnWithTools").InnerText =
+                    SpawnWithTools.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::StartInRespawnScreen");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "StartInRespawnScreen", null));
+                settingsNode.SelectSingleNode("descendant::StartInRespawnScreen").InnerText =
+                    StartInRespawnScreen.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableVoxelDestruction");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableVoxelDestruction", null));
+                settingsNode.SelectSingleNode("descendant::EnableVoxelDestruction").InnerText =
+                    EnableVoxelDestruction.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::MaxDrones");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "MaxDrones", null));
+                settingsNode.SelectSingleNode("descendant::MaxDrones").InnerText =
+                    MaxDrones.ToString();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableDrones");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableDrones", null));
+                settingsNode.SelectSingleNode("descendant::EnableDrones").InnerText =
+                    EnableDrones.ToString().ToLower();
+
+
 
 
                 valueNode = root.SelectSingleNode("descendant::Mods");
@@ -617,12 +737,38 @@ namespace SESM.Tools.Helpers
                     bool.TryParse(sessionSettings.Element("EnableOxygen").Value, out EnableOxygen);
                 if (sessionSettings.Element("Enable3rdPersonView") != null)
                     bool.TryParse(sessionSettings.Element("Enable3rdPersonView").Value, out Enable3rdPersonView);
-                else
-                    Enable3rdPersonView = true;
-                if (sessionSettings.Element("EnableEncounters") != null)
-                    bool.TryParse(sessionSettings.Element("EnableEncounters").Value, out EnableEncounters);
-                else
-                    EnableEncounters = true;
+                if (sessionSettings.Element("EnableFlora") != null)
+                    bool.TryParse(sessionSettings.Element("EnableFlora").Value, out EnableFlora);
+                if (sessionSettings.Element("EnableStationVoxelSupport") != null)
+                    bool.TryParse(sessionSettings.Element("EnableStationVoxelSupport").Value, out EnableStationVoxelSupport);
+                if (sessionSettings.Element("EnableSunRotation") != null)
+                    bool.TryParse(sessionSettings.Element("EnableSunRotation").Value, out EnableSunRotation);
+                if (sessionSettings.Element("DisableRespawnShips") != null)
+                    bool.TryParse(sessionSettings.Element("DisableRespawnShips").Value, out DisableRespawnShips);
+                if (sessionSettings.Element("ScenarioEditMode") != null)
+                    bool.TryParse(sessionSettings.Element("ScenarioEditMode").Value, out ScenarioEditMode);
+                if (sessionSettings.Element("Battle") != null)
+                    bool.TryParse(sessionSettings.Element("Battle").Value, out Battle);
+                if (sessionSettings.Element("Scenario") != null)
+                    bool.TryParse(sessionSettings.Element("Scenario").Value, out Scenario);
+                if (sessionSettings.Element("CanJoinRunning") != null)
+                    bool.TryParse(sessionSettings.Element("CanJoinRunning").Value, out CanJoinRunning);
+                if (sessionSettings.Element("PhysicsIterations") != null)
+                    int.TryParse(sessionSettings.Element("PhysicsIterations").Value, out PhysicsIterations);
+                if (sessionSettings.Element("SunRotationIntervalMinutes") != null)
+                    float.TryParse(sessionSettings.Element("SunRotationIntervalMinutes").Value, out SunRotationIntervalMinutes);
+                if (sessionSettings.Element("EnableJetpack") != null)
+                    bool.TryParse(sessionSettings.Element("EnableJetpack").Value, out EnableJetpack);
+                if (sessionSettings.Element("SpawnWithTools") != null)
+                    bool.TryParse(sessionSettings.Element("SpawnWithTools").Value, out SpawnWithTools);
+                if (sessionSettings.Element("StartInRespawnScreen") != null)
+                    bool.TryParse(sessionSettings.Element("StartInRespawnScreen").Value, out StartInRespawnScreen);
+                if (sessionSettings.Element("EnableVoxelDestruction") != null)
+                    bool.TryParse(sessionSettings.Element("EnableVoxelDestruction").Value, out EnableVoxelDestruction);
+                if (sessionSettings.Element("MaxDrones") != null)
+                    int.TryParse(sessionSettings.Element("MaxDrones").Value, out MaxDrones);
+                if (sessionSettings.Element("EnableDrones") != null)
+                    bool.TryParse(sessionSettings.Element("EnableDrones").Value, out EnableDrones);
 
                 if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                     Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
@@ -763,6 +909,39 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(settings.Element("Enable3rdPersonView").Value, out Enable3rdPersonView);
             if (settings.Element("EnableEncounters") != null)
                 bool.TryParse(settings.Element("EnableEncounters").Value, out EnableEncounters);
+            if (settings.Element("EnableFlora") != null)
+                bool.TryParse(settings.Element("EnableFlora").Value, out EnableFlora);
+            if (settings.Element("EnableStationVoxelSupport") != null)
+                bool.TryParse(settings.Element("EnableStationVoxelSupport").Value, out EnableStationVoxelSupport);
+            if (settings.Element("EnableSunRotation") != null)
+                bool.TryParse(settings.Element("EnableSunRotation").Value, out EnableSunRotation);
+            if (settings.Element("DisableRespawnShips") != null)
+                bool.TryParse(settings.Element("DisableRespawnShips").Value, out DisableRespawnShips);
+            if (settings.Element("ScenarioEditMode") != null)
+                bool.TryParse(settings.Element("ScenarioEditMode").Value, out ScenarioEditMode);
+            if (settings.Element("Battle") != null)
+                bool.TryParse(settings.Element("Battle").Value, out Battle);
+            if (settings.Element("Scenario") != null)
+                bool.TryParse(settings.Element("Scenario").Value, out Scenario);
+            if (settings.Element("CanJoinRunning") != null)
+                bool.TryParse(settings.Element("CanJoinRunning").Value, out CanJoinRunning);
+            if (settings.Element("PhysicsIterations") != null)
+                int.TryParse(settings.Element("PhysicsIterations").Value, out PhysicsIterations);
+            if (settings.Element("SunRotationIntervalMinutes") != null)
+                float.TryParse(settings.Element("SunRotationIntervalMinutes").Value, out SunRotationIntervalMinutes);
+            if (settings.Element("EnableJetpack") != null)
+                bool.TryParse(settings.Element("EnableJetpack").Value, out EnableJetpack);
+            if (settings.Element("SpawnWithTools") != null)
+                bool.TryParse(settings.Element("SpawnWithTools").Value, out SpawnWithTools);
+            if (settings.Element("StartInRespawnScreen") != null)
+                bool.TryParse(settings.Element("StartInRespawnScreen").Value, out StartInRespawnScreen);
+            if (settings.Element("EnableVoxelDestruction") != null)
+                bool.TryParse(settings.Element("EnableVoxelDestruction").Value, out EnableVoxelDestruction);
+            if (settings.Element("MaxDrones") != null)
+                int.TryParse(settings.Element("MaxDrones").Value, out MaxDrones);
+            if (settings.Element("EnableDrones") != null)
+                bool.TryParse(settings.Element("EnableDrones").Value, out EnableDrones);
+
 
             Mods = new List<ulong>();
             if (root.Element("Mods") != null)

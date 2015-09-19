@@ -2,6 +2,7 @@
 using System.Web.Mvc;
 using System.Xml.Linq;
 using Quartz;
+using SESM.Controllers.ActionFilters;
 using SESM.DTO;
 using SESM.Tools.API;
 
@@ -11,15 +12,13 @@ namespace SESM.Controllers.API
     {
         // POST: API/Misc/IsCronValid
         [HttpPost]
+        [APIHostAccess("MIS-ICV", "MISC_CRON")]
         public ActionResult IsCronValid()
         {
             // ** INIT **
             EntityUser user = Session["User"] as EntityUser;
 
             // ** PARSING **
-            if(user == null)
-                return Content(XMLMessage.Error("MIS-ICV-NOTLOG", "No user is logged in.").ToString());
-
             string cron = Request.Form["Cron"];
 
             if(string.IsNullOrWhiteSpace(cron))
@@ -33,15 +32,13 @@ namespace SESM.Controllers.API
 
         // POST: API/Misc/GetNextCronDates
         [HttpPost]
+        [APIHostAccess("MIS-GETDAT", "MISC_CRON")]
         public ActionResult GetNextCronDates()
         {
             // ** INIT **
             EntityUser user = Session["User"] as EntityUser;
 
             // ** PARSING **
-            if(user == null)
-                return Content(XMLMessage.Error("MIS-GETDAT-NOTLOG", "No user is logged in.").ToString());
-
             string cron = Request.Form["Cron"];
 
             if(string.IsNullOrWhiteSpace(cron))

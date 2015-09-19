@@ -46,14 +46,19 @@ namespace SESM.Tools.Helpers
                         logger?.Info("SteamCMD.exe Downloaded !");
                         logger?.Info("Launching for 15 seconds for initialisation");
 
-                        Process si = new Process();
-                        si.StartInfo.WorkingDirectory = PathHelper.GetSteamCMDPath();
-                        si.StartInfo.UseShellExecute = false;
-                        si.StartInfo.FileName = SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe";
-                        si.StartInfo.CreateNoWindow = false;
-                        si.StartInfo.RedirectStandardInput = false;
-                        si.StartInfo.RedirectStandardOutput = false;
-                        si.StartInfo.RedirectStandardError = false;
+                        Process si = new Process
+                        {
+                            StartInfo =
+                            {
+                                WorkingDirectory = PathHelper.GetSteamCMDPath(),
+                                UseShellExecute = false,
+                                FileName = SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe",
+                                CreateNoWindow = false,
+                                RedirectStandardInput = false,
+                                RedirectStandardOutput = false,
+                                RedirectStandardError = false
+                            }
+                        };
                         si.Start();
                         Thread.Sleep(15000);
                         if (!si.HasExited)
@@ -79,7 +84,7 @@ namespace SESM.Tools.Helpers
                     CheckSteamCMD(logger);
 
                     // Force deleting 
-                    if(Directory.Exists(PathHelper.GetSteamCMDPath() + @"appcache\"))
+                    if (Directory.Exists(PathHelper.GetSteamCMDPath() + @"appcache\"))
                         Directory.Delete(PathHelper.GetSteamCMDPath() + @"appcache\", true);
                     if (Directory.Exists(PathHelper.GetSteamCMDPath() + @"depotcache\"))
                         Directory.Delete(PathHelper.GetSteamCMDPath() + @"depotcache\", true);
@@ -100,8 +105,9 @@ namespace SESM.Tools.Helpers
                         }
                     };
 
-                    logger?.Info("Starting SteamCMD (" + GetInfoDuration + " secs Max)");
+                    logger?.Info("Starting SteamCMD (" + duration + " secs Max)");
                     logger?.Debug("Arguments : " + si.StartInfo.Arguments);
+
                     si.Start();
 
                     DateTime endTime = DateTime.Now.AddSeconds(duration);
@@ -117,7 +123,7 @@ namespace SESM.Tools.Helpers
                         logger?.Debug("    " + val);
                     }
                     logger?.Debug("End of SteamCMD output");
-
+                    
                     if (si.HasExited)
                         logger?.Info("Process closed itself gracefully");
                     else
@@ -134,6 +140,7 @@ namespace SESM.Tools.Helpers
                             logger?.Error("Error while killing process", ex);
                         }
                     }
+                    
                     return output;
                 }
             }
@@ -150,6 +157,7 @@ namespace SESM.Tools.Helpers
                                                     + " +force_install_dir " + PathHelper.GetSESyncDirPath()
                                                     + " +login Anonymous"
                                                     + " +app_status " + SEAppId
+                                                    + " +app_info_print " + SEAppId
                                                     + " +quit");
 
             if (output.Contains("Login Failure"))
@@ -193,6 +201,7 @@ namespace SESM.Tools.Helpers
                                                     + " +app_info_update" // Try to force info update
                                                     + " +app_info_update 1"
                                                     + " +app_info_print " + SEAppId
+                                                    + " +app_info_print " + SEAppId // Volontary double call to be sure to have info
                                                     + " +quit");
             if (output.Contains("Login Failure"))
             {
@@ -232,7 +241,8 @@ namespace SESM.Tools.Helpers
                                                     + (dev ?
                                                         " -beta development -betapassword " + SESMConfigHelper.SEAutoUpdateBetaPassword :
                                                         " -beta public")
-                                                    + " +quit", 120);
+                                                    + " +app_info_print " + SEAppId
+                                                    + " +quit", 180);
             logger.Info("Update output : " + output);
 
         }
@@ -243,6 +253,7 @@ namespace SESM.Tools.Helpers
                                                     + " +force_install_dir " + PathHelper.GetMESyncDirPath()
                                                     + " +login Anonymous"
                                                     + " +app_status " + MEAppId
+                                                    + " +app_info_print " + SEAppId // Volontary
                                                     + " +quit");
 
             if (output.Contains("Login Failure"))
@@ -286,6 +297,7 @@ namespace SESM.Tools.Helpers
                                                     + " +app_info_update" // Try to force info update
                                                     + " +app_info_update 1"
                                                     + " +app_info_print " + MEAppId
+                                                    + " +app_info_print " + SEAppId // Volontary
                                                     + " +quit");
             if (output.Contains("Login Failure"))
             {
@@ -325,7 +337,8 @@ namespace SESM.Tools.Helpers
                                                     + (dev ?
                                                         " -beta development -betapassword " + SESMConfigHelper.MEAutoUpdateBetaPassword :
                                                         " -beta public")
-                                                    + " +quit", 120);
+                                                    + " +app_info_print " + SEAppId // Volontary
+                                                    + " +quit", 180);
             logger.Info("Update output : " + output);
 
         }

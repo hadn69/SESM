@@ -3,7 +3,7 @@ using SESM.Controllers.ActionFilters;
 
 namespace SESM.Controllers
 {
-    [SuperAdmin]
+    [HostAccess("USER_MANAGE")]
     public class UsersController : Controller
     {
         // GET : /Users/

@@ -1,47 +1,35 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
 using System.Xml.Linq;
+using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools.API;
 
 namespace SESM.Controllers.API
 {
-    public class APIPerfMonController : Controller
+    public class APIPerfMonController : Controller, IAPIController
     {
-        private readonly DataContext _context = new DataContext();
+        public DataContext CurrentContext { get; set; }
+
+        public EntityServer RequestServer { get; set; }
+
+        public APIPerfMonController()
+        {
+            CurrentContext = new DataContext();
+        }
 
         // POST: API/PerfMon/GetPerfData
         [HttpPost]
+        [APIHostAccess("PM-GPD", "SERVER_PERF_READ")]
         public ActionResult GetPerfData()
         {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
             // ** PARSING / ACCESS **
-            int serverId = -1;
-            if (string.IsNullOrWhiteSpace(Request.Form["ServerID"]))
-                return Content(XMLMessage.Error("PM-GPD-MISID", "The ServerID field must be provided").ToString());
-
-            if (!int.TryParse(Request.Form["ServerID"], out serverId))
-                return Content(XMLMessage.Error("PM-GPD-BADID", "The ServerID is invalid").ToString());
-
-            EntityServer server = srvPrv.GetServer(serverId);
-
-            if (server == null)
-                return Content(XMLMessage.Error("PM-GPD-UKNSRV", "The server doesn't exist").ToString());
-
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("PM-GPD-NOACCESS", "You don't have access to this server").ToString());
-
             XMLMessage response = new XMLMessage("PM-GPD-OK");
 
             XElement recent = new XElement("Recent");
 
-            foreach (EntityPerfEntry item in server.PerfEntries.Where(x => x.CPUUsagePeak == null))
+            foreach (EntityPerfEntry item in RequestServer.PerfEntries.Where(x => x.CPUUsagePeak == null))
             {
                 recent.Add(new XElement("PerfEntry", new XElement("Date", item.Timestamp.ToString("o")),
                                                      new XElement("CPU", item.CPUUsage),
@@ -51,7 +39,7 @@ namespace SESM.Controllers.API
 
             XElement compiled = new XElement("Compiled");
 
-            foreach (EntityPerfEntry item in server.PerfEntries.Where(x => x.CPUUsagePeak != null))
+            foreach (EntityPerfEntry item in RequestServer.PerfEntries.Where(x => x.CPUUsagePeak != null))
             {
                 compiled.Add(new XElement("PerfEntry", new XElement("Date", item.Timestamp.ToString("o")),
                                                      new XElement("CPUAvg", item.CPUUsage),
@@ -75,19 +63,11 @@ namespace SESM.Controllers.API
 
         // GET: API/PerfMon/CleanPerfData
         [HttpGet]
+        [APIHostAccess("PM-CPD", "PERF_CLEANUP")]
         public ActionResult CleanPerfData()
         {
-            _context.Database.ExecuteSqlCommand("truncate table dbo.EntityPerfEntries");
+            CurrentContext.Database.ExecuteSqlCommand("truncate table dbo.EntityPerfEntries");
             return Content(XMLMessage.Success("PM-CPD-OK", "The performance datas have been cleared").ToString());
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _context.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace SESM
     {
         protected void Application_Start()
         {
-            Constants.SetVersion(3,7,2);
+            Constants.SetVersion(4,0,0);
             // Resetting Run Vars
             if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar"))
                 File.Delete(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar");
@@ -203,6 +203,46 @@ namespace SESM
                 .Build();
 
             scheduler.ScheduleJob(autoStartJob, autoStartTrigger);
+
+            ServerRoleProvider sroPrv = new ServerRoleProvider(context);
+            HostRoleProvider hroPrv = new HostRoleProvider(context);
+
+            if (sroPrv.GetServerRoles().Count == 0 && hroPrv.GetHostRoles().Count == 0)
+            {
+                EntityHostRole users = new EntityHostRole()
+                {
+                    Name = "Users",
+                    PermissionsSerialized = "1"
+                };
+
+                hroPrv.AddHostRole(users);
+
+                EntityServerRole Administrators = new EntityServerRole()
+                {
+                    Name = "Administrators",
+                    PermissionsSerialized = "305;300;1316;1308;1317;1318;1324;1325;1321;1310;1307;" +
+                                            "1319;1323;1309;1315;1305;1320;1322;1311;1313;1314;1306;" +
+                                            "1300;1304;1312;1234;1212;1211;1236;1209;1235;1253;1255;" +
+                                            "1226;1228;1219;1251;1246;1215;1263;1247;1248;1243;1258;" +
+                                            "1245;1207;1249;1250;1242;1261;1223;1214;1217;1233;1218;" +
+                                            "1205;1210;1262;1221;1220;1229;1231;1206;1225;1256;1200;" +
+                                            "1208;1213;1227;1232;1241;1254;1252;1204;1238;1240;1259;" +
+                                            "1260;1257;1239;1230;1244;1237;1216;1222;1224;1406;1405;" +
+                                            "1401;1404;1400;1409;1402;1403;1407;1408;1410;1000;1604;" +
+                                            "1602;1603;1600;1601;1605;1504;1502;1503;1500;1501;1505;" +
+                                            "1700;1014;1013;1011;1012;1131;1132;1133;1130;1111;1113;" +
+                                            "1114;1110;1112;1121;1122;1123;1120"
+                };
+
+                EntityServerRole Moderators = new EntityServerRole()
+                {
+                    Name = "Moderators",
+                    PermissionsSerialized = "1316;1317;1315;1300;1234;1235;1233;1200;1000;1600;1601;1500;1501;1014;1013;1011;1012"
+                };
+
+                sroPrv.AddServerRole(Administrators);
+                sroPrv.AddServerRole(Moderators);
+            }
         }
     }
 }

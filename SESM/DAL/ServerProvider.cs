@@ -30,7 +30,7 @@ namespace SESM.DAL
         {
             try
             {
-                EntityServer testServ = _context.Servers.First(serv => serv.Port == port || serv.ServerExtenderPort == port);
+                EntityServer testServ = _context.Servers.First(serv => serv.Port == port);
                 if (testServ == null)
                     return true;
 
@@ -55,60 +55,7 @@ namespace SESM.DAL
                 return SEDefault.ServerPort;
             return _context.Servers.Where(server => server.Ip == ip).Select(server => server.Port).Max() + 1;
         }
-
-        public int GetNextAvailableSESEPort(string ip = "")
-        {
-            if (string.IsNullOrWhiteSpace(ip))
-                ip = SEDefault.IP;
-
-            if (!_context.Servers.Any(server => server.Ip == ip))
-                return SEDefault.ServerExtenderPort;
-            return _context.Servers.Where(server => server.Ip == ip).Select(server => server.ServerExtenderPort).Max() + 1;
-        }
-
-        public void AddAdministrator(string[] listUsers, EntityServer server)
-        {
-            UserProvider usrPrv = new UserProvider(_context);
-            server.Administrators.Clear();
-
-            if (listUsers == null || listUsers.Length == 0)
-                return;
-
-            foreach (string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Administrators.Contains(usrPrv.GetUser(item))))
-            {
-                server.Administrators.Add(usrPrv.GetUser(item));
-            }
-        }
-
-        public void AddManagers(string[] listUsers, EntityServer server)
-        {
-            UserProvider usrPrv = new UserProvider(_context);
-            server.Managers.Clear();
-
-            if (listUsers == null || listUsers.Length == 0)
-                return;
-
-            foreach (string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Managers.Contains(usrPrv.GetUser(item))))
-            {
-                server.Managers.Add(usrPrv.GetUser(item));
-            }
-        }
-
-        public void AddUsers(string[] listUsers, EntityServer server)
-        {
-            UserProvider usrPrv = new UserProvider(_context);
-            server.Users.Clear();
-
-            if (listUsers == null || listUsers.Length == 0)
-                return;
-
-            foreach (string item in listUsers.Where(item => !string.IsNullOrWhiteSpace(item) && usrPrv.UserExist(item) && !server.Users.Contains(usrPrv.GetUser(item))))
-            {
-                server.Users.Add(usrPrv.GetUser(item));
-            }
-        }
-
-
+        
         public EntityServer GetServer(int id)
         {
             try
@@ -227,7 +174,7 @@ namespace SESM.DAL
                 UserProvider usrPrv = new UserProvider(_context);
                 EntityUser usr = usrPrv.GetUser(idUser);
                 EntityServer srv = GetServer(idServer);
-                if (usr.IsAdmin || srv.IsPublic || srv.Administrators.Contains(usr) || srv.Managers.Contains(usr) || srv.Users.Contains(usr))
+                if (usr.IsAdmin || srv.IsPublic)
                     return true;
                 return false;
             }
@@ -261,14 +208,14 @@ namespace SESM.DAL
 
                 if (user.IsAdmin)
                     return AccessLevel.SuperAdmin;
-
+                /*
                 if (server.Administrators.Contains(user))
                     return AccessLevel.Admin;
                 if (server.Managers.Contains(user))
                     return AccessLevel.Manager;
                 if (server.Users.Contains(user))
                     return AccessLevel.User;
-
+                    */
                 return server.IsPublic ? AccessLevel.Guest : AccessLevel.None;
             }
             catch (Exception)
@@ -333,9 +280,11 @@ namespace SESM.DAL
                 else
                 {
                     List<EntityServer> listServ = new List<EntityServer>();
+                    /*
                     listServ.AddRange(usr.AdministratorOf);
                     listServ.AddRange(usr.ManagerOf);
                     listServ.AddRange(usr.UserOf);
+                    */
                     foreach (EntityServer item in _context.Servers.ToList().Where(item => item.IsPublic && !listServ.Contains(item)))
                     {
                         listServ.Add(item);

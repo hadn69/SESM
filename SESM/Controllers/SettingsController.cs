@@ -10,7 +10,7 @@ namespace SESM.Controllers
         private readonly DataContext _context = new DataContext();
 
         [HttpGet]
-        [SuperAdmin]
+        [HostAccess("SETTINGS_SESM")]
         public ActionResult Index()
         {
 
@@ -18,7 +18,7 @@ namespace SESM.Controllers
         }
 
         [HttpGet]
-        [SuperAdmin]
+        [HostAccess("SETTINGS_SE")]
         public ActionResult SE()
         {
 
@@ -26,7 +26,7 @@ namespace SESM.Controllers
         }
 
         [HttpGet]
-        [SuperAdmin]
+        [HostAccess("SETTINGS_ME")]
         public ActionResult ME()
         {
 
@@ -34,7 +34,7 @@ namespace SESM.Controllers
         }
 
         [HttpGet]
-        [SuperAdmin]
+        [HostAccess("SETTINGS_SESE")]
         public ActionResult SESE()
         {
 
