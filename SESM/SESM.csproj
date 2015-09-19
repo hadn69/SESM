@@ -2300,7 +2300,7 @@
     <Content Include="Content\Js\sha1-min.js" />
     <Content Include="Content\Js\TouchSpinMod.js" />
     <Content Include="Content\logo-small.png" />
-    <Content Include="Content\logo.png" />
+    <Content Include="Content\LogoAlpha.png" />
     <Content Include="Content\sesmLogo.png" />
     <Content Include="Content\site.css" />
     <Content Include="MITLicense.txt" />
