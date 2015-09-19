@@ -348,6 +348,8 @@
 
                         if (!Access.SERVER_MAP_ME_DELETE)
                             this.getMenu().find("li:nth-child(3)").hide();
+
+                        return true;
                     },
                     onItem: function (context, e) {
                         var dirName = $(context).children("td:nth-child(3)").text();
