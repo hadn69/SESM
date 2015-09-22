@@ -10,6 +10,7 @@ using Ionic.Zip;
 using NLog;
 using Quartz;
 using Quartz.Impl;
+using SESM.Controllers.ActionFilters;
 using SESM.DAL;
 using SESM.DTO;
 using SESM.Models;
@@ -28,16 +29,9 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/GetSESMSettings        
         [HttpGet]
+        [APIHostAccess("SET-GSESMS", "SETTINGS_SESM")]
         public ActionResult GetSESMSettings()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-GSESMS-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             // ** PROCESS **
             XMLMessage response = new XMLMessage("SET-GSESMS-OK");
 
@@ -54,17 +48,11 @@ namespace SESM.Controllers.API
 
         // POST: API/Settings/SetSESMSettings
         [HttpPost]
+        [APIHostAccess("SET-SSESMS", "SETTINGS_SESM")]
         public ActionResult SetSESMSettings()
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-SSESMS-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             string Prefix = Request.Form["Prefix"];
             if (string.IsNullOrWhiteSpace(Prefix))
@@ -207,16 +195,9 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/GetBackupsSettings        
         [HttpGet]
+        [APIHostAccess("SET-GBS", "SETTINGS_SESM")]
         public ActionResult GetBackupsSettings()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-GBS-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             // ** PROCESS **
             XMLMessage response = new XMLMessage("SET-GBS-OK");
 
@@ -237,18 +218,9 @@ namespace SESM.Controllers.API
 
         // POST: API/Settings/SetBackupsSettings        
         [HttpPost]
+        [APIHostAccess("SET-SBS", "SETTINGS_SESM")]
         public ActionResult SetBackupsSettings()
         {
-            // ** INIT **
-            ServerProvider srvPrv = new ServerProvider(_context);
-
-            EntityUser user = Session["User"] as EntityUser;
-            int userID = user == null ? 0 : user.Id;
-
-            // ** PARSING / ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-SBS-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             bool AutoBackupLvl1Enabled;
             if (string.IsNullOrWhiteSpace(Request.Form["AutoBackupLvl1Enabled"]))
                 return Content(XMLMessage.Error("SRV-SBS-MISL1E", "The AutoBackupLvl1Enabled field must be provided").ToString());
@@ -381,15 +353,11 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/GetSEStatus        
         [HttpGet]
+        [APIHostAccess("SET-GSES", "SETTINGS_SE")]
         public ActionResult GetSEStatus()
         {
             // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-GSES-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
             XMLMessage response = new XMLMessage("SET-GSES-OK");
@@ -401,15 +369,9 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/GetSEVersion        
         [HttpGet]
+        [APIHostAccess("SET-GSEV", "SETTINGS_SE")]
         public ActionResult GetSEVersion()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-GSEV-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             // ** PROCESS **
             Logger logger = LogManager.GetLogger("SEGetVersionLogger");
             int? localVersion = null;
@@ -458,17 +420,11 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/GetSESettings        
         [HttpGet]
+        [APIHostAccess("SET-GSESE", "SETTINGS_SE")]
         public ActionResult GetSESettings()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-GSES-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             // ** PROCESS **
-            XMLMessage response = new XMLMessage("SET-GSES-OK");
+            XMLMessage response = new XMLMessage("SET-GSESE-OK");
 
             response.AddToContent(new XElement("AutoUpdateEnabled", SESMConfigHelper.SEAutoUpdateEnabled));
             response.AddToContent(new XElement("AutoUpdateCron", SESMConfigHelper.SEAutoUpdateCron));
@@ -479,15 +435,9 @@ namespace SESM.Controllers.API
 
         // POST: API/Settings/SetSESettings        
         [HttpPost]
+        [APIHostAccess("SET-SSES", "SETTINGS_SE")]
         public ActionResult SetSESettings()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-SSES-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             // ** PARSING **
             bool autoUpdateEnabled;
             if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateEnabled"]))
@@ -533,11 +483,9 @@ namespace SESM.Controllers.API
 
         // POST: API/Settings/UploadSE        
         [HttpPost]
+        [APIHostAccess("SET-UPSE", "SETTINGS_SE")]
         public ActionResult UploadSE(HttpPostedFileBase ZipFile)
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
             // ** PARSING **
             if (ZipFile == null)
                 return Content(XMLMessage.Error("SET-UPSE-MISZIP", "The zipFile parameter must be provided").ToString());
@@ -546,10 +494,6 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SET-UPSE-BADZIP", "The provided file in not a zip file").ToString());
 
             ZipFile.InputStream.Seek(0, SeekOrigin.Begin);
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-UPSE-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             ZipFile.SaveAs(SESMConfigHelper.SEDataPath + "DedicatedServer.zip");
 
@@ -565,20 +509,14 @@ namespace SESM.Controllers.API
 
         // POST: API/Settings/UpdateSE        
         [HttpPost]
+        [APIHostAccess("SET-UPDSE", "SETTINGS_SE")]
         public ActionResult UpdateSE()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
             // ** PARSING **
             bool force = false;
             if (!string.IsNullOrWhiteSpace(Request.Form["Force"]))
                 if (!bool.TryParse(Request.Form["Force"], out force))
                     return Content(XMLMessage.Error("SET-UPDSE-BADFRC", "The value provided in the Force field is not valid").ToString());
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-UPDSE-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
             Logger logger = LogManager.GetLogger("SEManualUpdateLogger");
@@ -596,16 +534,12 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/GetMEStatus        
         [HttpGet]
+        [APIHostAccess("SET-GMES", "SETTINGS_ME")]
         public ActionResult GetMEStatus()
         {
             // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-GMES-NOACCESS", "The current user don't have enough right for this action").ToString());
-
+           
             // ** PROCESS **
             XMLMessage response = new XMLMessage("SET-GMES-OK");
 
@@ -616,15 +550,9 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/GetMEVersion        
         [HttpGet]
+        [APIHostAccess("SET-GMEV", "SETTINGS_ME")]
         public ActionResult GetMEVersion()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-GMEV-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             // ** PROCESS **
             Logger logger = LogManager.GetLogger("MEGetVersionLogger");
             int? localVersion = null;
@@ -673,17 +601,11 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/GetMESettings        
         [HttpGet]
+        [APIHostAccess("SET-GMESE", "SETTINGS_ME")]
         public ActionResult GetMESettings()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-GMES-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             // ** PROCESS **
-            XMLMessage response = new XMLMessage("SET-GMES-OK");
+            XMLMessage response = new XMLMessage("SET-GMESE-OK");
 
             response.AddToContent(new XElement("AutoUpdateEnabled", SESMConfigHelper.MEAutoUpdateEnabled));
             response.AddToContent(new XElement("AutoUpdateCron", SESMConfigHelper.MEAutoUpdateCron));
@@ -694,15 +616,9 @@ namespace SESM.Controllers.API
 
         // POST: API/Settings/SetMESettings        
         [HttpPost]
+        [APIHostAccess("SET-SMES", "SETTINGS_ME")]
         public ActionResult SetMESettings()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-SMES-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             // ** PARSING **
             bool autoUpdateEnabled;
             if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateEnabled"]))
@@ -748,11 +664,9 @@ namespace SESM.Controllers.API
 
         // POST: API/Settings/UploadME        
         [HttpPost]
+        [APIHostAccess("SET-UPME", "SETTINGS_ME")]
         public ActionResult UploadME(HttpPostedFileBase ZipFile)
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
             // ** PARSING **
             if (ZipFile == null)
                 return Content(XMLMessage.Error("SET-UPME-MISZIP", "The zipFile parameter must be provided").ToString());
@@ -761,10 +675,6 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("SET-UPME-BADZIP", "The provided file in not a zip file").ToString());
 
             ZipFile.InputStream.Seek(0, SeekOrigin.Begin);
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-UPME-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             ZipFile.SaveAs(SESMConfigHelper.MEDataPath + "DedicatedServer.zip");
 
@@ -780,20 +690,14 @@ namespace SESM.Controllers.API
 
         // POST: API/Settings/UpdateME        
         [HttpPost]
+        [APIHostAccess("SET-UPDME", "SETTINGS_ME")]
         public ActionResult UpdateME()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
             // ** PARSING **
             bool force = false;
             if (!string.IsNullOrWhiteSpace(Request.Form["Force"]))
                 if (!bool.TryParse(Request.Form["Force"], out force))
                     return Content(XMLMessage.Error("SET-UPDME-BADFRC", "The value provided in the Force field is not valid").ToString());
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-UPDME-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
             Logger logger = LogManager.GetLogger("MEManualUpdateLogger");
@@ -811,15 +715,11 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/GetSESEStatus        
         [HttpGet]
+        [APIHostAccess("SET-GSESES", "SETTINGS_SESE")]
         public ActionResult GetSESEStatus()
         {
             // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-GSESES-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
             XMLMessage response = new XMLMessage("SET-GSESES-OK");
@@ -831,15 +731,9 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/GetSESEVersion        
         [HttpGet]
+        [APIHostAccess("SET-GSESEV", "SETTINGS_SESE")]
         public ActionResult GetSESEVersion()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-GSESEV-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             // ** PROCESS **
             Version localVersion = SESEHelper.GetLocalVersion();
 
@@ -858,17 +752,11 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/GetSESESettings        
         [HttpGet]
+        [APIHostAccess("SET-GSESESE", "SETTINGS_SESE")]
         public ActionResult GetSESESettings()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-GSESES-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             // ** PROCESS **
-            XMLMessage response = new XMLMessage("SET-GSESES-OK");
+            XMLMessage response = new XMLMessage("SET-GSESESE-OK");
 
             response.AddToContent(new XElement("GithubURL", SESMConfigHelper.SESEUpdateURL));
             response.AddToContent(new XElement("Dev", SESMConfigHelper.SESEAutoUpdateUseDev.ToString()));
@@ -880,15 +768,9 @@ namespace SESM.Controllers.API
 
         // POST: API/Settings/SetSESESettings        
         [HttpPost]
+        [APIHostAccess("SET-SSESES", "SETTINGS_SESE")]
         public ActionResult SetSESESettings()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-SSESES-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             // ** PARSING **
             string githubURL = Request.Form["GithubURL"];
             if (string.IsNullOrWhiteSpace(githubURL))
@@ -951,11 +833,9 @@ namespace SESM.Controllers.API
 
         // POST: API/Settings/UploadSESE        
         [HttpPost]
+        [APIHostAccess("SET-UPSESE", "SETTINGS_SESE")]
         public ActionResult UploadSESE(HttpPostedFileBase ZipFile)
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
             // ** PARSING **
             if (ZipFile == null)
                 return Content(XMLMessage.Error("SET-UPSESE-MISZIP", "The zipFile parameter must be provided").ToString());
@@ -970,10 +850,6 @@ namespace SESM.Controllers.API
                     return
                         Content(XMLMessage.Error("SET-UPSESE-NOTSESE", "The provided zip don't contain SESE").ToString());
             }
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-UPSESE-NOACCESS", "The current user don't have enough right for this action").ToString());
-
             SESEHelper.CleanupUpdate();
 
             string zipName = ZipFile.FileName;
@@ -994,20 +870,14 @@ namespace SESM.Controllers.API
 
         // POST: API/Settings/UpdateSESE        
         [HttpPost]
+        [APIHostAccess("SET-UPDSESE", "SETTINGS_SESE")]
         public ActionResult UpdateSESE()
         {
-            // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
-
             // ** PARSING **
             bool force = false;
             if (!string.IsNullOrWhiteSpace(Request.Form["Force"]))
                 if (!bool.TryParse(Request.Form["Force"], out force))
                     return Content(XMLMessage.Error("SET-UPDSESE-NOACCESS", "The value provided in the Force field is not valid").ToString());
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-UPDSESE-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
             Logger logger = LogManager.GetLogger("SESEManualUpdateLogger");
@@ -1021,15 +891,11 @@ namespace SESM.Controllers.API
 
         // GET: API/Settings/DeleteSESE        
         [HttpGet]
+        [APIHostAccess("SET-DELSESE", "SETTINGS_SESE")]
         public ActionResult DeleteSESE()
         {
             // ** INIT **
-            EntityUser user = Session["User"] as EntityUser;
             ServerProvider srvPrv = new ServerProvider(_context);
-
-            // ** ACCESS **
-            if (user == null || !user.IsAdmin)
-                return Content(XMLMessage.Error("SET-DELSESE-NOACCESS", "The current user don't have enough right for this action").ToString());
 
             // ** PROCESS **
             List<EntityServer> serverList = srvPrv.GetAllSESEServers();

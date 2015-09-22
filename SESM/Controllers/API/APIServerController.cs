@@ -58,8 +58,8 @@ namespace SESM.Controllers.API
                                                              new XElement("ID", server.Id),
                                                              new XElement("Public", server.IsPublic.ToString()),
                                                              new XElement("State", serversState[server].ToString()),
-                                                             new XElement("AccessLevel", srvPrv.GetAccessLevel(usr, server)),
                                                              new XElement("Type", server.ServerType == EnumServerType.SpaceEngineers ? server.UseServerExtender ? "SESE" : "SE" : "ME"),
+                                                             new XElement("HasAnyAccess", AuthHelper.HasAnyServerAccess(server)),
                                                              new XElement("CanStart", AuthHelper.HasAccess(RequestServer, "SERVER_POWER_START")),
                                                              new XElement("CanStop", AuthHelper.HasAccess(RequestServer, "SERVER_POWER_STOP")),
                                                              new XElement("CanRestart", AuthHelper.HasAccess(RequestServer, "SERVER_POWER_RESTART")),
@@ -313,7 +313,7 @@ namespace SESM.Controllers.API
             {
                 if (string.IsNullOrWhiteSpace(Request.Form["UseServerExtender"]))
                     return Content(XMLMessage.Error("SRV-SSET-MISSESE", "The UseServerExtender field must be provided").ToString());
-                if (!bool.TryParse(Request.Form["SESE"], out UseServerExtender))
+                if (!bool.TryParse(Request.Form["UseServerExtender"], out UseServerExtender))
                     return Content(XMLMessage.Error("SRV-SSET-BADSESE", "The UseServerExtender field is invalid").ToString());
             }
             else

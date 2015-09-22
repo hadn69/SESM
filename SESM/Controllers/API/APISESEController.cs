@@ -32,9 +32,7 @@ namespace SESM.Controllers.API
             if (server == null)
                 return Content(XMLMessage.Error("SESE-TW-UKNSRV", "The server doesn't exist").ToString());
 
-            if (!srvPrv.IsManagerOrAbore(srvPrv.GetAccessLevel(userID, server.Id)))
-                return Content(XMLMessage.Error("SESE-TW-NOACCESS", "You don't have access to this server").ToString());
-
+         
             if (!server.UseServerExtender)
                 return Content(XMLMessage.Error("SESE-TW-NOSESE", "SESE isn't activated on this server.").ToString());
 

@@ -46,61 +46,75 @@
             <ul class="sub-menu">
                 @foreach (EntityServer item in managedServers.OrderBy(x => x.Name))
                 {
-                    <li>
-                        <a href="/@item.Id/Dashboard/">
-                            @item.Name <span class="arrow"></span>
-                        </a>
-                        <ul class="sub-menu">
-                            @if (AuthHelper.HasAccess(item, "SERVER_INFO"))
-                            {
-                                <li>
-                                    <a href="/@item.Id/Dashboard/"><i class="icon-speedometer"></i> Dashboard</a>
-                                </li>
-                            }
-                            @if (AuthHelper.HasAccess(item, "SERVER_SETTINGS_GLOBAL_RD", "SERVER_SETTINGS_JOBS_RD", "SERVER_SETTINGS_BACKUPS_RD"))
-                            {
-                                <li>
-                                    <a href="/@item.Id/Settings/"><i class="icon-settings"></i> Server Settings</a>
-                                </li>
-                            }
-                            @if (AuthHelper.HasAccess(item, "SERVER_CONFIG_SE_RD", "SERVER_CONFIG_ME_RD"))
-                            {
-                                <li>
-                                    <a href="/@item.Id/Configuration/"><i class="icon-puzzle"></i> Game Configuration</a>
-                                </li>
-                            }
-                            @if (AuthHelper.HasAccess(item, "SERVER_EXPLORER_LIST"))
-                            {
-                                <li>
-                                    <a href="/@item.Id/Explorer/"><i class="icon-folder-alt"></i> File Explorer</a>
-                                </li>
-                            }
-                            @if (AuthHelper.HasAccess(item, "SERVER_MAP_SE_LIST", "SERVER_MAP_ME_LIST"))
-                            {
-                                <li>
-                                    <a href="/@item.Id/Maps/"><i class="icon-compass"></i> Maps Manager</a>
-                                </li>
-                            }
-                            @if (AuthHelper.HasAccess(item, "SERVER_PERF_READ"))
-                            {
-                                <li>
-                                    <a href="/@item.Id/Monitor/"><i class="icon-graph"></i> Perf Monitor</a>
-                                </li>
-                            }
-                            @if (AuthHelper.HasAccess(item, "ACCESS_SERVER_READ"))
-                            {
-                                <li>
-                                    <a href="/@item.Id/Access/"><i class="icon-list"></i> Access</a>
-                                </li>
-                            }
-                            @if (AuthHelper.HasAccess(item, "SERVER_INFO"))
-                            {
-                                <li>
-                                    <a href="/@item.Id/Status/"><i class="icon-screen-desktop"></i> Status Page</a>
-                                </li>
-                            }
-                        </ul>
-                    </li>
+                    if (AuthHelper.HasAccess(item, "SERVER_INFO",
+                        "SERVER_SETTINGS_GLOBAL_RD",
+                        "SERVER_SETTINGS_JOBS_RD",
+                        "SERVER_SETTINGS_BACKUPS_RD",
+                        "SERVER_CONFIG_SE_RD",
+                        "SERVER_CONFIG_ME_RD",
+                        "SERVER_EXPLORER_LIST",
+                        "SERVER_MAP_SE_LIST",
+                        "SERVER_MAP_ME_LIST", 
+                        "SERVER_PERF_READ",
+                        "ACCESS_SERVER_READ",
+                        "SERVER_INFO"))
+                    {
+                        <li>
+                            <a href="/@item.Id/Dashboard/">
+                                @item.Name <span class="arrow"></span>
+                            </a>
+                            <ul class="sub-menu">
+                                @if (AuthHelper.HasAccess(item, "SERVER_INFO"))
+                                {
+                                    <li>
+                                        <a href="/@item.Id/Dashboard/"><i class="icon-speedometer"></i> Dashboard</a>
+                                    </li>
+                                }
+                                @if (AuthHelper.HasAccess(item, "SERVER_SETTINGS_GLOBAL_RD", "SERVER_SETTINGS_JOBS_RD", "SERVER_SETTINGS_BACKUPS_RD"))
+                                {
+                                    <li>
+                                        <a href="/@item.Id/Settings/"><i class="icon-settings"></i> Server Settings</a>
+                                    </li>
+                                }
+                                @if (AuthHelper.HasAccess(item, "SERVER_CONFIG_SE_RD", "SERVER_CONFIG_ME_RD"))
+                                {
+                                    <li>
+                                        <a href="/@item.Id/Configuration/"><i class="icon-puzzle"></i> Game Configuration</a>
+                                    </li>
+                                }
+                                @if (AuthHelper.HasAccess(item, "SERVER_EXPLORER_LIST"))
+                                {
+                                    <li>
+                                        <a href="/@item.Id/Explorer/"><i class="icon-folder-alt"></i> File Explorer</a>
+                                    </li>
+                                }
+                                @if (AuthHelper.HasAccess(item, "SERVER_MAP_SE_LIST", "SERVER_MAP_ME_LIST"))
+                                {
+                                    <li>
+                                        <a href="/@item.Id/Maps/"><i class="icon-compass"></i> Maps Manager</a>
+                                    </li>
+                                }
+                                @if (AuthHelper.HasAccess(item, "SERVER_PERF_READ"))
+                                {
+                                    <li>
+                                        <a href="/@item.Id/Monitor/"><i class="icon-graph"></i> Perf Monitor</a>
+                                    </li>
+                                }
+                                @if (AuthHelper.HasAccess(item, "ACCESS_SERVER_READ"))
+                                {
+                                    <li>
+                                        <a href="/@item.Id/Access/"><i class="icon-list"></i> Access</a>
+                                    </li>
+                                }
+                                @if (AuthHelper.HasAccess(item, "SERVER_INFO"))
+                                {
+                                    <li>
+                                        <a href="/@item.Id/Status/"><i class="icon-screen-desktop"></i> Status Page</a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    }
                 }
             </ul>
         }

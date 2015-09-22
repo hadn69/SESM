@@ -167,76 +167,6 @@ namespace SESM.DAL
             }
         }
 
-        public bool CheckAccess(int idUser, int idServer)
-        {
-            try
-            {
-                UserProvider usrPrv = new UserProvider(_context);
-                EntityUser usr = usrPrv.GetUser(idUser);
-                EntityServer srv = GetServer(idServer);
-                if (usr.IsAdmin || srv.IsPublic)
-                    return true;
-                return false;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        public AccessLevel GetAccessLevel(int idUser, int idServer)
-        {
-            try
-            {
-                UserProvider usrPrv = new UserProvider(_context);
-                EntityUser usr = usrPrv.GetUser(idUser);
-                EntityServer srv = GetServer(idServer);
-                return GetAccessLevel(usr, srv);
-            }
-            catch (Exception)
-            {
-                return AccessLevel.None;
-            }
-        }
-
-        public AccessLevel GetAccessLevel(EntityUser user, EntityServer server)
-        {
-            try
-            {
-                if (user == null)
-                    return server.IsPublic ? AccessLevel.Guest : AccessLevel.None;
-
-                if (user.IsAdmin)
-                    return AccessLevel.SuperAdmin;
-                /*
-                if (server.Administrators.Contains(user))
-                    return AccessLevel.Admin;
-                if (server.Managers.Contains(user))
-                    return AccessLevel.Manager;
-                if (server.Users.Contains(user))
-                    return AccessLevel.User;
-                    */
-                return server.IsPublic ? AccessLevel.Guest : AccessLevel.None;
-            }
-            catch (Exception)
-            {
-                return AccessLevel.None;
-            }
-        }
-
-        public bool IsManagerOrAbore(AccessLevel accessLevel)
-        {
-            bool ret = accessLevel == AccessLevel.SuperAdmin ||
-                       accessLevel == AccessLevel.Admin ||
-                       accessLevel == AccessLevel.Manager;
-            return ret;
-        }
-
-        public bool IsAdminOrAbore(AccessLevel accessLevel)
-        {
-            return accessLevel == AccessLevel.SuperAdmin ||
-                   accessLevel == AccessLevel.Admin;
-        }
 
         public List<EntityServer> GetAllServers()
         {
@@ -273,24 +203,23 @@ namespace SESM.DAL
             {
                 UserProvider usrPrv = new UserProvider(_context);
                 EntityUser usr = usrPrv.GetUser(user.Id);
+
                 if (usr.IsAdmin)
                 {
                     return _context.Servers.ToList();
                 }
-                else
-                {
-                    List<EntityServer> listServ = new List<EntityServer>();
-                    /*
-                    listServ.AddRange(usr.AdministratorOf);
-                    listServ.AddRange(usr.ManagerOf);
-                    listServ.AddRange(usr.UserOf);
-                    */
-                    foreach (EntityServer item in _context.Servers.ToList().Where(item => item.IsPublic && !listServ.Contains(item)))
-                    {
-                        listServ.Add(item);
-                    }
-                    return listServ;
-                }
+                return usr.InstanceServerRoles.Select(item => item.Server).Where(item => AuthHelper.HasAccess(item, "SERVER_INFO", 
+                    "SERVER_SETTINGS_GLOBAL_RD", 
+                    "SERVER_SETTINGS_JOBS_RD", 
+                    "SERVER_SETTINGS_BACKUPS_RD",
+                    "SERVER_CONFIG_SE_RD", 
+                    "SERVER_CONFIG_ME_RD", 
+                    "SERVER_EXPLORER_LIST", 
+                    "SERVER_MAP_SE_LIST", 
+                    "SERVER_MAP_ME_LIST", 
+                    "SERVER_PERF_READ",
+                    "ACCESS_SERVER_READ",
+                    "SERVER_INFO")).ToList();
             }
             catch (Exception)
             {
@@ -311,28 +240,6 @@ namespace SESM.DAL
                 throw;
             }
         }
-
-        public bool SecurityCheck(EntityServer server, EntityUser user)
-        {
-            if (user == null || server == null)
-                return false;
-
-            AccessLevel accessLevel = GetAccessLevel(user.Id, server.Id);
-            if (accessLevel != AccessLevel.Guest && accessLevel != AccessLevel.User)
-            {
-                return true;
-            }
-            return false;
-        }
     }
-
-    public enum AccessLevel
-    {
-        SuperAdmin,
-        Admin,
-        Manager,
-        User,
-        Guest,
-        None
-    }
+    
 }

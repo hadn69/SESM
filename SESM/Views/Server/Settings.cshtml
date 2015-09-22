@@ -359,13 +359,19 @@
             function (result) {
                 if (result) {
                     LockPage();
-                    $.post("/API/Server/SetSettings",
-                    {
+
+                    var postParam = {
                         ServerID: serverID,
                         Name: $("#inpName").val(),
                         Public: $('#inpPublic').is(":checked"),
                         ProcessPriority: $("#inpProcessPriority").val()
-                    },
+                    };
+
+                    if ($("#inpUseServerExtender").parents(".form-group").css("display") != "none")
+                        postParam.UseServerExtender = $('#inpUseServerExtender').is(":checked");
+
+                    $.post("/API/Server/SetSettings",
+                    postParam,
                     function (data) {
                         UnlockPage();
                         var root = $($.parseXML(data)).find("Response");
