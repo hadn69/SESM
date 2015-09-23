@@ -364,7 +364,8 @@ namespace SESM.Controllers.API
                     RequestServer.UseServerExtender = UseServerExtender;
                     string newpath = PathHelper.GetInstancePath(RequestServer);
 
-                    Directory.Move(oldpath, newpath);
+                    if(oldpath != newpath)
+                        Directory.Move(oldpath, newpath);
 
                     ServiceHelper.RegisterService(RequestServer);
                 }
