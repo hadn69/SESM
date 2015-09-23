@@ -15,9 +15,14 @@
                     }
 
                     serverName = root.children("Content").children("Name").text();
-                    var accessLevel = root.children("Content").children("AccessLevel").text();
+
+                    var CanStart = root.children("Content").children("CanStart").text() == "true";
+                    var CanStop = root.children("Content").children("CanStop").text() == "true";
+                    var CanRestart = root.children("Content").children("CanRestart").text() == "true";
+                    var CanKill = root.children("Content").children("CanKill").text() == "true";
+
                     $("#QADiv").hide();
-                    if (!(accessLevel == "User" || accessLevel == "Guest" || accessLevel == "None")) {
+                    if (CanStart || CanStop || CanRestart || CanKill) {
                         $("#QADiv").show();
 
                         $("#btnQAStart").hide();
@@ -27,16 +32,16 @@
 
                         var state = root.children("Content").children("State").text();
 
-                        if (state == "Unknow" || state == "Stopped") {
+                        if (CanStart && (state == "Unknow" || state == "Stopped")) {
                             $("#btnQAStart").show();
                         }
-                        if (state == "Unknow" || state == "Running") {
+                        if (CanStop && (state == "Unknow" || state == "Running")) {
                             $("#btnQAStop").show();
                         }
-                        if (state == "Unknow" || state == "Running") {
+                        if (CanRestart && (state == "Unknow" || state == "Running")) {
                             $("#btnQARestart").show();
                         }
-                        if (state == "Unknow" || state == "Starting" || state == "Running" || state == "Stopping") {
+                        if (CanKill && (state == "Unknow" || state == "Starting" || state == "Running" || state == "Stopping")) {
                             $("#btnQAKill").show();
                         }
                     }

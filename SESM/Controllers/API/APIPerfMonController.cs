@@ -21,7 +21,7 @@ namespace SESM.Controllers.API
 
         // POST: API/PerfMon/GetPerfData
         [HttpPost]
-        [APIHostAccess("PM-GPD", "SERVER_PERF_READ")]
+        [APIServerAccess("PM-GPD", "SERVER_PERF_READ")]
         public ActionResult GetPerfData()
         {
             // ** PARSING / ACCESS **
