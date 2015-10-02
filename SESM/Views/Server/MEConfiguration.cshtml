@@ -564,9 +564,9 @@
 
                 // Construction
                 if (values.children("GameMode").text() == "Survival") {
-                    $("#inpGamemode").bootstrapSwitch('state', false);
+                    $("#inpGameMode").bootstrapSwitch('state', false);
                 } else if (values.children("GameMode").text() == "Creative") {
-                    $("#inpGamemode").bootstrapSwitch('state', true);
+                    $("#inpGameMode").bootstrapSwitch('state', true);
                 }
                 $("#inpEnableCopyPaste").bootstrapSwitch('state', values.children("EnableCopyPaste").text() == "true");
 
