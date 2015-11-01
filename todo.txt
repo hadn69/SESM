@@ -1,0 +1,6 @@
+check map import
+backp manager
+apply reg at start
+check scheduler
+log manger (color)
+find a way to read opened log
