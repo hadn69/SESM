@@ -17,11 +17,13 @@ namespace SESM.Tools
         // SE Auto-Update Settings
         public bool SEAutoUpdateEnabled { get; set; }
         public string SEAutoUpdateCron { get; set; }
+        public string SEAutoUpdateBranch { get; set; }
         public string SEAutoUpdateBetaPassword { get; set; }
 
-        // SE Auto-Update Settings
+        // ME Auto-Update Settings
         public bool MEAutoUpdateEnabled { get; set; }
         public string MEAutoUpdateCron { get; set; }
+        public string MEAutoUpdateBranch { get; set; }
         public string MEAutoUpdateBetaPassword { get; set; }
 
         // SESE Auto-Update Settings
@@ -61,11 +63,13 @@ namespace SESM.Tools
             // SE Auto-Update Settings
             SEAutoUpdateEnabled = true;
             SEAutoUpdateCron = "0 0/10 * * * ?";
+            SEAutoUpdateBranch = "public";
             SEAutoUpdateBetaPassword = string.Empty;
 
             // ME Auto-Update Settings
             MEAutoUpdateEnabled = false;
             MEAutoUpdateCron = "0 5/10 * * * ?";
+            MEAutoUpdateBranch = "public";
             MEAutoUpdateBetaPassword = string.Empty;
 
             // SESE Auto-Update Settings

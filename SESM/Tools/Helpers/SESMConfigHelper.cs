@@ -336,6 +336,20 @@ namespace SESM.Tools.Helpers
             }
         }
 
+        public static string SEAutoUpdateBranch
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.SEAutoUpdateBranch;
+            }
+            set
+            {
+                ConfigStorage.SEAutoUpdateBranch = value;
+                ConfigStorage.Write();
+            }
+        }
+
         public static string SEAutoUpdateBetaPassword
         {
             get
@@ -376,6 +390,20 @@ namespace SESM.Tools.Helpers
             set
             {
                 ConfigStorage.MEAutoUpdateCron = value;
+                ConfigStorage.Write();
+            }
+        }
+
+        public static string MEAutoUpdateBranch
+        {
+            get
+            {
+                ConfigStorage.Read();
+                return ConfigStorage.MEAutoUpdateBranch;
+            }
+            set
+            {
+                ConfigStorage.MEAutoUpdateBranch = value;
                 ConfigStorage.Write();
             }
         }

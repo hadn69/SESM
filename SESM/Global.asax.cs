@@ -28,6 +28,12 @@ namespace SESM
             ServiceHelper.KillAllProcesses("SteamService");
             ServiceHelper.KillAllProcesses("steamerrorreporter");
 
+            // Registering public branch if none set
+            if (string.IsNullOrWhiteSpace(SESMConfigHelper.SEAutoUpdateBranch))
+                SESMConfigHelper.SEAutoUpdateBranch = "public";
+            if (string.IsNullOrWhiteSpace(SESMConfigHelper.MEAutoUpdateBranch))
+                SESMConfigHelper.MEAutoUpdateBranch = "public";
+
             // Registering routes
             AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
