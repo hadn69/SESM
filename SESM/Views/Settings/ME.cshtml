@@ -129,7 +129,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label">Beta Password</label>
+                        <label class="col-md-4 control-label">Branch Password</label>
                         <div class="col-md-8">
                             <div class="input-group">
                                 <span class="input-group-addon">
@@ -440,7 +440,7 @@
 
         $("#inpAutoUpdateBranch").change(function () {
             if (branches[$("#inpAutoUpdateBranch").val()].PassRequired)
-                $("#inpAutoUpdateBetaPassword").parents(".form-group").first().show();
+                $("#inpAutoUpdateBetaPassword").val(null).parents(".form-group").first().show();
             else
                 $("#inpAutoUpdateBetaPassword").parents(".form-group").first().hide();
         });
