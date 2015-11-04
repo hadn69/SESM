@@ -118,6 +118,17 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="col-md-4 control-label">Branch</label>
+                        <div class="col-md-8">
+                            <div class="input-group select2-bootstrap-prepend">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-code-fork"></i>
+                                </span>
+                                <select class="form-control select2" name="AutoUpdateBranch" id="inpAutoUpdateBranch"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="col-md-4 control-label">Beta Password</label>
                         <div class="col-md-8">
                             <div class="input-group">
@@ -157,6 +168,7 @@
         var statusLoaded = false;
         var versionLoaded = false;
         var settingsLoaded = false;
+        var branches = {};
         var uploadZone;
 
         Dropzone.options.uploadDropzone = {
@@ -211,6 +223,9 @@
                 AutoUpdateCron: {
                     required: true,
                     cron: true
+                },
+                AutoUpdateBranch: {
+                    required: true
                 },
                 AutoUpdateBetaPassword: {
                 }
@@ -344,10 +359,32 @@
                         .removeClass("alert-danger")
                         .removeClass("alert-warning");
 
-                    $("#Local-ME").find(".number").last().html(root.children("Content").children("Local").text());
-                    $("#remote-ME").find(".number").last().html(root.children("Content").children("Remote").text());
+                    branches = {};
 
-                    if (root.children("Content").children("Local").text() == "0.0.0.0") {
+                    root.children("Content").children("Branches").children().each(function () {
+                        var item = $(this);
+                        var Name = item.children("Name").text();
+                        var BuildId = item.children("BuildId").text();
+                        var PassRequired = item.children("PassRequired").text() == "true";
+
+                        branches[Name] = { Name: Name, BuildId: BuildId, PassRequired: PassRequired };
+                    });
+
+                    var currentBranch = root.children("Content").children("SelectedBranch").text();
+
+                    $("#inpAutoUpdateBranch").empty();
+
+                    $.each(branches, function (index, value) {
+                        $("#inpAutoUpdateBranch").append($("<option></option>").attr("value", value.Name).text(value.Name));
+                    });
+
+                    $("#inpAutoUpdateBranch").val(currentBranch).trigger("change");
+
+
+                    $("#Local-ME").find(".number").last().html(root.children("Content").children("Local").text());
+                    $("#remote-ME").find(".number").last().html(branches[currentBranch].BuildId);
+
+                    if (root.children("Content").children("Local").text() == "0") {
                         $("#Status-ME").find("h3").html("Medieval Engineers is not installed");
                         $("#Status-ME").find(".alert").addClass("alert-info");
                         $("#Local-ME").find(".number").last().html("N/A");
@@ -401,7 +438,12 @@
             refresh();
         });
 
-        
+        $("#inpAutoUpdateBranch").change(function () {
+            if (branches[$("#inpAutoUpdateBranch").val()].PassRequired)
+                $("#inpAutoUpdateBetaPassword").parents(".form-group").first().show();
+            else
+                $("#inpAutoUpdateBetaPassword").parents(".form-group").first().hide();
+        });
 
         $("#inpAutoUpdateCron").focusout(function () {
             TestCron();
@@ -414,7 +456,8 @@
                 {
                     AutoUpdateEnabled: $("#inpAutoUpdateEnabled").is(':checked'),
                     AutoUpdateCron: $("#inpAutoUpdateCron").val(),
-                    AutoUpdateBetaPassword: $("#inpAutoUpdateBetaPassword").val()
+                    AutoUpdateBetaPassword: $("#inpAutoUpdateBetaPassword").val(),
+                    AutoUpdateBranch: $("#inpAutoUpdateBranch").val()
                 },
                 function (data) {
                     $("#btnUpdateSettings").prop('disabled', false);
