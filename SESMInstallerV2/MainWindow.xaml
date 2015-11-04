@@ -20,6 +20,10 @@
         ResizeMode="NoResize" 
         ShowMaxRestoreButton="False">
     
-    <Frame x:Name="frame" Content="Frame" Margin="10,10,10,50"/>
+    <Grid>
 
+        <!--<Frame x:Name="frame" Content="Frame" Margin="10,10,10,50"/>-->
+        <local:PageTransition x:Name="pageTransitionControl" Margin="25" TransitionType="SlideAndFade" />
+    </Grid>
 </Controls:MetroWindow>
+    

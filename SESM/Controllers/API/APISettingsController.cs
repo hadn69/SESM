@@ -374,46 +374,45 @@ namespace SESM.Controllers.API
         {
             // ** PROCESS **
             Logger logger = LogManager.GetLogger("SEGetVersionLogger");
-            int? localVersion = null;
 
-            int? remoteVersion = null;
+            SteamCMDHelper.SteamGameInfo SteamGame = null;
 
             for (int i = 0; i < 5; i++)
             {
-                if (localVersion == null)
+                logger.Info("Retrieving game infos : ");
+                SteamGame = SteamCMDHelper.GetSteamGameInfos(SteamCMDHelper.SEAppId, PathHelper.GetSESyncDirPath(), logger);
+                if (SteamGame == null)
                 {
-                    logger.Info("Retrieving local version : ");
-                    localVersion = SteamCMDHelper.GetSEInstalledVersion(logger);
-                }
-
-                if (remoteVersion == null)
-                {
-                    logger.Info("Retrieving remote version : ");
-                    remoteVersion =
-                        SteamCMDHelper.GetSEAvailableVersion(
-                            !string.IsNullOrWhiteSpace(SESMConfigHelper.SEAutoUpdateBetaPassword), logger);
-                }
-
-                if (localVersion == null || remoteVersion == null)
-                {
-                    logger.Info("Fail retrieving one of the version (try " + (i + 1) + " of 5), waiting and retrying ...");
+                    logger.Info("Fail retrieving game infos (try " + (i + 1) + " of 5), waiting and retrying ...");
                     Thread.Sleep(2000);
                 }
                 else
                     break;
-
             }
 
-            if (localVersion == null || remoteVersion == null)
+            if (SteamGame == null)
             {
-                return Content(XMLMessage.Error("SET-GSEV-FAIL", "Fail retieving one of the version. See SEGetVersion log for more info").ToString());
+                logger.Fatal("Fail retrieving game infos (too much try), steam CMD problem");
+                return Content(XMLMessage.Error("SET-GSEV-NOK", "Fail retrieving game infos.").ToString());
             }
 
             XMLMessage response = new XMLMessage("SET-GSEV-OK");
 
-            response.AddToContent(new XElement("Local", localVersion.ToString()));
-            response.AddToContent(new XElement("Remote", remoteVersion.ToString()));
-            response.AddToContent(new XElement("Diff", localVersion - remoteVersion));
+            response.AddToContent(new XElement("Local", SteamGame.InstalledBuildId));
+            response.AddToContent(new XElement("SelectedBranch", SESMConfigHelper.SEAutoUpdateBranch));
+            XElement branches = new XElement("Branches");
+
+            foreach (KeyValuePair<string, SteamCMDHelper.SteamGameInfo.BranchItem> item in SteamGame.Branches)
+            {
+                XElement branch = new XElement("Branch");
+                branch.Add(new XElement("Name", item.Key),
+                           new XElement("BuildId", item.Value.BuildId),
+                           new XElement("PassRequired", item.Value.PwdRequired));
+                branches.Add(branch);
+            }
+            response.AddToContent(branches);
+
+            response.AddToContent(new XElement("Diff", SteamGame.InstalledBuildId - SteamGame.Branches[SESMConfigHelper.SEAutoUpdateBranch].BuildId));
 
             return Content(response.ToString());
         }
@@ -454,10 +453,15 @@ namespace SESM.Controllers.API
 
             string autoUpdateBetaPassword = Request.Form["AutoUpdateBetaPassword"];
 
+            string autoUpdateBranch = Request.Form["AutoUpdateBranch"];
+            if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateBranch"]))
+                return Content(XMLMessage.Error("SET-SSES-MISAUB", "The AutoUpdateBranch field must be provided").ToString());
+
             // ** PROCESS **
             SESMConfigHelper.SEAutoUpdateEnabled = autoUpdateEnabled;
             SESMConfigHelper.SEAutoUpdateCron = autoUpdateCron;
             SESMConfigHelper.SEAutoUpdateBetaPassword = autoUpdateBetaPassword;
+            SESMConfigHelper.SEAutoUpdateBranch = autoUpdateBranch;
 
             // Deleting the Job
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
@@ -539,7 +543,7 @@ namespace SESM.Controllers.API
         {
             // ** INIT **
             ServerProvider srvPrv = new ServerProvider(_context);
-           
+
             // ** PROCESS **
             XMLMessage response = new XMLMessage("SET-GMES-OK");
 
@@ -555,46 +559,46 @@ namespace SESM.Controllers.API
         {
             // ** PROCESS **
             Logger logger = LogManager.GetLogger("MEGetVersionLogger");
-            int? localVersion = null;
 
-            int? remoteVersion = null;
+            SteamCMDHelper.SteamGameInfo SteamGame = null;
 
             for (int i = 0; i < 5; i++)
             {
-                if (localVersion == null)
+                logger.Info("Retrieving game infos : ");
+                SteamGame = SteamCMDHelper.GetSteamGameInfos(SteamCMDHelper.MEAppId, PathHelper.GetMESyncDirPath(), logger);
+                if (SteamGame == null)
                 {
-                    logger.Info("Retrieving local version : ");
-                    localVersion = SteamCMDHelper.GetMEInstalledVersion(logger);
-                }
-
-                if (remoteVersion == null)
-                {
-                    logger.Info("Retrieving remote version : ");
-                    remoteVersion =
-                        SteamCMDHelper.GetMEAvailableVersion(
-                            !string.IsNullOrWhiteSpace(SESMConfigHelper.MEAutoUpdateBetaPassword), logger);
-                }
-
-                if (localVersion == null || remoteVersion == null)
-                {
-                    logger.Info("Fail retrieving one of the version (try " + (i + 1) + " of 5), waiting and retrying ...");
+                    logger.Info("Fail retrieving game infos (try " + (i + 1) + " of 5), waiting and retrying ...");
                     Thread.Sleep(2000);
                 }
                 else
                     break;
-
             }
 
-            if (localVersion == null || remoteVersion == null)
+            if (SteamGame == null)
             {
-                return Content(XMLMessage.Error("SET-GMEV-FAIL", "Fail retieving one of the version. See MEGetVersion log for more info").ToString());
+                logger.Fatal("Fail retrieving game infos (too much try), steam CMD problem");
+                return Content(XMLMessage.Error("SET-GMEV-NOK", "Fail retrieving game infos.").ToString());
             }
+
 
             XMLMessage response = new XMLMessage("SET-GMEV-OK");
 
-            response.AddToContent(new XElement("Local", localVersion.ToString()));
-            response.AddToContent(new XElement("Remote", remoteVersion.ToString()));
-            response.AddToContent(new XElement("Diff", localVersion - remoteVersion));
+            response.AddToContent(new XElement("Local", SteamGame.InstalledBuildId));
+            response.AddToContent(new XElement("SelectedBranch", SESMConfigHelper.MEAutoUpdateBranch));
+            XElement branches = new XElement("Branches");
+
+            foreach (KeyValuePair<string, SteamCMDHelper.SteamGameInfo.BranchItem> item in SteamGame.Branches)
+            {
+                XElement branch = new XElement("Branch");
+                branch.Add(new XElement("Name", item.Key),
+                           new XElement("BuildId", item.Value.BuildId),
+                           new XElement("PassRequired", item.Value.PwdRequired));
+                branches.Add(branch);
+            }
+            response.AddToContent(branches);
+
+            response.AddToContent(new XElement("Diff", SteamGame.InstalledBuildId - SteamGame.Branches[SESMConfigHelper.MEAutoUpdateBranch].BuildId));
 
             return Content(response.ToString());
         }
@@ -633,12 +637,17 @@ namespace SESM.Controllers.API
             if (!CronExpression.IsValidExpression(autoUpdateCron))
                 return Content(XMLMessage.Error("SET-SMES-BADAUC", "The AutoUpdateCron field is invalid").ToString());
 
+            string autoUpdateBranch = Request.Form["AutoUpdateBranch"];
+            if (string.IsNullOrWhiteSpace(Request.Form["AutoUpdateBranch"]))
+                return Content(XMLMessage.Error("SET-SMES-MISAUB", "The AutoUpdateBranch field must be provided").ToString());
+
             string autoUpdateBetaPassword = Request.Form["AutoUpdateBetaPassword"];
 
             // ** PROCESS **
             SESMConfigHelper.MEAutoUpdateEnabled = autoUpdateEnabled;
             SESMConfigHelper.MEAutoUpdateCron = autoUpdateCron;
             SESMConfigHelper.MEAutoUpdateBetaPassword = autoUpdateBetaPassword;
+            SESMConfigHelper.MEAutoUpdateBranch = autoUpdateBranch;
 
             // Deleting the Job
             IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();

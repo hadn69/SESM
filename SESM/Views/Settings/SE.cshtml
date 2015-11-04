@@ -119,6 +119,19 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="col-md-4 control-label">Branch</label>
+                        <div class="col-md-8">
+                            <div class="input-group select2-bootstrap-prepend">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-code-fork"></i>
+                                </span>
+                                <select class="form-control select2" name="AutoUpdateBranch" id="inpAutoUpdateBranch">
+
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="col-md-4 control-label">Beta Password</label>
                         <div class="col-md-8">
                             <div class="input-group">
@@ -158,6 +171,7 @@
         var statusLoaded = false;
         var versionLoaded = false;
         var settingsLoaded = false;
+        var branches = {};
         var uploadZone;
 
         Dropzone.options.uploadDropzone = {
@@ -212,6 +226,9 @@
                 AutoUpdateCron: {
                     required: true,
                     cron: true
+                },
+                AutoUpdateBranch: {
+                    required: true
                 },
                 AutoUpdateBetaPassword: {
                 }
@@ -337,7 +354,7 @@
                         return;
                     }
 
-                    $("#btnUpdate").hide(0);
+                    $("#btnUpdate").hide();
 
                     $("#Status-SE").children(".alert")
                         .removeClass("alert-success")
@@ -345,23 +362,44 @@
                         .removeClass("alert-danger")
                         .removeClass("alert-warning");
 
-                    $("#Local-SE").find(".number").last().html(root.children("Content").children("Local").text());
-                    $("#remote-SE").find(".number").last().html(root.children("Content").children("Remote").text());
+                    branches = {};
 
-                    if (root.children("Content").children("Local").text() == "0.0.0.0") {
+                    root.children("Content").children("Branches").children().each(function() {
+                        var item = $(this);
+                        var Name = item.children("Name").text();
+                        var BuildId = item.children("BuildId").text();
+                        var PassRequired = item.children("PassRequired").text() == "true";
+
+                        branches[Name] = { Name: Name, BuildId: BuildId, PassRequired: PassRequired };
+                    });
+
+                    var currentBranch = root.children("Content").children("SelectedBranch").text();
+
+                    $("#inpAutoUpdateBranch").empty();
+
+                    $.each(branches, function (index, value) {
+                        $("#inpAutoUpdateBranch").append($("<option></option>").attr("value", value.Name).text(value.Name));
+                    });
+
+                    $("#inpAutoUpdateBranch").val(currentBranch).trigger("change");
+
+                    $("#Local-SE").find(".number").last().html(root.children("Content").children("Local").text());
+                    $("#remote-SE").find(".number").last().html(branches[currentBranch].BuildId);
+
+                    if (root.children("Content").children("Local").text() == "0") {
                         $("#Status-SE").find("h3").html("Space Engineers is not installed");
                         $("#Status-SE").find(".alert").addClass("alert-info");
                         $("#Local-SE").find(".number").last().html("N/A");
-                        $("#btnUpdate").show(0);
+                        $("#btnUpdate").show();
 
                         showView();
                         return;
                     }
-                    $("#btnDelete").show(0);
+                    $("#btnDelete").show();
                     if (root.children("Content").children("Diff").text() < 0) {
                         $("#Status-SE").find("h3").html("An update is available !");
                         $("#Status-SE").children(".alert").addClass("alert-warning");
-                        $("#btnUpdate").show(0);
+                        $("#btnUpdate").show();
                     }
                     else if (root.children("Content").children("Diff").text() == 0) {
                         $("#Status-SE").find("h3").html("Space Engineers is up to date !");
@@ -377,7 +415,6 @@
                 });
 
             $.get("/API/Settings/GetSESettings",
-                {},
                 function (data) {
                     settingsLoaded = true;
 
@@ -403,7 +440,12 @@
             refresh();
         });
 
-        
+        $("#inpAutoUpdateBranch").change(function() {
+            if (branches[$("#inpAutoUpdateBranch").val()].PassRequired)
+                $("#inpAutoUpdateBetaPassword").parents(".form-group").first().show();
+            else
+                $("#inpAutoUpdateBetaPassword").parents(".form-group").first().hide();
+            });
 
         $("#inpAutoUpdateCron").focusout(function () {
             TestCron();
@@ -416,7 +458,8 @@
                 {
                     AutoUpdateEnabled: $("#inpAutoUpdateEnabled").is(':checked'),
                     AutoUpdateCron: $("#inpAutoUpdateCron").val(),
-                    AutoUpdateBetaPassword: $("#inpAutoUpdateBetaPassword").val()
+                    AutoUpdateBetaPassword: $("#inpAutoUpdateBetaPassword").val(),
+                    AutoUpdateBranch: $("#inpAutoUpdateBranch").val()
                 },
                 function (data) {
                     $("#btnUpdateSettings").prop('disabled', false);

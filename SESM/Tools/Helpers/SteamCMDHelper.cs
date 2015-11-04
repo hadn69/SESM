@@ -1,18 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Web.Helpers;
 using Ionic.Zip;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NLog;
+using Quartz.Util;
 
 namespace SESM.Tools.Helpers
 {
     public class SteamCMDHelper
     {
-        private const int SEAppId = 298740;
-        private const int MEAppId = 367970;
+        public const int SEAppId = 298740;
+        public const int MEAppId = 367970;
         private const int GetInfoDuration = 60;
 
         private static object CheckSteamCMDLock = new object();
@@ -60,7 +67,7 @@ namespace SESM.Tools.Helpers
                             }
                         };
                         si.Start();
-                        Thread.Sleep(15000);
+                        si.WaitForExit(15000);
                         if (!si.HasExited)
                             si.Kill();
                         logger?.Info("Done SteamCMD initialisation");
@@ -98,50 +105,80 @@ namespace SESM.Tools.Helpers
                             UseShellExecute = false,
                             FileName = SESMConfigHelper.SEDataPath + @"\SteamCMD\steamcmd.exe",
                             Arguments = arguments,
-                            CreateNoWindow = false,
+                            CreateNoWindow = true,
                             RedirectStandardInput = true,
                             RedirectStandardOutput = true,
-                            RedirectStandardError = false
+                            RedirectStandardError = true
                         }
                     };
 
-                    logger?.Info("Starting SteamCMD (" + duration + " secs Max)");
-                    logger?.Debug("Arguments : " + si.StartInfo.Arguments);
+                    StringBuilder output = new StringBuilder();
+                    StringBuilder error = new StringBuilder();
 
-                    si.Start();
-
-                    DateTime endTime = DateTime.Now.AddSeconds(duration);
-                    string output = string.Empty;
-
-                    logger?.Debug("Start of SteamCMD output :");
-                    while (!si.HasExited && DateTime.Now <= endTime)
+                    using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
+                    using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
                     {
-                        string val = si.StandardOutput.ReadLine();
-                        if (val == null)
-                            continue;
-                        output += val + "\n";
-                        logger?.Debug("    " + val);
-                    }
-                    logger?.Debug("End of SteamCMD output");
-                    
-                    if (si.HasExited)
-                        logger?.Info("Process closed itself gracefully");
-                    else
-                    {
-                        logger?.Warn("Process execution timeout");
-                        try
+                        si.OutputDataReceived += (sender, e) =>
                         {
-                            ServiceHelper.KillProcessAndChildren(si.Id);
-                            logger?.Info("Killing process sucessful");
-                            Thread.Sleep(2000);
-                        }
-                        catch (Exception ex)
+                            if (e.Data == null)
+                                outputWaitHandle.Set();
+                            else
+                                output.AppendLine(e.Data);
+                        };
+                        si.ErrorDataReceived += (sender, e) =>
                         {
-                            logger?.Error("Error while killing process", ex);
+                            if (e.Data == null)
+                                errorWaitHandle.Set();
+                            else
+                                error.AppendLine(e.Data);
+                        };
+
+                        logger?.Info("Starting SteamCMD (" + duration + " secs Max)");
+                        //logger?.Debug("Arguments : " + si.StartInfo.Arguments);
+
+                        si.Start();
+
+                        si.BeginOutputReadLine();
+                        si.BeginErrorReadLine();
+
+                        if (si.WaitForExit(duration * 1000) &&
+                            outputWaitHandle.WaitOne(10 * 1000) &&
+                            errorWaitHandle.WaitOne(10 * 1000))
+                        {
+                            logger?.Info("Process closed itself gracefully");
                         }
+                        else
+                        {
+                            logger?.Warn("Process execution timeout");
+                            logger?.Warn("Trying to kill the process");
+                            try
+                            {
+                                ServiceHelper.KillProcessAndChildren(si.Id);
+                                logger?.Info("Killing process sucessful");
+                                Thread.Sleep(2000);
+                            }
+                            catch (Exception ex)
+                            {
+                                logger?.Error("Error while killing process", ex);
+                            }
+                        }
+
+                        logger?.Debug("-- Start of SteamCMD standard output :");
+                        foreach (string line in output.ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
+                        {
+                            logger?.Debug("    " + line);
+                        }
+                        logger?.Debug("-- End of SteamCMD standard output");
+
+                        logger?.Debug("== Start of SteamCMD error output :");
+                        foreach (string line in error.ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
+                        {
+                            logger?.Debug("    " + line);
+                        }
+                        logger?.Debug("== End of SteamCMD error output");
+
+                        return output.ToString();
                     }
-                    
-                    return output;
                 }
             }
             catch (Exception ex)
@@ -151,197 +188,180 @@ namespace SESM.Tools.Helpers
             return null;
         }
 
-        public static int? GetSEInstalledVersion(Logger logger = null)
+        public static SteamGameInfo GetSteamGameInfos(int appId, string syncDirPath, Logger logger)
         {
-            string output = ExecuteSteamCMD(logger, " +@ShutdownOnFailedCommand 1"
-                                                    + " +force_install_dir " + PathHelper.GetSESyncDirPath()
-                                                    + " +login Anonymous"
-                                                    + " +app_status " + SEAppId
-                                                    + " +app_info_print " + SEAppId
-                                                    + " +quit");
-
-            if (output.Contains("Login Failure"))
+            try
             {
-                logger?.Error("Login Failure !");
-                return null;
-            }
+                string arguments = " +@ShutdownOnFailedCommand 1 " +
+                                  " +force_install_dir " + syncDirPath +
+                                  " +login Anonymous " +
+                                  " +app_status " + appId +
+                                  " +app_info_print " + appId +
+                                  " +find a " +
+                                  " +quit";
 
-            if (output.Contains("install state:"))
-            {
-                if (output.Contains("install state: uninstalled"))
-                    return 0;
-                Regex regex = new Regex(@"BuildID (\d+)");
-                Match match = regex.Match(output);
-                if (match.Success)
+
+                string output = ExecuteSteamCMD(logger, arguments, 30);
+
+                SteamGameInfo gameInfo = new SteamGameInfo();
+
+                // Parsing installed buildid
+
+                if (output.Contains("Login Failure"))
                 {
-                    try
+                    logger?.Error("Login Failure !");
+                    return null;
+                }
+
+                if (output.Contains("install state:"))
+                {
+                    if (output.Contains("install state: uninstalled"))
+                        gameInfo.InstalledBuildId = 0;
+                    else
                     {
-                        VersionCache.SELocalVersion = match.Groups[1].Value;
-                        return int.Parse(match.Groups[1].Value);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger?.Error("Failed parsing int :", ex);
-                        return null;
+                        Regex regex = new Regex(@"BuildID (\d+)");
+                        Match match = regex.Match(output);
+                        if (match.Success)
+                        {
+                            try
+                            {
+                                VersionCache.SELocalVersion = match.Groups[1].Value;
+                                gameInfo.InstalledBuildId = int.Parse(match.Groups[1].Value);
+                            }
+                            catch (Exception ex)
+                            {
+                                logger?.Error("Failed parsing int :", ex);
+                                return null;
+                            }
+                        }
+                        else
+                        {
+                            logger?.Error("Missing BuildId keyword !");
+                            return null;
+                        }
                     }
                 }
-                logger?.Error("Missing keyword !");
-                return null;
-            }
-            logger?.Error("Missing keyword !");
-            return null;
-        }
-
-        public static int? GetSEAvailableVersion(bool dev, Logger logger = null)
-        {
-            string output = ExecuteSteamCMD(logger, " +@ShutdownOnFailedCommand 1"
-                                                    + " +force_install_dir " + PathHelper.GetSESyncDirPath()
-                                                    + " +login Anonymous"
-                                                    + " +app_info_request " + SEAppId
-                                                    + " +app_info_update" // Try to force info update
-                                                    + " +app_info_update 1"
-                                                    + " +app_info_print " + SEAppId
-                                                    + " +app_info_print " + SEAppId // Volontary double call to be sure to have info
-                                                    + " +quit");
-            if (output.Contains("Login Failure"))
-            {
-                logger?.Error("Login Failure !");
-                return null;
-            }
-
-            if (output.Contains("\"branches\""))
-            {
-                Regex regex = dev ?
-                    new Regex("dev\"\\s*{\\s*\"buildid\"\\s*\"(\\d+)") :
-                    new Regex("public\"\\s*{\\s*\"buildid\"\\s*\"(\\d+)");
-                Match match = regex.Match(output);
-                if (match.Success)
+                else
                 {
+                    logger?.Error("Missing Basic keyword !");
+                    return null;
+                }
+
+                // Parsing remote data
+
+                int firstPos = output.IndexOf('{');
+                int lastPos = output.LastIndexOf('}');
+
+                output = output.Substring(firstPos, lastPos - firstPos + 1);
+
+                output = output.Replace("\"\t\t\"", "\":\"");
+                output = Regex.Replace(output, ":\"(\\d{1,9})\"", ":$1");
+                output = Regex.Replace(output, "(})(\\s+[^}\\s])", "$1,$2");
+                output = Regex.Replace(output, "(\"|\\d)(\\s+\")", "$1,$2");
+                output = Regex.Replace(output, "(\")(\\s*{)", "$1:$2");
+
+                if (string.IsNullOrWhiteSpace(output))
+                    return null;
+
+                var converter = new ExpandoObjectConverter();
+                dynamic infos = JsonConvert.DeserializeObject<ExpandoObject>(output, converter);
+
+                gameInfo.Name = infos.common.name;
+                gameInfo.GameId = Convert.ToInt32(infos.common.gameid);
+
+                foreach (KeyValuePair<String, object> kvp in (infos.depots.branches as IDictionary<String, object>))
+                {
+                    dynamic item = kvp.Value;
+
+                    SteamGameInfo.BranchItem branch = new SteamGameInfo.BranchItem();
+
                     try
                     {
-                        VersionCache.SERemoteVersion = match.Groups[1].Value;
-                        return int.Parse(match.Groups[1].Value);
+                        branch.BuildId = Convert.ToInt32(item.buildid);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        logger?.Error("Failed parsing int :", ex);
-                        return 0;
                     }
+
+                    try
+                    {
+                        branch.Description = item.description;
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                    try
+                    {
+                        branch.PwdRequired = Convert.ToBoolean(item.pwdrequired);
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                    try
+                    {
+                        branch.PwdTestGID = item.pwdtestgid;
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                    gameInfo.Branches.Add(kvp.Key, branch);
                 }
+
+
+                return gameInfo;
+
             }
-            logger?.Error("Missing keyword !");
-            return null;
+            catch (Exception ex)
+            {
+                logger?.Fatal("GetSteamGameInfos Exception", ex);
+                return null;
+            }
         }
 
-        public static void UpdateSE(Logger logger, bool dev)
+        public static void Update(int appId, string syncDirPath, string branch, string password, Logger logger)
         {
             string output = ExecuteSteamCMD(logger, " +login Anonymous"
-                                                    + " +force_install_dir " + PathHelper.GetSESyncDirPath()
+                                                    + " +force_install_dir " + syncDirPath
                                                     + " +app_update " + SEAppId + " -validate "
-                                                    + (dev ?
-                                                        " -beta development -betapassword " + SESMConfigHelper.SEAutoUpdateBetaPassword :
-                                                        " -beta public")
-                                                    + " +app_info_print " + SEAppId
+                                                    + " -beta " + branch
+                                                    + (!string.IsNullOrWhiteSpace(password) ? "-betapassword " + password : "")
+                                                    + " +find a "
                                                     + " +quit", 180);
-            logger.Info("Update output : " + output);
-
+            //logger.Info("Update output : " + output);
         }
 
-        public static int? GetMEInstalledVersion(Logger logger = null)
+        public class SteamGameInfo
         {
-            string output = ExecuteSteamCMD(logger, " +@ShutdownOnFailedCommand 1"
-                                                    + " +force_install_dir " + PathHelper.GetMESyncDirPath()
-                                                    + " +login Anonymous"
-                                                    + " +app_status " + MEAppId
-                                                    + " +app_info_print " + SEAppId // Volontary
-                                                    + " +quit");
+            public string Name;
+            public int GameId;
+            public int InstalledBuildId;
+            public Dictionary<string, BranchItem> Branches = new Dictionary<string, BranchItem>();
 
-            if (output.Contains("Login Failure"))
+            public BranchItem this[string branch]
             {
-                logger?.Error("Login Failure !");
-                return null;
-            }
-
-            if (output.Contains("install state:"))
-            {
-                if (output.Contains("install state: uninstalled"))
-                    return 0;
-                Regex regex = new Regex(@"BuildID (\d+)");
-                Match match = regex.Match(output);
-                if (match.Success)
+                get { return Branches[branch]; }
+                set
                 {
-                    try
-                    {
-                        VersionCache.MELocalVersion = match.Groups[1].Value;
-                        return int.Parse(match.Groups[1].Value);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger?.Error("Failed parsing int :", ex);
-                        return null;
-                    }
-                }
-                logger?.Error("Missing keyword !");
-                return null;
-            }
-            logger?.Error("Missing keyword !");
-            return null;
-        }
-
-        public static int? GetMEAvailableVersion(bool dev, Logger logger = null)
-        {
-            string output = ExecuteSteamCMD(logger, " +@ShutdownOnFailedCommand 1"
-                                                    + " +force_install_dir " + PathHelper.GetMESyncDirPath()
-                                                    + " +login Anonymous"
-                                                    + " +app_info_request " + MEAppId
-                                                    + " +app_info_update" // Try to force info update
-                                                    + " +app_info_update 1"
-                                                    + " +app_info_print " + MEAppId
-                                                    + " +app_info_print " + SEAppId // Volontary
-                                                    + " +quit");
-            if (output.Contains("Login Failure"))
-            {
-                logger?.Error("Login Failure !");
-                return null;
-            }
-
-            if (output.Contains("\"branches\""))
-            {
-                Regex regex = dev ?
-                    new Regex("dev\"\\s*{\\s*\"buildid\"\\s*\"(\\d+)") :
-                    new Regex("public\"\\s*{\\s*\"buildid\"\\s*\"(\\d+)");
-                Match match = regex.Match(output);
-                if (match.Success)
-                {
-                    try
-                    {
-                        VersionCache.MERemoteVersion = match.Groups[1].Value;
-                        return int.Parse(match.Groups[1].Value);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger?.Error("Failed parsing int :", ex);
-                        return 0;
-                    }
+                    if (Branches.ContainsKey(branch))
+                        Branches[branch] = value;
+                    else
+                        Branches.Add(branch, value);
                 }
             }
-            logger?.Error("Missing keyword !");
-            return null;
+
+            public class BranchItem
+            {
+                public int BuildId;
+                public string Description;
+                public bool PwdRequired = false;
+                public string PwdTestGID;
+
+            }
         }
-
-        public static void UpdateME(Logger logger, bool dev)
-        {
-            string output = ExecuteSteamCMD(logger, " +login Anonymous"
-                                                    + " +force_install_dir " + PathHelper.GetMESyncDirPath()
-                                                    + " +app_update " + MEAppId + " -validate "
-                                                    + (dev ?
-                                                        " -beta development -betapassword " + SESMConfigHelper.MEAutoUpdateBetaPassword :
-                                                        " -beta public")
-                                                    + " +app_info_print " + SEAppId // Volontary
-                                                    + " +quit", 180);
-            logger.Info("Update output : " + output);
-
-        }
-
     }
+
+
 }

@@ -18,7 +18,7 @@ namespace SESM
     {
         protected void Application_Start()
         {
-            Constants.SetVersion(4,0,5);
+            Constants.SetVersion(4,1,0);
             // Resetting Run Vars
             if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar"))
                 File.Delete(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar");
@@ -27,6 +27,12 @@ namespace SESM
             ServiceHelper.KillAllProcesses("steamcmd");
             ServiceHelper.KillAllProcesses("SteamService");
             ServiceHelper.KillAllProcesses("steamerrorreporter");
+
+            // Registering public branch if none set
+            if (string.IsNullOrWhiteSpace(SESMConfigHelper.SEAutoUpdateBranch))
+                SESMConfigHelper.SEAutoUpdateBranch = "public";
+            if (string.IsNullOrWhiteSpace(SESMConfigHelper.MEAutoUpdateBranch))
+                SESMConfigHelper.MEAutoUpdateBranch = "public";
 
             // Registering routes
             AreaRegistration.RegisterAllAreas();

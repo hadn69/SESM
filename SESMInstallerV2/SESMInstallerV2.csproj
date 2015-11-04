@@ -13,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,14 +36,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MahApps.Metro, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
-      <HintPath>packages\MahApps.Metro.1.0.0\lib\net45\MahApps.Metro.dll</HintPath>
+    <Reference Include="MahApps.Metro, Version=1.1.2.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>packages\MahApps.Metro.1.1.2.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>C:\Users\12480_000\Documents\Visual Studio 2015\Projects\SESM\SESMInstallerV2\packages\MahApps.Metro.1.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>packages\MahApps.Metro.1.1.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
@@ -74,7 +76,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Pages\Intro.xaml">
+    <Page Include="Pages\P1_Mode.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\P0_Intro.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PageTransition.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -84,8 +94,15 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Pages\Intro.xaml.cs">
-      <DependentUpon>Intro.xaml</DependentUpon>
+    <Compile Include="MasterUserControl.cs" />
+    <Compile Include="Pages\P1_Mode.xaml.cs">
+      <DependentUpon>P1_Mode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\P0_Intro.xaml.cs">
+      <DependentUpon>P0_Intro.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PageTransition.xaml.cs">
+      <DependentUpon>PageTransition.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -116,18 +133,22 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\WindowsIcons-license.txt" />
+    <Resource Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Entypo-license.txt" />
+    <Resource Include="Resources\LogoAlpha.png" />
   </ItemGroup>
   <ItemGroup>
-    <SplashScreen Include="Resources\Logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Logo-tr.png" />
+    <SplashScreen Include="Resources\sesmLogo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="packages\Fody.1.29.3\build\dotnet\Fody.targets" Condition="Exists('packages\Fody.1.29.3\build\dotnet\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Ce projet fait référence à des packages NuGet qui sont manquants sur cet ordinateur. Utilisez l'option de restauration des packages NuGet pour les télécharger. Pour plus d'informations, consultez http://go.microsoft.com/fwlink/?LinkID=322105. Le fichier manquant est : {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Fody.1.29.3\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Fody.1.29.3\build\dotnet\Fody.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
+﻿using System.Windows.Controls;
 using MahApps.Metro.Controls;
 using SESMInstallerV2.Pages;
 
@@ -10,28 +6,27 @@ namespace SESMInstallerV2
 {
     public partial class MainWindow : MetroWindow
     {
-        public Page CurrentPage;
+        public MasterUserControl CurrentPage;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            Intro intro = new Intro();
-            CurrentPage = intro;
-            frame.Content = CurrentPage;
+            CurrentPage = new P0_Intro();
 
-            intro.NextPageClicked += Intro_NextPageClicked;
+            CurrentPage.MoveForwardTo += CurrentPage_MoveForwardTo;
+
+            pageTransitionControl.ShowPage(CurrentPage);
         }
 
-        private void Intro_NextPageClicked()
+        private void CurrentPage_MoveForwardTo(MasterUserControl sender, MasterUserControl page)
         {
-            DoubleAnimation da = new DoubleAnimation
-            {
-                From = 10,
-                To = -500,
-                Duration = new Duration(TimeSpan.FromSeconds(5))
-            };
-            TranslateTransform tt = new TranslateTransform();
-            CurrentPage.BeginAnimation(TranslateTransform.XProperty, da);
+            CurrentPage = page;
+
+            CurrentPage.MoveForwardTo += CurrentPage_MoveForwardTo;
+
+            pageTransitionControl.ShowPage(page);
+
         }
     }
 }

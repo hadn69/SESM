@@ -36,40 +36,42 @@ namespace SESM.Tools.Jobs
 
             int? localVersion = null;
             int? remoteVersion = null;
+            SteamCMDHelper.SteamGameInfo gameinfo = null;
             for (int i = 0; i < 5; i++)
             {
-                if (localVersion == null)
+                logger.Info("Retrieving game infos : ");
+                gameinfo = SteamCMDHelper.GetSteamGameInfos(SteamCMDHelper.SEAppId, PathHelper.GetSESyncDirPath(), logger);
+                if (gameinfo == null)
                 {
-                    logger.Info("Retrieving local version : ");
-                    localVersion = SteamCMDHelper.GetSEInstalledVersion(logger);
-                }
-
-                if (remoteVersion == null)
-                {
-                    logger.Info("Retrieving remote version : ");
-                    remoteVersion =
-                        SteamCMDHelper.GetSEAvailableVersion(
-                            !string.IsNullOrWhiteSpace(SESMConfigHelper.SEAutoUpdateBetaPassword), logger);
-                }
-
-                if (localVersion == null || remoteVersion == null)
-                {
-                    logger.Info("Fail retrieving one of the version (try " + (i + 1) + " of 5), waiting and retrying ...");
+                    logger.Info("Fail retrieving game infos (try " + (i + 1) + " of 5), waiting and retrying ...");
                     Thread.Sleep(2000);
                 }
                 else
                     break;
 
             }
-            if (localVersion == null || remoteVersion == null)
+            if (gameinfo == null)
             {
-                logger.Info("Fail retrieving one of the version (too much try), steam CMD problem");
-                return ReturnEnum.Error;
+                logger.Fatal("Fail retrieving one of the version (too much try), steam CMD problem");
+                if (!force)
+                    return ReturnEnum.Error;
             }
+            else
+            {
+                logger.Info("Getting branch " + SESMConfigHelper.SEAutoUpdateBranch);
+                if (gameinfo.Branches.ContainsKey(SESMConfigHelper.SEAutoUpdateBranch))
+                    logger.Info("Branch OK");
+                else
+                {
+                    logger.Fatal("Branch unknown");
+                }
 
-            logger.Info(" - Local Version : " + localVersion);
-            logger.Info(" - Remote Version : " + remoteVersion);
+                localVersion = gameinfo.InstalledBuildId;
+                remoteVersion = gameinfo.Branches[SESMConfigHelper.SEAutoUpdateBranch].BuildId;
 
+                logger.Info(" - Local Version : " + localVersion);
+                logger.Info(" - Remote Version : " + remoteVersion);
+            }
             // Test for update
             if (!useLocalZip && !force && localVersion >= remoteVersion)
             {
@@ -165,7 +167,7 @@ namespace SESM.Tools.Jobs
                 else
                 {
                     logger.Info("Updating SE Game Files ...");
-                    SteamCMDHelper.UpdateSE(logger, !string.IsNullOrWhiteSpace(SESMConfigHelper.SEAutoUpdateBetaPassword));
+                    SteamCMDHelper.Update(SteamCMDHelper.SEAppId, PathHelper.GetSESyncDirPath(), SESMConfigHelper.SEAutoUpdateBranch, SESMConfigHelper.SEAutoUpdateBetaPassword, logger);
 
                     logger.Info("Applying SE Game Files ...");
                     logger.Info("Applying Content ...");
