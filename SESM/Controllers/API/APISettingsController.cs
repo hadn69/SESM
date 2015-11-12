@@ -41,8 +41,8 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("MESavePath", SESMConfigHelper.MESavePath));
             response.AddToContent(new XElement("MEDataPath", SESMConfigHelper.MEDataPath));
             response.AddToContent(new XElement("Arch", SESMConfigHelper.Arch));
-            response.AddToContent(new XElement("SendLogToKeen", SESMConfigHelper.SendLogToKeen));
-            response.AddToContent(new XElement("AddDateToLog", SESMConfigHelper.AddDateToLog));
+            response.AddToContent(new XElement("SendLogToKeen", SESMConfigHelper.SESendLogToKeen));
+            response.AddToContent(new XElement("AddDateToLog", SESMConfigHelper.SEAddDateToLog));
             return Content(response.ToString());
         }
 
@@ -168,8 +168,10 @@ namespace SESM.Controllers.API
                 SESMConfigHelper.MESavePath = MESavePath;
                 SESMConfigHelper.MEDataPath = MEDataPath;
                 SESMConfigHelper.Arch = Arch;
-                SESMConfigHelper.SendLogToKeen = SendLogToKeen;
-                SESMConfigHelper.AddDateToLog = AddDateToLog;
+                SESMConfigHelper.SESendLogToKeen = SendLogToKeen;
+                SESMConfigHelper.MESendLogToKeen = SendLogToKeen;
+                SESMConfigHelper.SEAddDateToLog = AddDateToLog;
+                SESMConfigHelper.MEAddDateToLog = AddDateToLog;
 
                 foreach (EntityServer server in SEServer)
                 {

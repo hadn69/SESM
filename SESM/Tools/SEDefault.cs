@@ -100,5 +100,7 @@ namespace SESM.Tools
         public static readonly int MaxDrones = 5;
         public static readonly bool EnableDrones = true;
 
+        // -- New 12/11
+        public static readonly int FloraDensity = 20;
     }
 }

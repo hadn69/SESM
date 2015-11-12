@@ -18,10 +18,16 @@ namespace SESM
     {
         protected void Application_Start()
         {
-            Constants.SetVersion(4,1,1);
+            Constants.SetVersion(4,2,0);
+
+            SESMConfigHelper.Prefix = SESMConfigHelper.Prefix;
+
             // Resetting Run Vars
             if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar"))
                 File.Delete(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar");
+
+            // Trying to init the registery
+            SESMConfigHelper.InitializeRegistry();
 
             // Killing any remaining SteamCMD
             ServiceHelper.KillAllProcesses("steamcmd");
@@ -237,7 +243,7 @@ namespace SESM
                                             "1401;1404;1400;1409;1402;1403;1407;1408;1410;1000;1604;" +
                                             "1602;1603;1600;1601;1605;1504;1502;1503;1500;1501;1505;" +
                                             "1700;1014;1013;1011;1012;1131;1132;1133;1130;1111;1113;" +
-                                            "1114;1110;1112;1121;1122;1123;1120"
+                                            "1114;1110;1112;1121;1122;1123;1120;1264"
                 };
 
                 EntityServerRole Moderators = new EntityServerRole()
