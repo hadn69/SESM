@@ -308,6 +308,18 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
+                                            <label class="control-label col-md-6">Flora Density</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpFloraDensity" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
                                             <label class="control-label col-md-6">Can Join Running</label>
                                             <div class="col-md-6">
                                                 <input type="checkbox" id="inpCanJoinRunning">
@@ -412,9 +424,11 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Ice Generation</label>
+                                            <label class="control-label col-md-6">Voxel Generator Version</label>
                                             <div class="col-md-6">
-                                                <input type="checkbox" id="inpVoxelGeneratorVersion">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpVoxelGeneratorVersion" type="text" class="form-control">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -558,7 +572,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="control-label col-md-6">Force 3rd Person View</label>
+                                            <label class="control-label col-md-6">Allow 3rd Person View</label>
                                             <div class="col-md-6">
                                                 <input type="checkbox" id="inpEnable3rdPersonView">
                                             </div>
@@ -887,6 +901,13 @@
             max: 10000000,
             step: 1
         });
+        $('#inpFloraDensity').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 0,
+            max: 10000000,
+            step: 1
+        });
 
         // Gameplay
         $('#inpSpawnShipTimeMultiplier').TouchSpin({
@@ -895,6 +916,13 @@
             min: 1,
             max: 1000000,
             decimals: 2,
+            step: 1
+        });
+        $('#inpVoxelGeneratorVersion').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 0,
+            max: 2,
             step: 1
         });
         $('#inpMaxDrones').TouchSpin({
@@ -1023,6 +1051,7 @@
                 $("#inpBattle").bootstrapSwitch('state', values.children("Battle").text() == "true");
                 $('#inpPhysicsIterations').val(values.children("PhysicsIterations").text());
                 $("#inpEnableFlora").bootstrapSwitch('state', values.children("EnableFlora").text() == "true");
+                $("#inpFloraDensity").val(values.children("FloraDensity").text());
                 $("#inpCanJoinRunning").bootstrapSwitch('state', values.children("CanJoinRunning").text() == "true");
 
                 // Gameplay
@@ -1035,11 +1064,8 @@
                 $('#inpEnvironmentHostility').val(values.children("EnvironmentHostility").text());
                 $('#inpCargoShipsEnabled').bootstrapSwitch('state', values.children("CargoShipsEnabled").text() == "true");
                 $('#inpEnableToolShake').bootstrapSwitch('state', values.children("EnableToolShake").text() == "true");
-                if (values.children("VoxelGeneratorVersion").text() == "0") {
-                    $("#inpVoxelGeneratorVersion").bootstrapSwitch('state', false);
-                } else if (values.children("VoxelGeneratorVersion").text() == "1") {
-                    $("#inpVoxelGeneratorVersion").bootstrapSwitch('state', true);
-                }
+                $('#inpVoxelGeneratorVersion').val(values.children("VoxelGeneratorVersion").text());
+                
                 $('#inpEnableOxygen').bootstrapSwitch('state', values.children("EnableOxygen").text() == "true");
                 $('#inpEnableEncounters').bootstrapSwitch('state', values.children("EnableEncounters").text() == "true");
                 $('#inpEnableDrones').bootstrapSwitch('state', values.children("EnableEncounters").text() == "true");
@@ -1130,6 +1156,7 @@
                 $("#inpBattle").bootstrapSwitch("readonly", maskData.children("Battle").text() != "true");
                 $('#inpPhysicsIterations').prop("readonly", maskData.children("PhysicsIterations").text() != "true");
                 $("#inpEnableFlora").bootstrapSwitch("readonly", maskData.children("EnableFlora").text() != "true");
+                $("#inpFloraDensity").prop("readonly", maskData.children("FloraDensity").text() != "true");
                 $("#inpCanJoinRunning").bootstrapSwitch("readonly", maskData.children("CanJoinRunning").text() != "true");
 
                 // Gameplay
@@ -1142,7 +1169,7 @@
                 $('#inpEnvironmentHostility').prop("disabled", maskData.children("EnvironmentHostility").text() != "true");
                 $('#inpCargoShipsEnabled').bootstrapSwitch("readonly", maskData.children("CargoShipsEnabled").text() != "true");
                 $('#inpEnableToolShake').bootstrapSwitch("readonly", maskData.children("EnableToolShake").text() != "true");
-                $('#inpVoxelGeneratorVersion').bootstrapSwitch("readonly", maskData.children("VoxelGeneratorVersion").text() != "true");
+                $('#inpVoxelGeneratorVersion').prop("disabled", maskData.children("VoxelGeneratorVersion").text() != "true");
                 $('#inpEnableOxygen').bootstrapSwitch("readonly", maskData.children("EnableOxygen").text() != "true");
                 $('#inpEnableEncounters').bootstrapSwitch("readonly", maskData.children("EnableEncounters").text() != "true");
                 $('#inpEnableDrones').bootstrapSwitch("readonly", maskData.children("EnableDrones").text() != "true");
@@ -1248,6 +1275,8 @@
                         config.PhysicsIterations = $('#inpPhysicsIterations').val();
                     if (maskData.children("EnableFlora").text() == "true")
                         config.EnableFlora = $('#inpEnableFlora').is(":checked");
+                    if (maskData.children("FloraDensity").text() == "true")
+                        config.FloraDensity = $('#inpFloraDensity').val();
                     if (maskData.children("CanJoinRunning").text() == "true")
                         config.CanJoinRunning = $('#inpCanJoinRunning').is(":checked");
 

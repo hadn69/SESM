@@ -100,6 +100,9 @@ namespace SESM.Tools.Helpers
         public int MaxDrones = SEDefault.MaxDrones;
         public bool EnableDrones = SEDefault.EnableDrones;
 
+        // -- New 12/11
+        public int FloraDensity = SEDefault.FloraDensity;
+
         public override void Save(EntityServer serv)
         {
             StringBuilder sb = new StringBuilder();
@@ -163,6 +166,7 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <EnableVoxelDestruction>" + EnableVoxelDestruction.ToString().ToLower() + "</EnableVoxelDestruction>");
             sb.AppendLine("    <MaxDrones>" + MaxDrones + "</MaxDrones>");
             sb.AppendLine("    <EnableDrones>" + EnableDrones.ToString().ToLower() + "</EnableDrones>");
+            sb.AppendLine("    <FloraDensity>" + FloraDensity + "</FloraDensity>");
 
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
@@ -592,6 +596,11 @@ namespace SESM.Tools.Helpers
                     EnableDrones.ToString().ToLower();
 
 
+                valueNode = settingsNode.SelectSingleNode("descendant::FloraDensity");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "FloraDensity", null));
+                settingsNode.SelectSingleNode("descendant::FloraDensity").InnerText =
+                    FloraDensity.ToString();
 
 
                 valueNode = root.SelectSingleNode("descendant::Mods");
@@ -769,6 +778,8 @@ namespace SESM.Tools.Helpers
                     int.TryParse(sessionSettings.Element("MaxDrones").Value, out MaxDrones);
                 if (sessionSettings.Element("EnableDrones") != null)
                     bool.TryParse(sessionSettings.Element("EnableDrones").Value, out EnableDrones);
+                if (sessionSettings.Element("FloraDensity") != null)
+                    int.TryParse(sessionSettings.Element("FloraDensity").Value, out FloraDensity);
 
                 if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                     Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
@@ -941,7 +952,8 @@ namespace SESM.Tools.Helpers
                 int.TryParse(settings.Element("MaxDrones").Value, out MaxDrones);
             if (settings.Element("EnableDrones") != null)
                 bool.TryParse(settings.Element("EnableDrones").Value, out EnableDrones);
-
+            if (settings.Element("FloraDensity") != null)
+                int.TryParse(settings.Element("FloraDensity").Value, out FloraDensity);
 
             Mods = new List<ulong>();
             if (root.Element("Mods") != null)

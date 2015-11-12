@@ -31,7 +31,7 @@ namespace SESM.Controllers.API
         }
 
         #region Informations Provider
-
+        
         // GET: API/Server/GetServers
         [HttpGet]
         public ActionResult GetServers()
@@ -891,6 +891,7 @@ namespace SESM.Controllers.API
             values.Add(new XElement("EnableVoxelDestruction", serverConfig.EnableVoxelDestruction));
             values.Add(new XElement("MaxDrones", serverConfig.MaxDrones));
             values.Add(new XElement("EnableDrones", serverConfig.EnableDrones));
+            values.Add(new XElement("FloraDensity", serverConfig.FloraDensity));
 
             response.AddToContent(values);
 
@@ -959,6 +960,7 @@ namespace SESM.Controllers.API
             rights.Add(new XElement("EnableVoxelDestruction", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEVOXELDESTRUCTION_WR")));
             rights.Add(new XElement("MaxDrones", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_MAXDRONES_WR")));
             rights.Add(new XElement("EnableDrones", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEDRONES_WR")));
+            rights.Add(new XElement("FloraDensity", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_FLORADENSITY_WR")));
             response.AddToContent(rights);
 
             return Content(response.ToString());
@@ -986,7 +988,8 @@ namespace SESM.Controllers.API
                                      "SERVER_CONFIG_SE_SCENARIOEDITMODE_WR", "SERVER_CONFIG_SE_BATTLE_WR", "SERVER_CONFIG_SE_SCENARIO_WR",
                                      "SERVER_CONFIG_SE_CANJOINRUNNING_WR", "SERVER_CONFIG_SE_PHYSICSITERATIONS_WR", "SERVER_CONFIG_SE_SUNROTATIONINTERVALMINUTES_WR",
                                      "SERVER_CONFIG_SE_ENABLEJETPACK_WR", "SERVER_CONFIG_SE_SPAWNWITHTOOLS_WR", "SERVER_CONFIG_SE_STARTINRESPAWNSCREEN_WR",
-                                     "SERVER_CONFIG_SE_ENABLEVOXELDESTRUCTION_WR", "SERVER_CONFIG_SE_MAXDRONES_WR", "SERVER_CONFIG_SE_ENABLEDRONES_WR")]
+                                     "SERVER_CONFIG_SE_ENABLEVOXELDESTRUCTION_WR", "SERVER_CONFIG_SE_MAXDRONES_WR", "SERVER_CONFIG_SE_ENABLEDRONES_WR",
+                                     "SERVER_CONFIG_SE_FLORADENSITY_WR")]
         public ActionResult SESetConfiguration()
         {
             // ** INIT **
@@ -1413,7 +1416,7 @@ namespace SESM.Controllers.API
                 if (string.IsNullOrWhiteSpace(Request.Form["VoxelGeneratorVersion"]))
                     return Content(XMLMessage.Error("SRV-SESC-MISVGV", "The VoxelGeneratorVersion field must be provided").ToString());
                 if (!int.TryParse(Request.Form["VoxelGeneratorVersion"], out serverConfig.VoxelGeneratorVersion) ||
-                    serverConfig.VoxelGeneratorVersion < 0 || serverConfig.VoxelGeneratorVersion > 1)
+                    serverConfig.VoxelGeneratorVersion < 0 || serverConfig.VoxelGeneratorVersion > 2)
                     return Content(XMLMessage.Error("SRV-SESC-BADVGV", "The VoxelGeneratorVersion field is invalid").ToString());
             }
 
@@ -1586,6 +1589,15 @@ namespace SESM.Controllers.API
                     return Content(XMLMessage.Error("SRV-SESC-MISED", "The EnableDrones field must be provided").ToString());
                 if (!bool.TryParse(Request.Form["EnableDrones"], out serverConfig.EnableDrones))
                     return Content(XMLMessage.Error("SRV-SESC-BADED", "The EnableDrones field is invalid").ToString());
+            }
+
+            // ==== FloraDensity ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_FLORADENSITY_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["FloraDensity"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISFD", "The FloraDensity field must be provided").ToString());
+                if (!int.TryParse(Request.Form["FloraDensity"], out serverConfig.FloraDensity) || serverConfig.FloraDensity < 0)
+                    return Content(XMLMessage.Error("SRV-SESC-BADFD", "The FloraDensity field is invalid").ToString());
             }
 
             // ** PROCESS **
