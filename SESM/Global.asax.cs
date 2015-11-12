@@ -19,9 +19,15 @@ namespace SESM
         protected void Application_Start()
         {
             Constants.SetVersion(4,1,1);
+
+            SESMConfigHelper.Prefix = SESMConfigHelper.Prefix;
+
             // Resetting Run Vars
             if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar"))
                 File.Delete(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar");
+
+            // Trying to init the registery
+            SESMConfigHelper.InitializeRegistry();
 
             // Killing any remaining SteamCMD
             ServiceHelper.KillAllProcesses("steamcmd");

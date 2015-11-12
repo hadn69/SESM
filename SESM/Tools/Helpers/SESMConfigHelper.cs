@@ -19,7 +19,7 @@ namespace SESM.Tools.Helpers
         }
 
         // Registry Settings
-        private static void InitializeRegistry()
+        public static void InitializeRegistry()
         {
             RegistryKey wow6432Node = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node", true);
             RegistryKey ksh = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\KeenSoftwareHouse", true);
@@ -28,23 +28,32 @@ namespace SESM.Tools.Helpers
                 wow6432Node.CreateSubKey("KeenSoftwareHouse");
                 ksh = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\KeenSoftwareHouse", true);
             }
-            RegistryKey seds = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
+            RegistryKey seds = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicated", true);
             if (seds == null)
             {
-                ksh.CreateSubKey("SpaceEngineersDedicatedServer");
-                seds = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
-                seds.SetValue("AddDateToLog", "False", RegistryValueKind.String);
+                ksh.CreateSubKey("SpaceEngineersDedicated");
+                seds = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicated", true);
+                seds.SetValue("AddDateToLog", "True", RegistryValueKind.String);
+                seds.SetValue("SendLogToKeen", "False", RegistryValueKind.String);
+            }
+
+            seds = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\KeenSoftwareHouse\MedievalEngineersDedicated", true);
+            if (seds == null)
+            {
+                ksh.CreateSubKey("MedievalEngineersDedicated");
+                seds = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\KeenSoftwareHouse\MedievalEngineersDedicated", true);
+                seds.SetValue("AddDateToLog", "True", RegistryValueKind.String);
                 seds.SetValue("SendLogToKeen", "False", RegistryValueKind.String);
             }
         }
 
-        public static bool AddDateToLog
+        public static bool SEAddDateToLog
         {
             get
             {
                 InitializeRegistry();
                 RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer");
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicated");
 
                 string addDateToLog = (string)regKey.GetValue("AddDateToLog");
 
@@ -59,19 +68,19 @@ namespace SESM.Tools.Helpers
             {
                 InitializeRegistry();
                 RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicated", true);
 
                 regKey.SetValue("AddDateToLog", value ? "True" : "False", RegistryValueKind.String);
             }
         }
 
-        public static bool SendLogToKeen
+        public static bool SESendLogToKeen
         {
             get
             {
                 InitializeRegistry();
                 RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer");
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicated");
 
                 string addDateToLog = (string)regKey.GetValue("SendLogToKeen");
 
@@ -86,7 +95,61 @@ namespace SESM.Tools.Helpers
             {
                 InitializeRegistry();
                 RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
-                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicatedServer", true);
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\SpaceEngineersDedicated", true);
+
+                regKey.SetValue("SendLogToKeen", value ? "True" : "False", RegistryValueKind.String);
+            }
+        }
+
+        public static bool MEAddDateToLog
+        {
+            get
+            {
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\MedievalEngineersDedicated");
+
+                string addDateToLog = (string)regKey.GetValue("AddDateToLog");
+
+                if (addDateToLog == "False")
+                    return false;
+                if (addDateToLog == "True")
+                    return true;
+
+                throw new SystemException("RegKeyError");
+            }
+            set
+            {
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\MedievalEngineersDedicated", true);
+
+                regKey.SetValue("AddDateToLog", value ? "True" : "False", RegistryValueKind.String);
+            }
+        }
+
+        public static bool MESendLogToKeen
+        {
+            get
+            {
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\MedievalEngineersDedicated");
+
+                string addDateToLog = (string)regKey.GetValue("SendLogToKeen");
+
+                if (addDateToLog == "False")
+                    return false;
+                if (addDateToLog == "True")
+                    return true;
+
+                throw new SystemException("RegKeyError");
+            }
+            set
+            {
+                InitializeRegistry();
+                RegistryKey regKey = Registry.LocalMachine.OpenSubKey(
+                    @"SOFTWARE\Wow6432Node\KeenSoftwareHouse\MedievalEngineersDedicated", true);
 
                 regKey.SetValue("SendLogToKeen", value ? "True" : "False", RegistryValueKind.String);
             }
