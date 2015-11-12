@@ -18,7 +18,7 @@ namespace SESM
     {
         protected void Application_Start()
         {
-            Constants.SetVersion(4,1,1);
+            Constants.SetVersion(4,2,0);
 
             SESMConfigHelper.Prefix = SESMConfigHelper.Prefix;
 
