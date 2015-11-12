@@ -31,7 +31,13 @@
         CrashedRedShip,
         TwoPlatforms,
         Asteroids,
-        EmptyWorld
+        EmptyWorld,
+        EarthEasyStart,
+        EasyMarsStart,
+        EasyAlienStart,
+        EasyMoonStart,
+        StarSystem,
+        Planet
     }
 
     public enum MESubTypeId
