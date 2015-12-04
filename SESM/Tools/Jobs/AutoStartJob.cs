@@ -26,7 +26,6 @@ namespace SESM.Tools
                     Logger serviceLogger = LogManager.GetLogger("ServiceLogger");
                     foreach (EntityServer server in listServ)
                     {
-
                         serviceLogger.Info(server.Name + " started by autostart");
                         ServiceHelper.StartService(server);
                     }

@@ -21,6 +21,7 @@ using SESM.Tools.Jobs;
 
 namespace SESM.Controllers.API
 {
+
     public class APISettingsController : Controller
     {
         private readonly DataContext _context = new DataContext();

@@ -18,6 +18,7 @@ using SESM.Tools.Helpers;
 
 namespace SESM.Controllers.API
 {
+    [APICheckLockdown]
     public class APIExplorerController : Controller, IAPIController
     {
         public DataContext CurrentContext { get; set; }
@@ -272,7 +273,14 @@ namespace SESM.Controllers.API
                         Response.AddHeader("Content-Disposition",
                             String.Format("attachment; filename={0}", PathHelper.GetLastLeaf(paths[0])));
 
-                        Response.TransmitFile(paths[0]);
+                        using (FileStream fileStream = new FileStream(paths[0], FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        {
+                            using (StreamReader streamReader = new StreamReader(fileStream))
+                            {
+                                fileStream.CopyTo(Response.OutputStream);
+                                Response.OutputStream.Flush();
+                            }
+                        }
                         Response.End();
                         return null;
                     }
@@ -477,12 +485,20 @@ namespace SESM.Controllers.API
                 return Content(XMLMessage.Error("EXP-GFC-TOOBIG", "File is too big").ToString());
 
             // ** PROCESS **
-            string content = System.IO.File.ReadAllText(path);
+            //string content = System.IO.File.ReadAllText(path);
 
             XMLMessage response = new XMLMessage("EXP-GFC-OK");
             try
             {
-                response.AddToContent(new XCData(content));
+                string data = string.Empty;
+                using (FileStream fileStream = new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite))
+                {
+                    using (StreamReader streamReader = new StreamReader(fileStream))
+                    {
+                        data = streamReader.ReadToEnd();
+                    }
+                }
+                response.AddToContent(new XCData(data));
                 return Content(response.ToString());
             }
             catch (Exception)

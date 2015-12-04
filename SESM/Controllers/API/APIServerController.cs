@@ -19,6 +19,7 @@ using SESM.Tools.Jobs;
 
 namespace SESM.Controllers.API
 {
+    [APICheckLockdown]
     public class APIServerController : Controller, IAPIController
     {
         public DataContext CurrentContext { get; set; }

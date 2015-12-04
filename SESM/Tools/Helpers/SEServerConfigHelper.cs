@@ -746,6 +746,8 @@ namespace SESM.Tools.Helpers
                     bool.TryParse(sessionSettings.Element("EnableOxygen").Value, out EnableOxygen);
                 if (sessionSettings.Element("Enable3rdPersonView") != null)
                     bool.TryParse(sessionSettings.Element("Enable3rdPersonView").Value, out Enable3rdPersonView);
+                if (sessionSettings.Element("EnableEncounters") != null)
+                    bool.TryParse(sessionSettings.Element("EnableEncounters").Value, out EnableEncounters);
                 if (sessionSettings.Element("EnableFlora") != null)
                     bool.TryParse(sessionSettings.Element("EnableFlora").Value, out EnableFlora);
                 if (sessionSettings.Element("EnableStationVoxelSupport") != null)
