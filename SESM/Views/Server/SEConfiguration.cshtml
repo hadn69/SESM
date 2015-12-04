@@ -913,7 +913,7 @@
         $('#inpSpawnShipTimeMultiplier').TouchSpin({
             buttondown_class: 'btn blue',
             buttonup_class: 'btn green',
-            min: 1,
+            min: 0,
             max: 1000000,
             decimals: 2,
             step: 1
@@ -1068,7 +1068,7 @@
                 
                 $('#inpEnableOxygen').bootstrapSwitch('state', values.children("EnableOxygen").text() == "true");
                 $('#inpEnableEncounters').bootstrapSwitch('state', values.children("EnableEncounters").text() == "true");
-                $('#inpEnableDrones').bootstrapSwitch('state', values.children("EnableEncounters").text() == "true");
+                $('#inpEnableDrones').bootstrapSwitch('state', values.children("EnableDrones").text() == "true");
                 $('#inpMaxDrones').val(values.children("MaxDrones").text());
 
                 // Players

@@ -9,6 +9,7 @@ using SESM.Tools.API;
 
 namespace SESM.Controllers.API
 {
+    
     public class APIUsersController : Controller
     {
         private readonly DataContext _context = new DataContext();

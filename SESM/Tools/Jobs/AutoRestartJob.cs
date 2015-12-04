@@ -5,7 +5,7 @@ using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools.Helpers;
 
-namespace SESM.Tools
+namespace SESM.Tools.Jobs
 {
     public class AutoRestartJob : IJob
     {

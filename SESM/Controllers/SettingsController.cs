@@ -4,7 +4,7 @@ using SESM.DAL;
 
 namespace SESM.Controllers
 {
-
+    [CheckLockdown]
     public class SettingsController : Controller
     {
         private readonly DataContext _context = new DataContext();

@@ -2699,9 +2699,10 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ActionFilters\APIHostAccessAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\APIServerAccessAttribute.cs" />
+    <Compile Include="Controllers\ActionFilters\APICheckLockdownAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\HostAccessAttribute.cs" />
     <Compile Include="Controllers\ActionFilters\ServerAccessAttribute.cs" />
-    <Compile Include="Controllers\ActionFilters\CheckLockout.cs" />
+    <Compile Include="Controllers\ActionFilters\CheckLockdownAttribute.cs" />
     <Compile Include="Controllers\API\APIAccessController.cs" />
     <Compile Include="Controllers\API\APIAccountController.cs" />
     <Compile Include="Controllers\API\APIExplorerController.cs" />

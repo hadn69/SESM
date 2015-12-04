@@ -5,7 +5,7 @@ using SESM.DTO;
 
 namespace SESM.Controllers
 {
-    [CheckLockout]
+    [CheckLockdown]
     public class ServerController : Controller
     {
         readonly DataContext _context = new DataContext();

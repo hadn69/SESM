@@ -17,6 +17,7 @@ using SESM.Tools.Helpers;
 
 namespace SESM.Controllers.API
 {
+    [APICheckLockdown]
     public class APIMapController : Controller, IAPIController
     {
         public DataContext CurrentContext { get; set; }
