@@ -18,13 +18,13 @@ namespace SESM
     {
         protected void Application_Start()
         {
-            Constants.SetVersion(4,2,0);
-
-            SESMConfigHelper.Prefix = SESMConfigHelper.Prefix;
+            Constants.SetVersion(4,2,1);
 
             // Resetting Run Vars
             if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar"))
                 File.Delete(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar");
+
+            SESMConfigHelper.Prefix = SESMConfigHelper.Prefix;
 
             // Trying to init the registery
             SESMConfigHelper.InitializeRegistry();
