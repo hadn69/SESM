@@ -10,7 +10,7 @@ using SESM.DTO;
 using SESM.Tools;
 using SESM.Tools.Helpers;
 using SESM.Tools.Jobs;
-using SESM.Tools.Monitor;
+using SESM.Tools.Jobs.Monitor;
 
 namespace SESM
 {
@@ -98,7 +98,7 @@ namespace SESM
             // Perf Monitor
             if (SESMConfigHelper.PerfMonitorEnabled)
             {
-                IJobDetail collectorJob = JobBuilder.Create<Collector>()
+                IJobDetail collectorJob = JobBuilder.Create<CollectorJob>()
                     .WithIdentity("CollectorJob", "Monitor")
                     .Build();
 
@@ -110,7 +110,7 @@ namespace SESM
 
                 scheduler.ScheduleJob(collectorJob, collectorTrigger);
 
-                IJobDetail hourlyCrusherJob = JobBuilder.Create<HourlyCrusher>()
+                IJobDetail hourlyCrusherJob = JobBuilder.Create<HourlyCrusherJob>()
                     .WithIdentity("HourlyCrusherJob", "Monitor")
                     .Build();
 

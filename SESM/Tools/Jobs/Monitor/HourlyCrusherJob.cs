@@ -6,9 +6,9 @@ using Quartz;
 using SESM.DAL;
 using SESM.DTO;
 
-namespace SESM.Tools.Monitor
+namespace SESM.Tools.Jobs.Monitor
 {
-    public class HourlyCrusher : IJob
+    public class HourlyCrusherJob : IJob
     {
         private static Logger _logger = LogManager.GetLogger("HourlyCrusherLogger");
         public void Execute(IJobExecutionContext jobContext)

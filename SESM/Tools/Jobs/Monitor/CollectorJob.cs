@@ -6,9 +6,9 @@ using SESM.DAL;
 using SESM.DTO;
 using SESM.Tools.Helpers;
 
-namespace SESM.Tools.Monitor
+namespace SESM.Tools.Jobs.Monitor
 {
-    public class Collector : IJob
+    public class CollectorJob : IJob
     {
         public void Execute(IJobExecutionContext jobContext)
         {

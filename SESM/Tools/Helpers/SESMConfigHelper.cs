@@ -7,15 +7,11 @@ namespace SESM.Tools.Helpers
     public class SESMConfigHelper
     {
         private static readonly SESMConfigStorage ConfigStorage;
-        private static readonly SESMRunningVarsStorage RunningVars;
 
         static SESMConfigHelper()
         {
             ConfigStorage = new SESMConfigStorage();
             ConfigStorage.Initialize();
-
-            RunningVars = new SESMRunningVarsStorage();
-            RunningVars.Initialize();
         }
 
         // Registry Settings
@@ -161,7 +157,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.DBConnString;
             }
             set
@@ -176,7 +171,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.Prefix;        
             }
             set
@@ -190,8 +184,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
-
                 if (!ConfigStorage.SESavePath.EndsWith(@"\"))
                 {
                     ConfigStorage.SESavePath += @"\";
@@ -211,8 +203,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
-
                 if (!ConfigStorage.SEDataPath.EndsWith(@"\"))
                 {
                     ConfigStorage.SEDataPath += @"\";
@@ -232,8 +222,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
-
                 if (!ConfigStorage.MESavePath.EndsWith(@"\"))
                 {
                     ConfigStorage.MESavePath += @"\";
@@ -253,8 +241,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
-
                 if (!ConfigStorage.MEDataPath.EndsWith(@"\"))
                 {
                     ConfigStorage.MEDataPath += @"\";
@@ -301,7 +287,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.PerfMonitorEnabled;
             }
             set
@@ -317,13 +302,11 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                RunningVars.Read();
-                return RunningVars.Lockdown;
+                return SESMRunningVarsStorage.Lockdown;
             }
             set
             {
-                RunningVars.Lockdown = value;
-                RunningVars.Write();
+                SESMRunningVarsStorage.Lockdown = value;
             }
         }
 
@@ -331,13 +314,11 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                RunningVars.Read();
-                return RunningVars.SEUpdating;
+                return SESMRunningVarsStorage.SEUpdating;
             }
             set
             {
-                RunningVars.SEUpdating = value;
-                RunningVars.Write();
+                SESMRunningVarsStorage.SEUpdating = value;
             }
         }
 
@@ -345,13 +326,11 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                RunningVars.Read();
-                return RunningVars.MEUpdating;
+                return SESMRunningVarsStorage.MEUpdating;
             }
             set
             {
-                RunningVars.MEUpdating = value;
-                RunningVars.Write();
+                SESMRunningVarsStorage.MEUpdating = value;
             }
         }
 
@@ -359,13 +338,11 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                RunningVars.Read();
-                return RunningVars.SESEUpdating;
+                return SESMRunningVarsStorage.SESEUpdating;
             }
             set
             {
-                RunningVars.SESEUpdating = value;
-                RunningVars.Write();
+                SESMRunningVarsStorage.SESEUpdating = value;
             }
         }
 
@@ -375,7 +352,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.SEAutoUpdateEnabled;
             }
             set
@@ -389,7 +365,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.SEAutoUpdateCron;
             }
             set
@@ -403,7 +378,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.SEAutoUpdateBranch;
             }
             set
@@ -417,7 +391,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.SEAutoUpdateBetaPassword;
             }
             set
@@ -433,7 +406,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.MEAutoUpdateEnabled;
             }
             set
@@ -447,7 +419,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.MEAutoUpdateCron;
             }
             set
@@ -461,7 +432,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.MEAutoUpdateBranch;
             }
             set
@@ -475,7 +445,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.MEAutoUpdateBetaPassword;
             }
             set
@@ -491,7 +460,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.SESEUpdateURL;
             }
             set
@@ -505,7 +473,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.SESEAutoUpdateEnabled;
             }
             set
@@ -519,7 +486,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.SESEAutoUpdateUseDev;
             }
             set
@@ -533,7 +499,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.SESEAutoUpdateCron;
             }
             set
@@ -548,7 +513,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.AutoBackupLvl1Enabled;
             }
             set
@@ -562,7 +526,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.AutoBackupLvl1Cron;
             }
             set
@@ -576,7 +539,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.AutoBackupLvl1NbToKeep;
             }
             set
@@ -590,7 +552,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.AutoBackupLvl2Enabled;
             }
             set
@@ -604,7 +565,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.AutoBackupLvl2Cron;
             }
             set
@@ -618,7 +578,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.AutoBackupLvl2NbToKeep;
             }
             set
@@ -632,7 +591,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.AutoBackupLvl3Enabled;
             }
             set
@@ -646,7 +604,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.AutoBackupLvl3Cron;
             }
             set
@@ -660,7 +617,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.AutoBackupLvl3NbToKeep;
             }
             set
@@ -676,7 +632,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.DiagnosisEnabled;
             }
             set
@@ -690,7 +645,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.BlockDll;
             }
             set
@@ -704,7 +658,6 @@ namespace SESM.Tools.Helpers
         {
             get
             {
-                ConfigStorage.Read();
                 return ConfigStorage.LowPriorityStart;
             }
             set

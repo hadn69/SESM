@@ -2816,11 +2816,11 @@
     <Compile Include="Tools\Jobs\ReturnEnum.cs" />
     <Compile Include="Tools\Jobs\SEAutoUpdateJob.cs" />
     <Compile Include="Tools\Jobs\SESEAutoUpdateJob.cs" />
-    <Compile Include="Tools\Monitor\Collector.cs" />
+    <Compile Include="Tools\Jobs\Monitor\CollectorJob.cs" />
     <Compile Include="Tools\Helpers\ServiceHelper.cs" />
     <Compile Include="Tools\Helpers\SEServerConfigHelper.cs" />
     <Compile Include="Tools\Helpers\SESMConfigHelper.cs" />
-    <Compile Include="Tools\Monitor\HourlyCrusher.cs" />
+    <Compile Include="Tools\Jobs\Monitor\HourlyCrusherJob.cs" />
     <Compile Include="Tools\Jobs\ResetPriorityJob.cs" />
     <Compile Include="Tools\ServerInfoHelper.cs" />
     <Compile Include="Tools\SESMConfigStorage.cs" />
