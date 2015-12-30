@@ -18,7 +18,7 @@ namespace SESM
     {
         protected void Application_Start()
         {
-            Constants.SetVersion(4,2,1);
+            Constants.SetVersion(4,2,2);
 
             // Resetting Run Vars
             if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\SESM.RunVar"))
