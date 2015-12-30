@@ -3,12 +3,13 @@ using Westwind.Utilities.Configuration;
 
 namespace SESM.Tools
 {
-    public class SESMRunningVarsStorage : AppConfiguration
+    public static class SESMRunningVarsStorage
     {
-        public bool Lockdown;
-        public bool SEUpdating;
-        public bool MEUpdating;
-        public bool SESEUpdating;
+        public static bool Lockdown;
+        public static bool SEUpdating;
+        public static bool MEUpdating;
+        public static bool SESEUpdating;
+        /*
         public SESMRunningVarsStorage()
         {
             Lockdown = false;
@@ -17,6 +18,15 @@ namespace SESM.Tools
             SESEUpdating = false;
 
         }
+        */
+        static SESMRunningVarsStorage()
+        {
+            Lockdown = false;
+            SEUpdating = false;
+            MEUpdating = false;
+            SESEUpdating = false;
+        }
+        /*
         protected override IConfigurationProvider OnCreateDefaultProvider(string sectionName, object configData)
         {
             ConfigurationFileConfigurationProvider<SESMRunningVarsStorage> provider = new ConfigurationFileConfigurationProvider<SESMRunningVarsStorage>()
@@ -27,5 +37,6 @@ namespace SESM.Tools
 
             return provider;
         }
+        */
     }
 }

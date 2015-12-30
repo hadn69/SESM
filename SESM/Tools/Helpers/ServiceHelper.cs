@@ -417,6 +417,10 @@ namespace SESM.Tools.Helpers
             {
                 outputLine = item;
             }
+
+            if(outputLine.Length <= 28)
+                return null;
+
             string pid = outputLine.Substring(28).Trim();
             uint processId = uint.Parse(pid);
             if (processId == 0)
@@ -428,19 +432,22 @@ namespace SESM.Tools.Helpers
         public static Ressources? GetCurrentRessourceUsage(string serviceName)
         {
             uint? pid = GetServicePID(serviceName);
-            Ressources ressources = new Ressources();
+            Ressources ressources = new Ressources
+            {
+                CPU = 0,
+                Memory = 0
+            };
+
             if (pid == null || pid == 0)
             {
-                ressources.CPU = 0;
-                ressources.Memory = 0;
                 return ressources;
             }
 
             try
             {
                 SelectQuery query = new SelectQuery("select PercentProcessorTime, WorkingSetPrivate " +
-                                                  "from Win32_PerfFormattedData_PerfProc_Process " +
-                                                  "where IDProcess = " + pid);
+                                                    "from Win32_PerfFormattedData_PerfProc_Process " +
+                                                    "where IDProcess = " + pid);
 
                 ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
                 ManagementObjectCollection collection = searcher.Get();
