@@ -54,7 +54,7 @@ namespace SESM.Tools.Helpers
                 if ((useDev && item.prerelease) || (!useDev && !item.prerelease))
                 {
                     Match extract = Regex.Match(item.assets[0].name, @"^.*v(([0-9]+.){3}\d+).*$");
-                    if (extract.Groups.Count != 2)
+                    if (extract.Groups.Count != 3)
                         return null;
                     VersionCache.SESERemoteVersion = extract.Groups[1].Value;
                     return new Version(extract.Groups[1].Value);
