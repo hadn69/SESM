@@ -482,6 +482,25 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Enable Cyberhounds</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpEnableCyberhounds">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Enable Spiders</label>
+                                            <div class="col-md-6">
+                                                <input type="checkbox" id="inpEnableSpiders">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -1071,6 +1090,9 @@
                 $('#inpEnableDrones').bootstrapSwitch('state', values.children("EnableDrones").text() == "true");
                 $('#inpMaxDrones').val(values.children("MaxDrones").text());
 
+                $('#inpEnableCyberhounds').bootstrapSwitch('state', values.children("EnableCyberhounds").text() == "true");
+                $('#inpEnableSpiders').bootstrapSwitch('state', values.children("EnableSpiders").text() == "true");
+
                 // Players
                 $('#inpAutoHealing').bootstrapSwitch('state', values.children("AutoHealing").text() == "true");
                 $('#inpWeaponsEnabled').bootstrapSwitch('state', values.children("WeaponsEnabled").text() == "true");
@@ -1174,6 +1196,8 @@
                 $('#inpEnableEncounters').bootstrapSwitch("readonly", maskData.children("EnableEncounters").text() != "true");
                 $('#inpEnableDrones').bootstrapSwitch("readonly", maskData.children("EnableDrones").text() != "true");
                 $('#inpMaxDrones').prop("disabled", maskData.children("MaxDrones").text() != "true");
+                $('#inpEnableCyberhounds').bootstrapSwitch("readonly", maskData.children("EnableCyberhounds").text() != "true");
+                $('#inpEnableSpiders').bootstrapSwitch("readonly", maskData.children("EnableSpiders").text() != "true");
 
                 // Players
                 $('#inpAutoHealing').bootstrapSwitch("readonly", maskData.children("AutoHealing").text() != "true");
@@ -1313,6 +1337,10 @@
                         config.EnableDrones = $('#inpEnableDrones').is(":checked");
                     if (maskData.children("MaxDrones").text() == "true")
                         config.MaxDrones = $('#inpMaxDrones').val();
+                    if (maskData.children("EnableCyberhounds").text() == "true")
+                        config.EnableCyberhounds = $('#inpEnableCyberhounds').is(":checked");
+                    if (maskData.children("EnableSpiders").text() == "true")
+                        config.EnableSpiders = $('#inpEnableSpiders').is(":checked");
 
                     // Players
                     if (maskData.children("AutoHealing").text() == "true")

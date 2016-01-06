@@ -103,6 +103,10 @@ namespace SESM.Tools.Helpers
         // -- New 12/11
         public int FloraDensity = SEDefault.FloraDensity;
 
+        // -- New 06/01/16
+        public bool EnableCyberhounds = SEDefault.EnableCyberhounds;
+        public bool EnableSpiders = SEDefault.EnableSpiders;
+
         public override void Save(EntityServer serv)
         {
             StringBuilder sb = new StringBuilder();
@@ -167,6 +171,8 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <MaxDrones>" + MaxDrones + "</MaxDrones>");
             sb.AppendLine("    <EnableDrones>" + EnableDrones.ToString().ToLower() + "</EnableDrones>");
             sb.AppendLine("    <FloraDensity>" + FloraDensity + "</FloraDensity>");
+            sb.AppendLine("    <EnableCyberhounds>" + EnableCyberhounds.ToString().ToLower() + "</EnableCyberhounds>");
+            sb.AppendLine("    <EnableSpiders>" + EnableSpiders.ToString().ToLower() + "</EnableSpiders>");
 
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
@@ -603,6 +609,20 @@ namespace SESM.Tools.Helpers
                     FloraDensity.ToString();
 
 
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableCyberhounds");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableCyberhounds", null));
+                settingsNode.SelectSingleNode("descendant::EnableCyberhounds").InnerText =
+                    EnableCyberhounds.ToString().ToLower();
+
+
+                valueNode = settingsNode.SelectSingleNode("descendant::EnableSpiders");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "EnableSpiders", null));
+                settingsNode.SelectSingleNode("descendant::EnableSpiders").InnerText =
+                    EnableSpiders.ToString().ToLower();
+
+
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if (valueNode == null)
                     root.AppendChild(doc.CreateNode(XmlNodeType.Element, "Mods", null));
@@ -782,6 +802,10 @@ namespace SESM.Tools.Helpers
                     bool.TryParse(sessionSettings.Element("EnableDrones").Value, out EnableDrones);
                 if (sessionSettings.Element("FloraDensity") != null)
                     int.TryParse(sessionSettings.Element("FloraDensity").Value, out FloraDensity);
+                if (sessionSettings.Element("EnableCyberhounds") != null)
+                    bool.TryParse(sessionSettings.Element("EnableCyberhounds").Value, out EnableCyberhounds);
+                if (sessionSettings.Element("EnableSpiders") != null)
+                    bool.TryParse(sessionSettings.Element("EnableSpiders").Value, out EnableSpiders);
 
                 if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                     Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
@@ -956,6 +980,10 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(settings.Element("EnableDrones").Value, out EnableDrones);
             if (settings.Element("FloraDensity") != null)
                 int.TryParse(settings.Element("FloraDensity").Value, out FloraDensity);
+            if (settings.Element("EnableCyberhounds") != null)
+                bool.TryParse(settings.Element("EnableCyberhounds").Value, out EnableCyberhounds);
+            if (settings.Element("EnableSpiders") != null)
+                bool.TryParse(settings.Element("EnableSpiders").Value, out EnableSpiders);
 
             Mods = new List<ulong>();
             if (root.Element("Mods") != null)
