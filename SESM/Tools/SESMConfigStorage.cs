@@ -73,7 +73,7 @@ namespace SESM.Tools
             MEAutoUpdateBetaPassword = string.Empty;
 
             // SESE Auto-Update Settings
-            SESEUpdateURL = "https://api.github.com/repos/SEServerExtender/SEServerExtender/releases";
+            SESEUpdateURL = "https://api.github.com/repos/rexxar-tc/SEServerExtender/releases";
             SESEAutoUpdateEnabled = false;
             SESEAutoUpdateUseDev = true;
             SESEAutoUpdateCron = "0 5/10 * * * ?";
