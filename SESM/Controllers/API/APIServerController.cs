@@ -893,6 +893,8 @@ namespace SESM.Controllers.API
             values.Add(new XElement("MaxDrones", serverConfig.MaxDrones));
             values.Add(new XElement("EnableDrones", serverConfig.EnableDrones));
             values.Add(new XElement("FloraDensity", serverConfig.FloraDensity));
+            values.Add(new XElement("EnableCyberhounds", serverConfig.EnableCyberhounds));
+            values.Add(new XElement("EnableSpiders", serverConfig.EnableSpiders));
 
             response.AddToContent(values);
 
@@ -962,6 +964,8 @@ namespace SESM.Controllers.API
             rights.Add(new XElement("MaxDrones", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_MAXDRONES_WR")));
             rights.Add(new XElement("EnableDrones", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLEDRONES_WR")));
             rights.Add(new XElement("FloraDensity", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_FLORADENSITY_WR")));
+            rights.Add(new XElement("EnableCyberhounds", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLECYBERHOUNDS_WR")));
+            rights.Add(new XElement("EnableSpiders", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLESPIDERS_WR")));
             response.AddToContent(rights);
 
             return Content(response.ToString());
@@ -990,7 +994,7 @@ namespace SESM.Controllers.API
                                      "SERVER_CONFIG_SE_CANJOINRUNNING_WR", "SERVER_CONFIG_SE_PHYSICSITERATIONS_WR", "SERVER_CONFIG_SE_SUNROTATIONINTERVALMINUTES_WR",
                                      "SERVER_CONFIG_SE_ENABLEJETPACK_WR", "SERVER_CONFIG_SE_SPAWNWITHTOOLS_WR", "SERVER_CONFIG_SE_STARTINRESPAWNSCREEN_WR",
                                      "SERVER_CONFIG_SE_ENABLEVOXELDESTRUCTION_WR", "SERVER_CONFIG_SE_MAXDRONES_WR", "SERVER_CONFIG_SE_ENABLEDRONES_WR",
-                                     "SERVER_CONFIG_SE_FLORADENSITY_WR")]
+                                     "SERVER_CONFIG_SE_FLORADENSITY_WR", "SERVER_CONFIG_SE_ENABLECYBERHOUNDS_WR", "SERVER_CONFIG_SE_ENABLESPIDERS_WR")]
         public ActionResult SESetConfiguration()
         {
             // ** INIT **
@@ -1599,6 +1603,24 @@ namespace SESM.Controllers.API
                     return Content(XMLMessage.Error("SRV-SESC-MISFD", "The FloraDensity field must be provided").ToString());
                 if (!int.TryParse(Request.Form["FloraDensity"], out serverConfig.FloraDensity) || serverConfig.FloraDensity < 0)
                     return Content(XMLMessage.Error("SRV-SESC-BADFD", "The FloraDensity field is invalid").ToString());
+            }
+
+            // ==== EnableCyberhounds ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLECYBERHOUNDS_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableCyberhounds"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISECH", "The EnableCyberhounds field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableCyberhounds"], out serverConfig.EnableCyberhounds))
+                    return Content(XMLMessage.Error("SRV-SESC-BADECH", "The EnableCyberhounds field is invalid").ToString());
+            }
+
+            // ==== EnableSpiders ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLESPIDERS_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["EnableSpiders"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISECH", "The EnableSpiders field must be provided").ToString());
+                if (!bool.TryParse(Request.Form["EnableSpiders"], out serverConfig.EnableSpiders))
+                    return Content(XMLMessage.Error("SRV-SESC-BADECH", "The EnableSpiders field is invalid").ToString());
             }
 
             // ** PROCESS **
