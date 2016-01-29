@@ -262,6 +262,7 @@ namespace SESM.Controllers.API
                 values.Add(new XElement("UseServerExtender", RequestServer.UseServerExtender));
             values.Add(new XElement("Public", RequestServer.IsPublic));
             values.Add(new XElement("ProcessPriority", RequestServer.ProcessPriority.ToString()));
+            values.Add(new XElement("StartupType", RequestServer.ServerStartup.ToString()));
             response.AddToContent(values);
 
             XElement rights = new XElement("Rights");
@@ -270,6 +271,7 @@ namespace SESM.Controllers.API
                 rights.Add(new XElement("UseServerExtender", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_USESESE_WR")));
             rights.Add(new XElement("Public", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PUBLIC_WR")));
             rights.Add(new XElement("ProcessPriority", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PROCESSPRIO_WR")));
+            rights.Add(new XElement("StartupType", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_STARTUPTYPE_WR")));
             response.AddToContent(rights);
 
             return Content(response.ToString());
@@ -280,7 +282,8 @@ namespace SESM.Controllers.API
         [APIServerAccess("SRV-SSET", "SERVER_SETTINGS_GLOBAL_NAME_WR",
                                      "SERVER_SETTINGS_GLOBAL_USESESE_WR",
                                      "SERVER_SETTINGS_GLOBAL_PROCESSPRIO_WR",
-                                     "SERVER_SETTINGS_GLOBAL_PUBLIC_WR")]
+                                     "SERVER_SETTINGS_GLOBAL_PUBLIC_WR",
+                                     "SERVER_SETTINGS_GLOBAL_STARTUPTYPE_WR")]
         public ActionResult SetSettings()
         {
             // ** INIT **
@@ -291,6 +294,7 @@ namespace SESM.Controllers.API
             bool accessSESE = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_USESESE_WR");
             bool accessPublic = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PUBLIC_WR");
             bool accessProcessPrio = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PROCESSPRIO_WR");
+            bool accessServerStartup = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_STARTUPTYPE_WR");
 
             string Name;
             if (accessName)
@@ -342,13 +346,24 @@ namespace SESM.Controllers.API
             else
                 ProcessPriority = RequestServer.ProcessPriority;
 
+            EnumServerStartup ServerStartup;
+            if (accessServerStartup)
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["StartupType"]))
+                    return Content(XMLMessage.Error("SRV-SSET-MISST", "The StartupType field must be provided").ToString());
+                if (!Enum.TryParse(Request.Form["StartupType"], out ServerStartup))
+                    return Content(XMLMessage.Error("SRV-SSET-BADST", "The StartupType field is invalid").ToString());
+            }
+            else
+                ServerStartup = RequestServer.ServerStartup;
+
             // ** Process **
             try
             {
                 ServiceState serverState = srvPrv.GetState(RequestServer);
                 bool restartRequired = false;
 
-                if ((accessName || accessSESE) && (Name != RequestServer.Name || UseServerExtender != RequestServer.UseServerExtender))
+                if ((accessName  && Name != RequestServer.Name) || (accessSESE && UseServerExtender != RequestServer.UseServerExtender) || (accessServerStartup && ServerStartup != RequestServer.ServerStartup))
                 {
                     if (serverState != ServiceState.Stopped &&
                         serverState != ServiceState.Unknow)
@@ -363,6 +378,7 @@ namespace SESM.Controllers.API
                     string oldpath = PathHelper.GetInstancePath(RequestServer);
                     RequestServer.Name = Name;
                     RequestServer.UseServerExtender = UseServerExtender;
+                    RequestServer.ServerStartup = ServerStartup;
                     string newpath = PathHelper.GetInstancePath(RequestServer);
 
                     if(oldpath != newpath)

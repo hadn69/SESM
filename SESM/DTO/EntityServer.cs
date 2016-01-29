@@ -19,6 +19,7 @@ namespace SESM.DTO
         public int? AutoSaveInMinutes { get; set; }
         public EnumProcessPriority ProcessPriority { get; set; }
         public EnumServerType ServerType { get; set; }
+        public EnumServerStartup ServerStartup { get; set; }
 
         private ICollection<EntityInstanceServerRole> _instanceServerRoles;
         public virtual ICollection<EntityInstanceServerRole> InstanceServerRoles
@@ -45,6 +46,7 @@ namespace SESM.DTO
             UseServerExtender = false;
             IsAutoStartEnabled = false;
             ProcessPriority = EnumProcessPriority.Normal;
+            ServerStartup = EnumServerStartup.Automatic;
         }
     }
 }

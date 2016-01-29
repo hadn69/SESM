@@ -80,6 +80,20 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-6">Startup Type</label>
+                                            <div class="col-md-6">
+                                                <select id="inpStartupType" class="bs-select form-control">
+                                                    <option value="Manual">Manual</option>
+                                                    <option value="Automatic">Automatic</option>
+                                                    <option value="Automatic_Delayed">Automatic (Delayed)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
                                         <div class="col-md-offset-6 col-md-6">
                                             <button type="button" class="btn green" id="btnSaveServer">Save</button>
                                         </div>
@@ -274,6 +288,8 @@
                 $('#inpProcessPriority').val(values.children("ProcessPriority").text());
                 if (values.children("UseServerExtender").length != 0)
                     $('#inpUseServerExtender').bootstrapSwitch('state', values.children("UseServerExtender").text() == "true");
+                $('#inpStartupType').val(values.children("StartupType").text());
+
 
 
                 $('#inpName').prop("readonly", serverRights.children("Name").text() != "true");
@@ -286,6 +302,7 @@
                 } else {
                     $("#inpUseServerExtender").parents(".form-group").hide();
                 }
+                $('#inpStartupType').prop("disabled", serverRights.children("StartupType").text() != "true");
 
             });
 
@@ -364,7 +381,8 @@
                         ServerID: serverID,
                         Name: $("#inpName").val(),
                         Public: $('#inpPublic').is(":checked"),
-                        ProcessPriority: $("#inpProcessPriority").val()
+                        ProcessPriority: $("#inpProcessPriority").val(),
+                        StartupType: $("#inpStartupType").val()
                     };
 
                     if ($("#inpUseServerExtender").parents(".form-group").css("display") != "none")
