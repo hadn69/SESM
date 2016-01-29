@@ -2736,6 +2736,7 @@
     <Compile Include="DTO\EntityServerRole.cs" />
     <Compile Include="DTO\EntityUser.cs" />
     <Compile Include="DTO\EnumProcessPriority.cs" />
+    <Compile Include="DTO\EnumServerStartup.cs" />
     <Compile Include="DTO\EnumServerType.cs" />
     <Compile Include="DTO\EnumHostPerm.cs" />
     <Compile Include="Global.asax.cs">
@@ -2788,6 +2789,10 @@
     <Compile Include="Migrations\201509171642008_ServerRoleInstanceNameRemoval.cs" />
     <Compile Include="Migrations\201509171642008_ServerRoleInstanceNameRemoval.Designer.cs">
       <DependentUpon>201509171642008_ServerRoleInstanceNameRemoval.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201601292204255_ServerStartupType.cs" />
+    <Compile Include="Migrations\201601292204255_ServerStartupType.Designer.cs">
+      <DependentUpon>201601292204255_ServerStartupType.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ArchType.cs" />
@@ -2877,6 +2882,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509171642008_ServerRoleInstanceNameRemoval.resx">
       <DependentUpon>201509171642008_ServerRoleInstanceNameRemoval.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201601292204255_ServerStartupType.resx">
+      <DependentUpon>201601292204255_ServerStartupType.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

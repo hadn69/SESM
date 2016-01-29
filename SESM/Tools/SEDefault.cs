@@ -106,5 +106,8 @@ namespace SESM.Tools
         // -- New 06/01/16
         public static readonly bool EnableCyberhounds = false;
         public static readonly bool EnableSpiders = true;
+
+        // -- New 29/01/16
+        public static readonly float FloraDensityMultiplier = 1;
     }
 }

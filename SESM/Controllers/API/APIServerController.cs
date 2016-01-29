@@ -262,6 +262,7 @@ namespace SESM.Controllers.API
                 values.Add(new XElement("UseServerExtender", RequestServer.UseServerExtender));
             values.Add(new XElement("Public", RequestServer.IsPublic));
             values.Add(new XElement("ProcessPriority", RequestServer.ProcessPriority.ToString()));
+            values.Add(new XElement("StartupType", RequestServer.ServerStartup.ToString()));
             response.AddToContent(values);
 
             XElement rights = new XElement("Rights");
@@ -270,6 +271,7 @@ namespace SESM.Controllers.API
                 rights.Add(new XElement("UseServerExtender", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_USESESE_WR")));
             rights.Add(new XElement("Public", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PUBLIC_WR")));
             rights.Add(new XElement("ProcessPriority", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PROCESSPRIO_WR")));
+            rights.Add(new XElement("StartupType", AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_STARTUPTYPE_WR")));
             response.AddToContent(rights);
 
             return Content(response.ToString());
@@ -280,7 +282,8 @@ namespace SESM.Controllers.API
         [APIServerAccess("SRV-SSET", "SERVER_SETTINGS_GLOBAL_NAME_WR",
                                      "SERVER_SETTINGS_GLOBAL_USESESE_WR",
                                      "SERVER_SETTINGS_GLOBAL_PROCESSPRIO_WR",
-                                     "SERVER_SETTINGS_GLOBAL_PUBLIC_WR")]
+                                     "SERVER_SETTINGS_GLOBAL_PUBLIC_WR",
+                                     "SERVER_SETTINGS_GLOBAL_STARTUPTYPE_WR")]
         public ActionResult SetSettings()
         {
             // ** INIT **
@@ -291,6 +294,7 @@ namespace SESM.Controllers.API
             bool accessSESE = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_USESESE_WR");
             bool accessPublic = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PUBLIC_WR");
             bool accessProcessPrio = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_PROCESSPRIO_WR");
+            bool accessServerStartup = AuthHelper.HasAccess(RequestServer, "SERVER_SETTINGS_GLOBAL_STARTUPTYPE_WR");
 
             string Name;
             if (accessName)
@@ -342,13 +346,24 @@ namespace SESM.Controllers.API
             else
                 ProcessPriority = RequestServer.ProcessPriority;
 
+            EnumServerStartup ServerStartup;
+            if (accessServerStartup)
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["StartupType"]))
+                    return Content(XMLMessage.Error("SRV-SSET-MISST", "The StartupType field must be provided").ToString());
+                if (!Enum.TryParse(Request.Form["StartupType"], out ServerStartup))
+                    return Content(XMLMessage.Error("SRV-SSET-BADST", "The StartupType field is invalid").ToString());
+            }
+            else
+                ServerStartup = RequestServer.ServerStartup;
+
             // ** Process **
             try
             {
                 ServiceState serverState = srvPrv.GetState(RequestServer);
                 bool restartRequired = false;
 
-                if ((accessName || accessSESE) && (Name != RequestServer.Name || UseServerExtender != RequestServer.UseServerExtender))
+                if ((accessName  && Name != RequestServer.Name) || (accessSESE && UseServerExtender != RequestServer.UseServerExtender) || (accessServerStartup && ServerStartup != RequestServer.ServerStartup))
                 {
                     if (serverState != ServiceState.Stopped &&
                         serverState != ServiceState.Unknow)
@@ -363,6 +378,7 @@ namespace SESM.Controllers.API
                     string oldpath = PathHelper.GetInstancePath(RequestServer);
                     RequestServer.Name = Name;
                     RequestServer.UseServerExtender = UseServerExtender;
+                    RequestServer.ServerStartup = ServerStartup;
                     string newpath = PathHelper.GetInstancePath(RequestServer);
 
                     if(oldpath != newpath)
@@ -895,6 +911,7 @@ namespace SESM.Controllers.API
             values.Add(new XElement("FloraDensity", serverConfig.FloraDensity));
             values.Add(new XElement("EnableCyberhounds", serverConfig.EnableCyberhounds));
             values.Add(new XElement("EnableSpiders", serverConfig.EnableSpiders));
+            values.Add(new XElement("FloraDensityMultiplier", serverConfig.FloraDensityMultiplier));
 
             response.AddToContent(values);
 
@@ -966,6 +983,8 @@ namespace SESM.Controllers.API
             rights.Add(new XElement("FloraDensity", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_FLORADENSITY_WR")));
             rights.Add(new XElement("EnableCyberhounds", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLECYBERHOUNDS_WR")));
             rights.Add(new XElement("EnableSpiders", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_ENABLESPIDERS_WR")));
+            rights.Add(new XElement("FloraDensityMultiplier", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_FLORADENSITYMULTIPLIER_WR")));
+            
             response.AddToContent(rights);
 
             return Content(response.ToString());
@@ -994,7 +1013,8 @@ namespace SESM.Controllers.API
                                      "SERVER_CONFIG_SE_CANJOINRUNNING_WR", "SERVER_CONFIG_SE_PHYSICSITERATIONS_WR", "SERVER_CONFIG_SE_SUNROTATIONINTERVALMINUTES_WR",
                                      "SERVER_CONFIG_SE_ENABLEJETPACK_WR", "SERVER_CONFIG_SE_SPAWNWITHTOOLS_WR", "SERVER_CONFIG_SE_STARTINRESPAWNSCREEN_WR",
                                      "SERVER_CONFIG_SE_ENABLEVOXELDESTRUCTION_WR", "SERVER_CONFIG_SE_MAXDRONES_WR", "SERVER_CONFIG_SE_ENABLEDRONES_WR",
-                                     "SERVER_CONFIG_SE_FLORADENSITY_WR", "SERVER_CONFIG_SE_ENABLECYBERHOUNDS_WR", "SERVER_CONFIG_SE_ENABLESPIDERS_WR")]
+                                     "SERVER_CONFIG_SE_FLORADENSITY_WR", "SERVER_CONFIG_SE_ENABLECYBERHOUNDS_WR", "SERVER_CONFIG_SE_ENABLESPIDERS_WR",
+                                     "SERVER_CONFIG_SE_FLORADENSITYMULTIPLIER_WR")]
         public ActionResult SESetConfiguration()
         {
             // ** INIT **
@@ -1621,6 +1641,15 @@ namespace SESM.Controllers.API
                     return Content(XMLMessage.Error("SRV-SESC-MISECH", "The EnableSpiders field must be provided").ToString());
                 if (!bool.TryParse(Request.Form["EnableSpiders"], out serverConfig.EnableSpiders))
                     return Content(XMLMessage.Error("SRV-SESC-BADECH", "The EnableSpiders field is invalid").ToString());
+            }
+
+            // ==== FloraDensityMultiplier ====
+            if (AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_FLORADENSITYMULTIPLIER_WR"))
+            {
+                if (string.IsNullOrWhiteSpace(Request.Form["FloraDensityMultiplier"]))
+                    return Content(XMLMessage.Error("SRV-SESC-MISFDM", "The FloraDensityMultiplier field must be provided").ToString());
+                if (!float.TryParse(Request.Form["FloraDensityMultiplier"], out serverConfig.FloraDensityMultiplier) || serverConfig.FloraDensityMultiplier < 0)
+                    return Content(XMLMessage.Error("SRV-SESC-BADFDM", "The FloraDensityMultiplier field is invalid").ToString());
             }
 
             // ** PROCESS **
