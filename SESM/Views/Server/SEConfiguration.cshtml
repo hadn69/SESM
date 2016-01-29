@@ -1323,12 +1323,8 @@
                         config.CargoShipsEnabled = $('#inpCargoShipsEnabled').is(":checked");
                     if (maskData.children("EnableToolShake").text() == "true")
                         config.EnableToolShake = $('#inpEnableToolShake').is(":checked");
-                    if (maskData.children("VoxelGeneratorVersion").text() == "true") {
-                        if ($('#inpVoxelGeneratorVersion').is(":checked"))
-                            config.VoxelGeneratorVersion = "1";
-                        else
-                            config.VoxelGeneratorVersion = "0";
-                    }
+                    if (maskData.children("VoxelGeneratorVersion").text() == "true")
+                        config.VoxelGeneratorVersion = $('#inpVoxelGeneratorVersion').val();
                     if (maskData.children("EnableOxygen").text() == "true")
                         config.EnableOxygen = $('#inpEnableOxygen').is(":checked");
                     if (maskData.children("EnableEncounters").text() == "true")
