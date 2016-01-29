@@ -320,6 +320,16 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
+                                            <label class="control-label col-md-6">Flora Density Multiplier</label>
+                                            <div class="col-md-6">
+                                                <div class="input-inline input-small">
+                                                    <input id="inpFloraDensityMultiplier" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
                                             <label class="control-label col-md-6">Can Join Running</label>
                                             <div class="col-md-6">
                                                 <input type="checkbox" id="inpCanJoinRunning">
@@ -927,6 +937,14 @@
             max: 10000000,
             step: 1
         });
+        $('#inpFloraDensityMultiplier').TouchSpin({
+            buttondown_class: 'btn blue',
+            buttonup_class: 'btn green',
+            min: 0,
+            max: 10000000,
+            decimals: 2,
+            step: 1
+        });
 
         // Gameplay
         $('#inpSpawnShipTimeMultiplier').TouchSpin({
@@ -1072,6 +1090,7 @@
                 $("#inpEnableFlora").bootstrapSwitch('state', values.children("EnableFlora").text() == "true");
                 $("#inpFloraDensity").val(values.children("FloraDensity").text());
                 $("#inpCanJoinRunning").bootstrapSwitch('state', values.children("CanJoinRunning").text() == "true");
+                $("#inpFloraDensityMultiplier").val(values.children("FloraDensityMultiplier").text());
 
                 // Gameplay
                 $('#inpSpawnShipTimeMultiplier').val(values.children("SpawnShipTimeMultiplier").text());
@@ -1180,6 +1199,7 @@
                 $("#inpEnableFlora").bootstrapSwitch("readonly", maskData.children("EnableFlora").text() != "true");
                 $("#inpFloraDensity").prop("readonly", maskData.children("FloraDensity").text() != "true");
                 $("#inpCanJoinRunning").bootstrapSwitch("readonly", maskData.children("CanJoinRunning").text() != "true");
+                $("#inpFloraDensityMultiplier").prop("readonly", maskData.children("FloraDensityMultiplier").text() != "true");
 
                 // Gameplay
                 $('#inpSpawnShipTimeMultiplier').prop("readonly", maskData.children("SpawnShipTimeMultiplier").text() != "true");
@@ -1303,6 +1323,8 @@
                         config.FloraDensity = $('#inpFloraDensity').val();
                     if (maskData.children("CanJoinRunning").text() == "true")
                         config.CanJoinRunning = $('#inpCanJoinRunning').is(":checked");
+                    if (maskData.children("FloraDensityMultiplier").text() == "true")
+                        config.FloraDensityMultiplier = $('#inpFloraDensityMultiplier').val();
 
                     // Gameplay
                     if (maskData.children("SpawnShipTimeMultiplier").text() == "true")
