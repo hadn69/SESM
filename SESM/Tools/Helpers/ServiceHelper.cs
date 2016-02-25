@@ -256,11 +256,27 @@ namespace SESM.Tools.Helpers
             if (server.ServerType == EnumServerType.MedievalEngineers)
                 dataPath += "MedievalEngineersDedicated.exe";
 
+            string startupMode = string.Empty;
+
+            switch (server.ServerStartup)
+            {
+                case EnumServerStartup.Manual:
+                    startupMode = "demand";
+                    break;
+                case EnumServerStartup.Automatic:
+                    startupMode = "auto";
+                    break;
+                case EnumServerStartup.Automatic_Delayed:
+                    startupMode = "delayed-auto";
+                    break;
+            }
+
+
             Process si = new Process();
             si.StartInfo.WorkingDirectory = @"c:\";
             si.StartInfo.UseShellExecute = false;
             si.StartInfo.FileName = "cmd.exe";
-            si.StartInfo.Arguments = "/c \"sc create " + GetServiceName(server) + " start= auto binPath= \\\"" + dataPath + "\\\"\"";
+            si.StartInfo.Arguments = "/c \"sc create " + GetServiceName(server) + " start= " + startupMode + " binPath= \\\"" + dataPath + "\\\"\"";
             si.StartInfo.CreateNoWindow = true;
             si.StartInfo.RedirectStandardInput = true;
             si.StartInfo.RedirectStandardOutput = true;
@@ -326,8 +342,7 @@ namespace SESM.Tools.Helpers
         /// <param name="pid">Process ID.</param>
         public static void KillProcessAndChildren(int pid)
         {
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher
-              ("Select * From Win32_Process Where ParentProcessID=" + pid);
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("Select * From Win32_Process Where ParentProcessID=" + pid);
             ManagementObjectCollection moc = searcher.Get();
             foreach (ManagementObject mo in moc)
             {
@@ -356,7 +371,7 @@ namespace SESM.Tools.Helpers
                 uint? pid = GetServicePID(serviceName);
                 if (pid == null)
                     return;
-                KillProcessAndChildren((int)pid);
+                KillProcessAndChildren((int) pid);
             }
         }
 
@@ -390,7 +405,9 @@ namespace SESM.Tools.Helpers
                 {
                     KillProcessAndChildren(proc.Id);
                 }
-                catch (Exception) { }
+                catch (Exception)
+                {
+                }
             }
         }
 
@@ -418,7 +435,7 @@ namespace SESM.Tools.Helpers
                 outputLine = item;
             }
 
-            if(outputLine.Length <= 28)
+            if (outputLine.Length <= 28)
                 return null;
 
             string pid = outputLine.Substring(28).Trim();
@@ -434,8 +451,7 @@ namespace SESM.Tools.Helpers
             uint? pid = GetServicePID(serviceName);
             Ressources ressources = new Ressources
             {
-                CPU = 0,
-                Memory = 0
+                CPU = 0, Memory = 0
             };
 
             if (pid == null || pid == 0)
@@ -445,23 +461,20 @@ namespace SESM.Tools.Helpers
 
             try
             {
-                SelectQuery query = new SelectQuery("select PercentProcessorTime, WorkingSetPrivate " +
-                                                    "from Win32_PerfFormattedData_PerfProc_Process " +
-                                                    "where IDProcess = " + pid);
+                SelectQuery query = new SelectQuery("select PercentProcessorTime, WorkingSetPrivate " + "from Win32_PerfFormattedData_PerfProc_Process " + "where IDProcess = " + pid);
 
                 ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
                 ManagementObjectCollection collection = searcher.Get();
                 IEnumerator enumerator = collection.GetEnumerator();
                 enumerator.MoveNext();
-                ManagementObject managementObject = (ManagementObject)enumerator.Current;
-                ressources.CPU = int.Parse(managementObject["PercentProcessorTime"].ToString()) / Environment.ProcessorCount;
-                ressources.Memory = (int)Math.Floor(long.Parse(managementObject["WorkingSetPrivate"].ToString()) / (1024.0 * 2)); // /!\ RAM in MB
+                ManagementObject managementObject = (ManagementObject) enumerator.Current;
+                ressources.CPU = int.Parse(managementObject["PercentProcessorTime"].ToString())/Environment.ProcessorCount;
+                ressources.Memory = (int) Math.Floor(long.Parse(managementObject["WorkingSetPrivate"].ToString())/(1024.0*2)); // /!\ RAM in MB
             }
             catch (Exception ex)
             {
                 Logger exceptionLogger = LogManager.GetLogger("GenericExceptionLogger");
                 exceptionLogger.Fatal("Caught Exception in GetCurrentRessourceUsage :", ex);
-
             }
             return ressources;
         }

@@ -107,6 +107,9 @@ namespace SESM.Tools.Helpers
         public bool EnableCyberhounds = SEDefault.EnableCyberhounds;
         public bool EnableSpiders = SEDefault.EnableSpiders;
 
+        // -- New 29/01/16
+        public float FloraDensityMultiplier = SEDefault.FloraDensityMultiplier;
+
         public override void Save(EntityServer serv)
         {
             StringBuilder sb = new StringBuilder();
@@ -173,6 +176,7 @@ namespace SESM.Tools.Helpers
             sb.AppendLine("    <FloraDensity>" + FloraDensity + "</FloraDensity>");
             sb.AppendLine("    <EnableCyberhounds>" + EnableCyberhounds.ToString().ToLower() + "</EnableCyberhounds>");
             sb.AppendLine("    <EnableSpiders>" + EnableSpiders.ToString().ToLower() + "</EnableSpiders>");
+            sb.AppendLine("    <FloraDensityMultiplier>" + FloraDensityMultiplier + "</FloraDensityMultiplier>");
 
             sb.AppendLine("  </SessionSettings>");
             sb.AppendLine("  <Scenario>");
@@ -623,6 +627,13 @@ namespace SESM.Tools.Helpers
                     EnableSpiders.ToString().ToLower();
 
 
+                valueNode = settingsNode.SelectSingleNode("descendant::FloraDensityMultiplier");
+                if (valueNode == null)
+                    settingsNode.AppendChild(doc.CreateNode(XmlNodeType.Element, "FloraDensityMultiplier", null));
+                settingsNode.SelectSingleNode("descendant::FloraDensityMultiplier").InnerText =
+                    FloraDensityMultiplier.ToString();
+
+
                 valueNode = root.SelectSingleNode("descendant::Mods");
                 if (valueNode == null)
                     root.AppendChild(doc.CreateNode(XmlNodeType.Element, "Mods", null));
@@ -806,6 +817,8 @@ namespace SESM.Tools.Helpers
                     bool.TryParse(sessionSettings.Element("EnableCyberhounds").Value, out EnableCyberhounds);
                 if (sessionSettings.Element("EnableSpiders") != null)
                     bool.TryParse(sessionSettings.Element("EnableSpiders").Value, out EnableSpiders);
+                if (sessionSettings.Element("FloraDensityMultiplier") != null)
+                    float.TryParse(sessionSettings.Element("FloraDensityMultiplier").Value, out FloraDensityMultiplier);
 
                 if (root.Element("Scenario") != null && root.Element("Scenario").Element("SubtypeId") != null)
                     Enum.TryParse(root.Element("Scenario").Element("SubtypeId").Value, out ScenarioType);
@@ -984,6 +997,8 @@ namespace SESM.Tools.Helpers
                 bool.TryParse(settings.Element("EnableCyberhounds").Value, out EnableCyberhounds);
             if (settings.Element("EnableSpiders") != null)
                 bool.TryParse(settings.Element("EnableSpiders").Value, out EnableSpiders);
+            if (settings.Element("FloraDensityMultiplier") != null)
+                float.TryParse(settings.Element("FloraDensityMultiplier").Value, out FloraDensityMultiplier);
 
             Mods = new List<ulong>();
             if (root.Element("Mods") != null)
