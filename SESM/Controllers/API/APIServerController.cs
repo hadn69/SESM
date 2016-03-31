@@ -1697,73 +1697,73 @@ namespace SESM.Controllers.API
             XMLMessage response = new XMLMessage("SRV-MEGC-OK");
 
             XElement values = new XElement("Values");
-            response.AddToContent(new XElement("IP", serverConfig.IP));
-            response.AddToContent(new XElement("SteamPort", serverConfig.SteamPort));
-            response.AddToContent(new XElement("ServerPort", serverConfig.ServerPort));
-            response.AddToContent(new XElement("ServerName", serverConfig.ServerName));
-            response.AddToContent(new XElement("IgnoreLastSession", serverConfig.IgnoreLastSession));
-            response.AddToContent(new XElement("PauseGameWhenEmpty", serverConfig.PauseGameWhenEmpty));
-            response.AddToContent(new XElement("EnableSpectator", serverConfig.EnableSpectator));
-            response.AddToContent(new XElement("AutoSaveInMinutes", RequestServer.AutoSaveInMinutes));
-            response.AddToContent(new XElement("GameMode", serverConfig.GameMode));
-            response.AddToContent(new XElement("EnableCopyPaste", serverConfig.EnableCopyPaste));
-            response.AddToContent(new XElement("MaxPlayers", serverConfig.MaxPlayers));
-            response.AddToContent(new XElement("WorldName", serverConfig.WorldName));
+            values.Add(new XElement("IP", serverConfig.IP));
+            values.Add(new XElement("SteamPort", serverConfig.SteamPort));
+            values.Add(new XElement("ServerPort", serverConfig.ServerPort));
+            values.Add(new XElement("ServerName", serverConfig.ServerName));
+            values.Add(new XElement("IgnoreLastSession", serverConfig.IgnoreLastSession));
+            values.Add(new XElement("PauseGameWhenEmpty", serverConfig.PauseGameWhenEmpty));
+            values.Add(new XElement("EnableSpectator", serverConfig.EnableSpectator));
+            values.Add(new XElement("AutoSaveInMinutes", RequestServer.AutoSaveInMinutes));
+            values.Add(new XElement("GameMode", serverConfig.GameMode));
+            values.Add(new XElement("EnableCopyPaste", serverConfig.EnableCopyPaste));
+            values.Add(new XElement("MaxPlayers", serverConfig.MaxPlayers));
+            values.Add(new XElement("WorldName", serverConfig.WorldName));
 
             XElement mods = new XElement("Mods");
             foreach (ulong mod in serverConfig.Mods)
                 mods.Add(new XElement("Mod", mod));
-            response.AddToContent(mods);
+            values.Add(mods);
 
-            response.AddToContent(new XElement("OnlineMode", serverConfig.OnlineMode));
+            values.Add(new XElement("OnlineMode", serverConfig.OnlineMode));
             response.AddToContent(new XElement("GroupID", serverConfig.GroupID));
 
             XElement administrators = new XElement("Administrators");
             foreach (ulong adminitrator in serverConfig.Administrators)
                 administrators.Add(new XElement("Adminitrator", adminitrator));
-            response.AddToContent(administrators);
+            values.Add(administrators);
 
             XElement banned = new XElement("Banned");
             foreach (ulong ban in serverConfig.Banned)
                 banned.Add(new XElement("Ban", ban));
-            response.AddToContent(banned);
+            values.Add(banned);
 
-            response.AddToContent(new XElement("ClientCanSave", serverConfig.ClientCanSave));
-            response.AddToContent(new XElement("EnableStructuralSimulation", serverConfig.EnableStructuralSimulation));
-            response.AddToContent(new XElement("MaxActiveFracturePieces", serverConfig.MaxActiveFracturePieces));
-            response.AddToContent(new XElement("EnableBarbarians", serverConfig.EnableBarbarians));
-            response.AddToContent(new XElement("MaximumBots", serverConfig.MaximumBots));
-            response.AddToContent(new XElement("GameDayInRealMinutes", serverConfig.GameDayInRealMinutes));
-            response.AddToContent(new XElement("DayNightRatio", serverConfig.DayNightRatio));
-            response.AddToContent(new XElement("EnableAnimals", serverConfig.EnableAnimals));
+            values.Add(new XElement("ClientCanSave", serverConfig.ClientCanSave));
+            values.Add(new XElement("EnableStructuralSimulation", serverConfig.EnableStructuralSimulation));
+            values.Add(new XElement("MaxActiveFracturePieces", serverConfig.MaxActiveFracturePieces));
+            values.Add(new XElement("EnableBarbarians", serverConfig.EnableBarbarians));
+            values.Add(new XElement("MaximumBots", serverConfig.MaximumBots));
+            values.Add(new XElement("GameDayInRealMinutes", serverConfig.GameDayInRealMinutes));
+            values.Add(new XElement("DayNightRatio", serverConfig.DayNightRatio));
+            values.Add(new XElement("EnableAnimals", serverConfig.EnableAnimals));
             response.AddToContent(values);
 
             XElement rights = new XElement("Rights");
-            response.AddToContent(new XElement("IP", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_IP_WR")));
-            response.AddToContent(new XElement("SteamPort", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_STEAMPORT_WR")));
-            response.AddToContent(new XElement("ServerPort", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_SERVERPORT_WR")));
-            response.AddToContent(new XElement("ServerName", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_SERVERNAME_WR")));
-            response.AddToContent(new XElement("IgnoreLastSession", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_IGNORELASTSESSION_WR")));
-            response.AddToContent(new XElement("PauseGameWhenEmpty", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_PAUSEGAMEWHENEMPTY_WR")));
-            response.AddToContent(new XElement("EnableSpectator", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ENABLESPECTATOR_WR")));
-            response.AddToContent(new XElement("AutoSaveInMinutes", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_AUTOSAVEINMINUTES_WR")));
-            response.AddToContent(new XElement("GameMode", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_GAMEMODE_WR")));
-            response.AddToContent(new XElement("EnableCopyPaste", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ENABLECOPYPASTE_WR")));
-            response.AddToContent(new XElement("MaxPlayers", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_MAXPLAYERS_WR")));
-            response.AddToContent(new XElement("WorldName", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_WORLDNAME_WR")));
-            response.AddToContent(new XElement("Mods", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_MODS_WR")));
-            response.AddToContent(new XElement("OnlineMode", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ONLINEMODE_WR")));
-            response.AddToContent(new XElement("GroupID", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_GROUPID_WR")));
-            response.AddToContent(new XElement("Administrators", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ADMINISTRATORS_WR")));
-            response.AddToContent(new XElement("Banned", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_BANNED_WR")));
-            response.AddToContent(new XElement("ClientCanSave", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_CLIENTCANSAVE_WR")));
-            response.AddToContent(new XElement("EnableStructuralSimulation", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ENABLESTRUCTURALSIMULATION_WR")));
-            response.AddToContent(new XElement("MaxActiveFracturePieces", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_MAXACTIVEFRACTUREPIECES_WR")));
-            response.AddToContent(new XElement("EnableBarbarians", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ENABLEBARBARIANS_WR")));
-            response.AddToContent(new XElement("MaximumBots", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_MAXIMUMBOTS_WR")));
-            response.AddToContent(new XElement("GameDayInRealMinutes", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_GAMEDAYINREALMINUTES_WR")));
-            response.AddToContent(new XElement("DayNightRatio", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_DAYNIGHTRATIO_WR")));
-            response.AddToContent(new XElement("EnableAnimals", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ENABLEANIMALS_WR")));
+            rights.Add(new XElement("IP", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_SE_IP_WR")));
+            rights.Add(new XElement("SteamPort", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_STEAMPORT_WR")));
+            rights.Add(new XElement("ServerPort", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_SERVERPORT_WR")));
+            rights.Add(new XElement("ServerName", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_SERVERNAME_WR")));
+            rights.Add(new XElement("IgnoreLastSession", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_IGNORELASTSESSION_WR")));
+            rights.Add(new XElement("PauseGameWhenEmpty", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_PAUSEGAMEWHENEMPTY_WR")));
+            rights.Add(new XElement("EnableSpectator", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ENABLESPECTATOR_WR")));
+            rights.Add(new XElement("AutoSaveInMinutes", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_AUTOSAVEINMINUTES_WR")));
+            rights.Add(new XElement("GameMode", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_GAMEMODE_WR")));
+            rights.Add(new XElement("EnableCopyPaste", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ENABLECOPYPASTE_WR")));
+            rights.Add(new XElement("MaxPlayers", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_MAXPLAYERS_WR")));
+            rights.Add(new XElement("WorldName", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_WORLDNAME_WR")));
+            rights.Add(new XElement("Mods", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_MODS_WR")));
+            rights.Add(new XElement("OnlineMode", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ONLINEMODE_WR")));
+            rights.Add(new XElement("GroupID", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_GROUPID_WR")));
+            rights.Add(new XElement("Administrators", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ADMINISTRATORS_WR")));
+            rights.Add(new XElement("Banned", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_BANNED_WR")));
+            rights.Add(new XElement("ClientCanSave", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_CLIENTCANSAVE_WR")));
+            rights.Add(new XElement("EnableStructuralSimulation", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ENABLESTRUCTURALSIMULATION_WR")));
+            rights.Add(new XElement("MaxActiveFracturePieces", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_MAXACTIVEFRACTUREPIECES_WR")));
+            rights.Add(new XElement("EnableBarbarians", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ENABLEBARBARIANS_WR")));
+            rights.Add(new XElement("MaximumBots", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_MAXIMUMBOTS_WR")));
+            rights.Add(new XElement("GameDayInRealMinutes", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_GAMEDAYINREALMINUTES_WR")));
+            rights.Add(new XElement("DayNightRatio", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_DAYNIGHTRATIO_WR")));
+            rights.Add(new XElement("EnableAnimals", AuthHelper.HasAccess(RequestServer, "SERVER_CONFIG_ME_ENABLEANIMALS_WR")));
             response.AddToContent(rights);
 
             return Content(response.ToString());
