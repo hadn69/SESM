@@ -242,9 +242,9 @@ namespace SESM.Tools.Helpers
             if (server.ServerType == EnumServerType.MedievalEngineers)
                 dataPath = SESMConfigHelper.MEDataPath;
 
-            if (SESMConfigHelper.Arch == ArchType.x86)
-                dataPath += @"DedicatedServer\";
-            if (SESMConfigHelper.Arch == ArchType.x64)
+            //if (SESMConfigHelper.Arch == ArchType.x86)
+            //    dataPath += @"DedicatedServer\";
+            //if (SESMConfigHelper.Arch == ArchType.x64)
                 dataPath += @"DedicatedServer64\";
 
             if (server.ServerType == EnumServerType.SpaceEngineers)

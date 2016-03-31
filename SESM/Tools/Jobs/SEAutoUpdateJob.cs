@@ -145,11 +145,13 @@ namespace SESM.Tools.Jobs
                     logger.Info("Deleting Content ...");
                     Directory.Delete(SESMConfigHelper.SEDataPath + @"Content\", true);
                 }
+                /*
                 if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer\"))
                 {
                     logger.Info("Deleting DedicatedServer ...");
                     Directory.Delete(SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
                 }
+                */
                 if (Directory.Exists(SESMConfigHelper.SEDataPath + @"DedicatedServer64\"))
                 {
                     logger.Info("Deleting DedicatedServer64 ...");
@@ -173,9 +175,11 @@ namespace SESM.Tools.Jobs
                     logger.Info("Applying Content ...");
                     FSHelper.DirectoryCopy(PathHelper.GetSESyncDirPath() + @"Content\",
                         SESMConfigHelper.SEDataPath + @"Content\", true);
+                    /*
                     logger.Info("Applying DedicatedServer ...");
                     FSHelper.DirectoryCopy(PathHelper.GetSESyncDirPath() + @"DedicatedServer\",
                         SESMConfigHelper.SEDataPath + @"DedicatedServer\", true);
+                        */
                     logger.Info("Applying DedicatedServer64 ...");
                     FSHelper.DirectoryCopy(PathHelper.GetSESyncDirPath() + @"DedicatedServer64\",
                         SESMConfigHelper.SEDataPath + @"DedicatedServer64\", true);
