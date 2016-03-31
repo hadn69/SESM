@@ -325,7 +325,7 @@ namespace SESM.Tools.Helpers
         {
             string output = ExecuteSteamCMD(logger, " +login Anonymous"
                                                     + " +force_install_dir " + syncDirPath
-                                                    + " +app_update " + SEAppId + " -validate "
+                                                    + " +app_update " + appId + " -validate "
                                                     + " -beta " + branch
                                                     + (!string.IsNullOrWhiteSpace(password) ? "-betapassword " + password : "")
                                                     + " +find a "
