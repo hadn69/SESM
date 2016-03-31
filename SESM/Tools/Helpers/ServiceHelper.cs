@@ -93,13 +93,14 @@ namespace SESM.Tools.Helpers
                     }
                     else
                     {
-                        string[] argsStr = new string[6];
+                        string[] argsStr = new string[7];
                         argsStr[0] = "noconsole";
-                        argsStr[1] = "autosave=" + server.AutoSaveInMinutes;
+                        argsStr[1] = "autosave=" + (server.AutoSaveInMinutes?.ToString() ?? "5");
                         argsStr[2] = "instance=" + serviceName;
                         argsStr[3] = "instancepath=" + PathHelper.GetInstancePath(server);
                         argsStr[4] = "logpath=" + PathHelper.GetInstancePath(server);
                         argsStr[5] = "gamepath=" + SESMConfigHelper.SEDataPath;
+                        argsStr[6] = "wcfOn";
                         svcController.Start(argsStr);
                     }
 
@@ -241,9 +242,9 @@ namespace SESM.Tools.Helpers
             if (server.ServerType == EnumServerType.MedievalEngineers)
                 dataPath = SESMConfigHelper.MEDataPath;
 
-            if (SESMConfigHelper.Arch == ArchType.x86)
-                dataPath += @"DedicatedServer\";
-            if (SESMConfigHelper.Arch == ArchType.x64)
+            //if (SESMConfigHelper.Arch == ArchType.x86)
+            //    dataPath += @"DedicatedServer\";
+            //if (SESMConfigHelper.Arch == ArchType.x64)
                 dataPath += @"DedicatedServer64\";
 
             if (server.ServerType == EnumServerType.SpaceEngineers)

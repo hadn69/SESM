@@ -41,7 +41,7 @@ namespace SESM.Controllers.API
             response.AddToContent(new XElement("SEDataPath", SESMConfigHelper.SEDataPath));
             response.AddToContent(new XElement("MESavePath", SESMConfigHelper.MESavePath));
             response.AddToContent(new XElement("MEDataPath", SESMConfigHelper.MEDataPath));
-            response.AddToContent(new XElement("Arch", SESMConfigHelper.Arch));
+            //response.AddToContent(new XElement("Arch", SESMConfigHelper.Arch));
             response.AddToContent(new XElement("SendLogToKeen", SESMConfigHelper.SESendLogToKeen));
             response.AddToContent(new XElement("AddDateToLog", SESMConfigHelper.SEAddDateToLog));
             return Content(response.ToString());
@@ -85,11 +85,13 @@ namespace SESM.Controllers.API
             if (!SEDataPath.EndsWith(@"\"))
                 return Content(XMLMessage.Error("SRV-SSESMS-BADMDP", "The MEDataPath field must end with \\").ToString());
 
+            /*
             ArchType Arch;
             if (string.IsNullOrWhiteSpace(Request.Form["Arch"]))
                 return Content(XMLMessage.Error("SRV-SSESMS-MISAR", "The Arch field must be provided").ToString());
             if (!Enum.TryParse(Request.Form["Arch"], out Arch))
                 return Content(XMLMessage.Error("SRV-SSESMS-BADAR", "The Arch field is invalid").ToString());
+                */
 
             bool SendLogToKeen;
             if (string.IsNullOrWhiteSpace(Request.Form["SendLogToKeen"]))
@@ -168,7 +170,7 @@ namespace SESM.Controllers.API
                 SESMConfigHelper.SEDataPath = SEDataPath;
                 SESMConfigHelper.MESavePath = MESavePath;
                 SESMConfigHelper.MEDataPath = MEDataPath;
-                SESMConfigHelper.Arch = Arch;
+                //SESMConfigHelper.Arch = Arch;
                 SESMConfigHelper.SESendLogToKeen = SendLogToKeen;
                 SESMConfigHelper.MESendLogToKeen = SendLogToKeen;
                 SESMConfigHelper.SEAddDateToLog = AddDateToLog;

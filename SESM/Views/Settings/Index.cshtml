@@ -50,12 +50,14 @@
                             <input type="text" class="form-control" placeholder="Ex : C:\ProgramData\MedievalEngineersDedicated\" id="inpMESavePath">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Architecture</label>
-                        <div class="col-md-8">
-                            <input type="checkbox" id="inpArch" class="make-switch" data-off-text="&nbsp;x64&nbsp;" data-on-text="&nbsp;x86&nbsp;">
-                        </div>
+                <!--
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Architecture</label>
+                    <div class="col-md-8">
+                        <input type="checkbox" id="inpArch" class="make-switch" data-off-text="&nbsp;x64&nbsp;" data-on-text="&nbsp;x86&nbsp;">
                     </div>
+                </div>
+                    -->
                     <div class="form-group">
                         <label class="col-md-4 control-label">Send Log To KSH</label>
                         <div class="col-md-8">
@@ -261,7 +263,7 @@
                 $('#inpSESavePath').val(content.children("SESavePath").text());
                 $('#inpMEDataPath').val(content.children("MEDataPath").text());
                 $('#inpMESavePath').val(content.children("MESavePath").text());
-                $('#inpArch').bootstrapSwitch('state', content.children("Arch").text() == "x86");
+                //$('#inpArch').bootstrapSwitch('state', content.children("Arch").text() == "x86");
                 $('#inpSendLogToKeen').bootstrapSwitch('state', content.children("SendLogToKeen").text() == "true");
                 $('#inpAddDateToLog').bootstrapSwitch('state', content.children("AddDateToLog").text() == "true");
             });
@@ -312,7 +314,7 @@
                         SEDataPath: $("#inpSEDataPath").val(),
                         MESavePath: $("#inpMESavePath").val(),
                         MEDataPath: $("#inpMEDataPath").val(),
-                        Arch: $('#inpArch').is(":checked") ? "x86" : "x64",
+                        //Arch: $('#inpArch').is(":checked") ? "x86" : "x64",
                         SendLogToKeen: $('#inpSendLogToKeen').is(":checked"),
                         AddDateToLog: $('#inpAddDateToLog').is(":checked")
                     },
